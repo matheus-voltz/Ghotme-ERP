@@ -48,6 +48,11 @@ Route::get('/quotes/{id}/send-whatsapp', [App\Http\Controllers\quotes\SendWhatsa
 
 //clients
 Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users-clients');
+
+// routes/web.php ou api.php
+Route::get('/users/datatable', [UserController::class, 'datatable'])
+    ->name('users.datatable');
+
 });
 
 

@@ -121,9 +121,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
   if (dt_basic_table) {
     let tableTitle = document.createElement('h5');
     tableTitle.classList.add('card-title', 'mb-0', 'text-md-start', 'text-center', 'pb-md-0', 'pb-6');
-    tableTitle.innerHTML = 'DataTable with Buttons';
+    tableTitle.innerHTML = '';
     dt_basic = new DataTable(dt_basic_table, {
-      ajax: assetsPath + 'json/table-datatable.json',
+      // ajax: assetsPath + 'json/table-datatable.json',
       columns: [
         { data: 'id' },
         { data: 'id', orderable: false, render: DataTable.render.select() },

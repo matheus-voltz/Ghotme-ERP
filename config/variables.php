@@ -3,7 +3,7 @@
 return [
   "creatorName" => "Pixinvent",
   "creatorUrl" => "https://pixinvent.com",
-  "templateName" => "FIXAR ERP",
+  "templateName" => "Ghotme ERP",
   "templateSuffix" => "Bootstrap Admin Template",
   "templateVersion" => "3.0.0",
   "templateFree" => false,

@@ -99,10 +99,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   if (dt_ajax_table) {
     let dt_ajax = new DataTable(dt_ajax_table, {
       processing: true,
-      ajax: {
-        url: assetsPath + 'json/ajax.php',
-        dataSrc: 'data'
-      },
+      // Dados agora vêm do HTML renderizado pelo backend (Laravel)
       layout: {
         topStart: {
           rowClass: 'row mx-3 my-0 justify-content-between',
