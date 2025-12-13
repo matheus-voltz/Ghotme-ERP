@@ -1,0 +1,283 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Home",
+      "icon": "menu-icon icon-base ti tabler-smart-home",
+      "slug": "pages-home"
+    },
+    {
+      "name": "Ordens de Serviço",
+      "icon": "menu-icon icon-base ti tabler-file",
+      "slug": "allorders",
+      "submenu": [
+        {
+          "url": "/allorders",
+          "name": "Todas as OS",
+          "slug": "allorders"
+        },
+        {
+          "url": "/newOS",
+          "name": "Criar OS",
+          "slug": "newOS"
+        },
+        {
+          "url": "/runningOS",
+          "name": "OS em andamento",
+          "slug": "runningOS"
+        },
+        {
+          "url": "/endOS",
+          "name": "OS finalizadas",
+          "slug": "endOS"
+        },
+        {
+          "url": "/canceledOS",
+          "name": "OS canceladas",
+          "slug": "canceledOS"
+        },
+        {
+          "url": "/waitingOS",
+          "name": "OS aguardando aprovação",
+          "slug": "waitingOS"
+        },
+        {
+          "url": "/checklist",
+          "name": "Checklist do veiculo",
+          "slug": "checklist"
+        }
+      ]
+    },
+    {
+      "name": "Orçamentos",
+      "icon": "menu-icon icon-base ti tabler-file-dollar",
+      "slug": "budgets",
+      "submenu": [
+        {
+          "url": "/budgets/pending",
+          "name": "Aguardando aprovação",
+          "slug": "pending"
+        },
+        {
+          "url": "/budgets/approved",
+          "name": "Aprovados",
+          "slug": "approved"
+        },
+        {
+          "url": "/budgets/rejected",
+          "name": "Reprovados",
+          "slug": "rejected"
+        },
+        {
+          "url": "/budgets/send-whatsapp",
+          "name": "Enviar por WhatsApp",
+          "slug": "send-whatsapp"
+        }
+      ]
+    },
+    {
+      "name": "Clientes & Veículos",
+      "icon": "menu-icon icon-base ti tabler-users",
+      "slug": "clients-vehicles",
+      "submenu": [
+      {
+        "url": "/users",
+        "name": "Clientes",
+        "slug": "users-clients"
+      },
+      {
+        "url": "/vehicles",
+        "name": "Veículos",
+        "slug": "vehicles"
+      },
+      {
+        "url": "/vehicle-history",
+        "name": "Histórico do veículo",
+        "slug": "vehicle-history"
+      }
+      ]
+    },
+    {
+      "name": "Estoque",
+      "icon": "menu-icon icon-base ti tabler-box",
+      "slug": "inventory",
+      "submenu": [
+        {
+          "url": "/inventory/items",
+          "name": "Itens/Peças",
+          "slug": "items"
+        },
+        {
+          "url": "/inventory/stock-in",
+          "name": "Entrada de estoque",
+          "slug": "stock-in"
+        },
+        {
+          "url": "/inventory/stock-out",
+          "name": "Saída de estoque",
+          "slug": "stock-out"
+        },
+        {
+          "url": "/inventory/adjustments",
+          "name": "Ajustes",
+          "slug": "adjustments"
+        },
+        {
+          "url": "/inventory/critical-stock",
+          "name": "Estoque crítico / alerta",
+          "slug": "critical-stock"
+        },
+        {
+          "url": "/inventory/suppliers",
+          "name": "Fornecedores",
+          "slug": "suppliers"
+        }
+      ]
+    },
+    {
+      "name": "Serviços",
+      "icon": "menu-icon icon-base ti tabler-tools",
+      "slug": "services",
+      "submenu": [
+        {
+          "url": "/services/table",
+          "name": "Tabela de serviços",
+          "slug": "services-table"
+        },
+        {
+          "url": "/services/packages",
+          "name": "Pacotes de serviço",
+          "slug": "service-packages"
+        }
+      ]
+    },
+    {
+      "name": "Financeiro",
+      "icon": "menu-icon icon-base ti tabler-wallet",
+      "slug": "finance",
+      "submenu": [
+        {
+          "url": "/finance/accounts-receivable",
+          "name": "Contas a receber",
+          "slug": "accounts-receivable"
+        },
+        {
+          "url": "/finance/accounts-payable",
+          "name": "Contas a pagar",
+          "slug": "accounts-payable"
+        },
+        {
+          "url": "/finance/cash-flow",
+          "name": "Fluxo de caixa",
+          "slug": "cash-flow"
+        },
+        {
+          "url": "/finance/payment-methods",
+          "name": "Formas de pagamento",
+          "slug": "payment-methods"
+        },
+        {
+          "url": "/finance/reports",
+          "name": "Relatórios financeiros",
+          "slug": "financial-reports"
+        }
+      ]
+    },
+    {
+      "name": "Relatórios",
+      "icon": "menu-icon icon-base ti tabler-chart-line",
+      "slug": "reports",
+      "submenu": [
+        {
+          "url": "/reports/os-status",
+          "name": "OS por status",
+          "slug": "os-status"
+        },
+        {
+          "url": "/reports/revenue",
+          "name": "Faturamento",
+          "slug": "revenue"
+        },
+        {
+          "url": "/reports/cost-per-service",
+          "name": "Custo por serviço",
+          "slug": "cost-per-service"
+        },
+        {
+          "url": "/reports/consumed-stock",
+          "name": "Estoque consumido",
+          "slug": "consumed-stock"
+        },
+        {
+          "url": "/reports/mechanic-performance",
+          "name": "Desempenho por mecânico",
+          "slug": "mechanic-performance"
+        },
+        {
+          "url": "/reports/average-time-per-service",
+          "name": "Tempo médio por serviço",
+          "slug": "average-time-per-service"
+        }
+      ]
+    },
+    {
+      "name": "Configurações",
+      "icon": "menu-icon icon-base ti tabler-settings",
+      "slug": "settings",
+      "submenu": [
+        {
+          "url": "/settings/users-permissions",
+          "name": "Usuários e permissões",
+          "slug": "users-permissions"
+        },
+        {
+          "url": "/settings/custom-checklist",
+          "name": "Checklist personalizado",
+          "slug": "custom-checklist"
+        },
+        {
+          "url": "/settings/os-settings",
+          "name": "Configurações da OS",
+          "slug": "os-settings"
+        },
+        {
+          "url": "/settings/integrations",
+          "name": "Integrações (WhatsApp, API)",
+          "slug": "integrations"
+        },
+        {
+          "url": "/settings/company-data",
+          "name": "Dados da empresa",
+          "slug": "company-data"
+        },
+        {
+          "url": "/settings/print-templates",
+          "name": "Modelos de impressão",
+          "slug": "print-templates"
+        }
+      ]
+    },
+    {
+      "name": "Suporte",
+      "icon": "menu-icon icon-base ti tabler-help",
+      "slug": "support",
+      "submenu": [
+        {
+          "url": "/support/chat-whatsapp",
+          "name": "Chat / WhatsApp",
+          "slug": "chat-whatsapp"
+        },
+        {
+          "url": "/support/knowledge-base",
+          "name": "Base de conhecimento",
+          "slug": "knowledge-base"
+        },
+        {
+          "url": "/support/open-ticket",
+          "name": "Abrir chamado",
+          "slug": "open-ticket"
+        }
+      ]
+    }
+  ]
+}
