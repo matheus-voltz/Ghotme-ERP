@@ -40,18 +40,18 @@ $configData = Helper::appClasses();
         <div class="swiper-slide">
           <div class="row">
             <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
+              <h5 class="text-white mb-0">Análises do Site</h5>
+              <small>Total de 28,5% de Taxa de Conversão</small>
             </div>
             <div class="row">
               <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-                <h6 class="text-white mt-0 mt-md-3 mb-4">Traffic</h6>
+                <h6 class="text-white mt-0 mt-md-3 mb-4">Tráfego</h6>
                 <div class="row">
                   <div class="col-6">
                     <ul class="list-unstyled mb-0">
                       <li class="d-flex mb-4 align-items-center">
                         <p class="mb-0 fw-medium me-2 website-analytics-text-bg">28%</p>
-                        <p class="mb-0">Sessions</p>
+                        <p class="mb-0">Sessões</p>
                       </li>
                       <li class="d-flex align-items-center">
                         <p class="mb-0 fw-medium me-2 website-analytics-text-bg">1.2k</p>
@@ -63,41 +63,42 @@ $configData = Helper::appClasses();
                     <ul class="list-unstyled mb-0">
                       <li class="d-flex mb-4 align-items-center">
                         <p class="mb-0 fw-medium me-2 website-analytics-text-bg">3.1k</p>
-                        <p class="mb-0">Page Views</p>
+                        <p class="mb-0">Visualizações de Página</p>
                       </li>
                       <li class="d-flex align-items-center">
                         <p class="mb-0 fw-medium me-2 website-analytics-text-bg">12%</p>
-                        <p class="mb-0">Conversions</p>
+                        <p class="mb-0">Conversões</p>
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
               <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-                <img src="{{ asset('assets/img/illustrations/card-website-analytics-1.png') }}" alt="Website Analytics"
+                <img src="{{ asset('assets/img/illustrations/card-website-analytics-1.png') }}" alt="Análises do Site"
                   height="150" class="card-website-analytics-img" />
               </div>
             </div>
           </div>
         </div>
+
         <div class="swiper-slide">
           <div class="row">
             <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
+              <h5 class="text-white mb-0">Análises do Site</h5>
+              <small>Total de 28,5% de Taxa de Conversão</small>
             </div>
             <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-              <h6 class="text-white mt-0 mt-md-3 mb-4">Spending</h6>
+              <h6 class="text-white mt-0 mt-md-3 mb-4">Gastos</h6>
               <div class="row">
                 <div class="col-6">
                   <ul class="list-unstyled mb-0">
                     <li class="d-flex mb-4 align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">12h</p>
-                      <p class="mb-0">Spend</p>
+                      <p class="mb-0">Tempo Gasto</p>
                     </li>
                     <li class="d-flex align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">127</p>
-                      <p class="mb-0">Order</p>
+                      <p class="mb-0">Pedidos</p>
                     </li>
                   </ul>
                 </div>
@@ -105,40 +106,41 @@ $configData = Helper::appClasses();
                   <ul class="list-unstyled mb-0">
                     <li class="d-flex mb-4 align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">18</p>
-                      <p class="mb-0">Order Size</p>
+                      <p class="mb-0">Tamanho do Pedido</p>
                     </li>
                     <li class="d-flex align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">2.3k</p>
-                      <p class="mb-0">Items</p>
+                      <p class="mb-0">Itens</p>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-              <img src="{{ asset('assets/img/illustrations/card-website-analytics-2.png') }}" alt="Website Analytics"
+              <img src="{{ asset('assets/img/illustrations/card-website-analytics-2.png') }}" alt="Análises do Site"
                 height="150" class="card-website-analytics-img" />
             </div>
           </div>
         </div>
+
         <div class="swiper-slide">
           <div class="row">
             <div class="col-12">
-              <h5 class="text-white mb-0">Website Analytics</h5>
-              <small>Total 28.5% Conversion Rate</small>
+              <h5 class="text-white mb-0">Análises do Site</h5>
+              <small>Total de 28,5% de Taxa de Conversão</small>
             </div>
             <div class="col-lg-7 col-md-9 col-12 order-2 order-md-1 pt-md-9">
-              <h6 class="text-white mt-0 mt-md-3 mb-4">Revenue Sources</h6>
+              <h6 class="text-white mt-0 mt-md-3 mb-4">Fontes de Receita</h6>
               <div class="row">
                 <div class="col-6">
                   <ul class="list-unstyled mb-0">
                     <li class="d-flex mb-4 align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">268</p>
-                      <p class="mb-0">Direct</p>
+                      <p class="mb-0">Direto</p>
                     </li>
                     <li class="d-flex align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">62</p>
-                      <p class="mb-0">Referral</p>
+                      <p class="mb-0">Referência</p>
                     </li>
                   </ul>
                 </div>
@@ -146,23 +148,24 @@ $configData = Helper::appClasses();
                   <ul class="list-unstyled mb-0">
                     <li class="d-flex mb-4 align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">890</p>
-                      <p class="mb-0">Organic</p>
+                      <p class="mb-0">Orgânico</p>
                     </li>
                     <li class="d-flex align-items-center">
                       <p class="mb-0 fw-medium me-2 website-analytics-text-bg">1.2k</p>
-                      <p class="mb-0">Campaign</p>
+                      <p class="mb-0">Campanha</p>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
             <div class="col-lg-5 col-md-3 col-12 order-1 order-md-2 my-4 my-md-0 text-center">
-              <img src="{{ asset('assets/img/illustrations/card-website-analytics-3.png') }}" alt="Website Analytics"
+              <img src="{{ asset('assets/img/illustrations/card-website-analytics-3.png') }}" alt="Análises do Site"
                 height="150" class="card-website-analytics-img" />
             </div>
           </div>
         </div>
       </div>
+
       <div class="swiper-pagination"></div>
     </div>
   </div>
@@ -172,9 +175,9 @@ $configData = Helper::appClasses();
   <div class="col-xl-3 col-sm-6">
     <div class="card h-100">
       <div class="card-header pb-0">
-        <h5 class="mb-3 card-title">Average Daily Sales</h5>
-        <p class="mb-0 text-body">Total Sales This Month</p>
-        <h4 class="mb-0">$28,450</h4>
+        <h5 class="mb-3 card-title">Vendas Médias Diárias</h5>
+        <p class="mb-0 text-body">Total de Vendas Neste Mês</p>
+        <h4 class="mb-0">$28.450</h4>
       </div>
       <div class="card-body px-0">
         <div id="averageDailySales"></div>
@@ -188,7 +191,7 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header">
         <div class="d-flex justify-content-between">
-          <p class="mb-0 text-body">Sales Overview</p>
+          <p class="mb-0 text-body">Visão Geral de Vendas</p>
           <p class="card-text fw-medium text-success">+18.2%</p>
         </div>
         <h4 class="card-title mb-1">$42.5k</h4>
@@ -197,13 +200,15 @@ $configData = Helper::appClasses();
         <div class="row">
           <div class="col-4">
             <div class="d-flex gap-2 align-items-center mb-2">
-              <span class="badge bg-label-info p-1 rounded"><i
-                  class="icon-base ti tabler-shopping-cart icon-sm"></i></span>
-              <p class="mb-0">Order</p>
+              <span class="badge bg-label-info p-1 rounded">
+                <i class="icon-base ti tabler-shopping-cart icon-sm"></i>
+              </span>
+              <p class="mb-0">Pedidos</p>
             </div>
             <h5 class="mb-0 pt-1">62.2%</h5>
-            <small class="text-body-secondary">6,440</small>
+            <small class="text-body-secondary">6.440</small>
           </div>
+
           <div class="col-4">
             <div class="divider divider-vertical">
               <div class="divider-text">
@@ -211,21 +216,25 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </div>
+
           <div class="col-4 text-end">
             <div class="d-flex gap-2 justify-content-end align-items-center mb-2">
-              <p class="mb-0">Visits</p>
-              <span class="badge bg-label-primary p-1 rounded"><i class="icon-base ti tabler-link icon-sm"></i></span>
+              <p class="mb-0">Visitas</p>
+              <span class="badge bg-label-primary p-1 rounded">
+                <i class="icon-base ti tabler-link icon-sm"></i>
+              </span>
             </div>
             <h5 class="mb-0 pt-1">25.5%</h5>
-            <small class="text-body-secondary">12,749</small>
+            <small class="text-body-secondary">12.749</small>
           </div>
         </div>
+
         <div class="d-flex align-items-center mt-6">
           <div class="progress w-100" style="height: 10px;">
-            <div class="progress-bar bg-info" style="width: 70%" role="progressbar" aria-valuenow="70" aria-valuemin="0"
-              aria-valuemax="100"></div>
-            <div class="progress-bar bg-primary" role="progressbar" style="width: 30%" aria-valuenow="30"
-              aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-info" style="width: 70%" role="progressbar"
+              aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-primary" style="width: 30%" role="progressbar"
+              aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
           </div>
         </div>
       </div>
@@ -238,8 +247,8 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header pb-0 d-flex justify-content-between">
         <div class="card-title mb-0">
-          <h5 class="mb-1">Earning Reports</h5>
-          <p class="card-subtitle">Weekly Earnings Overview</p>
+          <h5 class="mb-1">Relatórios de Ganhos</h5>
+          <p class="card-subtitle">Visão Geral de Ganhos Semanais</p>
         </div>
         <div class="dropdown">
           <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button"
@@ -247,11 +256,12 @@ $configData = Helper::appClasses();
             <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="earningReportsId">
-            <a class="dropdown-item" href="javascript:void(0);">View More</a>
-            <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+            <a class="dropdown-item" href="javascript:void(0);">Ver Mais</a>
+            <a class="dropdown-item" href="javascript:void(0);">Excluir</a>
           </div>
         </div>
       </div>
+
       <div class="card-body">
         <div class="row align-items-center g-md-8">
           <div class="col-12 col-md-5 d-flex flex-column">
@@ -259,31 +269,37 @@ $configData = Helper::appClasses();
               <h2 class="mb-0">$468</h2>
               <div class="badge rounded bg-label-success">+4.2%</div>
             </div>
-            <small class="text-body">You informed of this week compared to last week</small>
+            <small class="text-body">
+              Você teve um aumento nesta semana em comparação com a semana passada
+            </small>
           </div>
           <div class="col-12 col-md-7 ps-xl-8">
             <div id="weeklyEarningReports"></div>
           </div>
         </div>
+
         <div class="border rounded p-5 mt-5">
           <div class="row gap-4 gap-sm-0">
             <div class="col-12 col-sm-4">
               <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-primary p-1"><i
-                    class="icon-base ti tabler-currency-dollar icon-18px"></i></div>
-                <h6 class="mb-0 fw-normal">Earnings</h6>
+                <div class="badge rounded bg-label-primary p-1">
+                  <i class="icon-base ti tabler-currency-dollar icon-18px"></i>
+                </div>
+                <h6 class="mb-0 fw-normal">Ganhos</h6>
               </div>
               <h4 class="my-2">$545.69</h4>
               <div class="progress w-75" style="height:4px">
-                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0"
-                  aria-valuemax="100"></div>
+                <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65"
+                  aria-valuemin="0" aria-valuemax="100"></div>
               </div>
             </div>
+
             <div class="col-12 col-sm-4">
               <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-info p-1"><i class="icon-base ti tabler-chart-pie-2 icon-18px"></i>
+                <div class="badge rounded bg-label-info p-1">
+                  <i class="icon-base ti tabler-chart-pie-2 icon-18px"></i>
                 </div>
-                <h6 class="mb-0 fw-normal">Profit</h6>
+                <h6 class="mb-0 fw-normal">Lucro</h6>
               </div>
               <h4 class="my-2">$256.34</h4>
               <div class="progress w-75" style="height:4px">
@@ -291,11 +307,13 @@ $configData = Helper::appClasses();
                   aria-valuemin="0" aria-valuemax="100"></div>
               </div>
             </div>
+
             <div class="col-12 col-sm-4">
               <div class="d-flex gap-2 align-items-center">
-                <div class="badge rounded bg-label-danger p-1"><i
-                    class="icon-base ti tabler-brand-paypal icon-18px"></i></div>
-                <h6 class="mb-0 fw-normal">Expense</h6>
+                <div class="badge rounded bg-label-danger p-1">
+                  <i class="icon-base ti tabler-brand-paypal icon-18px"></i>
+                </div>
+                <h6 class="mb-0 fw-normal">Despesas</h6>
               </div>
               <h4 class="my-2">$74.19</h4>
               <div class="progress w-75" style="height:4px">
@@ -315,8 +333,8 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <div class="card-title mb-0">
-          <h5 class="mb-1">Support Tracker</h5>
-          <p class="card-subtitle">Last 7 Days</p>
+          <h5 class="mb-1">Acompanhamento de Suporte</h5>
+          <p class="card-subtitle">Últimos 7 Dias</p>
         </div>
         <div class="dropdown">
           <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button"
@@ -324,8 +342,8 @@ $configData = Helper::appClasses();
             <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="supportTrackerMenu">
-            <a class="dropdown-item" href="javascript:void(0);">View More</a>
-            <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+            <a class="dropdown-item" href="javascript:void(0);">Ver Mais</a>
+            <a class="dropdown-item" href="javascript:void(0);">Excluir</a>
           </div>
         </div>
       </div>
@@ -333,29 +351,34 @@ $configData = Helper::appClasses();
         <div class="col-12 col-sm-4">
           <div class="mt-lg-4 mt-lg-2 mb-lg-6 mb-2">
             <h2 class="mb-0">164</h2>
-            <p class="mb-0">Total Tickets</p>
+            <p class="mb-0">Total de Chamados</p>
           </div>
           <ul class="p-0 m-0">
             <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
-              <div class="badge rounded bg-label-primary p-1_5"><i class="icon-base ti tabler-ticket icon-md"></i></div>
+              <div class="badge rounded bg-label-primary p-1_5">
+                <i class="icon-base ti tabler-ticket icon-md"></i>
+              </div>
               <div>
-                <h6 class="mb-0 text-nowrap">New Tickets</h6>
+                <h6 class="mb-0 text-nowrap">Novos Chamados</h6>
                 <small class="text-body-secondary">142</small>
               </div>
             </li>
             <li class="d-flex gap-4 align-items-center mb-lg-3 pb-1">
-              <div class="badge rounded bg-label-info p-1_5"><i class="icon-base ti tabler-circle-check icon-md"></i>
+              <div class="badge rounded bg-label-info p-1_5">
+                <i class="icon-base ti tabler-circle-check icon-md"></i>
               </div>
               <div>
-                <h6 class="mb-0 text-nowrap">Open Tickets</h6>
+                <h6 class="mb-0 text-nowrap">Chamados Abertos</h6>
                 <small class="text-body-secondary">28</small>
               </div>
             </li>
             <li class="d-flex gap-4 align-items-center pb-1">
-              <div class="badge rounded bg-label-warning p-1_5"><i class="icon-base ti tabler-clock icon-md"></i></div>
+              <div class="badge rounded bg-label-warning p-1_5">
+                <i class="icon-base ti tabler-clock icon-md"></i>
+              </div>
               <div>
-                <h6 class="mb-0 text-nowrap">Response Time</h6>
-                <small class="text-body-secondary">1 Day</small>
+                <h6 class="mb-0 text-nowrap">Tempo de Resposta</h6>
+                <small class="text-body-secondary">1 Dia</small>
               </div>
             </li>
           </ul>
@@ -373,8 +396,8 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <div class="card-title mb-0">
-          <h5 class="mb-1">Sales by Countries</h5>
-          <p class="card-subtitle">Monthly Sales Overview</p>
+          <h5 class="mb-1">Vendas por País</h5>
+          <p class="card-subtitle">Visão Geral de Vendas Mensais</p>
         </div>
         <div class="dropdown">
           <button class="btn btn-text-secondary btn-icon rounded-pill text-body-secondary border-0 me-n1" type="button"
@@ -382,9 +405,9 @@ $configData = Helper::appClasses();
             <i class="icon-base ti tabler-dots-vertical icon-22px text-body-secondary"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="salesByCountry">
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Share</a>
+            <a class="dropdown-item" href="javascript:void(0);">Baixar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Atualizar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Compartilhar</a>
           </div>
         </div>
       </div>
@@ -399,7 +422,7 @@ $configData = Helper::appClasses();
                 <div class="d-flex align-items-center">
                   <h6 class="mb-0 me-1">$8,567k</h6>
                 </div>
-                <small class="text-body">United states</small>
+                <small class="text-body">Estados Unidos</small>
               </div>
               <div class="user-progress">
                 <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
@@ -409,6 +432,7 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="d-flex align-items-center mb-4">
             <div class="avatar flex-shrink-0 me-4">
               <i class="fis fi fi-br rounded-circle fs-2"></i>
@@ -418,7 +442,7 @@ $configData = Helper::appClasses();
                 <div class="d-flex align-items-center">
                   <h6 class="mb-0 me-1">$2,415k</h6>
                 </div>
-                <small class="text-body">Brazil</small>
+                <small class="text-body">Brasil</small>
               </div>
               <div class="user-progress">
                 <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
@@ -428,6 +452,7 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="d-flex align-items-center mb-4">
             <div class="avatar flex-shrink-0 me-4">
               <i class="fis fi fi-in rounded-circle fs-2"></i>
@@ -437,7 +462,7 @@ $configData = Helper::appClasses();
                 <div class="d-flex align-items-center">
                   <h6 class="mb-0 me-1">$865k</h6>
                 </div>
-                <small class="text-body">India</small>
+                <small class="text-body">Índia</small>
               </div>
               <div class="user-progress">
                 <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
@@ -447,6 +472,7 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="d-flex align-items-center mb-4">
             <div class="avatar flex-shrink-0 me-4">
               <i class="fis fi fi-au rounded-circle fs-2"></i>
@@ -456,7 +482,7 @@ $configData = Helper::appClasses();
                 <div class="d-flex align-items-center">
                   <h6 class="mb-0 me-1">$745k</h6>
                 </div>
-                <small class="text-body">Australia</small>
+                <small class="text-body">Austrália</small>
               </div>
               <div class="user-progress">
                 <p class="text-danger fw-medium mb-0 d-flex align-items-center gap-1">
@@ -466,6 +492,7 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="d-flex align-items-center mb-4">
             <div class="avatar flex-shrink-0 me-4">
               <i class="fis fi fi-fr rounded-circle fs-2"></i>
@@ -475,7 +502,7 @@ $configData = Helper::appClasses();
                 <div class="d-flex align-items-center">
                   <h6 class="mb-0 me-1">$45</h6>
                 </div>
-                <small class="text-body">France</small>
+                <small class="text-body">França</small>
               </div>
               <div class="user-progress">
                 <p class="text-success fw-medium mb-0 d-flex align-items-center gap-1">
@@ -485,6 +512,7 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="d-flex align-items-center">
             <div class="avatar flex-shrink-0 me-4">
               <i class="fis fi fi-cn rounded-circle fs-2"></i>
@@ -515,15 +543,15 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header">
         <div class="d-flex justify-content-between align-items-center">
-          <h5 class="mb-0 card-title">Total Earning</h5>
+          <h5 class="mb-0 card-title">Ganhos Totais</h5>
           <div class="dropdown">
             <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button"
               id="totalEarning" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="totalEarning">
-              <a class="dropdown-item" href="javascript:void(0);">View More</a>
-              <a class="dropdown-item" href="javascript:void(0);">Delete</a>
+              <a class="dropdown-item" href="javascript:void(0);">Ver Mais</a>
+              <a class="dropdown-item" href="javascript:void(0);">Excluir</a>
             </div>
           </div>
         </div>
@@ -533,26 +561,31 @@ $configData = Helper::appClasses();
           <h6 class="text-success mb-0">25.8%</h6>
         </div>
       </div>
+
       <div class="card-body">
         <div id="totalEarningChart"></div>
+
         <div class="d-flex align-items-start my-4">
-          <div class="badge rounded bg-label-primary p-2 me-4 rounded"><i
-              class="icon-base ti tabler-brand-paypal icon-md"></i></div>
+          <div class="badge rounded bg-label-primary p-2 me-4 rounded">
+            <i class="icon-base ti tabler-brand-paypal icon-md"></i>
+          </div>
           <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
             <div class="me-2">
-              <h6 class="mb-0">Total Revenue</h6>
-              <small class="text-body">Client Payment</small>
+              <h6 class="mb-0">Receita Total</h6>
+              <small class="text-body">Pagamento do Cliente</small>
             </div>
             <h6 class="mb-0 text-success">+$126</h6>
           </div>
         </div>
+
         <div class="d-flex align-items-start">
-          <div class="badge rounded bg-label-secondary p-2 me-4 rounded"><i
-              class="icon-base ti tabler-currency-dollar icon-md"></i></div>
+          <div class="badge rounded bg-label-secondary p-2 me-4 rounded">
+            <i class="icon-base ti tabler-currency-dollar icon-md"></i>
+          </div>
           <div class="d-flex justify-content-between w-100 gap-2 align-items-center">
             <div class="me-2">
-              <h6 class="mb-0">Total Sales</h6>
-              <small class="text-body">Refund</small>
+              <h6 class="mb-0">Total de Vendas</h6>
+              <small class="text-body">Reembolso</small>
             </div>
             <h6 class="mb-0 text-success">+$98</h6>
           </div>
@@ -567,8 +600,8 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <div class="card-title mb-0">
-          <h5 class="mb-1">Monthly Campaign State</h5>
-          <p class="card-subtitle">8.52k Social Visiters</p>
+          <h5 class="mb-1">Status da Campanha Mensal</h5>
+          <p class="card-subtitle">8,52 mil Visitantes Sociais</p>
         </div>
         <div class="dropdown">
           <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button"
@@ -576,72 +609,89 @@ $configData = Helper::appClasses();
             <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="MonthlyCampaign">
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">View All</a>
+            <a class="dropdown-item" href="javascript:void(0);">Atualizar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Baixar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Ver Todos</a>
           </div>
         </div>
       </div>
+
       <div class="card-body">
         <ul class="p-0 m-0">
           <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-success rounded p-1_5"><i class="icon-base ti tabler-mail icon-md"></i></div>
+            <div class="badge bg-label-success rounded p-1_5">
+              <i class="icon-base ti tabler-mail icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Emails</h6>
+              <h6 class="mb-0 ms-4">E-mails</h6>
               <div class="d-flex">
-                <p class="mb-0">12,346</p>
-                <p class="ms-4 text-success mb-0">0.3%</p>
+                <p class="mb-0">12.346</p>
+                <p class="ms-4 text-success mb-0">0,3%</p>
               </div>
             </div>
           </li>
+
           <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-info rounded p-1_5"><i class="icon-base ti tabler-link icon-md"></i></div>
+            <div class="badge bg-label-info rounded p-1_5">
+              <i class="icon-base ti tabler-link icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Opened</h6>
+              <h6 class="mb-0 ms-4">Abertos</h6>
               <div class="d-flex">
-                <p class="mb-0">8,734</p>
-                <p class="ms-4 text-success mb-0">2.1%</p>
+                <p class="mb-0">8.734</p>
+                <p class="ms-4 text-success mb-0">2,1%</p>
               </div>
             </div>
           </li>
+
           <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-warning rounded p-1_5"><i class="icon-base ti tabler-mouse icon-md"></i></div>
+            <div class="badge bg-label-warning rounded p-1_5">
+              <i class="icon-base ti tabler-mouse icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Clicked</h6>
+              <h6 class="mb-0 ms-4">Cliques</h6>
               <div class="d-flex">
                 <p class="mb-0">967</p>
-                <p class="ms-4 text-danger mb-0">1.4%</p>
+                <p class="ms-4 text-danger mb-0">1,4%</p>
               </div>
             </div>
           </li>
+
           <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-primary rounded p-1_5"><i class="icon-base ti tabler-users icon-md"></i></div>
+            <div class="badge bg-label-primary rounded p-1_5">
+              <i class="icon-base ti tabler-users icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Subscribe</h6>
+              <h6 class="mb-0 ms-4">Inscrições</h6>
               <div class="d-flex">
                 <p class="mb-0">345</p>
-                <p class="ms-4 text-success mb-0">8.5%</p>
+                <p class="ms-4 text-success mb-0">8,5%</p>
               </div>
             </div>
           </li>
+
           <li class="mb-6 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-secondary rounded p-1_5"><i
-                class="icon-base ti tabler-alert-triangle icon-md"></i></div>
+            <div class="badge bg-label-secondary rounded p-1_5">
+              <i class="icon-base ti tabler-alert-triangle icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Complaints</h6>
+              <h6 class="mb-0 ms-4">Reclamações</h6>
               <div class="d-flex">
                 <p class="mb-0">10</p>
-                <p class="ms-4 text-danger mb-0">1.5%</p>
+                <p class="ms-4 text-danger mb-0">1,5%</p>
               </div>
             </div>
           </li>
+
           <li class="mb-3 d-flex justify-content-between align-items-center">
-            <div class="badge bg-label-danger rounded p-1_5"><i class="icon-base ti tabler-ban icon-md"></i></div>
+            <div class="badge bg-label-danger rounded p-1_5">
+              <i class="icon-base ti tabler-ban icon-md"></i>
+            </div>
             <div class="d-flex justify-content-between w-100 flex-wrap">
-              <h6 class="mb-0 ms-4">Unsubscribe</h6>
+              <h6 class="mb-0 ms-4">Cancelamentos</h6>
               <div class="d-flex">
                 <p class="mb-0">86</p>
-                <p class="ms-4 text-success mb-0">0.8%</p>
+                <p class="ms-4 text-success mb-0">0,8%</p>
               </div>
             </div>
           </li>
@@ -656,8 +706,8 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <div class="card-title mb-0">
-          <h5 class="mb-1">Source Visits</h5>
-          <p class="card-subtitle">38.4k Visitors</p>
+          <h5 class="mb-1">Origem das Visitas</h5>
+          <p class="card-subtitle">38,4 mil Visitantes</p>
         </div>
         <div class="dropdown">
           <button class="btn btn-text-secondary rounded-pill text-body-secondary border-0 p-2 me-n1" type="button"
@@ -665,22 +715,24 @@ $configData = Helper::appClasses();
             <i class="icon-base ti tabler-dots-vertical icon-md text-body-secondary"></i>
           </button>
           <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sourceVisits">
-            <a class="dropdown-item" href="javascript:void(0);">Refresh</a>
-            <a class="dropdown-item" href="javascript:void(0);">Download</a>
-            <a class="dropdown-item" href="javascript:void(0);">View All</a>
+            <a class="dropdown-item" href="javascript:void(0);">Atualizar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Baixar</a>
+            <a class="dropdown-item" href="javascript:void(0);">Ver Todos</a>
           </div>
         </div>
       </div>
+
       <div class="card-body">
         <ul class="list-unstyled mb-0">
           <li class="mb-6">
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-shadow icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-shadow icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">Direct Source</h6>
-                  <small class="text-body">Direct link click</small>
+                  <h6 class="mb-0">Fonte Direta</h6>
+                  <small class="text-body">Clique em link direto</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">1.2k</p>
@@ -689,14 +741,16 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="mb-6">
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-globe icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-globe icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">Social Network</h6>
-                  <small class="text-body">Social Channels</small>
+                  <h6 class="mb-0">Redes Sociais</h6>
+                  <small class="text-body">Canais Sociais</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">31.5k</p>
@@ -705,14 +759,16 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="mb-6">
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-mail icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-mail icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">Email Newsletter</h6>
-                  <small class="text-body">Mail Campaigns</small>
+                  <h6 class="mb-0">Newsletter por E-mail</h6>
+                  <small class="text-body">Campanhas de E-mail</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">893</p>
@@ -721,14 +777,16 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="mb-6">
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-external-link icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-external-link icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">Referrals</h6>
-                  <small class="text-body">Impact Radius Visits</small>
+                  <h6 class="mb-0">Referências</h6>
+                  <small class="text-body">Visitas por Links Externos</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">342</p>
@@ -737,14 +795,16 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li class="mb-6">
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-ad icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-ad icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">ADVT</h6>
-                  <small class="text-body">Google ADVT</small>
+                  <h6 class="mb-0">Anúncios</h6>
+                  <small class="text-body">Google Ads</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">2.15k</p>
@@ -753,14 +813,16 @@ $configData = Helper::appClasses();
               </div>
             </div>
           </li>
+
           <li>
             <div class="d-flex align-items-center">
-              <div class="badge bg-label-secondary text-body p-2 me-4 rounded"><i
-                  class="icon-base ti tabler-star icon-md"></i></div>
+              <div class="badge bg-label-secondary text-body p-2 me-4 rounded">
+                <i class="icon-base ti tabler-star icon-md"></i>
+              </div>
               <div class="d-flex justify-content-between w-100 flex-wrap gap-2">
                 <div class="me-2">
-                  <h6 class="mb-0">Other</h6>
-                  <small class="text-body">Many Sources</small>
+                  <h6 class="mb-0">Outros</h6>
+                  <small class="text-body">Diversas Fontes</small>
                 </div>
                 <div class="d-flex align-items-center">
                   <p class="mb-0">12.5k</p>
@@ -784,11 +846,11 @@ $configData = Helper::appClasses();
             <tr>
               <th></th>
               <th></th>
-              <th>Project</th>
-              <th>Leader</th>
-              <th>Team</th>
-              <th class="w-px-200">Progress</th>
-              <th>Action</th>
+              <th>Projeto</th>
+              <th>Líder</th>
+              <th>Equipe</th>
+              <th class="w-px-200">Progresso</th>
+              <th>Ações</th>
             </tr>
           </thead>
         </table>
