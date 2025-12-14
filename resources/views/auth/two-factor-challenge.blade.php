@@ -38,40 +38,42 @@ $customizerHidden = 'customizer-hide';
     <!-- Two Steps Verification -->
     <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-6 p-sm-12">
       <div class="w-px-400 mx-auto mt-12 mt-5">
-        <h4 class="mb-1">Two Step Verification 💬</h4>
+        <h4 class="mb-1">Verificação em duas etapas 💬</h4>
         <div x-data="{ recovery: false }">
           <div class="text-start mb-6" x-show="! recovery">
-            Please confirm access to your account by entering the authentication code provided by your
-            authenticator
-            application.
+            Confirme o acesso à sua conta inserindo o código de autenticação fornecido pelo seu
+            aplicativo autenticador.
           </div>
           <div class="text-start mb-6" x-show="recovery">
-            Please confirm access to your account by entering one of your emergency recovery codes.
+            Confirme o acesso à sua conta inserindo um dos seus códigos de recuperação de emergência.
           </div>
           <x-validation-errors class="mb-1" />
           <form method="POST" action="{{ route('two-factor.login') }}">
             @csrf
             <div class="mb-6" x-show="! recovery">
-              <x-label class="form-label" value="{{ __('Code') }}" />
+              <x-label class="form-label" value="{{ __('Código') }}" />
               <x-input class="{{ $errors->has('code') ? 'is-invalid' : '' }}" type="text" inputmode="numeric"
                 name="code" autofocus x-ref="code" autocomplete="one-time-code" />
               <x-input-error for="code"></x-input-error>
             </div>
             <div class="mb-5" x-show="recovery">
-              <x-label class="form-label" value="{{ __('Recovery Code') }}" />
+              <x-label class="form-label" value="{{ __('Código de recuperação') }}" />
               <x-input class="{{ $errors->has('recovery_code') ? 'is-invalid' : '' }}" type="text" name="recovery_code"
                 x-ref="recovery_code" autocomplete="one-time-code" />
               <x-input-error for="recovery_code"></x-input-error>
             </div>
             <div class="d-flex justify-content-end gap-2">
               <div x-show="! recovery" x-on:click="recovery = true; $nextTick(() => { $refs.recovery_code.focus()})">
-                <button type="button" class="btn btn-outline-secondary">Use a recovery code</button>
+                <button type="button" class="btn btn-outline-secondary">
+                  Usar um código de recuperação
+                </button>
               </div>
               <div x-cloak x-show="recovery" x-on:click="recovery = false; $nextTick(() => { $refs.code.focus() })">
-                <button type="button" class="btn btn-outline-secondary">Use an authentication
-                  code</button>
+                <button type="button" class="btn btn-outline-secondary">
+                  Usar um código de autenticação
+                </button>
               </div>
-              <x-button class="px-3">Log in</x-button>
+              <x-button class="px-3">Entrar</x-button>
             </div>
           </form>
         </div>
