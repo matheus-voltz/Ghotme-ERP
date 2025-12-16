@@ -12,9 +12,87 @@ class ClientFieldsSeeder extends Seeder
     {
         $fields = [
 
-            // ======================
-            // 🔧 OFICINA MECÂNICA
-            // ======================
+            /*
+            |--------------------------------------------------------------------------
+            | 👤 CLIENTE – CAMPOS BASE (TODOS OS SEGMENTOS)
+            |--------------------------------------------------------------------------
+            */
+
+            // 📞 CONTATO
+            [
+                'segment' => 'cliente',
+                'label' => 'Telefone',
+                'field_key' => 'telefone',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-phone',
+                'order' => 1,
+                'active' => true,
+            ],
+            [
+                'segment' => 'cliente',
+                'label' => 'WhatsApp',
+                'field_key' => 'whatsapp',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-brand-whatsapp',
+                'order' => 2,
+                'active' => true,
+            ],
+            [
+                'segment' => 'cliente',
+                'label' => 'E-mail',
+                'field_key' => 'email',
+                'field_type' => 'email',
+                'required' => false,
+                'icon' => 'ti tabler-mail',
+                'order' => 3,
+                'active' => true,
+            ],
+
+            // 📍 ENDEREÇO
+            [
+                'segment' => 'cliente',
+                'label' => 'CEP',
+                'field_key' => 'cep',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-map-pin',
+                'order' => 4,
+                'active' => true,
+            ],
+            [
+                'segment' => 'cliente',
+                'label' => 'Cidade',
+                'field_key' => 'cidade',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-building-community',
+                'order' => 5,
+                'active' => true,
+            ],
+            [
+                'segment' => 'cliente',
+                'label' => 'Estado',
+                'field_key' => 'estado',
+                'field_type' => 'select',
+                'options' => [
+                    'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS',
+                    'MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC',
+                    'SP','SE','TO'
+                ],
+                'required' => false,
+                'icon' => 'ti tabler-map',
+                'order' => 6,
+                'active' => true,
+            ],
+
+            /*
+            |--------------------------------------------------------------------------
+            | 🔧 OFICINA MECÂNICA (VEÍCULO)
+            |--------------------------------------------------------------------------
+            */
+
             [
                 'segment' => 'oficina',
                 'label' => 'Placa do Veículo',
@@ -22,7 +100,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => true,
                 'icon' => 'ti tabler-car',
-                'order' => 1
+                'order' => 1,
+                'active' => true,
             ],
             [
                 'segment' => 'oficina',
@@ -31,7 +110,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => true,
                 'icon' => 'ti tabler-tag',
-                'order' => 2
+                'order' => 2,
+                'active' => true,
             ],
             [
                 'segment' => 'oficina',
@@ -40,7 +120,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => true,
                 'icon' => 'ti tabler-car-garage',
-                'order' => 3
+                'order' => 3,
+                'active' => true,
             ],
             [
                 'segment' => 'oficina',
@@ -49,22 +130,27 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'number',
                 'required' => false,
                 'icon' => 'ti tabler-calendar',
-                'order' => 4
+                'order' => 4,
+                'active' => true,
             ],
             [
                 'segment' => 'oficina',
                 'label' => 'Tipo de Combustível',
                 'field_key' => 'combustivel',
                 'field_type' => 'select',
-                'options' => json_encode(['Gasolina', 'Etanol', 'Diesel', 'Flex', 'Elétrico']),
+                'options' => ['Gasolina', 'Etanol', 'Diesel', 'Flex', 'Elétrico'],
                 'required' => false,
                 'icon' => 'ti tabler-gas-station',
-                'order' => 5
+                'order' => 5,
+                'active' => true,
             ],
 
-            // ======================
-            // 🏥 CLÍNICA
-            // ======================
+            /*
+            |--------------------------------------------------------------------------
+            | 🏥 CLÍNICA
+            |--------------------------------------------------------------------------
+            */
+
             [
                 'segment' => 'clinica',
                 'label' => 'Convênio',
@@ -72,7 +158,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-heart',
-                'order' => 1
+                'order' => 1,
+                'active' => true,
             ],
             [
                 'segment' => 'clinica',
@@ -81,22 +168,27 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-id',
-                'order' => 2
+                'order' => 2,
+                'active' => true,
             ],
             [
                 'segment' => 'clinica',
                 'label' => 'Plano',
                 'field_key' => 'plano',
                 'field_type' => 'select',
-                'options' => json_encode(['Básico', 'Intermediário', 'Premium']),
+                'options' => ['Básico', 'Intermediário', 'Premium'],
                 'required' => false,
                 'icon' => 'ti tabler-list',
-                'order' => 3
+                'order' => 3,
+                'active' => true,
             ],
 
-            // ======================
-            // 🏢 EMPRESA / SERVIÇOS
-            // ======================
+            /*
+            |--------------------------------------------------------------------------
+            | 🏢 EMPRESA / SERVIÇOS
+            |--------------------------------------------------------------------------
+            */
+
             [
                 'segment' => 'empresa',
                 'label' => 'Ramo de Atividade',
@@ -104,7 +196,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-briefcase',
-                'order' => 1
+                'order' => 1,
+                'active' => true,
             ],
             [
                 'segment' => 'empresa',
@@ -113,7 +206,8 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'number',
                 'required' => false,
                 'icon' => 'ti tabler-users',
-                'order' => 2
+                'order' => 2,
+                'active' => true,
             ],
             [
                 'segment' => 'empresa',
@@ -122,12 +216,16 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-currency-dollar',
-                'order' => 3
+                'order' => 3,
+                'active' => true,
             ],
         ];
 
         foreach ($fields as $field) {
-            ClientField::create($field);
+            ClientField::updateOrCreate(
+                ['segment' => $field['segment'], 'field_key' => $field['field_key']],
+                $field
+            );
         }
     }
 }

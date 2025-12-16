@@ -12,16 +12,40 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('clients', function (Blueprint $table) {
-            $table->id();
-            $table->enum('type', ['PF', 'PJ']);
-            $table->string('name');
-            $table->string('document')->nullable();
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('whatsapp')->nullable();
-            $table->string('status')->default('active');
-            $table->timestamps();
-        });
+        $table->id();
+
+        // Tipo de cliente
+        $table->enum('type', ['PF', 'PJ']);
+
+        // PF
+        $table->string('name')->nullable();
+        $table->string('cpf')->nullable();
+        $table->string('rg')->nullable();
+        $table->date('birth_date')->nullable();
+
+        // PJ
+        $table->string('company_name')->nullable();
+        $table->string('trade_name')->nullable();
+        $table->string('cnpj')->nullable();
+        $table->string('state_registration')->nullable();
+        $table->string('municipal_registration')->nullable();
+
+        // Contato
+        $table->string('email')->nullable();
+        $table->string('phone')->nullable();
+        $table->string('whatsapp')->nullable();
+
+        // Endereço
+        $table->string('zip_code')->nullable();
+        $table->string('street')->nullable();
+        $table->string('number')->nullable();
+        $table->string('complement')->nullable();
+        $table->string('district')->nullable();
+        $table->string('city')->nullable();
+        $table->string('state')->nullable();
+
+        $table->timestamps();
+    });
 
     }
 
