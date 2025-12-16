@@ -15,7 +15,7 @@ class ClientsController extends Controller
     public function index(Request $request, User $user)
     {
     
-        $segment = 'clientes'; // depois você pode puxar da empresa logada
+        $segment = 'cliente'; // depois você pode puxar da empresa logada
 
         $users = User::all();
 
