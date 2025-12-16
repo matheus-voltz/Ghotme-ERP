@@ -18,11 +18,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
         newRecord.addEventListener('click', function () {
           offCanvasEl = new bootstrap.Offcanvas(offCanvasElement);
           // Empty fields on offCanvas open
-          (offCanvasElement.querySelector('.dt-full-name').value = ''),
-            (offCanvasElement.querySelector('.dt-post').value = ''),
-            (offCanvasElement.querySelector('.dt-email').value = ''),
-            (offCanvasElement.querySelector('.dt-date').value = ''),
-            (offCanvasElement.querySelector('.dt-salary').value = '');
+          offCanvasElement
+            .querySelectorAll('input, textarea, select')
+            .forEach(el => (el.value = ''));
           // Open offCanvas with form
           offCanvasEl.show();
         });
@@ -560,11 +558,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
     var count = 101;
     // On form submit, if form is valid
     fv.on('core.form.valid', function () {
-      let new_name = document.querySelector('.add-new-record .dt-full-name').value,
-        new_post = document.querySelector('.add-new-record .dt-post').value,
-        new_email = document.querySelector('.add-new-record .dt-email').value,
-        new_date = document.querySelector('.add-new-record .dt-date').value,
-        new_salary = document.querySelector('.add-new-record .dt-salary').value;
+      const form = document.querySelector('#form-add-new-record');
+
+      const new_name   = form.querySelector('[name="basicFullname"]')?.value || '';
+      const new_post   = form.querySelector('[name="basicPost"]')?.value || '';
+      const new_email  = form.querySelector('[name="basicEmail"]')?.value || '';
+      const new_date   = form.querySelector('[name="basicDate"]')?.value || '';
+      const new_salary = form.querySelector('[name="basicSalary"]')?.value || '';
 
       if (new_name != '') {
         dt_basic.row

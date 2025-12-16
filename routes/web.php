@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
-
+use App\Http\Controllers\ClientsController;
 
 
 // locale
@@ -47,7 +47,8 @@ Route::get('/quotes/rejected', [App\Http\Controllers\quotes\Rejected::class, 'in
 Route::get('/quotes/{id}/send-whatsapp', [App\Http\Controllers\quotes\SendWhatsapp::class, 'send'])->name('quotes-send-whatsapp');
 
 //clients
-Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users-clients');
+Route::get('/clients', [App\Http\Controllers\ClientsController::class, 'index'])->name('clients');
+
 
 // routes/web.php ou api.php
 Route::get('/users/datatable', [UserController::class, 'datatable'])

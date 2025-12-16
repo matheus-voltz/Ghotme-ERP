@@ -81,9 +81,9 @@
       "slug": "clients-vehicles",
       "submenu": [
       {
-        "url": "/users",
+        "url": "/clients",
         "name": "Clientes",
-        "slug": "users-clients"
+        "slug": "clients"
       },
       {
         "url": "/vehicles",
