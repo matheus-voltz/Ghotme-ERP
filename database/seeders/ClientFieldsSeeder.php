@@ -18,6 +18,17 @@ class ClientFieldsSeeder extends Seeder
             |--------------------------------------------------------------------------
             */
 
+            [
+                'segment' => 'cliente',
+                'label' => 'Nome',
+                'field_key' => 'nome',
+                'field_type' => 'text',
+                'required' => true,
+                'icon' => 'ti tabler-user',
+                'order' => 1,
+                'active' => true,
+            ],
+
             // 📞 CONTATO
             [
                 'segment' => 'cliente',
@@ -26,7 +37,7 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-phone',
-                'order' => 1,
+                'order' => 2,
                 'active' => true,
             ],
             [
@@ -36,7 +47,7 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-brand-whatsapp',
-                'order' => 2,
+                'order' => 3,
                 'active' => true,
             ],
             [
@@ -46,7 +57,7 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'email',
                 'required' => false,
                 'icon' => 'ti tabler-mail',
-                'order' => 3,
+                'order' => 4,
                 'active' => true,
             ],
 
@@ -58,7 +69,7 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-map-pin',
-                'order' => 4,
+                'order' => 5,
                 'active' => true,
             ],
             [
@@ -68,7 +79,7 @@ class ClientFieldsSeeder extends Seeder
                 'field_type' => 'text',
                 'required' => false,
                 'icon' => 'ti tabler-building-community',
-                'order' => 5,
+                'order' => 8,
                 'active' => true,
             ],
             [
@@ -83,7 +94,40 @@ class ClientFieldsSeeder extends Seeder
                 ],
                 'required' => false,
                 'icon' => 'ti tabler-map',
+                'order' => 9,
+                'active' => true,
+            ],
+            //rua
+            [
+                'segment' => 'cliente',
+                'label' => 'Rua',
+                'field_key' => 'rua',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-road',
                 'order' => 6,
+                'active' => true,
+            ],
+            //numero
+            [
+                'segment' => 'cliente',
+                'label' => 'Número',
+                'field_key' => 'numero',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-hash',
+                'order' => 7,
+                'active' => true,
+            ],
+            //bairro
+            [
+                'segment' => 'cliente',
+                'label' => 'Bairro',
+                'field_key' => 'bairro',
+                'field_type' => 'text',
+                'required' => false,
+                'icon' => 'ti tabler-building',
+                'order' => 10,
                 'active' => true,
             ],
 
