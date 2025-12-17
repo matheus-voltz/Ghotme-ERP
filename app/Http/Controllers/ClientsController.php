@@ -50,20 +50,26 @@ class ClientsController extends Controller
      */
     public function store(Request $request)
     {
-        $client = Client::create($request->only([
-            'type', 'name', 'document', 'email', 'phone', 'whatsapp'
-        ]));
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email',
+            'phone' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
+            'cep' => 'nullable|string',
+            'rua' => 'nullable|string',
+            'numero' => 'nullable|string',
+            'complemento' => 'nullable|string',
+            'bairro' => 'nullable|string',
+            'cidade' => 'nullable|string',
+            'estado' => 'nullable|string',
 
-        foreach ($request->dynamic ?? [] as $fieldId => $value) {
-            ClientFieldValue::create([
-                'client_id' => $client->id,
-                'client_field_id' => $fieldId,
-                'value' => $value
-            ]);
-        }
+        ]);
 
-        return redirect()->route('clients.index');
+        $client = Client::create($data);
+
+        return redirect()->back()->with('success', 'Cliente salvo com sucesso!');
     }
+    
 
 
     /**

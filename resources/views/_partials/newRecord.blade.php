@@ -5,9 +5,9 @@
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body flex-grow-1">
-    <form class="add-new-record pt-0 row g-2" id="form-add-new-record" onsubmit="return false">
+    <form action="{{ route('clients.store') }}"  method="post" class="add-new-record pt-0 row g-2" id="form-add-new-record" onsubmit="return false">
+      @csrf
       @foreach($fields as $field)
-       
         @php
           $type = $field['field_type'] ?? 'text';
         @endphp
