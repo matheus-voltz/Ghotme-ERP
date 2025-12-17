@@ -27,7 +27,7 @@
             @elseif ($type === 'select' and isset($field['options']))
               <select
                 name="{{ $field['name'] }}"
-                id="select2Basic" class="select2 form-select selectpicker" data-allow-clear="true">
+                id="{{ $field['field_key'] }}" class="select2 form-select selectpicker" data-allow-clear="true">
                 
                 <option value="">{{ $field['placeholder'] }}</option>
                 @foreach ($field->options as $option)
@@ -39,11 +39,12 @@
             @else
               <input
                 type="{{ $type }}"
-                id="{{ $field['name'] }}"
-                name="{{ $field['name'] }}"
+                id="{{ $field['field_key'] }}"
+                name="{{ $field['field_key'] }}"
                 class="form-control {{ $field['class'] }}"
                 placeholder="{{ $field['placeholder'] }}"
                 aria-label="{{ $field['placeholder'] }}"
+                value=""
               />
             @endif
           </div>
@@ -57,3 +58,26 @@
     </form>
   </div>
 </div>
+
+<script>
+document.getElementById('cep').addEventListener('blur', function () {
+  let cep = this.value.replace(/\D/g, '');
+
+  if (cep.length !== 8) return;
+
+  fetch(`https://brasilapi.com.br/api/cep/v1/${cep}`)
+    .then(response => {
+      if (!response.ok) throw new Error('CEP não encontrado');
+      return response.json();
+    })
+    .then(data => {
+      document.getElementById('rua').value    = data.street || '';
+      document.getElementById('bairro').value = data.neighborhood || '';
+      document.getElementById('cidade').value = data.city || '';
+      document.getElementById('estado').value     = data.state || '';
+    })
+    .catch(() => {
+      alert('CEP inválido ou não encontrado');
+    });
+});
+</script>
