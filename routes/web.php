@@ -73,6 +73,7 @@ Route::get('/quotes/{id}/send-whatsapp', [App\Http\Controllers\quotes\SendWhatsa
 
 //clients
 Route::get('/clients', [App\Http\Controllers\ClientsController::class, 'index'])->name('clients');
+Route::get('/clients/create', [ClientsController::class, 'create'])->name('clients.create');
 Route::post('/clients/store', [ClientsController::class, 'store'])->name('clients.store');
 
 // routes/web.php ou api.php

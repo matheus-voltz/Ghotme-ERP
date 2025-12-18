@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClientField;
 use App\Models\User;
+use App\Models\Client;
 use Illuminate\Http\Request;
 
 
@@ -34,14 +35,14 @@ class ClientsController extends Controller
      */
     public function create(Request $request)
     {
-        $segment = $request->get('segment', 'oficina');
+        $segment = $request->get('segment', 'cliente');
 
         $fields = ClientField::where('segment', $segment)
             ->where('active', true)
             ->orderBy('order')
             ->get();
 
-        return view('clients.create', compact('fields', 'segment'));
+        return view('content.pages.clients.newClients', compact('fields', 'segment'));
     }
 
 
@@ -50,6 +51,7 @@ class ClientsController extends Controller
      */
     public function store(Request $request)
     {
+        dd($request->all());
         $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email',
