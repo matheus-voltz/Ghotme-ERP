@@ -12,9 +12,9 @@
       "slug": "allorders",
       "submenu": [
         {
-          "url": "/allorders",
+          "url": "/ordens-servico",
           "name": "Todas as OS",
-          "slug": "allorders"
+          "slug": "ordens-servico"
         },
         {
           "url": "/newOS",

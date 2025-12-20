@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class endOs extends Controller
+class OrdemServicoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view("content.pages.endOS");
+        return view('content.pages.ordens-servico.index');
     }
 
     /**
