@@ -58,6 +58,9 @@ Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('o
 
 Route::resource('/settings/users-permissions', UserManagement::class)->names('users-permissions');
 
+// Rota 2: Fornece os dados para o DataTables (JSON)
+Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
+
 });
 
 

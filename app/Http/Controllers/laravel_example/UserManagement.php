@@ -38,7 +38,7 @@ class UserManagement extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index(Request $request): JsonResponse
+  public function dataBase(Request $request): JsonResponse
   {
     $columns = [
       1 => 'id',
@@ -70,10 +70,13 @@ class UserManagement extends Controller
       $totalFiltered = $query->count();
     }
 
-    $users = $query->offset($start)
-      ->limit($limit)
-      ->orderBy($order, $dir)
-      ->get();
+    $query->orderBy($order, $dir);
+
+    if ($limit !== null && $limit != -1) {
+      $query->offset($start)->limit($limit);
+    }
+
+    $users = $query->get();
 
     $data = [];
     $ids = $start;
@@ -102,9 +105,9 @@ class UserManagement extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function create()
+  public function index()
   {
-    //
+    return view('content.laravel-example.user-management');
   }
 
   /**

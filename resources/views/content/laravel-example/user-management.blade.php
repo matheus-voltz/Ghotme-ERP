@@ -28,6 +28,18 @@
 @endsection
 
 @section('content')
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Add User</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body mx-0 flex-grow-0">
+    <form class="add-new-user pt-0" id="addNewUserForm">
+      ...
+      ...
+    </form>
+  </div>
+</div>
 <div class="row g-6 mb-6">
   <div class="col-sm-6 col-xl-3">
     <div class="card">
@@ -217,5 +229,27 @@
     </div>
   </div>
 </div>
+<!-- ...existing code... -->
 
+<script>
+  $(function () {
+    var table = $('.datatables-users').DataTable({
+      processing: true,
+      serverSide: true,
+      // AQUI É O PULO DO GATO: Aponta para a rota que retorna o JSON
+      ajax: "{{ route('user-list') }}",
+      columns: [
+        { data: 'fake_id', name: 'id' },
+        { data: 'name', name: 'name' },
+        { data: 'email', name: 'email' },
+        { data: 'email_verified_at', name: 'email_verified_at' },
+        { data: 'action', name: 'action', orderable: false, searchable: false } // Se tiver coluna de ações
+      ],
+      // ... restante das configurações
+    });
+  });
+</script>
+
+<!-- ...existing code... -->
 @endsection
+
