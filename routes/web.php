@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
 use App\Http\Controllers\pages\HomePage;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\laravel_example\UserManagement;
 
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
@@ -53,6 +54,9 @@ Route::middleware([
   // Main Page Route
 Route::get('/', [HomePage::class, 'index'])->name('dashboard');
 Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico'); 
+
+
+Route::resource('/settings/users-permissions', UserManagement::class)->names('users-permissions');
 
 });
 
