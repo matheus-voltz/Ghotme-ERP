@@ -506,17 +506,17 @@ document.addEventListener('DOMContentLoaded', function (e) {
       customerName: {
         validators: {
           notEmpty: {
-            message: 'Please enter fullname '
+            message: 'Por favor preencha o nome completo '
           }
         }
       },
       customerEmail: {
         validators: {
           notEmpty: {
-            message: 'Please enter your email'
+            message: 'Por favor preencha o email'
           },
           emailAddress: {
-            message: 'The value is not a valid email address'
+            message: 'O email nao é valido'
           }
         }
       }

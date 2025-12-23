@@ -57,12 +57,13 @@ Route::get('/', [HomePage::class, 'index'])->name('dashboard');
 Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico'); 
 
 
+
 Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
-
-// Rota que fornece os DADOS (JSON) para o DataTables
-// Aponta para o método 'dataBase' do seu controller
 Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
-
+Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
+Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');
+Route::put('/user-list/{id}', [UserManagement::class, 'update'])->name('user-list.update');
+Route::delete('/user-list/{id}', [UserManagement::class, 'destroy'])->name('user-list.destroy');
 });
 
 

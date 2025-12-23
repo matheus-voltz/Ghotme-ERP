@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 message: 'Please enter email address'
               },
               emailAddress: {
-                message: 'The value is not a valid email address'
+                message: 'O email nao é valido'
               }
             }
           },

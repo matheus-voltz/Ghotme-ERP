@@ -574,6 +574,28 @@ document.addEventListener('DOMContentLoaded', function (e) {
             document.getElementById('user_id').value = data.id;
             document.getElementById('add-user-fullname').value = data.name;
             document.getElementById('add-user-email').value = data.email;
+            document.getElementById('add-user-contact').value = data.contact_number || '';
+            document.getElementById('add-user-company').value = data.company || '';
+
+            setVal('country', data.country);
+            const $country = $('#country');
+            if ($country.length && $country.hasClass('select2-hidden-accessible')) {
+              $country.val(data.country).trigger('change');
+            }
+
+            // role (se for Select2, precisa trigger)
+            setVal('user-role', data.role);
+            const $role = $('#user-role');
+            if ($role.length && $role.hasClass('select2-hidden-accessible')) {
+              $role.val(data.role).trigger('change');
+            }
+
+            // plan (se existir no form)
+            setVal('user-plan', data.plan);
+            const $plan = $('#user-plan');
+            if ($plan.length && $plan.hasClass('select2-hidden-accessible')) {
+              $plan.val(data.plan).trigger('change');
+            }
           });
       }
     });
@@ -628,24 +650,24 @@ document.addEventListener('DOMContentLoaded', function (e) {
         name: {
           validators: {
             notEmpty: {
-              message: 'Please enter fullname'
+              message: 'Por favor preencha o nome completo'
             }
           }
         },
         email: {
           validators: {
             notEmpty: {
-              message: 'Please enter your email'
+              message: 'Por favor preencha o email'
             },
             emailAddress: {
-              message: 'The value is not a valid email address'
+              message: 'O email nao é valido'
             }
           }
         },
         userContact: {
           validators: {
             notEmpty: {
-              message: 'Please enter your contact'
+              message: 'Por favor insira seu número'
             }
           }
         },
@@ -743,19 +765,41 @@ document.addEventListener('DOMContentLoaded', function (e) {
   const phoneMaskList = document.querySelectorAll('.phone-mask');
 
   // Phone Number
-  if (phoneMaskList) {
-    phoneMaskList.forEach(function (phoneMask) {
-      phoneMask.addEventListener('input', event => {
-        const cleanValue = event.target.value.replace(/\D/g, '');
-        phoneMask.value = formatGeneral(cleanValue, {
-          blocks: [3, 3, 4],
-          delimiters: [' ', ' ']
-        });
-      });
-      registerCursorTracker({
-        input: phoneMask,
-        delimiter: ' '
-      });
-    });
+  function formatBRPhone(digits) {
+  // só números e no máximo 11
+  digits = (digits || '').replace(/\D/g, '').slice(0, 11);
+
+  const ddd = digits.slice(0, 2);
+  const part1 = digits.slice(2);
+
+  // enquanto digita, vai montando aos poucos
+  let out = '';
+  if (ddd.length) out = `(${ddd}`;
+  if (ddd.length === 2) out += ') ';
+
+  // 10 dígitos total: (DD) 0000-0000  => part1: 8
+  // 11 dígitos total: (DD) 00000-0000 => part1: 9
+  if (part1.length) {
+    const isMobile = digits.length > 10; // 11 dígitos
+    const firstLen = isMobile ? 5 : 4;
+
+    const a = part1.slice(0, firstLen);
+    const b = part1.slice(firstLen, firstLen + 4);
+
+    out += a;
+    if (b.length) out += `-${b}`;
   }
+
+  return out;
+}
+
+if (phoneMaskList && phoneMaskList.length) {
+  phoneMaskList.forEach(phoneMask => {
+    phoneMask.addEventListener('input', event => {
+      event.target.value = formatBRPhone(event.target.value);
+    });
+
+
+  });
+}
 });
