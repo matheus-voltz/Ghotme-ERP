@@ -229,27 +229,25 @@
     </div>
   </div>
 </div>
-<!-- ...existing code... -->
-
+{{-- // ...existing code... --}}
 <script>
   $(function () {
     var table = $('.datatables-users').DataTable({
       processing: true,
       serverSide: true,
-      // AQUI É O PULO DO GATO: Aponta para a rota que retorna o JSON
+      // Atualize aqui para usar a rota 'user-list'
       ajax: "{{ route('user-list') }}",
       columns: [
         { data: 'fake_id', name: 'id' },
         { data: 'name', name: 'name' },
         { data: 'email', name: 'email' },
         { data: 'email_verified_at', name: 'email_verified_at' },
-        { data: 'action', name: 'action', orderable: false, searchable: false } // Se tiver coluna de ações
+        { data: 'action', name: 'action', orderable: false, searchable: false }
       ],
-      // ... restante das configurações
+      // ...existing code...
     });
   });
 </script>
-
-<!-- ...existing code... -->
+{{-- // ...existing code... --}}
 @endsection
 

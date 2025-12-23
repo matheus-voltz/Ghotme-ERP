@@ -14,6 +14,7 @@ use App\Http\Controllers\authentications\RegisterBasic;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
+
 /*
 |--------------------------------------------------------------------------
 | Email Verification
@@ -56,9 +57,10 @@ Route::get('/', [HomePage::class, 'index'])->name('dashboard');
 Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico'); 
 
 
-Route::resource('/settings/users-permissions', UserManagement::class)->names('users-permissions');
+Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
 
-// Rota 2: Fornece os dados para o DataTables (JSON)
+// Rota que fornece os DADOS (JSON) para o DataTables
+// Aponta para o método 'dataBase' do seu controller
 Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
 
 });

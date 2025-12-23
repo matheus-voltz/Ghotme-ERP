@@ -226,9 +226,9 @@
       "slug": "settings",
       "submenu": [
         {
-          "url": "/settings/users-permissions",
+          "url": "/settings/user-management",
           "name": "Usuários e permissões",
-          "slug": "users-permissions"
+          "slug": "pages-user-management"
         },
         {
           "url": "/settings/custom-checklist",

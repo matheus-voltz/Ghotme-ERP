@@ -15,7 +15,7 @@ class UserManagement extends Controller
    * Redirect to user-management view.
    *
    */
-  public function UserManagement(): View
+  public function index(): View
   {
     // dd('UserManagement');
     $users = User::all();
@@ -105,9 +105,9 @@ class UserManagement extends Controller
    *
    * @return \Illuminate\Http\Response
    */
-  public function index()
+  public function create()
   {
-    return view('content.laravel-example.user-management');
+    // return view('content.laravel-example.user-management');
   }
 
   /**
