@@ -45,6 +45,7 @@ class UserManagement extends Controller
       2 => 'name',
       3 => 'email',
       4 => 'email_verified_at',
+      5 => 'is_active',
     ];
 
     $totalData = User::count(); // Total records without filtering
@@ -88,6 +89,7 @@ class UserManagement extends Controller
         'name' => $user->name,
         'email' => $user->email,
         'email_verified_at' => $user->email_verified_at,
+        'is_active' => $user->is_active,
       ];
     }
 

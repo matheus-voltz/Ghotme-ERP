@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         { data: 'name' },
         { data: 'email' },
         { data: 'email_verified_at' },
+        { data: 'is_active' },
         { data: 'action' }
       ],
       columnDefs: [
@@ -143,6 +144,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
               verified
                 ? '<i class="icon-base ti fs-4 tabler-shield-check text-success"></i>'
                 : '<i class="icon-base ti fs-4 tabler-shield-x text-danger" ></i>'
+            }`;
+          }
+        },
+        {
+          // status
+          targets: 5,
+          className: 'text-center',
+          render: function (data, type, full, meta) {
+            const isActive = full['is_active'];
+            return `${
+              isActive
+                ? '<span class="badge bg-success">Active</span>'
+                : '<span class="badge bg-danger">Inactive</span>'
             }`;
           }
         },
@@ -576,6 +590,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             document.getElementById('add-user-email').value = data.email;
             document.getElementById('add-user-contact').value = data.contact_number || '';
             document.getElementById('add-user-company').value = data.company || '';
+
 
             setVal('country', data.country);
             const $country = $('#country');

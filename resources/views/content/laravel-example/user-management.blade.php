@@ -139,6 +139,7 @@
           <th>User</th>
           <th>Email</th>
           <th>Verified</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
