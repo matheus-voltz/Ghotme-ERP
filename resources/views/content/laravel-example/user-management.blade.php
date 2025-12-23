@@ -46,12 +46,12 @@
       <div class="card-body">
         <div class="d-flex align-items-start justify-content-between">
           <div class="content-left">
-            <span class="text-heading">Users</span>
+            <span class="text-heading">Usuarios</span>
             <div class="d-flex align-items-center my-1">
               <h4 class="mb-0 me-2">{{ $totalUser }}</h4>
               <p class="text-success mb-0">(100%)</p>
             </div>
-            <small class="mb-0">Total Users</small>
+            <small class="mb-0">Total Usuarios</small>
           </div>
           <div class="avatar">
             <span class="avatar-initial rounded bg-label-primary">
@@ -67,12 +67,12 @@
       <div class="card-body">
         <div class="d-flex align-items-start justify-content-between">
           <div class="content-left">
-            <span class="text-heading">Verified Users</span>
+            <span class="text-heading">Usuarios Verificados</span>
             <div class="d-flex align-items-center my-1">
               <h4 class="mb-0 me-2">{{ $verified }}</h4>
               <p class="text-success mb-0">(+95%)</p>
             </div>
-            <small class="mb-0">Recent analytics </small>
+            <small class="mb-0">Analítica recente</small>
           </div>
           <div class="avatar">
             <span class="avatar-initial rounded bg-label-danger">
@@ -88,12 +88,12 @@
       <div class="card-body">
         <div class="d-flex align-items-start justify-content-between">
           <div class="content-left">
-            <span class="text-heading">Duplicate Users</span>
+            <span class="text-heading">Usuarios Duplicados</span>
             <div class="d-flex align-items-center my-1">
               <h4 class="mb-0 me-2">{{ $userDuplicates }}</h4>
               <p class="text-success mb-0">(0%)</p>
             </div>
-            <small class="mb-0">Recent analytics</small>
+            <small class="mb-0">Analítica recente</small>
           </div>
           <div class="avatar">
             <span class="avatar-initial rounded bg-label-success">
@@ -109,12 +109,12 @@
       <div class="card-body">
         <div class="d-flex align-items-start justify-content-between">
           <div class="content-left">
-            <span class="text-heading">Verification Pending</span>
+            <span class="text-heading">Verificação Pendente</span>
             <div class="d-flex align-items-center my-1">
               <h4 class="mb-0 me-2">{{ $notVerified }}</h4>
               <p class="text-danger mb-0">(+6%)</p>
             </div>
-            <small class="mb-0">Recent analytics</small>
+            <small class="mb-0">Analítica recente</small>
           </div>
           <div class="avatar">
             <span class="avatar-initial rounded bg-label-warning">
@@ -129,7 +129,6 @@
 <!-- Users List Table -->
 <div class="card">
   <div class="card-header border-bottom">
-    <h5 class="card-title mb-0">Search Filter</h5>
   </div>
   <div class="card-datatable">
     <table class="datatables-users table border-top">
@@ -148,7 +147,7 @@
   <!-- Offcanvas to add new user -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
     <div class="offcanvas-header border-bottom">
-      <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Add User</h5>
+      <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Adicionar Usuario</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
@@ -177,7 +176,7 @@
         </div>
         <div class="mb-6">
           <label class="form-label" for="country">País</label>
-          <select id="country" class="select2 form-select">
+          <select id="country" class="select2 form-select" name="country">
             <option value="">Selecione</option>
             <option value="Australia">Austrália</option>
             <option value="Bangladesh">Bangladesh</option>
@@ -207,7 +206,7 @@
         </div>
         <div class="mb-6">
           <label class="form-label" for="user-role">Permissão</label>
-          <select id="user-role" class="form-select">
+          <select id="user-role" class="form-select" name="role">
             <option value="subscriber">Inscrito</option>
             <option value="editor">Editor</option>
             <option value="maintainer">Mantenedor</option>
@@ -217,7 +216,7 @@
         </div>
         <div class="mb-6">
           <label class="form-label" for="user-plan">Plano</label>
-          <select id="user-plan" class="form-select">
+          <select id="user-plan" class="form-select" name="plan">
             <option value="basic">Básico</option>
             <option value="enterprise">Empresarial</option>
             <option value="company">Companhia</option>

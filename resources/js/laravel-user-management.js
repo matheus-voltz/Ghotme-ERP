@@ -497,11 +497,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
         // sweetalert for confirmation of delete
         Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
+          title: 'Você tem certeza?',
+          text: "Você não poderá reverter isso!",
           icon: 'warning',
           showCancelButton: true,
-          confirmButtonText: 'Yes, delete it!',
+          confirmButtonText: 'Sim, exclua!',
           customClass: {
             confirmButton: 'btn btn-primary me-3',
             cancelButton: 'btn btn-label-secondary'
@@ -524,8 +524,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                   // success sweetalert
                   Swal.fire({
                     icon: 'success',
-                    title: 'Deleted!',
-                    text: 'The user has been deleted!',
+                    title: 'Excluído!',
+                    text: 'O usuário foi excluído!',
                     customClass: {
                       confirmButton: 'btn btn-success'
                     }
@@ -539,8 +539,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
               });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire({
-              title: 'Cancelled',
-              text: 'The User is not deleted!',
+              title: 'Cancelado',
+              text: 'O usuário não foi excluído!',
               icon: 'error',
               customClass: {
                 confirmButton: 'btn btn-success'
@@ -732,8 +732,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
           // sweetalert
           Swal.fire({
             icon: 'success',
-            title: `Successfully ${status}!`,
-            text: `User ${status} Successfully.`,
+            title: `${status} com sucesso!`,
+            text: `Usuário ${status} com sucesso.`,
             customClass: {
               confirmButton: 'btn btn-success'
             }

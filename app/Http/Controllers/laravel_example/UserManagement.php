@@ -119,16 +119,22 @@ class UserManagement extends Controller
   public function store(Request $request)
   {
     $userID = $request->id;
-
+    
     if ($userID) {
       // update the value
       $users = User::updateOrCreate(
         ['id' => $userID],
-        ['name' => $request->name, 'email' => $request->email]
+        ['name' => $request->name, 
+                'email' => $request->email, 
+                'company' => $request->company,
+                'contact_number' => $request->userContact,
+                'country' => $request->country,
+                'role' => $request->role,
+                'plan' => $request->plan,]
       );
 
-      // user updated
-      return response()->json('Updated');
+      //criar um response json status ok e mensagem updated
+      return response()->json('atualizado');
     } else {
       // create new one if email is unique
       $userEmail = User::where('email', $request->email)->first();
@@ -140,7 +146,7 @@ class UserManagement extends Controller
         );
 
         // user created
-        return response()->json('Created');
+        return response()->json('Criado');
       } else {
         // user already exist
         return response()->json(['message' => "already exits"], 422);
