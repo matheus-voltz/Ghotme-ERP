@@ -94,11 +94,11 @@
               <div class="col-12 mb-2">
                 <div class="form-check form-check-inline my-2 ms-2 me-6">
                   <input name="collapsible-payment" class="form-check-input" type="radio" value="" id="collapsible-payment-cc" checked="" />
-                  <label class="form-check-label" for="collapsible-payment-cc">Cartão de Crédito/Débito/ATM</label>
+                  <label class="form-check-label" for="collapsible-payment-cc">Cartão de Crédito</label>
                 </div>
                 <div class="form-check form-check-inline ms-2 my-2">
                   <input name="collapsible-payment" class="form-check-input" type="radio" value="" id="collapsible-payment-cash" />
-                  <label class="form-check-label" for="collapsible-payment-cash">Conta Paypal</label>
+                  <label class="form-check-label" for="collapsible-payment-cash">Pix</label>
                 </div>
               </div>
               <div class="col-12">
@@ -110,7 +110,7 @@
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label" for="paymentName">Nome</label>
-                <input type="text" id="paymentName" class="form-control" placeholder="John Doe" />
+                <input type="text" id="paymentName" class="form-control" placeholder="Luke Skywalker" />
               </div>
               <div class="col-6 col-md-3">
                 <label class="form-label" for="paymentExpiryDate">Data de Expiração</label>

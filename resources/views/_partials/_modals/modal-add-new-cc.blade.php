@@ -18,7 +18,7 @@
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label" for="modalAddCardName">Name</label>
-            <input type="text" id="modalAddCardName" class="form-control" placeholder="John Doe" />
+            <input type="text" id="modalAddCardName" class="form-control" placeholder="Luke Skywalker" />
           </div>
           <div class="col-6 col-md-3">
             <label class="form-label" for="modalAddCardExpiryDate">Exp. Date</label>

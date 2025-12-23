@@ -260,7 +260,7 @@
                   </div>
                   <div class="col-12 col-md-6">
                     <label for="modalAppUserName" class="form-label">Name on Card</label>
-                    <input type="text" class="form-control" placeholder="John Doe" id="modalAppUserName" />
+                    <input type="text" class="form-control" placeholder="Luke Skywalker" id="modalAppUserName" />
                   </div>
                   <div class="col-6 col-md-3">
                     <label for="modalAppExpiry" class="form-label">Expiry</label>

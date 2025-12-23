@@ -18,7 +18,7 @@
           </div>
           <div class="col-12 col-md-6">
             <label class="form-label" for="modalEditName">Name</label>
-            <input type="text" id="modalEditName" class="form-control" placeholder="John Doe" value="John Doe" />
+            <input type="text" id="modalEditName" class="form-control" placeholder="Luke Skywalker" value="Luke Skywalker" />
           </div>
           <div class="col-6 col-md-3">
             <label class="form-label" for="modalEditExpiryDate">Exp. Date</label>

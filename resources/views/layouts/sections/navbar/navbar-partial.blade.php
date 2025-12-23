@@ -89,7 +89,7 @@ use Illuminate\Support\Facades\Route;
                   @if (Auth::check())
                   {{ Auth::user()->name }}
                   @else
-                  John Doe
+                  Luke Skywalker
                   @endif
                 </h6>
                 <small class="text-body-secondary">Admin</small>

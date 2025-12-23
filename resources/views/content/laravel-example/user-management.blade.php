@@ -157,8 +157,8 @@
         <input type="hidden" name="id" id="user_id">
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-user-fullname">Nome Completo</label>
-          <input type="text" class="form-control" id="add-user-fullname" placeholder="John Doe" name="name"
-            aria-label="John Doe"/>
+          <input type="text" class="form-control" id="add-user-fullname" placeholder="Luke Skywalker" name="name"
+            aria-label="Luke Skywalker"/>
         </div>
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-user-email">Email</label>
