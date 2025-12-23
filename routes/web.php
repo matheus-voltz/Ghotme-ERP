@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\OrdemServicoController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\language\LanguageController;
 use App\Http\Controllers\pages\HomePage;
@@ -64,6 +65,9 @@ Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-
 Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');
 Route::put('/user-list/{id}', [UserManagement::class, 'update'])->name('user-list.update');
 Route::delete('/user-list/{id}', [UserManagement::class, 'destroy'])->name('user-list.destroy');
+
+//settings billing
+Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 });
 
 

@@ -112,7 +112,7 @@ use Illuminate\Support\Facades\Route;
         </li>
         @endif
         <li>
-          <a class="dropdown-item" href="javascript:void(0);">
+          <a class="dropdown-item" href="{{ route('settings') }}">
             <span class="d-flex align-items-center align-middle">
               <i class="flex-shrink-0 icon-base ti tabler-file-dollar me-3 icon-md"></i><span
                 class="flex-grow-1 align-middle">Billing</span>
