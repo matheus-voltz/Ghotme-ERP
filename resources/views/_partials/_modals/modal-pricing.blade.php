@@ -81,8 +81,8 @@
                     <li class="mb-2"><strong>Indicado para:</strong></li>
                     <li class="mb-2">MEI</li>
                     <li class="mb-2">Pequenos negócios</li>
-                    <li class="mb-4">Quem está começando a organizar a casa</li>
                     <br>
+                    <li class="mb-4">Orçamento com integração via whatsapp</li>
                     <li class="mb-4">1 empresa (CNPJ)</li>
                     <li class="mb-4">Até 3 usuários</li>
                     <li class="mb-4">Funcionalidades essenciais do ERP</li>

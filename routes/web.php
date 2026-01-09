@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 | Email Verification
 |--------------------------------------------------------------------------
 */
+Route::view('/welcome', view: 'content.font-pages.landing-page')->name('welcome');
 
 Route::get('/email/verify', function () {
     return view('content.authentications.auth-verify-email-basic');

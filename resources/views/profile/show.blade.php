@@ -11,6 +11,16 @@ $breadcrumbs = [['link' => 'home', 'name' => 'Home'], ['link' => 'javascript:voi
 @section('content')
 
 @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+<div class="nav-align-top">
+  <ul class="nav nav-pills flex-column flex-md-row mb-6">
+    <li class="nav-item">
+      <a class="nav-link active" href="#"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Account</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Billing & Plans</a>
+    </li>
+  </ul>
+</div>
 <div class="mb-6">
   @livewire('profile.update-profile-information-form')
 </div>
