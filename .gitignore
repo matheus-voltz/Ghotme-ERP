@@ -2,7 +2,7 @@ node_modules
 /vendor
 /node_modules
 .env
-.env.*
+.env
 /storage/*.key
 /public/storage
 /.idea
