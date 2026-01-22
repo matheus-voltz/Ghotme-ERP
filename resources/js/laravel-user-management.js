@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   // Variable declaration for table
   const dt_user_table = document.querySelector('.datatables-users'),
     userView = baseUrl + 'app/user/view/account',
+    userSuspend = baseUrl + 'app/user/suspend/account',
     offCanvasForm = document.getElementById('offcanvasAddUser');
 
   // Select2 initialization
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
               '<a href="' +
               userView +
               '" class="dropdown-item">View</a>' +
-              '<a href="javascript:;" class="dropdown-item">Suspend</a>' +
+              '<a href="'+userSuspend+'" class="dropdown-item">Suspend</a>' +
               '</div>' +
               '</div>'
             );
