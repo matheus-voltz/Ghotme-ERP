@@ -13,20 +13,6 @@
       0 => 'Laravel\\Jetstream\\JetstreamServiceProvider',
     ),
   ),
-  'laravel/pail' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Pail\\PailServiceProvider',
-    ),
-  ),
-  'laravel/sail' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Laravel\\Sail\\SailServiceProvider',
-    ),
-  ),
   'laravel/sanctum' => 
   array (
     'providers' => 
@@ -59,29 +45,11 @@
       0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
   ),
-  'nunomaduro/collision' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-    ),
-  ),
   'nunomaduro/termwind' => 
   array (
     'providers' => 
     array (
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    ),
-  ),
-  'pixinvent/vuexy-laravel-bootstrap-jetstream' => 
-  array (
-    'aliases' => 
-    array (
-      'Jetstrap' => 'Pixinvent\\Jetstrap\\JetstrapFacade',
-    ),
-    'providers' => 
-    array (
-      0 => 'Pixinvent\\Jetstrap\\JetstrapServiceProvider',
     ),
   ),
 );
