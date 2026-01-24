@@ -11,6 +11,7 @@ use App\Http\Controllers\laravel_example\UserManagement;
 use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
+use App\Http\Controllers\ClientsController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -59,8 +60,10 @@ Route::middleware([
     Route::get('/', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
     
-    // Route::get('/clients', [ClientController::class, 'index'])->name('clients');
+    // Clients
+    Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
 
+    // Settings
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
     Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
