@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Clients extends Model
 {
+    protected $table = 'clients';
+
     protected $fillable = [
         'type',
         'name',
@@ -34,4 +36,3 @@ class Clients extends Model
         return $this->hasMany(ClientFieldValue::class);
     }
 }
-

@@ -61,9 +61,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 // columns according to JSON
                 { data: 'fake_id' },
                 { data: 'id' },
+                { data: 'type' },
                 { data: 'name' },
                 { data: 'email' },
-                { data: 'email_verified_at' },
+                { data: 'company_name' },
                 { data: 'is_active' },
                 { data: 'action' }
             ],
@@ -88,25 +89,37 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     }
                 },
                 {
-                    // User full name
+                    // Type
                     targets: 2,
+                    render: function (data, type, full, meta) {
+                        const clientType = full['type'];
+                        const color = clientType === 'PJ' ? 'info' : 'success';
+                        return `<span class="badge bg-label-${color}">${clientType}</span>`;
+                    }
+                },
+                {
+                    // Client Name
+                    targets: 3,
                     responsivePriority: 4,
                     render: function (data, type, full, meta) {
-                        const { name } = full; // Destructuring to get 'name' from the 'full' object
+                        const { name, company_name, type: clientType } = full;
+                        // Display name logic: priority to company_name if PJ, else name
+                        const displayName = clientType === 'PJ' ? company_name : name;
 
                         // For Avatar badge
                         const stateNum = Math.floor(Math.random() * 6);
                         const states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
                         const state = states[stateNum];
 
-                        // Extract initials from the name
-                        const initials = (name.match(/\b\w/g) || []).shift() + (name.match(/\b\w/g) || []).pop();
+                        // Extract initials
+                        let initials = (displayName.match(/\b\w/g) || []).shift() || '';
+                        if ((displayName.match(/\b\w/g) || []).length > 1) {
+                            initials += (displayName.match(/\b\w/g) || []).pop();
+                        }
                         const initialsUpper = initials.toUpperCase();
 
-                        // Create avatar badge using template literals
                         const avatar = `<span class="avatar-initial rounded-circle bg-label-${state}">${initialsUpper}</span>`;
 
-                        // Create full output for row using template literals
                         const rowOutput = `
               <div class="d-flex justify-content-start align-items-center user-name">
                 <div class="avatar-wrapper">
@@ -116,46 +129,38 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 </div>
                 <div class="d-flex flex-column">
                   <a href="${userView}" class="text-truncate text-heading">
-                    <span class="fw-medium">${name}</span>
+                    <span class="fw-medium">${displayName}</span>
                   </a>
                 </div>
               </div>
             `;
-
-                        // Return the final output as HTML string
                         return rowOutput;
                     }
                 },
                 {
-                    // User email
-                    targets: 3,
+                    // Email
+                    targets: 4,
                     render: function (data, type, full, meta) {
-                        const email = full['email'];
-
-                        return '<span class="user-email">' + email + '</span>';
+                        return '<span class="user-email">' + full['email'] + '</span>';
                     }
                 },
                 {
-                    // email verify
-                    targets: 4,
+                    // Company Name (Extra column if needed, or maybe verified status?)
+                    targets: 5,
                     className: 'text-center',
                     render: function (data, type, full, meta) {
-                        const verified = full['email_verified_at'];
-                        return `${verified
-                                ? '<i class="icon-base ti fs-4 tabler-shield-check text-success"></i>'
-                                : '<i class="icon-base ti fs-4 tabler-shield-x text-danger" ></i>'
-                            }`;
+                        return full['company_name'] || '-';
                     }
                 },
                 {
                     // status
-                    targets: 5,
+                    targets: 6,
                     className: 'text-center',
                     render: function (data, type, full, meta) {
                         const isActive = full['is_active'];
                         return `${isActive
-                                ? '<span class="badge bg-success">Ativo</span>'
-                                : '<span class="badge bg-danger">Inativo</span>'
+                            ? '<span class="badge bg-success">Ativo</span>'
+                            : '<span class="badge bg-danger">Inativo</span>'
                             }`;
                     }
                 },

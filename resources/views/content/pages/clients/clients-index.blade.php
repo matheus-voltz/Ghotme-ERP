@@ -2,18 +2,9 @@
 
 @section('title', 'Clients')
 @section('content')
-{{-- <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddClients" aria-labelledby="offcanvasAddClientsLabel">
-  <div class="offcanvas-header">
-    <h5 id="offcanvasAddClientsLabel" class="offcanvas-title">Add Client</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body mx-0 flex-grow-0">
-    <form class="add-new-clients pt-0" id="addNewClientsForm">
-      ...
-      ...
-    </form>
-  </div>
-</div> --}}
+@section('page-script')
+@vite(['resources/js/laravel-clients.js'])
+@endsection
 <div class="card">
   <div class="card-header border-bottom">
   </div>
@@ -33,7 +24,7 @@
       </thead>
     </table>
   </div>
-<!-- Offcanvas to add new client -->
+  <!-- Offcanvas to add new client -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddClients" aria-labelledby="offcanvasAddClientsLabel">
     <div class="offcanvas-header border-bottom">
       <h5 id="offcanvasAddClientsLabel" class="offcanvas-title">Adicionar Cliente</h5>
@@ -46,7 +37,7 @@
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-client-fullname">Nome</label>
           <input type="text" class="form-control" id="add-client-fullname" placeholder="Luke Skywalker" name="name"
-            aria-label="Luke Skywalker"/>
+            aria-label="Luke Skywalker" />
         </div>
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-client-email">Email</label>
@@ -56,7 +47,7 @@
         <div class="mb-6">
           <label class="form-label" for="add-client-company">Nome Empresa</label>
           <input type="text" id="add-client-company" class="form-control" placeholder="Web Developer" aria-label="jdoe1"
-            name="company" value/>
+            name="company" value />
         </div>
         <div class="mb-6">
           <label class="form-label" for="country">País</label>
@@ -114,46 +105,5 @@
   </div>
 </div>
 {{-- // ...existing code... --}}
-<script>
-  $(function () {
-    var table = $('.datatables-clients').DataTable({
-      processing: true,
-      serverSide: true,
-      // Atualize aqui para usar a rota 'user-list'
-      ajax: "{{ route('clients-list') }}",
-      columns: [
-        { data: 'fake_id', name: 'id' },
-        { data: 'type', name: 'type' },
-        { data: 'name', name: 'name' },
-        { data: 'email', name: 'email' },
-        { data: 'company_name', name: 'company_name' },
-        { data: 'status', name: 'status' },
-        { data: 'actions', name: 'action', orderable: false, searchable: false }
-      ],
-      // ...existing code...
-    });
-  });
 
-    // edit record
-  $(document).on('click', '.edit-record', function () {
-    var client_id = $(this).data('id');
-    console.log('Editing client with ID:', client_id);
-    // changing the title of offcanvas
-    $('#offcanvasAddClientsLabel').html('Edit Client');
-
-    // get data
-    $.get(`${baseUrl}clients-list\/${client_id}\/edit`, function (data) {
-      $('#client_id').val(data.id);
-      $('#add-client-fullname').val(data.name);
-      $('#add-client-email').val(data.email);
-      $('#add-client-contact').val(data.contact_number || '');
-      $('#add-client-company').val(data.company || '');
-
-      $('#country').val(data.country).trigger('change'); // bom para select2
-      $('#client-role').val(data.role).trigger('change');
-      $('#client-plan').val(data.plan).trigger('change');
-    });
-
-  });
-</script>
 @endsection
