@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Client;
+use App\Models\Clients;
 
 class ClientsController extends Controller
 {
@@ -14,7 +14,7 @@ class ClientsController extends Controller
 
     public function index()
     {
-        $clients = Client::all();
+        $clients = Clients::all();
         return view('content.pages.clients.clients-index', compact('clients'));
     }
 
@@ -23,7 +23,8 @@ class ClientsController extends Controller
      */
     public function dataBase()
     {
-        $clients = Client::all();
+        $clients = Clients::all();
+        dd($clients);
         return response()->json($clients);
     }
     

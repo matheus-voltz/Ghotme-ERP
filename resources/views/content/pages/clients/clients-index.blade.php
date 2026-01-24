@@ -123,9 +123,11 @@
       ajax: "{{ route('clients-list') }}",
       columns: [
         { data: 'fake_id', name: 'id' },
+        { data: 'type', name: 'type' },
         { data: 'name', name: 'name' },
         { data: 'email', name: 'email' },
-        { data: 'company', name: 'company' },
+        { data: 'company_name', name: 'company_name' },
+        { data: 'status', name: 'status' },
         { data: 'actions', name: 'action', orderable: false, searchable: false }
       ],
       // ...existing code...

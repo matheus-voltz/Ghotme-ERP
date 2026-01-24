@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
     });
 
     // Users datatable
-    if (dt_user_table) {
-        const dt_user = new DataTable(dt_user_table, {
+    if (dt_clients_table) {
+        const dt_clients = new DataTable(dt_clients_table, {
             processing: true,
             serverSide: true,
             ajax: {
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             },
             columns: [
                 // columns according to JSON
-                { data: 'id' },
+                { data: 'fake_id' },
                 { data: 'id' },
                 { data: 'name' },
                 { data: 'email' },
