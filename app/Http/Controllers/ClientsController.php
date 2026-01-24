@@ -71,6 +71,7 @@ class ClientsController extends Controller
             // Campos extras que podem ser úteis no template JS
             $nestedData['company_name'] = $client->company_name;
             $nestedData['trade_name'] = $client->trade_name ?? '';
+            $nestedData['action'] = '';
 
             $data[] = $nestedData;
         }

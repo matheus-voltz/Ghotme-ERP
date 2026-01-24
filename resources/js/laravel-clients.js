@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         }
     });
 
-    // Users datatable
+    // Clients datatable
     if (dt_clients_table) {
         const dt_clients = new DataTable(dt_clients_table, {
             processing: true,

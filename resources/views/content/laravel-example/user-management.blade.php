@@ -28,7 +28,8 @@
 @endsection
 
 @section('content')
-{{-- <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
+{{-- 
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddUser" aria-labelledby="offcanvasAddUserLabel">
   <div class="offcanvas-header">
     <h5 id="offcanvasAddUserLabel" class="offcanvas-title">Add User</h5>
     <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>

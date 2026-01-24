@@ -2,9 +2,42 @@
 
 @section('title', 'Clients')
 @section('content')
+
+
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+'resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
+@endsection
+
+<!-- Vendor Scripts -->
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/moment/moment.js',
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/@form-validation/popular.js',
+'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
+'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/cleave-zen/cleave-zen.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
+@endsection
+
 @section('page-script')
 @vite(['resources/js/laravel-clients.js'])
 @endsection
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddClients" aria-labelledby="offcanvasAddClientsLabel">
+  <div class="offcanvas-header">
+    <h5 id="offcanvasAddClientsLabel" class="offcanvas-title">Add Client</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body mx-0 flex-grow-0">
+    <form class="add-new-clients pt-0" id="addNewClientsForm">
+      ...
+      ...
+    </form>
+  </div>
+</div>
 <div class="card">
   <div class="card-header border-bottom">
   </div>
