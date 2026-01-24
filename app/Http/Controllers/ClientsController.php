@@ -21,12 +21,68 @@ class ClientsController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function dataBase()
+    public function dataBase(Request $request)
     {
-        $clients = Clients::all();
-        return response()->json($clients);
+        $totalData = Clients::count();
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')] ?? 'id';
+        $dir = $request->input('order.0.dir') ?? 'desc';
+
+        if (empty($request->input('search.value'))) {
+            $clients = Clients::offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+        } else {
+            $search = $request->input('search.value');
+
+            $clients = Clients::where('id', 'LIKE', "%{$search}%")
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orWhere('company_name', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order, $dir)
+                ->get();
+
+            $totalFiltered = Clients::where('id', 'LIKE', "%{$search}%")
+                ->orWhere('name', 'LIKE', "%{$search}%")
+                ->orWhere('company_name', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->count();
+        }
+
+        $data = [];
+        $ids = $start;
+
+        foreach ($clients as $client) {
+            $nestedData['fake_id'] = ++$ids;
+            $nestedData['id'] = $client->id;
+            // Para o JS exibir corretamente, passamos o nome completo (ou razão social) no campo 'name'
+            $nestedData['name'] = $client->type === 'PJ' ? $client->company_name : $client->name;
+            $nestedData['email'] = $client->email;
+            $nestedData['email_verified_at'] = 1; // Simulado pois Client não tem verification
+            $nestedData['is_active'] = $client->status === 'Ativo';
+            $nestedData['type'] = $client->type;
+
+            // Campos extras que podem ser úteis no template JS
+            $nestedData['company_name'] = $client->company_name;
+            $nestedData['trade_name'] = $client->trade_name ?? '';
+
+            $data[] = $nestedData;
+        }
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => intval($totalData),
+            'recordsFiltered' => intval($totalFiltered),
+            'data' => $data
+        ]);
     }
-    
+
     public function create()
     {
         //
