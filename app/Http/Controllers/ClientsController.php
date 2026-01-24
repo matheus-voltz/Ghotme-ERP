@@ -24,7 +24,6 @@ class ClientsController extends Controller
     public function dataBase()
     {
         $clients = Clients::all();
-        dd($clients);
         return response()->json($clients);
     }
     
