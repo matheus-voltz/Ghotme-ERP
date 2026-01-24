@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                   </div>
                 </div>
                 <div class="d-flex flex-column">
-                  <a href="${userView}" class="text-truncate text-heading">
+                  <a href="${clientsView}" class="text-truncate text-heading">
                     <span class="fw-medium">${displayName}</span>
                   </a>
                 </div>
@@ -166,21 +166,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 {
                     // Actions
-                    targets: -1,
+                    targets: 7,
                     title: 'Ações',
                     searchable: false,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         return (
                             '<div class="d-flex align-items-center gap-4">' +
-                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full['id']}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
+                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full['id']}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddClients"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
                             `<button class="btn btn-sm btn-icon delete-record" data-id="${full['id']}"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
                             '<button class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="icon-base ti tabler-dots-vertical icon-22px"></i></button>' +
                             '<div class="dropdown-menu dropdown-menu-end m-0">' +
                             '<a href="' +
-                            userView +
+                            clientsView +
                             '" class="dropdown-item">View</a>' +
-                            '<a href="' + userSuspend + '" class="dropdown-item">Suspend</a>' +
+                            '<a href="' + clientsSuspend + '" class="dropdown-item">Suspend</a>' +
                             '</div>' +
                             '</div>'
                         );
