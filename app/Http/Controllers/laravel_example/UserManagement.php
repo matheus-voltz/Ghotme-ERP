@@ -49,16 +49,16 @@ class UserManagement extends Controller
     ];
 
     $totalData = User::count(); // Total records without filtering
-      $totalFiltered = $totalData;
+    $totalFiltered = $totalData;
 
-      $limit = $request->input('length');
-      $start = $request->input('start');
-      $order = $columns[$request->input('order.0.column')] ?? 'id';
-      $dir = $request->input('order.0.dir') ?? 'desc';
+    $limit = $request->input('length');
+    $start = $request->input('start');
+    $order = $columns[$request->input('order.0.column')] ?? 'id';
+    $dir = $request->input('order.0.dir') ?? 'desc';
 
-      $query = User::query();
+    $query = User::query();
 
-      // Search handling
+    // Search handling
     if (!empty($request->input('search.value'))) {
       $search = $request->input('search.value');
 
@@ -121,18 +121,20 @@ class UserManagement extends Controller
   public function store(Request $request)
   {
     $userID = $request->id;
-    
+
     if ($userID) {
       // update the value
       $users = User::updateOrCreate(
         ['id' => $userID],
-        ['name' => $request->name, 
-                'email' => $request->email, 
-                'company' => $request->company,
-                'contact_number' => $request->userContact,
-                'country' => $request->country,
-                'role' => $request->role,
-                'plan' => $request->plan,]
+        [
+          'name' => $request->name,
+          'email' => $request->email,
+          'company' => $request->company,
+          'contact_number' => $request->userContact,
+          'country' => $request->country,
+          'role' => $request->role,
+          'plan' => $request->plan,
+        ]
       );
 
       //criar um response json status ok e mensagem updated
@@ -197,5 +199,32 @@ class UserManagement extends Controller
   public function destroy($id)
   {
     $users = User::where('id', $id)->delete();
+  }
+
+  /**
+   * Suspend the specified user account.
+   *
+   * @param  \Illuminate\Http\Request  $request
+   * @return \Illuminate\Http\Response
+   */
+  public function suspendUser(Request $request)
+  {
+    $userId = $request->id;
+    $user = User::find($userId);
+
+    if ($user) {
+      // Toggle suspension or just suspend? "Suspend" implies turning off.
+      // Assuming is_active = 1 is active, 0 is suspended.
+      // If we want to strictly "suspend", we set to 0.
+      // If the user is already suspended, maybe we want to activate? 
+      // The request says "suspend/account", so I'll assume it sets to suspended state.
+      // However, usually these buttons are toggles. I will make provided ID suspended.
+      $user->is_active = 0;
+      $user->save();
+
+      return response()->json(['status' => 'success', 'message' => 'User suspended successfully']);
+    }
+
+    return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
   }
 }

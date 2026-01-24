@@ -156,15 +156,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
             const isActive = full['is_active'];
             return `${
               isActive
-                ? '<span class="badge bg-success">Active</span>'
-                : '<span class="badge bg-danger">Inactive</span>'
+                ? '<span class="badge bg-success">Ativo</span>'
+                : '<span class="badge bg-danger">Inativo</span>'
             }`;
           }
         },
         {
           // Actions
           targets: -1,
-          title: 'Actions',
+          title: 'Ações',
           searchable: false,
           orderable: false,
           render: function (data, type, full, meta) {
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
           features: [
             {
               search: {
-                placeholder: 'Search User',
+                placeholder: 'Procurar usuario',
                 text: '_INPUT_'
               }
             },
@@ -210,12 +210,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 {
                   extend: 'collection',
                   className: 'btn btn-label-secondary dropdown-toggle',
-                  text: '<i class="icon-base ti tabler-upload me-2 icon-sm"></i>Export',
+                  text: '<i class="icon-base ti tabler-upload me-2 icon-sm"></i>Exportar',
                   buttons: [
                     {
                       extend: 'print',
                       title: 'Users',
-                      text: '<i class="icon-base ti tabler-printer me-2" ></i>Print',
+                      text: '<i class="icon-base ti tabler-printer me-2" ></i>Imprimir',
                       className: 'dropdown-item',
                       exportOptions: {
                         columns: [1, 2, 3, 4, 5],
@@ -382,7 +382,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     {
                       extend: 'copy',
                       title: 'Users',
-                      text: '<i class="icon-base ti tabler-copy me-2" ></i>Copy',
+                      text: '<i class="icon-base ti tabler-copy me-2" ></i>Copiar',
                       className: 'dropdown-item',
                       exportOptions: {
                         columns: [1, 2, 3, 4, 5],
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                   ]
                 },
                 {
-                  text: '<i class="icon-base ti tabler-plus icon-sm me-0 me-sm-2"></i><span class="d-none d-sm-inline-block">Add New User</span>',
+                  text: '<i class="icon-base ti tabler-plus icon-sm me-0 me-sm-2"></i><span class="d-none d-sm-inline-block">Adicionar novo usuario</span>',
                   className: 'add-new btn btn-primary',
                   attr: {
                     'data-bs-toggle': 'offcanvas',
@@ -621,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
     if (addNewBtn) {
       addNewBtn.addEventListener('click', function () {
         document.getElementById('user_id').value = ''; //resetting input field
-        document.getElementById('offcanvasAddUserLabel').innerHTML = 'Add User';
+        document.getElementById('offcanvasAddUserLabel').innerHTML = 'Adicionar novo usuario';
       });
     }
 

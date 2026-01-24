@@ -136,11 +136,11 @@
         <tr>
           <th></th>
           <th>Id</th>
-          <th>User</th>
+          <th>Usuario</th>
           <th>Email</th>
-          <th>Verified</th>
+          <th>Verificado</th>
           <th>Status</th>
-          <th>Actions</th>
+          <th>Ações</th>
         </tr>
       </thead>
     </table>
@@ -243,7 +243,7 @@
         { data: 'name', name: 'name' },
         { data: 'email', name: 'email' },
         { data: 'email_verified_at', name: 'email_verified_at' },
-        { data: 'action', name: 'action', orderable: false, searchable: false }
+        { data: 'actions', name: 'action', orderable: false, searchable: false }
       ],
       // ...existing code...
     });

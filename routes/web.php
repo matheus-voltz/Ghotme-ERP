@@ -21,6 +21,7 @@ use Illuminate\Http\Request;
 | Email Verification
 |--------------------------------------------------------------------------
 */
+
 Route::view('/welcome', view: 'content.font-pages.landing-page')->name('welcome');
 
 Route::get('/email/verify', function () {
@@ -49,33 +50,34 @@ Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
 Route::middleware([
-  'auth:sanctum',
-  config('jetstream.auth_session'),
-  'verified',
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
 ])->group(function () {
-  
-  // Main Page Route
-Route::get('/', [HomePage::class, 'index'])->name('dashboard');
-Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico'); 
+
+    // Main Page Route
+    Route::get('/', [HomePage::class, 'index'])->name('dashboard');
+    Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
 
 
 
-Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
-Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
-Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
-Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');
-Route::put('/user-list/{id}', [UserManagement::class, 'update'])->name('user-list.update');
-Route::delete('/user-list/{id}', [UserManagement::class, 'destroy'])->name('user-list.destroy');
+    Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
+    Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
+    Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
+    Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');
+    Route::put('/user-list/{id}', [UserManagement::class, 'update'])->name('user-list.update');
+    Route::delete('/user-list/{id}', [UserManagement::class, 'destroy'])->name('user-list.destroy');
+    Route::post('/app/user/suspend/account', [UserManagement::class, 'suspendUser'])->name('user-management.suspend');
 
-//settings billing
-Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    //settings billing
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
 });
 
 
 Route::get('/teste-email', function () {
     Mail::raw('Teste de email via Gmail', function ($message) {
         $message->to('grafit933@gmail.com')
-                ->subject('Teste Laravel Gmail');
+            ->subject('Teste Laravel Gmail');
     });
 
     return 'Email enviado';
