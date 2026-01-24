@@ -121,19 +121,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         const avatar = `<span class="avatar-initial rounded-circle bg-label-${state}">${initialsUpper}</span>`;
 
                         const rowOutput = `
-              <div class="d-flex justify-content-start align-items-center user-name">
-                <div class="avatar-wrapper">
-                  <div class="avatar avatar-sm me-4">
-                    ${avatar}
-                  </div>
-                </div>
-                <div class="d-flex flex-column">
-                  <a href="${clientsView}" class="text-truncate text-heading">
-                    <span class="fw-medium">${displayName}</span>
-                  </a>
-                </div>
-              </div>
-            `;
+                            <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="avatar-wrapper">
+                                <div class="avatar avatar-sm me-4">
+                                    ${avatar}
+                                </div>
+                                </div>
+                                <div class="d-flex flex-column">
+                                <a href="${clientsView}" class="text-truncate text-heading">
+                                    <span class="fw-medium">${displayName}</span>
+                                </a>
+                                </div>
+                            </div>
+                        `;
                         return rowOutput;
                     }
                 },
