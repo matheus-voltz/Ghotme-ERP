@@ -23,7 +23,7 @@
     <div class="nav-align-top">
       <ul class="nav nav-pills flex-column flex-md-row mb-6">
         <li class="nav-item">
-          <a class="nav-link" href="#"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Account</a>
+          <a class="nav-link" href="{{ route('profile.show') }}"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Account</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Billing & Plans</a>
