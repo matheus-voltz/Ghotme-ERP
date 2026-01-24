@@ -15,22 +15,22 @@ class Clients extends Model
         'rg',
         'birth_date',
         'company_name',
+        'trade_name',
         'cnpj',
         'state_registration',
         'municipal_registration',
-        'cep',
-        'address',
-        'number',
-        'complement',
-        'district',
-        'city',
-        'state',
-        'country',
         'email',
         'phone',
         'whatsapp',
-        'status'
+        'cep',
+        'rua',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
     ];
+
     public function fieldValues()
     {
         return $this->hasMany(ClientFieldValue::class);
