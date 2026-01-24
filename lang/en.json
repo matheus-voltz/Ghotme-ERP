@@ -222,6 +222,10 @@
   "Cancelled": "Cancelado",
   "Yes": "Sim",
   "No": "Não",
-  "Assinatura cancelada!": "Desinscrito!",
-  "Cancel": "Cancelar"
+  "Assinatura cancelada!": "Assinatura cancelada!",
+  "Cancel": "Cancelar",
+  "Create API Token": "Criar token API",
+  "API tokens allow third-party services to authenticate with our application on your behalf.": "Tokens API permitem que serviços terceiros autentiquem com nossa aplicação em seu nome.",
+  "Token Name": "Nome do token",
+  "Create": "Criar"
 }

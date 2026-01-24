@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire({
-              title: 'Cancelled',
+              title: 'Cancelado',
               text: 'Desinscrição cancelada!!',
               icon: 'error',
               customClass: {

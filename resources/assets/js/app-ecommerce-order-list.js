@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
       1: { title: 'Paid', class: 'text-success' },
       2: { title: 'Pending', class: 'text-warning' },
       3: { title: 'Failed', class: 'text-danger' },
-      4: { title: 'Cancelled', class: 'text-secondary' }
+      4: { title: 'Cancelado', class: 'text-secondary' }
     };
 
   // E-commerce Products datatable

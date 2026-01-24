@@ -32,8 +32,8 @@
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           Swal.fire({
-            title: 'Cancelled',
-            text: 'Cancelled Delete :)',
+            title: 'Cancelado',
+            text: 'Cancelado Delete :)',
             icon: 'error',
             customClass: {
               confirmButton: 'btn btn-success waves-effect waves-light'
@@ -75,7 +75,7 @@
             });
           } else if (result.dismiss === Swal.DismissReason.cancel) {
             Swal.fire({
-              title: 'Cancelled',
+              title: 'Cancelado',
               text: 'Desinscrição cancelada!!',
               icon: 'error',
               customClass: {

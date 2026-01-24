@@ -71,10 +71,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
             onStatusChanged: function (areFieldsValid) {
               areFieldsValid
                 ? // Enable the submit button
-                  // so user has a chance to submit the form again
-                  deactivateButton.removeAttribute('disabled')
+                // so user has a chance to submit the form again
+                deactivateButton.removeAttribute('disabled')
                 : // Disable the submit button
-                  deactivateButton.setAttribute('disabled', 'disabled');
+                deactivateButton.setAttribute('disabled', 'disabled');
             }
           }),
           // Submit the form when all fields are valid
@@ -120,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
               });
             } else if (result.dismiss === Swal.DismissReason.cancel) {
               Swal.fire({
-                title: 'Cancelled',
-                text: 'Deactivation Cancelled!!',
+                title: 'Cancelado',
+                text: 'Deactivation Cancelado!!',
                 icon: 'error',
                 customClass: {
                   confirmButton: 'btn btn-success waves-effect waves-light'

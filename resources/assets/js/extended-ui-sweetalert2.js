@@ -422,7 +422,7 @@
         const values = [];
         let currentStep;
 
-        for (currentStep = 0; currentStep < steps.length; ) {
+        for (currentStep = 0; currentStep < steps.length;) {
           const result = await new swalQueueStep({
             title: 'Question ' + steps[currentStep],
             showCancelButton: currentStep > 0,
@@ -544,7 +544,7 @@
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           Swal.fire({
-            title: 'Cancelled',
+            title: 'Cancelado',
             text: 'Your imaginary file is safe :)',
             icon: 'error',
             customClass: {
