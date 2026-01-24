@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
   if (cancelSubscription) {
     cancelSubscription.onclick = function () {
       Swal.fire({
-        text: 'Are you sure you would like to cancel your subscription?',
+        text: 'Tem certeza que quer cancelar sua inscrição?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Yes',
@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
         if (result.value) {
           Swal.fire({
             icon: 'success',
-            title: 'Unsubscribed!',
-            text: 'Your subscription cancelled successfully.',
+            title: 'Assinatura cancelada!',
+            text: 'Sua inscrição foi cancelada com sucesso!!',
             customClass: {
               confirmButton: 'btn btn-success waves-effect waves-light'
             }
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           Swal.fire({
             title: 'Cancelled',
-            text: 'Unsubscription Cancelled!!',
+            text: 'Desinscrição cancelada!!',
             icon: 'error',
             customClass: {
               confirmButton: 'btn btn-success waves-effect waves-light'

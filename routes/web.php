@@ -58,8 +58,8 @@ Route::middleware([
     // Main Page Route
     Route::get('/', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
-
-
+    
+    // Route::get('/clients', [ClientController::class, 'index'])->name('clients');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
