@@ -21,6 +21,12 @@ class ClientsController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+    public function dataBase()
+    {
+        $clients = Client::all();
+        return response()->json($clients);
+    }
+    
     public function create()
     {
         //

@@ -62,6 +62,7 @@ Route::middleware([
     
     // Clients
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
+    Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
 
     // Settings
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
