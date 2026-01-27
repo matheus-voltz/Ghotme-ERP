@@ -12,6 +12,7 @@ use App\Http\Controllers\pages\MiscError;
 use App\Http\Controllers\authentications\LoginBasic;
 use App\Http\Controllers\authentications\RegisterBasic;
 use App\Http\Controllers\ClientsController;
+use App\Http\Controllers\VehiclesController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -63,6 +64,10 @@ Route::middleware([
     // Clients
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
+
+    // Vehicles
+    Route::get('/vehicles', [VehiclesController::class, 'index'])->name('vehicles');
+    Route::get('/vehicles-list', [VehiclesController::class, 'dataBase'])->name('vehicles-list');
 
     // Settings
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
