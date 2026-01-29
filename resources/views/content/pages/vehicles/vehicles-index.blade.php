@@ -24,7 +24,7 @@
 @endsection
 
 @section('page-script')
-@vite(['resources/js/laravel-clients.js'])
+@vite(['resources/js/laravel-vehicles.js'])
 @endsection
 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddVehicles" aria-labelledby="offcanvasAddVehiclesLabel">
   <div class="offcanvas-header">
@@ -42,7 +42,7 @@
   <div class="card-header border-bottom">
   </div>
   <div class="card-datatable">
-    <table class="datatables-clients table border-top">
+    <table class="datatables-vehicles table border-top">
       <thead>
         <tr>
           <th></th>
@@ -69,38 +69,35 @@
         @csrf
         <input type="hidden" name="id" id="vehicle_id">
         <div class="mb-6 form-control-validation">
-          <label class="form-label" for="add-vehicle-fullname">Placa</label>
-          <input type="text" class="form-control" id="add-vehicle-fullname" placeholder="Luke Skywalker" name="name"
-            aria-label="Luke Skywalker" />
+          <label class="form-label" for="add-vehicle-placa">Placa</label>
+          <input type="text" class="form-control" id="add-vehicle-placa" placeholder="ABC-1234" name="placa"
+            aria-label="Placa" />
         </div>
         <div class="mb-6 form-control-validation">
-          <label class="form-label" for="add-vehicle-email">Renavam</label>
-          <input type="text" id="add-vehicle-email" class="form-control" placeholder="john.doe@example.com"
-            aria-label="john.doe@example.com" name="email" />
+          <label class="form-label" for="add-vehicle-renavam">Renavam</label>
+          <input type="text" id="add-vehicle-renavam" class="form-control" placeholder="12345678901"
+            aria-label="Renavam" name="renavan" />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="add-vehicle-company">Marca</label>
-          <input type="text" id="add-vehicle-company" class="form-control" placeholder="Web Developer" aria-label="jdoe1"
-            name="company" value />
+          <label class="form-label" for="add-vehicle-marca">Marca</label>
+          <input type="text" id="add-vehicle-marca" class="form-control" placeholder="Toyota" aria-label="Marca"
+            name="marca" />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="add-vehicle-company">Modelo</label>
-          <input type="text" id="add-vehicle-company" class="form-control" placeholder="Web Developer" aria-label="jdoe1"
-            name="company" value />
+          <label class="form-label" for="add-vehicle-modelo">Modelo</label>
+          <input type="text" id="add-vehicle-modelo" class="form-control" placeholder="Corolla" aria-label="Modelo"
+            name="modelo" />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="add-vehicle-company">Ano Fabricacao</label>
-          <input type="text" id="add-vehicle-company" class="form-control" placeholder="Web Developer" aria-label="jdoe1"
-            name="company" value />
+          <label class="form-label" for="add-vehicle-ano-fabricacao">Ano Fabricação</label>
+          <input type="text" id="add-vehicle-ano-fabricacao" class="form-control" placeholder="2022" aria-label="Ano Fabricação"
+            name="ano_fabricacao" />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="vehicle-role">Ativo</label>
-          <select id="vehicle-role" class="form-select" name="role">
-            <option value="subscriber">Inscrito</option>
-            <option value="editor">Editor</option>
-            <option value="maintainer">Mantenedor</option>
-            <option value="author">Autor</option>
-            <option value="admin">Administrador</option>
+          <label class="form-label" for="vehicle-status">Ativo</label>
+          <select id="vehicle-status" class="form-select" name="ativo">
+            <option value="1">Sim</option>
+            <option value="0">Não</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary me-3 data-submit">Enviar</button>

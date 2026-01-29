@@ -1,0 +1,14 @@
+models:
+  Inventory:
+    product_name: string
+    quantity: integer
+    price: decimal:10,2
+    sku: string unique
+    active: boolean default:true
+    timestamps: true
+
+controllers:
+  Inventory:
+    resource: web
+    # O Blueprint gerará as ações padrão (index, create, store, show, edit, update, destroy)
+    # Você pode personalizar as ações se necessário, mas para o padrão 'resource' basta o acima.

@@ -14,10 +14,22 @@ class VehiclesController extends Controller
     {
         return view('content.pages.vehicles.vehicles-index');
     }
-    
+
     public function dataBase(Request $request)
     {
-       $totalData = Vehicles::count();
+        $columns = [
+            0 => 'id',
+            1 => 'id',
+            2 => 'placa',
+            3 => 'renavan',
+            4 => 'marca',
+            5 => 'modelo',
+            6 => 'ano_fabricacao',
+            7 => 'ativo',
+            8 => 'id',
+        ];
+
+        $totalData = Vehicles::count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -34,18 +46,20 @@ class VehiclesController extends Controller
             $search = $request->input('search.value');
 
             $vehicles = Vehicles::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->orWhere('company_name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->orWhere('placa', 'LIKE', "%{$search}%")
+                ->orWhere('renavan', 'LIKE', "%{$search}%")
+                ->orWhere('marca', 'LIKE', "%{$search}%")
+                ->orWhere('modelo', 'LIKE', "%{$search}%")
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy($order, $dir)
                 ->get();
 
             $totalFiltered = Vehicles::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->orWhere('company_name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->orWhere('placa', 'LIKE', "%{$search}%")
+                ->orWhere('renavan', 'LIKE', "%{$search}%")
+                ->orWhere('marca', 'LIKE', "%{$search}%")
+                ->orWhere('modelo', 'LIKE', "%{$search}%")
                 ->count();
         }
 
@@ -55,9 +69,8 @@ class VehiclesController extends Controller
         foreach ($vehicles as $vehicle) {
             $nestedData['fake_id'] = ++$ids;
             $nestedData['id'] = $vehicle->id;
-            // Para o JS exibir corretamente, passamos o nome completo (ou razão social) no campo 'name'
             $nestedData['placa'] = $vehicle->placa;
-            $nestedData['renavam'] = $vehicle->renavam;
+            $nestedData['renavam'] = $vehicle->renavan; // JS expects 'renavam'
             $nestedData['ativo'] = $vehicle->ativo;
             $nestedData['marca'] = $vehicle->marca;
             $nestedData['modelo'] = $vehicle->modelo;
@@ -87,7 +100,36 @@ class VehiclesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $vehicleId = $request->id;
+
+        if ($vehicleId) {
+            // Update
+            $vehicle = Vehicles::updateOrCreate(
+                ['id' => $vehicleId],
+                [
+                    'placa' => $request->placa,
+                    'renavan' => $request->renavan,
+                    'marca' => $request->marca,
+                    'modelo' => $request->modelo,
+                    'ano_fabricacao' => $request->ano_fabricacao,
+                    'ativo' => $request->ativo,
+                ]
+            );
+
+            return response()->json('Atualizado');
+        } else {
+            // Create
+            $vehicle = Vehicles::create([
+                'placa' => $request->placa,
+                'renavan' => $request->renavan,
+                'marca' => $request->marca,
+                'modelo' => $request->modelo,
+                'ano_fabricacao' => $request->ano_fabricacao,
+                'ativo' => $request->ativo,
+            ]);
+
+            return response()->json('Criado');
+        }
     }
 
     /**
@@ -103,7 +145,8 @@ class VehiclesController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $vehicle = Vehicles::findOrFail($id);
+        return response()->json($vehicle);
     }
 
     /**
@@ -119,6 +162,8 @@ class VehiclesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $vehicle = Vehicles::findOrFail($id);
+        $vehicle->delete();
+        return response()->json(['message' => 'Vehicle deleted successfully']);
     }
 }

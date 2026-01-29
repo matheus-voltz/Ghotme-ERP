@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
     headingColor = config.colors.headingColor;
 
     // Variable declaration for table
-    const dt_clients_table = document.querySelector('.datatables-vehicles'),
+    const dt_vehicles_table = document.querySelector('.datatables-vehicles'),
         vehiclesView = baseUrl + 'app/vehicles/view/account',
         vehiclesSuspend = baseUrl + 'app/vehicles/suspend/account',
         offCanvasForm = document.getElementById('offcanvasAddVehicles');
@@ -36,8 +36,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
     });
 
     // Clients datatable
-    if (dt_clients_table) {
-        const dt_clients = new DataTable(dt_clients_table, {
+    if (dt_vehicles_table) {
+        const dt_vehicles = new DataTable(dt_vehicles_table, {
             processing: true,
             serverSide: true,
             ajax: {
@@ -120,8 +120,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                 </div>
                                 </div>
                                 <div class="d-flex flex-column">
-                                <a href="${clientsView}" class="text-truncate text-heading">
-                                    <span class="fw-medium">${placa}</span>
+                                <a href="${vehiclesView}" class="text-truncate text-heading">
+                                    <span class="fw-medium">${displayName}</span>
                                 </a>
                                 </div>
                             </div>
@@ -131,14 +131,35 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 {
                     // Renavam
-                    targets: 4,
+                    targets: 3,
                     render: function (data, type, full, meta) {
                         return '<span class="vehicle-email">' + full['renavam'] + '</span>';
                     }
                 },
                 {
-                    // Ativo
+                    // Marca
+                    targets: 4,
+                    render: function (data, type, full, meta) {
+                        return '<span>' + full['marca'] + '</span>';
+                    }
+                },
+                {
+                    // Modelo
                     targets: 5,
+                    render: function (data, type, full, meta) {
+                        return '<span>' + full['modelo'] + '</span>';
+                    }
+                },
+                {
+                    // Ano Fabricacao
+                    targets: 6,
+                    render: function (data, type, full, meta) {
+                        return '<span>' + full['ano_fabricacao'] + '</span>';
+                    }
+                },
+                {
+                    // Ativo
+                    targets: 7,
                     className: 'text-center',
                     render: function (data, type, full, meta) {
                         const ativo = full['ativo'];
@@ -149,20 +170,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     }
                 },
                 {
-                    // Marca
-                    targets: 6,
-                    className: 'text-center',
-                    render: function (data, type, full, meta) {
-                        const marca = full['marca'];
-                        return `${marca
-                            ? '<span class="badge bg-success">Ativo</span>'
-                            : '<span class="badge bg-danger">Inativo</span>'
-                            }`;
-                    }
-                },
-                {
                     // Actions
-                    targets: 7,
+                    targets: 8,
                     title: 'Ações',
                     searchable: false,
                     orderable: false,
@@ -586,30 +595,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     .then(response => response.json())
                     .then(data => {
                         document.getElementById('vehicle_id').value = data.id;
-                        document.getElementById('add-vehicle-fullname').value = data.name;
-                        document.getElementById('add-vehicle-email').value = data.email;
-                        document.getElementById('add-vehicle-contact').value = data.contact_number || '';
-                        document.getElementById('add-vehicle-company').value = data.company || '';
+                        document.getElementById('add-vehicle-placa').value = data.placa;
+                        document.getElementById('add-vehicle-renavam').value = data.renavan;
+                        document.getElementById('add-vehicle-marca').value = data.marca || '';
+                        document.getElementById('add-vehicle-modelo').value = data.modelo || '';
+                        document.getElementById('add-vehicle-ano-fabricacao').value = data.ano_fabricacao || '';
 
-
-                        setVal('country', data.country);
-                        const $country = $('#country');
-                        if ($country.length && $country.hasClass('select2-hidden-accessible')) {
-                            $country.val(data.country).trigger('change');
-                        }
-
-                        // role (se for Select2, precisa trigger)
-                        setVal('vehicle-role', data.role);
-                        const $role = $('#vehicle-role');
-                        if ($role.length && $role.hasClass('select2-hidden-accessible')) {
-                            $role.val(data.role).trigger('change');
-                        }
-
-                        // plan (se existir no form)
-                        setVal('vehicle-plan', data.plan);
-                        const $plan = $('#vehicle-plan');
-                        if ($plan.length && $plan.hasClass('select2-hidden-accessible')) {
-                            $plan.val(data.plan).trigger('change');
+                        const $status = $('#vehicle-status');
+                        if ($status.length) {
+                            $status.val(data.ativo ? '1' : '0').trigger('change');
                         }
                     });
             }
@@ -662,34 +656,31 @@ document.addEventListener('DOMContentLoaded', function (e) {
     if (addNewVehicleForm) {
         const fv = FormValidation.formValidation(addNewVehicleForm, {
             fields: {
-                name: {
+                placa: {
                     validators: {
                         notEmpty: {
-                            message: 'Por favor preencha o nome completo'
+                            message: 'Por favor preencha a placa'
                         }
                     }
                 },
-                email: {
+                renavan: {
                     validators: {
                         notEmpty: {
-                            message: 'Por favor preencha o email'
-                        },
-                        emailAddress: {
-                            message: 'O email nao é valido'
+                            message: 'Por favor preencha o renavam'
                         }
                     }
                 },
-                userContact: {
+                marca: {
                     validators: {
                         notEmpty: {
-                            message: 'Por favor insira seu número'
+                            message: 'Por favor preencha a marca'
                         }
                     }
                 },
-                company: {
+                modelo: {
                     validators: {
                         notEmpty: {
-                            message: 'Please enter your company'
+                            message: 'Por favor preencha o modelo'
                         }
                     }
                 }

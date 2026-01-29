@@ -60,7 +60,7 @@ Route::middleware([
     // Main Page Route
     Route::get('/', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
-    
+
     // Clients
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
@@ -68,6 +68,9 @@ Route::middleware([
     // Vehicles
     Route::get('/vehicles', [VehiclesController::class, 'index'])->name('vehicles');
     Route::get('/vehicles-list', [VehiclesController::class, 'dataBase'])->name('vehicles-list');
+    Route::get('/vehicles-list/{id}/edit', [VehiclesController::class, 'edit'])->name('vehicles-list.edit');
+    Route::post('/vehicles-list', [VehiclesController::class, 'store'])->name('vehicles-list.store');
+    Route::delete('/vehicles-list/{id}', [VehiclesController::class, 'destroy'])->name('vehicles-list.destroy');
 
     // Settings
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
@@ -91,3 +94,6 @@ Route::get('/teste-email', function () {
 
     return 'Email enviado';
 });
+
+
+Route::resource('inventories', App\Http\Controllers\InventoryController::class);

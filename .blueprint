@@ -1,0 +1,16 @@
+created:
+    - app/Http/Controllers/InventoryController.php
+    - database/factories/InventoryFactory.php
+    - database/migrations/2026_01_29_233440_create_inventories_table.php
+    - app/Models/Inventory.php
+    - tests/Feature/Http/Controllers/InventoryControllerTest.php
+    - app/Http/Requests/InventoryStoreRequest.php
+    - app/Http/Requests/InventoryUpdateRequest.php
+    - resources/views/inventory/index.blade.php
+    - resources/views/inventory/create.blade.php
+    - resources/views/inventory/show.blade.php
+    - resources/views/inventory/edit.blade.php
+updated:
+    - routes/web.php
+models:
+    Inventory: { product_name: string, quantity: integer, price: 'decimal:10,2', sku: 'string unique', active: 'boolean default:true', timestamps: timestamps }
