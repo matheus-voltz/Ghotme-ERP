@@ -1,4 +1,11 @@
 <?php return array (
+  'laravel-shift/blueprint' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Blueprint\\BlueprintServiceProvider',
+    ),
+  ),
   'laravel/fortify' => 
   array (
     'providers' => 
