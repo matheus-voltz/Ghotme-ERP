@@ -31,6 +31,23 @@ class OrdemServico extends Model
         return $this->hasOne(VehicleHistory::class, 'ordem_servico_id');
     }
 
+    public function items()
+    {
+        return $this->hasMany(\App\Models\OrdemServicoItem::class);
+    }
+
+    public function parts()
+    {
+        return $this->hasMany(\App\Models\OrdemServicoPart::class);
+    }
+
+    public function getTotalAttribute()
+    {
+        $servicesTotal = $this->items->sum(fn($i) => $i->price * $i->quantity);
+        $partsTotal = $this->parts->sum(fn($p) => $p->price * $p->quantity);
+        return $servicesTotal + $partsTotal;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

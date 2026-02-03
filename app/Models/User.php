@@ -63,6 +63,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'profile_photo_url',
     ];
 
+    public function ordensServico()
+    {
+        return $this->hasMany(OrdemServico::class);
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -3,62 +3,122 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\OrdemServico;
+use App\Models\OrdemServicoItem;
+use App\Models\OrdemServicoPart;
+use App\Models\Clients;
+use App\Models\Veiculos;
+use App\Models\Service;
+use App\Models\InventoryItem;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class OrdemServicoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return view('content.pages.ordens-servico.index');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function dataBase(Request $request)
+    {
+        $query = OrdemServico::with(['client', 'veiculo']);
+        
+        $totalData = $query->count();
+        $totalFiltered = $totalData;
+
+        $items = $query->orderBy('created_at', 'desc')->get();
+
+        $data = [];
+        foreach ($items as $item) {
+            $data[] = [
+                'id' => $item->id,
+                'client' => $item->client ? ($item->client->name ?? $item->client->company_name) : '-',
+                'vehicle' => $item->veiculo ? "{$item->veiculo->placa} - {$item->veiculo->modelo}" : '-',
+                'status' => $item->status,
+                'total' => $item->total,
+                'date' => $item->created_at->format('d/m/Y')
+            ];
+        }
+
+        return response()->json(['data' => $data]);
+    }
+
     public function create()
     {
-        //
+        $clients = Clients::all();
+        $services = Service::where('is_active', true)->get();
+        $parts = InventoryItem::where('is_active', true)->get();
+        return view('content.pages.ordens-servico.create', compact('clients', 'services', 'parts'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'veiculo_id' => 'required|exists:veiculos,id',
+            'status' => 'required',
+            'description' => 'nullable|string',
+            'km_entry' => 'nullable|integer',
+            'services' => 'nullable|array',
+            'parts' => 'nullable|array',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $os = OrdemServico::create([
+                'client_id' => $validated['client_id'],
+                'veiculo_id' => $validated['veiculo_id'],
+                'status' => $validated['status'],
+                'description' => $validated['description'],
+                'km_entry' => $validated['km_entry'],
+                'user_id' => Auth::id()
+            ]);
+
+            if (!empty($validated['services'])) {
+                foreach ($validated['services'] as $id => $data) {
+                    if (!isset($data['selected'])) continue;
+                    OrdemServicoItem::create([
+                        'ordem_servico_id' => $os->id,
+                        'service_id' => $id,
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1
+                    ]);
+                }
+            }
+
+            if (!empty($validated['parts'])) {
+                foreach ($validated['parts'] as $id => $data) {
+                    if (!isset($data['selected'])) continue;
+                    OrdemServicoPart::create([
+                        'ordem_servico_id' => $os->id,
+                        'inventory_item_id' => $id,
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('ordens-servico')->with('success', 'OS Criada!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function updateStatus(Request $request, $id)
     {
-        //
+        $os = OrdemServico::findOrFail($id);
+        $os->update(['status' => $request->status]);
+        return response()->json(['success' => true]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function getVehiclesByClient($clientId)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $vehicles = Veiculos::where('cliente_id', $clientId)->get();
+        return response()->json($vehicles);
     }
 }

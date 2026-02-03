@@ -20,6 +20,10 @@ use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\InventoryAlertController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServicePackageController;
+use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\PaymentMethodController;
+use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\ReportController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -67,6 +71,11 @@ Route::middleware([
     // Main Page Route
     Route::get('/', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
+    Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');
+    Route::get('/ordens-servico/data', [OrdemServicoController::class, 'dataBase'])->name('ordens-servico.data');
+    Route::post('/ordens-servico', [OrdemServicoController::class, 'store'])->name('ordens-servico.store');
+    Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
+    Route::get('/api/clients/{id}/vehicles', [OrdemServicoController::class, 'getVehiclesByClient']);
 
     // Clients
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
@@ -124,6 +133,32 @@ Route::middleware([
     Route::get('/services/packages/{id}/edit', [ServicePackageController::class, 'edit'])->name('services.packages.edit');
     Route::put('/services/packages/{id}', [ServicePackageController::class, 'update'])->name('services.packages.update');
     Route::delete('/services/packages/{id}', [ServicePackageController::class, 'destroy'])->name('services.packages.destroy');
+
+    // Finance
+    Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
+    Route::get('/finance/accounts-payable', [FinanceController::class, 'payables'])->name('finance.payables');
+    Route::get('/finance/data', [FinanceController::class, 'dataBase'])->name('finance.data');
+    Route::post('/finance/transactions', [FinanceController::class, 'store'])->name('finance.transactions.store');
+    Route::post('/finance/transactions/{id}/pay', [FinanceController::class, 'markAsPaid'])->name('finance.transactions.pay');
+    Route::delete('/finance/transactions/{id}', [FinanceController::class, 'destroy'])->name('finance.transactions.destroy');
+    
+    Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
+    
+    Route::get('/finance/payment-methods', [PaymentMethodController::class, 'index'])->name('finance.payment-methods');
+    Route::get('/finance/payment-methods-list', [PaymentMethodController::class, 'dataBase'])->name('finance.payment-methods.list');
+    Route::post('/finance/payment-methods', [PaymentMethodController::class, 'store'])->name('finance.payment-methods.store');
+    Route::delete('/finance/payment-methods/{id}', [PaymentMethodController::class, 'destroy'])->name('finance.payment-methods.destroy');
+
+    Route::get('/finance/reports', [FinancialReportController::class, 'index'])->name('finance.reports');
+    Route::get('/finance/reports/chart-data', [FinancialReportController::class, 'getChartData']);
+
+    // Reports
+    Route::get('/reports/os-status', [ReportController::class, 'osStatus'])->name('reports.os-status');
+    Route::get('/reports/os-status-data', [ReportController::class, 'getOsStatusData']);
+    Route::get('/reports/consumed-stock', [ReportController::class, 'consumedStock'])->name('reports.consumed-stock');
+    Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
+    Route::get('/reports/mechanic-performance', [ReportController::class, 'mechanicPerformance'])->name('reports.mechanic-performance');
+    Route::get('/reports/average-time', [ReportController::class, 'averageTime'])->name('reports.average-time');
 
     // Settings
 
