@@ -399,7 +399,7 @@
     "isEntry": true
   },
   "resources/assets/js/app-ecommerce-customer-detail.js": {
-    "file": "assets/app-ecommerce-customer-detail-B9_BRr2o.js",
+    "file": "assets/app-ecommerce-customer-detail-N4COGBbO.js",
     "name": "app-ecommerce-customer-detail",
     "src": "resources/assets/js/app-ecommerce-customer-detail.js",
     "isEntry": true
@@ -411,13 +411,13 @@
     "isEntry": true
   },
   "resources/assets/js/app-ecommerce-order-details.js": {
-    "file": "assets/app-ecommerce-order-details-DrrkEwc0.js",
+    "file": "assets/app-ecommerce-order-details-B11wwH9m.js",
     "name": "app-ecommerce-order-details",
     "src": "resources/assets/js/app-ecommerce-order-details.js",
     "isEntry": true
   },
   "resources/assets/js/app-ecommerce-order-list.js": {
-    "file": "assets/app-ecommerce-order-list-CJTdlGVr.js",
+    "file": "assets/app-ecommerce-order-list-NTEG9IIa.js",
     "name": "app-ecommerce-order-list",
     "src": "resources/assets/js/app-ecommerce-order-list.js",
     "isEntry": true
@@ -513,7 +513,7 @@
     "isEntry": true
   },
   "resources/assets/js/app-user-view-billing.js": {
-    "file": "assets/app-user-view-billing-DSaOnJRm.js",
+    "file": "assets/app-user-view-billing-tCcMX91n.js",
     "name": "app-user-view-billing",
     "src": "resources/assets/js/app-user-view-billing.js",
     "isEntry": true
@@ -525,7 +525,7 @@
     "isEntry": true
   },
   "resources/assets/js/app-user-view.js": {
-    "file": "assets/app-user-view-9Q2s_S8s.js",
+    "file": "assets/app-user-view-Cw_WSdfb.js",
     "name": "app-user-view",
     "src": "resources/assets/js/app-user-view.js",
     "isEntry": true
@@ -639,7 +639,7 @@
     "isEntry": true
   },
   "resources/assets/js/extended-ui-sweetalert2.js": {
-    "file": "assets/extended-ui-sweetalert2-BzUlMzp0.js",
+    "file": "assets/extended-ui-sweetalert2-DNgoBRt7.js",
     "name": "extended-ui-sweetalert2",
     "src": "resources/assets/js/extended-ui-sweetalert2.js",
     "isEntry": true
@@ -873,13 +873,13 @@
     "isEntry": true
   },
   "resources/assets/js/pages-account-settings-account.js": {
-    "file": "assets/pages-account-settings-account-BksVlPfg.js",
+    "file": "assets/pages-account-settings-account-k86vWGZN.js",
     "name": "pages-account-settings-account",
     "src": "resources/assets/js/pages-account-settings-account.js",
     "isEntry": true
   },
   "resources/assets/js/pages-account-settings-billing.js": {
-    "file": "assets/pages-account-settings-billing-CBpt4aHv.js",
+    "file": "assets/pages-account-settings-billing-D91S6rdJ.js",
     "name": "pages-account-settings-billing",
     "src": "resources/assets/js/pages-account-settings-billing.js",
     "isEntry": true
@@ -4042,10 +4042,46 @@
     "src": "resources/js/app.js",
     "isEntry": true
   },
+  "resources/js/inventory-items.js": {
+    "file": "assets/inventory-items-YGhXP-7C.js",
+    "name": "inventory-items",
+    "src": "resources/js/inventory-items.js",
+    "isEntry": true
+  },
+  "resources/js/inventory-suppliers.js": {
+    "file": "assets/inventory-suppliers-hAcNaW2i.js",
+    "name": "inventory-suppliers",
+    "src": "resources/js/inventory-suppliers.js",
+    "isEntry": true
+  },
+  "resources/js/laravel-clients.js": {
+    "file": "assets/laravel-clients-nLstnRck.js",
+    "name": "laravel-clients",
+    "src": "resources/js/laravel-clients.js",
+    "isEntry": true
+  },
   "resources/js/laravel-user-management.js": {
-    "file": "assets/laravel-user-management-5D0P8pn5.js",
+    "file": "assets/laravel-user-management-DN_WE5Dk.js",
     "name": "laravel-user-management",
     "src": "resources/js/laravel-user-management.js",
+    "isEntry": true
+  },
+  "resources/js/service-packages.js": {
+    "file": "assets/service-packages-BdMqUnde.js",
+    "name": "service-packages",
+    "src": "resources/js/service-packages.js",
+    "isEntry": true
+  },
+  "resources/js/services-table.js": {
+    "file": "assets/services-table-Bf5ZVvFB.js",
+    "name": "services-table",
+    "src": "resources/js/services-table.js",
+    "isEntry": true
+  },
+  "resources/js/vehicle-history.js": {
+    "file": "assets/vehicle-history-CXTQjr6U.js",
+    "name": "vehicle-history",
+    "src": "resources/js/vehicle-history.js",
     "isEntry": true
   }
 }

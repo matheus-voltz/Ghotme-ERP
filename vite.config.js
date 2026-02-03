@@ -61,6 +61,12 @@ export default defineConfig({
         ...vendorJsFiles,
         ...LibsJsFiles,
         'resources/js/laravel-user-management.js', // Processing Laravel User Management CRUD JS File
+        'resources/js/laravel-clients.js',
+        'resources/js/inventory-items.js',
+        'resources/js/inventory-suppliers.js',
+        'resources/js/vehicle-history.js',
+        'resources/js/services-table.js',
+        'resources/js/service-packages.js',
         ...CoreScssFiles,
         ...LibsScssFiles,
         ...LibsCssFiles,
