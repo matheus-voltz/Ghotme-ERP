@@ -24,6 +24,9 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\FinancialReportController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CompanySettingController;
+use App\Http\Controllers\ChecklistController;
+use App\Http\Controllers\AppSettingController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -161,6 +164,18 @@ Route::middleware([
     Route::get('/reports/average-time', [ReportController::class, 'averageTime'])->name('reports.average-time');
 
     // Settings
+    Route::get('/settings/company-data', [CompanySettingController::class, 'index'])->name('settings.company-data');
+    Route::post('/settings/company-data', [CompanySettingController::class, 'update'])->name('settings.company-data.update');
+
+    // Custom Checklist
+    Route::get('/settings/custom-checklist', [ChecklistController::class, 'index'])->name('settings.custom-checklist');
+    Route::get('/settings/custom-checklist-list', [ChecklistController::class, 'dataBase'])->name('settings.custom-checklist.list');
+    Route::post('/settings/custom-checklist', [ChecklistController::class, 'store'])->name('settings.custom-checklist.store');
+    Route::delete('/settings/custom-checklist/{id}', [ChecklistController::class, 'destroy'])->name('settings.custom-checklist.destroy');
+
+    // OS Settings
+    Route::get('/settings/os-settings', [AppSettingController::class, 'index'])->name('settings.os-settings');
+    Route::post('/settings/os-settings', [AppSettingController::class, 'update'])->name('settings.os-settings.update');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
