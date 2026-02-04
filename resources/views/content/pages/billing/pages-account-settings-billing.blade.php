@@ -83,14 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const method = $btn.data('method');
         const originalText = $btn.html();
         
-        // Force plan selection if user is on 'free' plan
+        // Only force plan selection if no future plan is selected yet
         const currentPlan = "{{ $user->plan }}";
-        if (currentPlan === 'free') {
+        const selectedPlan = "{{ $user->selected_plan }}";
+        
+        if (currentPlan === 'free' && (!selectedPlan || selectedPlan === 'free')) {
             pendingMethod = method;
             Swal.fire({
                 icon: 'info',
                 title: 'Selecione um Plano',
-                text: 'Para gerar um pagamento, você precisa primeiro escolher qual plano deseja assinar.',
+                text: 'Você precisa primeiro escolher qual plano deseja assinar para gerar a cobrança.',
                 confirmButtonText: 'Ver Planos',
                 customClass: { confirmButton: 'btn btn-primary' },
                 buttonsStyling: false

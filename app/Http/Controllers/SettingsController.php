@@ -145,10 +145,14 @@ class SettingsController extends Controller
             }
 
             $invoiceUrl = $result['invoiceUrl'] ?? null;
-            if ($user->plan_type === 'monthly' && !$invoiceUrl) {
+            $paymentId = $result['id']; // Default to result ID
+
+            // If it's a subscription, we MUST fetch the first payment's ID and URL
+            if ($user->plan_type === 'monthly') {
                 $payments = $this->asaas->getSubscriptionPayments($result['id']);
                 if (!empty($payments['data'])) {
-                    $invoiceUrl = $payments['data'][0]['invoiceUrl'] ?? null;
+                    $paymentId = $payments['data'][0]['id'];
+                    $invoiceUrl = $payments['data'][0]['invoiceUrl'] ?? $invoiceUrl;
                 }
             }
 
@@ -164,14 +168,14 @@ class SettingsController extends Controller
 
             $responseData = [
                 'success' => true,
-                'payment_id' => $result['id'],
+                'payment_id' => $paymentId,
                 'amount' => number_format($amount, 2, ',', '.'),
                 'invoice_url' => $invoiceUrl,
-                'bank_slip_url' => $result['bankSlipUrl'] ?? null,
+                'bank_slip_url' => $result['bankSlipUrl'] ?? ($payments['data'][0]['bankSlipUrl'] ?? null),
             ];
 
             if ($method === 'pix') {
-                $pixData = $this->asaas->getPixData($result['id']);
+                $pixData = $this->asaas->getPixData($paymentId);
                 $responseData['pix_code'] = $pixData['payload'] ?? null;
                 $responseData['pix_qr'] = $pixData['encodedImage'] ?? null;
             }

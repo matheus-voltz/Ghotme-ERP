@@ -78,6 +78,7 @@ class WebhookController extends Controller
                 $user->trial_ends_at = now()->addMonth();
             }
 
+            $user->selected_plan = null; // Limpa a seleção temporária pois o plano agora é oficial
             $user->save();
             Log::info("User {$user->id} plan updated to {$user->plan} via Webhook.");
         }
