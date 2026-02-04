@@ -69,8 +69,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     title: 'Ações',
                     orderable: false,
                     render: (data, type, full) => {
+                        const whatsappLink = full.whatsapp ? `https://api.whatsapp.com/send?phone=55${full.whatsapp.replace(/\D/g, '')}` : '#';
+                        const whatsappBtn = full.whatsapp 
+                            ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success"><i class="ti tabler-brand-whatsapp"></i></a>` 
+                            : '';
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
+                            whatsappBtn +
                             `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddClients"><i class="ti tabler-edit"></i></button>` +
                             `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}"><i class="ti tabler-trash"></i></button>` +
                             '</div>'
