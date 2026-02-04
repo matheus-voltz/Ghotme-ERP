@@ -26,6 +26,20 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
         <button class="navbar-toggler border-0 text-heading position-absolute end-0 top-0 scaleX-n1-rtl p-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <i class="icon-base ti tabler-x icon-lg"></i>
         </button>
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link fw-medium" href="#landingFeatures">Funcionalidades</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-medium" href="#landingPricing">Planos</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-medium" href="#landingFAQ">FAQ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-medium" href="#landingContact">Contato</a>
+          </li>
+        </ul>
       </div>
       <div class="landing-menu-overlay d-lg-none"></div>
       <!-- Menu wrapper: End -->
@@ -43,20 +57,20 @@ data-bs-toggle="dropdown">
             <li>
               <button type="button" class="dropdown-item align-items-center active" data-bs-theme-value="light"
 aria-pressed="false">
-                <span><i class="icon-base ti tabler-sun icon-md me-3" data-icon="sun"></i>Light</span>
+                <span><i class="icon-base ti tabler-sun icon-md me-3" data-icon="sun"></i>Claro</span>
               </button>
             </li>
             <li>
               <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="dark"
 aria-pressed="true">
-                <span><i class="icon-base ti tabler-moon-stars icon-md me-3" data-icon="moon-stars"></i>Dark</span>
+                <span><i class="icon-base ti tabler-moon-stars icon-md me-3" data-icon="moon-stars"></i>Escuro</span>
               </button>
             </li>
             <li>
               <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="system"
 aria-pressed="false">
                 <span><i class="icon-base ti tabler-device-desktop-analytics icon-md me-3"
-data-icon="device-desktop-analytics"></i>System</span>
+data-icon="device-desktop-analytics"></i>Sistema</span>
               </button>
             </li>
           </ul>
@@ -66,9 +80,22 @@ data-icon="device-desktop-analytics"></i>System</span>
 
         <!-- navbar button: Start -->
         <li>
-          <a href="javascript:;" class="btn btn-primary" target="_blank"><span
-              class="icon-base ti tabler-login scaleX-n1-rtl me-md-1"></span><span
-              class="d-none d-md-block">Login/Register</span></a>
+          @if (Route::has('login'))
+            @auth
+              <a href="{{ route('dashboard') }}" class="btn btn-primary"><span
+                  class="icon-base ti tabler-layout-dashboard me-md-1"></span><span
+                  class="d-none d-md-block">Acessar Painel</span></a>
+            @else
+              <a href="{{ route('login') }}" class="btn btn-label-primary me-2"><span
+                  class="icon-base ti tabler-login me-md-1"></span><span
+                  class="d-none d-md-block">Entrar</span></a>
+              @if (Route::has('register'))
+                <a href="{{ route('register') }}" class="btn btn-primary"><span
+                    class="icon-base ti tabler-user-plus me-md-1"></span><span
+                    class="d-none d-md-block">Cadastrar</span></a>
+              @endif
+            @endauth
+          @endif
         </li>
         <!-- navbar button: End -->
       </ul>

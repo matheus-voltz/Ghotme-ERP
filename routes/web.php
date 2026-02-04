@@ -44,7 +44,16 @@ use Illuminate\Http\Request;
 |--------------------------------------------------------------------------
 */
 
-Route::view('/welcome', view: 'content.font-pages.landing-page')->name('welcome');
+/*
+|--------------------------------------------------------------------------
+| Landing Page
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/', function () {
+    return view('content.font-pages.landing-page');
+})->name('welcome');
+
 
 Route::get('/email/verify', function () {
     return view('content.authentications.auth-verify-email-basic');
@@ -78,7 +87,7 @@ Route::middleware([
 ])->group(function () {
 
     // Main Page Route
-    Route::get('/', [HomePage::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
     Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');
     Route::get('/ordens-servico/data', [OrdemServicoController::class, 'dataBase'])->name('ordens-servico.data');
