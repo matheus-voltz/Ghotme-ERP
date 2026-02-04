@@ -15,9 +15,8 @@
 <!-- Page Scripts -->
 @section('page-script')
 @vite(['resources/assets/js/pages-pricing.js', 'resources/assets/js/modal-edit-cc.js'])
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     const $form = $('#formAccountSettings');
     const $btnSave = $('#btnSaveProfile');
 
@@ -238,7 +237,7 @@ function copyPix() {
               <p>Gerencie sua assinatura e detalhes do plano.</p>
             </div>
             <div class="mb-6">
-              <h6 class="mb-1">Situação: {{ $user->plan === 'free' ? 'Período de Teste' : 'Assinatura Ativa' }}</h6>
+              <h6 class="mb-1">Situação: {{ $user->plan === 'free' ? 'Período de Teste' : 'Plano ' . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ' Ativo' }}</h6>
               <p>{{ $planDetails['description'] }}</p>
             </div>
             <div>
@@ -252,12 +251,12 @@ function copyPix() {
           </div>
           <div class="col-md-6">
             @if($trialExpired && $user->plan === 'free')
-            <div class="alert alert-danger mb-6" role="alert">
+            <div class="alert alert-danger mb-4" role="alert">
               <h5 class="alert-heading mb-1 d-flex align-items-center">
                 <span class="alert-icon rounded"><i class="icon-base ti tabler-alert-circle icon-md"></i></span>
-                <span>Seu período de teste grátis expirou!</span>
+                <span>Teste grátis expirado!</span>
               </h5>
-              <span class="ms-11 ps-1">Faça o upgrade agora para não perder o acesso às suas funcionalidades.</span>
+              <span class="ms-11 ps-1">Faça o upgrade para continuar usando o sistema.</span>
             </div>
             @endif
 
@@ -265,13 +264,13 @@ function copyPix() {
               <div class="plan-statistics">
                 <div class="d-flex justify-content-between mb-1">
                   <h6 class="mb-0">Dias de Uso</h6>
-                  <h6 class="mb-0">{{ (int)$daysUsed }} de 30 Dias</h6>
+                  <h6 class="mb-0">{{ number_format($daysUsed, 12, '.', '') }} de 30 Dias</h6>
                 </div>
                 <div class="progress mb-1" style="height: 8px;">
-                  @php $percent = min(100, max(0, ((int)$daysUsed / 30) * 100)); @endphp
-                  <div class="progress-bar" style="width: {{ $percent }}%"></div>
+                  @php $percent = min(100, max(0, ($daysUsed / 30) * 100)); @endphp
+                  <div class="progress-bar {{ $trialExpired ? 'bg-danger' : '' }}" role="progressbar" style="width: {{ $percent }}%"></div>
                 </div>
-                <small>{{ (int)$trialDaysLeft }} dias restantes de teste grátis</small>
+                <small>{{ number_format(max(0, $trialDaysLeft), 12, '.', '') }} dias restantes de teste grátis</small>
               </div>
             @endif
           </div>
@@ -288,48 +287,49 @@ function copyPix() {
         <div class="row gx-6">
           <div class="col-md-6">
             <div class="payment-methods-list">
-              <div class="d-flex align-items-center mb-4 p-3 border rounded">
-                <div class="avatar flex-shrink-0 me-3 bg-label-success p-2">
-                  <i class="ti tabler-qrcode fs-3"></i>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                  <div class="me-2">
-                    <h6 class="mb-0">Pix</h6>
-                    <small class="text-muted">Aprovação imediata</small>
+              @if($user->plan_type === 'monthly')
+                <!-- Pix (Somente Mensal) -->
+                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-label-success me-3 p-2"><i class="icon-base ti tabler-qrcode fs-3"></i></div>
+                    <div><h6 class="mb-0">Pix</h6><small class="text-muted">Aprovação imediata</small></div>
                   </div>
-                  <div class="user-progress">
-                    <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
-                  </div>
+                  <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
                 </div>
-              </div>
-              <div class="d-flex align-items-center mb-4 p-3 border rounded">
-                <div class="avatar flex-shrink-0 me-3 bg-label-info p-2">
-                  <i class="ti tabler-barcode fs-3"></i>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                  <div class="me-2">
-                    <h6 class="mb-0">Boleto Bancário</h6>
-                    <small class="text-muted">Aprovação em até 48h</small>
+                <!-- Boleto Mensal -->
+                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
+                    <div><h6 class="mb-0">Boleto Mensalidade</h6><small class="text-muted">Vencimento em 3 dias</small></div>
                   </div>
-                  <div class="user-progress">
-                    <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
-                  </div>
+                  <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
                 </div>
-              </div>
-              <div class="d-flex align-items-center mb-4 p-3 border rounded">
-                <div class="avatar flex-shrink-0 me-3 bg-label-primary p-2">
-                  <i class="ti tabler-credit-card fs-3"></i>
-                </div>
-                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
-                  <div class="me-2">
-                    <h6 class="mb-0">Cartão de Crédito</h6>
-                    <small class="text-muted">Faturamento recorrente</small>
+                <!-- Cartão Recorrente -->
+                <div class="d-flex align-items-center p-3 border rounded justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
+                    <div><h6 class="mb-0">Cartão Recorrente</h6><small class="text-muted">Assinatura mensal</small></div>
                   </div>
-                  <div class="user-progress">
-                    <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
-                  </div>
+                  <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
                 </div>
-              </div>
+              @else
+                <!-- Boleto Único (Anual) -->
+                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
+                    <div><h6 class="mb-0">Boleto Único Anual</h6><small class="text-muted">Pagamento à vista</small></div>
+                  </div>
+                  <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
+                </div>
+                <!-- Cartão Parcelado (Anual) -->
+                <div class="d-flex align-items-center p-3 border rounded justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
+                    <div><h6 class="mb-0">Cartão Parcelado</h6><small class="text-muted">Parcele em até 12x</small></div>
+                  </div>
+                  <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
+                </div>
+              @endif
             </div>
           </div>
           <div class="col-md-6 mt-6 mt-md-0">

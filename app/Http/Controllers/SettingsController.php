@@ -103,6 +103,11 @@ class SettingsController extends Controller
         $type = $request->type; // monthly, yearly
         $method = $request->method ?? 'pix'; // default method for initial generation
 
+        // Safety: Pix is not allowed for yearly plans
+        if ($type === 'yearly' && $method === 'pix') {
+            $method = 'boleto';
+        }
+
         $plans = [
             'padrao' => ['monthly' => 149.00, 'yearly' => 1490.00],
             'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
@@ -134,9 +139,8 @@ class SettingsController extends Controller
                 return response()->json(['success' => false, 'message' => $result['errors'][0]['description'] ?? 'Erro ao processar no Asaas.']);
             }
 
-            // Atualiza o plano do usuário imediatamente
+            // Salva a intenção do tipo de plano (mensal/anual) mas mantém o plano atual (ex: free)
             $user->update([
-                'plan' => $plan,
                 'plan_type' => $type
             ]);
 
@@ -146,36 +150,26 @@ class SettingsController extends Controller
                 'plan_name' => ucfirst($plan) . " (" . ($type === 'monthly' ? 'Mensal' : 'Anual') . ")",
                 'amount' => $amount,
                 'payment_method' => ucfirst($method),
+                'payment_url' => $result['invoiceUrl'] ?? null,
                 'status' => 'pending',
             ]);
 
             $invoiceUrl = $result['invoiceUrl'] ?? null;
 
             // If it's a subscription, we might need to fetch the first payment's URL
-            if ($type === 'monthly' && !$invoiceUrl) {
+            if ($type === 'monthly' && !$invoiceUrl && isset($result['id'])) {
                 $payments = $this->asaas->getSubscriptionPayments($result['id']);
                 if (!empty($payments['data'])) {
                     $invoiceUrl = $payments['data'][0]['invoiceUrl'] ?? null;
                 }
             }
 
-            $responseData = [
+            return response()->json([
                 'success' => true,
                 'message' => 'Plano selecionado com sucesso! Aguardando pagamento.',
-                'invoice_url' => $invoiceUrl,
-            ];
-
-            if ($method === 'pix') {
-                if ($type === 'monthly') {
-                    $responseData['redirect_url'] = $invoiceUrl;
-                } else {
-                    $pixData = $this->asaas->getPixData($result['id']);
-                    $responseData['pix_code'] = $pixData['payload'] ?? null;
-                    $responseData['pix_qr'] = $pixData['encodedImage'] ?? null;
-                }
-            }
-
-            return response()->json($responseData);
+                'redirect_url' => $invoiceUrl,
+                'invoice_url' => $invoiceUrl
+            ]);
 
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);

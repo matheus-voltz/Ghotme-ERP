@@ -50,9 +50,9 @@
           defaultTheme: "{{ $configData['themeOpt'] }}",
           defaultSkin: appliedSkin,
           defaultSemiDark: {{ $configData['semiDark'] ? 'true' : 'false' }},
-          defaultShowDropdownOnHover: "{{ $configData['showDropdownOnHover'] }}",
-          displayCustomizer: "{{ $configData['displayCustomizer'] }}",
-          lang: '{{ app()->getLocale() }}',
+          defaultShowDropdownOnHover: {{ $configData['showDropdownOnHover'] ? 'true' : 'false' }},
+          displayCustomizer: {{ $configData['displayCustomizer'] ? 'true' : 'false' }},
+          lang: 'en', // Keep customizer lang as English to avoid crashes with unsupported locales
           'controls': <?php echo json_encode($configData['customizerControls']); ?>,
         });
 

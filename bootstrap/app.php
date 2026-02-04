@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(LocaleMiddleware::class);
+        $middleware->validateCsrfTokens(except: [
+            '/webhook/asaas'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

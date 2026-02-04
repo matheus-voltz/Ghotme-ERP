@@ -32,6 +32,7 @@ use App\Http\Controllers\PrintTemplateController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\VehicleChecklistController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\WebhookController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -243,5 +244,8 @@ Route::get('/teste-email', function () {
     return 'Email enviado';
 });
 
+
+// Asaas Webhook
+Route::post('/webhook/asaas', [WebhookController::class, 'asaas']);
 
 Route::resource('inventories', App\Http\Controllers\InventoryController::class);

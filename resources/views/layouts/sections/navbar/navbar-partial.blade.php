@@ -31,33 +31,6 @@ use Illuminate\Support\Facades\Route;
 @endif
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-  <!-- Language -->
-  <div class="navbar-nav align-items-center">
-    <li class="nav-item dropdown me-2 me-xl-0">
-      <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-        <i class="icon-base ti tabler-language icon-md"></i>
-      </a>
-      <ul class="dropdown-menu dropdown-menu-start">
-        <li>
-          <a class="dropdown-item {{ app()->getLocale() === 'pt' ? 'active' : '' }}" href="{{ url('lang/pt') }}">
-            <span class="align-middle">Português</span>
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item {{ app()->getLocale() === 'en' ? 'active' : '' }}" href="{{ url('lang/en') }}">
-            <span class="align-middle">English</span>
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item {{ app()->getLocale() === 'es' ? 'active' : '' }}" href="{{ url('lang/es') }}">
-            <span class="align-middle">Español</span>
-          </a>
-        </li>
-      </ul>
-    </li>
-  </div>
-  <!-- / Language -->
-
   @if ($configData['hasCustomizer'] == true)
   <!-- Style Switcher -->
   <div class="navbar-nav align-items-center">
@@ -91,7 +64,33 @@ use Illuminate\Support\Facades\Route;
   </div>
   <!-- / Style Switcher-->
   @endif
+
   <ul class="navbar-nav flex-row align-items-center ms-auto">
+    <!-- Language -->
+    <li class="nav-item dropdown me-2 me-xl-0">
+      <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+        <i class="icon-base ti tabler-language icon-md"></i>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li>
+          <a class="dropdown-item {{ app()->getLocale() === 'pt' ? 'active' : '' }}" href="{{ url('lang/pt') }}">
+            <span class="align-middle">Português</span>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item {{ app()->getLocale() === 'en' ? 'active' : '' }}" href="{{ url('lang/en') }}">
+            <span class="align-middle">English</span>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item {{ app()->getLocale() === 'es' ? 'active' : '' }}" href="{{ url('lang/es') }}">
+            <span class="align-middle">Español</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <!--/ Language -->
+
     <!-- User -->
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
