@@ -30,7 +30,7 @@ $configData = Helper::appClasses();
             <p class="mb-0 text-white-50">Aqui está o que está acontecendo na oficina hoje.</p>
           </div>
           <div class="avatar bg-white p-2 rounded">
-            <i class="ti ti-settings text-primary fs-2"></i>
+            <i class="icon-base ti tabler-settings text-primary fs-2"></i>
           </div>
         </div>
         <div class="row g-4">
@@ -67,7 +67,7 @@ $configData = Helper::appClasses();
   <div class="col-xl-3 col-md-6">
     <div class="card h-100">
       <div class="card-body">
-        <div class="badge p-2 bg-label-success mb-3"><i class="ti ti-currency-dollar fs-3"></i></div>
+        <div class="badge p-2 bg-label-success mb-3"><i class="icon-base ti tabler-currency-dollar fs-3"></i></div>
         <h5 class="card-title mb-1">Faturamento (Mês)</h5>
         <p class="text-muted mb-3 small">Receita confirmada</p>
         <div class="d-flex align-items-center gap-2">
@@ -84,7 +84,7 @@ $configData = Helper::appClasses();
         <h5 class="card-title mb-4">Atenção</h5>
         <ul class="list-unstyled mb-0">
           <li class="d-flex mb-3 align-items-center">
-            <div class="badge bg-label-danger p-1 rounded me-3"><i class="ti ti-alert-triangle fs-5"></i></div>
+            <div class="badge bg-label-danger p-1 rounded me-3"><i class="icon-base ti tabler-alert-triangle fs-5"></i></div>
             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
               <div class="me-2">
                 <h6 class="mb-0">Estoque Baixo</h6>
@@ -94,7 +94,7 @@ $configData = Helper::appClasses();
             </div>
           </li>
           <li class="d-flex align-items-center">
-            <div class="badge bg-label-warning p-1 rounded me-3"><i class="ti ti-file-dollar fs-5"></i></div>
+            <div class="badge bg-label-warning p-1 rounded me-3"><i class="icon-base ti tabler-file-dollar fs-5"></i></div>
             <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
               <div class="me-2">
                 <h6 class="mb-0">Orçamentos</h6>
@@ -113,7 +113,7 @@ $configData = Helper::appClasses();
     <div class="card h-100">
       <div class="card-header d-flex justify-content-between">
         <h5 class="mb-0">Fluxo para os Próximos 7 Dias</h5>
-        <i class="ti ti-calendar-event text-muted"></i>
+        <i class="icon-base ti tabler-calendar-event text-muted"></i>
       </div>
       <div class="card-body">
         <div class="d-flex justify-content-around align-items-center py-4 border rounded bg-lighter mb-4">

@@ -23,16 +23,12 @@ class SettingsController extends Controller
     {
         $user = auth()->user();
         
-        // Trial logic
-        $trialDaysLeft = 0;
-        if ($user->trial_ends_at) {
-            $trialDaysLeft = max(0, now()->diffInDays($user->trial_ends_at, false));
-        } else {
-            // Set trial if not set (first time accessing settings maybe?)
-            $user->trial_ends_at = $user->created_at->addDays(30);
-            $user->save();
-            $trialDaysLeft = max(0, now()->diffInDays($user->trial_ends_at, false));
-        }
+        // Trial logic with high precision (decimals)
+        $trialDuration = 30;
+        $secondsSinceCreation = now()->diffInSeconds($user->created_at);
+        $daysUsed = $secondsSinceCreation / 86400; // 24 * 3600
+        $trialDaysLeft = max(0, $trialDuration - $daysUsed);
+        $trialExpired = ($user->plan === 'free' && $trialDaysLeft <= 0);
 
         $billingHistory = BillingHistory::where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -65,11 +61,11 @@ class SettingsController extends Controller
                 'name' => 'Teste Grátis',
                 'price' => '0,00',
                 'period' => 'Mês',
-                'description' => 'Você está aproveitando os 30 dias de avaliação gratuita.'
+                'description' => $trialExpired ? 'Seu período de teste grátis expirou!' : 'Você está aproveitando os 30 dias de avaliação gratuita.'
             ];
         }
 
-        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'billingHistory', 'planDetails'));
+        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'daysUsed', 'billingHistory', 'planDetails', 'trialExpired'));
     }
 
     public function updateProfile(Request $request)
