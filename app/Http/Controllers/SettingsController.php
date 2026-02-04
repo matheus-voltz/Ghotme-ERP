@@ -23,11 +23,11 @@ class SettingsController extends Controller
     {
         $user = auth()->user();
         
-        // Trial logic with high precision (decimals)
+        // Trial logic based on account creation (integers)
         $trialDuration = 30;
-        $secondsSinceCreation = now()->diffInSeconds($user->created_at);
-        $daysUsed = $secondsSinceCreation / 86400; // 24 * 3600
+        $daysUsed = (int)now()->diffInDays($user->created_at);
         $trialDaysLeft = max(0, $trialDuration - $daysUsed);
+        
         $trialExpired = ($user->plan === 'free' && $trialDaysLeft <= 0);
 
         $billingHistory = BillingHistory::where('user_id', $user->id)

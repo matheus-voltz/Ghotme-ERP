@@ -83,6 +83,23 @@ $(document).ready(function() {
         const method = $btn.data('method');
         const originalText = $btn.html();
         
+        // Client-side validation for CPF/CNPJ
+        const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
+        if (!cpfCnpjValue) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Dados Incompletos',
+                text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" abaixo antes de prosseguir.',
+                confirmButtonText: 'Ir para o campo',
+                customClass: { confirmButton: 'btn btn-primary' },
+                buttonsStyling: false
+            }).then(() => {
+                $('input[name="cpf_cnpj"]').focus();
+                $('input[name="cpf_cnpj"]')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            return;
+        }
+        
         $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
 
         $.ajax({
@@ -123,6 +140,24 @@ $(document).ready(function() {
         const plan = $btn.data('plan');
         const type = $('.price-duration-toggler').is(':checked') ? 'yearly' : 'monthly';
         const originalText = $btn.html();
+
+        // Client-side validation for CPF/CNPJ
+        const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
+        if (!cpfCnpjValue) {
+            $('#pricingModal').modal('hide');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Dados Incompletos',
+                text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" antes de escolher um plano.',
+                confirmButtonText: 'Preencher agora',
+                customClass: { confirmButton: 'btn btn-primary' },
+                buttonsStyling: false
+            }).then(() => {
+                $('input[name="cpf_cnpj"]').focus();
+                $('input[name="cpf_cnpj"]')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            return;
+        }
 
         $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
 
@@ -190,9 +225,6 @@ function copyPix() {
             </div>
             <div>
               <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
-              @if($user->plan === 'free')
-                <p class="mb-1 text-muted small">Após o término do teste, o valor será de R$ 149,00/mês.</p>
-              @endif
             </div>
           </div>
           <div class="col-md-6">
@@ -210,13 +242,13 @@ function copyPix() {
               <div class="plan-statistics">
                 <div class="d-flex justify-content-between mb-1">
                   <h6 class="mb-0">Dias de Uso</h6>
-                  <h6 class="mb-0">{{ $daysUsed }} de 30 Dias</h6>
+                  <h6 class="mb-0">{{ (int)$daysUsed }} de 30 Dias</h6>
                 </div>
                 <div class="progress mb-1" style="height: 8px;">
-                  @php $percent = min(100, max(0, ($daysUsed / 30) * 100)); @endphp
+                  @php $percent = min(100, max(0, ((int)$daysUsed / 30) * 100)); @endphp
                   <div class="progress-bar" style="width: {{ $percent }}%"></div>
                 </div>
-                <small>{{ $trialDaysLeft }} dias restantes de teste grátis</small>
+                <small>{{ (int)$trialDaysLeft }} dias restantes de teste grátis</small>
               </div>
             @endif
           </div>
