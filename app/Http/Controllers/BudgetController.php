@@ -67,7 +67,7 @@ class BudgetController extends Controller
     {
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
-            'veiculo_id' => 'required|exists:vehicles,id',
+            'veiculo_id' => 'required|exists:veiculos,id',
             'valid_until' => 'required|date',
             'description' => 'nullable|string',
             'services' => 'nullable|array',

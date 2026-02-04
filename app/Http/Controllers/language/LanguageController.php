@@ -10,7 +10,7 @@ class LanguageController extends Controller
 {
   public function swap(Request $request, $locale)
   {
-    if (!in_array($locale, ['en', 'pt','fr'])) {
+    if (!in_array($locale, ['en', 'pt','es'])) {
       abort(400);
     } else {
       $request->session()->put('locale', $locale);

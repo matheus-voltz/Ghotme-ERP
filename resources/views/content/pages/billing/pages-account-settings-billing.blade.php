@@ -196,25 +196,29 @@ function copyPix() {
             </div>
           </div>
           <div class="col-md-6">
-            @if($trialDaysLeft <= 5)
-            <div class="alert alert-warning mb-6" role="alert">
+            @if($trialExpired && $user->plan === 'free')
+            <div class="alert alert-danger mb-6" role="alert">
               <h5 class="alert-heading mb-1 d-flex align-items-center">
                 <span class="alert-icon rounded"><i class="icon-base ti tabler-alert-circle icon-md"></i></span>
-                <span>Seu período de teste está acabando!</span>
+                <span>Seu período de teste grátis expirou!</span>
               </h5>
-              <span class="ms-11 ps-1">Faltam apenas {{ $trialDaysLeft }} dias para o fim do teste grátis.</span>
+              <span class="ms-11 ps-1">Faça o upgrade agora para não perder o acesso às suas funcionalidades.</span>
             </div>
             @endif
-            <div class="plan-statistics">
-              <div class="d-flex justify-content-between">
-                <h6 class="mb-1">Dias de Uso</h6>
-                <h6 class="mb-1">{{ 30 - $trialDaysLeft }} de 30 Dias</h6>
+
+            @if($user->plan === 'free')
+              <div class="plan-statistics">
+                <div class="d-flex justify-content-between mb-1">
+                  <h6 class="mb-0">Dias de Uso</h6>
+                  <h6 class="mb-0">{{ $daysUsed }} de 30 Dias</h6>
+                </div>
+                <div class="progress mb-1" style="height: 8px;">
+                  @php $percent = min(100, max(0, ($daysUsed / 30) * 100)); @endphp
+                  <div class="progress-bar" style="width: {{ $percent }}%"></div>
+                </div>
+                <small>{{ $trialDaysLeft }} dias restantes de teste grátis</small>
               </div>
-              <div class="progress rounded mb-1">
-                <div class="progress-bar" role="progressbar" style="width: {{ ((30 - $trialDaysLeft) / 30) * 100 }}%" aria-valuenow="{{ ((30 - $trialDaysLeft) / 30) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-              <small>{{ $trialDaysLeft }} dias restantes de teste grátis</small>
-            </div>
+            @endif
           </div>
           <div class="col-12 d-flex gap-2 flex-wrap">
             <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#pricingModal"><i class="ti tabler-rocket me-1"></i> Escolher um Plano</button>
