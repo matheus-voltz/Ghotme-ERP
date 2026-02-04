@@ -428,7 +428,7 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{{ url('/register') }}" class="btn btn-label-primary">Começar Grátis</a>
+                <a href="{{ url('/register') }}" class="btn btn-label-primary plan-action-btn">Começar Grátis</a>
               </div>
             </div>
           </div>
@@ -491,7 +491,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-padrao" target="_blank" class="btn btn-primary">Assinar Agora</a>
+                <a href="https://www.asaas.com/c/plano-padrao-mensal" 
+                   data-monthly-link="https://www.asaas.com/c/plano-padrao-mensal"
+                   data-yearly-link="https://www.asaas.com/c/plano-padrao-anual"
+                   target="_blank" class="btn btn-primary plan-action-btn">Assinar Agora</a>
               </div>
             </div>
           </div>
@@ -555,7 +558,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-enterprise" target="_blank" class="btn btn-label-primary">Assinar Agora</a>
+                <a href="https://www.asaas.com/c/plano-enterprise-mensal" 
+                   data-monthly-link="https://www.asaas.com/c/plano-enterprise-mensal"
+                   data-yearly-link="https://www.asaas.com/c/plano-enterprise-anual"
+                   target="_blank" class="btn btn-label-primary plan-action-btn">Assinar Agora</a>
               </div>
             </div>
           </div>
@@ -714,7 +720,7 @@ $pageConfigs = [
         <div class="col-lg-6 text-start text-sm-center text-lg-start">
           <h3 class="cta-title text-primary fw-bold mb-1">Pronto para transformar sua empresa?</h3>
           <h5 class="text-body mb-8">Comece agora seu teste grátis de 7 dias e sinta a diferença.</h5>
-          <a href="{{ url('/front-pages/payment') }}" class="btn btn-lg btn-primary">Quero Começar</a>
+          <a href="{{ url('/register') }}" class="btn btn-lg btn-primary">Quero Começar</a>
         </div>
         <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
           <img src="{{ asset('assets/img/front-pages/landing-page/cta-dashboard.png') }}" alt="cta dashboard"

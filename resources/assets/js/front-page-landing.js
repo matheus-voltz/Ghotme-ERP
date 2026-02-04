@@ -13,10 +13,7 @@
     ReviewsPreviousBtn = document.getElementById('reviews-previous-btn'),
     ReviewsNextBtn = document.getElementById('reviews-next-btn'),
     ReviewsSliderPrev = document.querySelector('.swiper-button-prev'),
-    ReviewsSliderNext = document.querySelector('.swiper-button-next'),
-    priceDurationToggler = document.querySelector('.price-duration-toggler'),
-    priceMonthlyList = [].slice.call(document.querySelectorAll('.price-monthly')),
-    priceYearlyList = [].slice.call(document.querySelectorAll('.price-yearly'));
+    ReviewsSliderNext = document.querySelector('.swiper-button-next');
 
   // Hero
   const mediaQueryXL = '1200';
@@ -87,12 +84,16 @@
   // Reviews slider next and previous
   // -----------------------------------
   // Add click event listener to next button
-  ReviewsNextBtn.addEventListener('click', function () {
-    ReviewsSliderNext.click();
-  });
-  ReviewsPreviousBtn.addEventListener('click', function () {
-    ReviewsSliderPrev.click();
-  });
+  if (ReviewsNextBtn) {
+    ReviewsNextBtn.addEventListener('click', function () {
+      ReviewsSliderNext.click();
+    });
+  }
+  if (ReviewsPreviousBtn) {
+    ReviewsPreviousBtn.addEventListener('click', function () {
+      ReviewsSliderPrev.click();
+    });
+  }
 
   // Review client logo
   // -----------------------------------
@@ -116,31 +117,52 @@
 
   // Pricing Plans
   // -----------------------------------
-  document.addEventListener('DOMContentLoaded', function (event) {
+  const initPricing = () => {
+    const priceDurationToggler = document.querySelector('.price-duration-toggler');
+    const priceMonthlyList = [].slice.call(document.querySelectorAll('.price-monthly'));
+    const priceYearlyList = [].slice.call(document.querySelectorAll('.price-yearly'));
+    const planActionButtons = [].slice.call(document.querySelectorAll('.plan-action-btn'));
+
     function togglePrice() {
       if (priceDurationToggler.checked) {
-        // If checked
-        priceYearlyList.map(function (yearEl) {
+        // If checked (Anual)
+        priceYearlyList.forEach(function (yearEl) {
           yearEl.classList.remove('d-none');
         });
-        priceMonthlyList.map(function (monthEl) {
+        priceMonthlyList.forEach(function (monthEl) {
           monthEl.classList.add('d-none');
         });
+        // Update button links to yearly
+        planActionButtons.forEach(function (btnEl) {
+          const yearlyLink = btnEl.getAttribute('data-yearly-link');
+          if (yearlyLink) {
+            btnEl.setAttribute('href', yearlyLink);
+          }
+        });
       } else {
-        // If not checked
-        priceYearlyList.map(function (yearEl) {
+        // If not checked (Mensal)
+        priceYearlyList.forEach(function (yearEl) {
           yearEl.classList.add('d-none');
         });
-        priceMonthlyList.map(function (monthEl) {
+        priceMonthlyList.forEach(function (monthEl) {
           monthEl.classList.remove('d-none');
+        });
+        // Update button links to monthly
+        planActionButtons.forEach(function (btnEl) {
+          const monthlyLink = btnEl.getAttribute('data-monthly-link');
+          if (monthlyLink) {
+            btnEl.setAttribute('href', monthlyLink);
+          }
         });
       }
     }
-    // togglePrice Event Listener
-    togglePrice();
 
-    priceDurationToggler.onchange = function () {
+    if (priceDurationToggler) {
       togglePrice();
-    };
-  });
+      priceDurationToggler.addEventListener('change', togglePrice);
+    }
+  };
+
+  // Initialize on load
+  initPricing();
 })();
