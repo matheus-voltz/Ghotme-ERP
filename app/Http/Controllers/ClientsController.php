@@ -4,22 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Clients;
+use Illuminate\Support\Facades\DB;
 
 class ClientsController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-
-
     public function index()
     {
-        $clients = Clients::all();
-        return view('content.pages.clients.clients-index', compact('clients'));
+        return view('content.pages.clients.clients-index');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Return data for DataTables.
      */
     public function dataBase(Request $request)
     {
@@ -28,32 +26,39 @@ class ClientsController extends Controller
 
         $limit = $request->input('length');
         $start = $request->input('start');
-        $order = $columns[$request->input('order.0.column')] ?? 'id';
+        
+        $columns = [
+            0 => 'id', 
+            1 => 'id', 
+            2 => 'type', 
+            3 => 'name', 
+            4 => 'cpf', // document mapping
+            5 => 'email', 
+            6 => 'id', // vehicles_count (sorting on count is complex, using id for now)
+            7 => 'id'
+        ];
+        $orderColumnIndex = $request->input('order.0.column');
+        $order = $columns[$orderColumnIndex] ?? 'id';
         $dir = $request->input('order.0.dir') ?? 'desc';
 
-        if (empty($request->input('search.value'))) {
-            $clients = Clients::offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-        } else {
+        $query = Clients::withCount('vehicles');
+
+        if (!empty($request->input('search.value'))) {
             $search = $request->input('search.value');
-
-            $clients = Clients::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->orWhere('company_name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir)
-                ->get();
-
-            $totalFiltered = Clients::where('id', 'LIKE', "%{$search}%")
-                ->orWhere('name', 'LIKE', "%{$search}%")
-                ->orWhere('company_name', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
-                ->count();
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('company_name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('cpf', 'LIKE', "%{$search}%")
+                  ->orWhere('cnpj', 'LIKE', "%{$search}%");
+            });
+            $totalFiltered = $query->count();
         }
+
+        $clients = $query->offset($start)
+            ->limit($limit)
+            ->orderBy($order, $dir)
+            ->get();
 
         $data = [];
         $ids = $start;
@@ -61,16 +66,14 @@ class ClientsController extends Controller
         foreach ($clients as $client) {
             $nestedData['fake_id'] = ++$ids;
             $nestedData['id'] = $client->id;
-            // Para o JS exibir corretamente, passamos o nome completo (ou razão social) no campo 'name'
-            $nestedData['name'] = $client->type === 'PJ' ? $client->company_name : $client->name;
-            $nestedData['email'] = $client->email;
-            $nestedData['email_verified_at'] = 1; // Simulado pois Client não tem verification
-            $nestedData['is_active'] = $client->status === 'Ativo';
             $nestedData['type'] = $client->type;
-
-            // Campos extras que podem ser úteis no template JS
+            $nestedData['name'] = $client->type === 'PF' ? $client->name : $client->company_name;
+            $nestedData['email'] = $client->email;
             $nestedData['company_name'] = $client->company_name;
-            $nestedData['trade_name'] = $client->trade_name ?? '';
+            $nestedData['whatsapp'] = $client->whatsapp;
+            $nestedData['document'] = $client->type === 'PF' ? $client->cpf : $client->cnpj;
+            $nestedData['vehicles_count'] = $client->vehicles_count;
+            $nestedData['is_active'] = true;
             $nestedData['action'] = '';
 
             $data[] = $nestedData;
@@ -84,48 +87,76 @@ class ClientsController extends Controller
         ]);
     }
 
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'type' => 'required|in:PF,PJ',
+            'name' => 'required_if:type,PF|nullable|string|max:255',
+            'cpf' => 'required_if:type,PF|nullable|string|max:20',
+            'company_name' => 'required_if:type,PJ|nullable|string|max:255',
+            'cnpj' => 'required_if:type,PJ|nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'whatsapp' => 'nullable|string|max:20',
+            'cep' => 'nullable|string|max:10',
+            'rua' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:20',
+            'bairro' => 'nullable|string|max:255',
+            'cidade' => 'nullable|string|max:255',
+            'estado' => 'nullable|string|max:2',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
+        $client = Clients::create($validated);
+
+        return response()->json(['success' => true, 'message' => 'Cliente cadastrado com sucesso!']);
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $client = Clients::findOrFail($id);
+        return response()->json($client);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $client = Clients::findOrFail($id);
+        
+        $validated = $request->validate([
+            'type' => 'required|in:PF,PJ',
+            'name' => 'required_if:type,PF|nullable|string|max:255',
+            'cpf' => 'required_if:type,PF|nullable|string|max:20',
+            'company_name' => 'required_if:type,PJ|nullable|string|max:255',
+            'cnpj' => 'required_if:type,PJ|nullable|string|max:20',
+            'email' => 'nullable|email|max:255',
+            'whatsapp' => 'nullable|string|max:20',
+            'cep' => 'nullable|string|max:10',
+            'rua' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:20',
+            'bairro' => 'nullable|string|max:255',
+            'cidade' => 'nullable|string|max:255',
+            'estado' => 'nullable|string|max:2',
+        ]);
+
+        $client->update($validated);
+
+        return response()->json(['success' => true, 'message' => 'Cliente atualizado com sucesso!']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $client = Clients::findOrFail($id);
+        $client->delete();
+        return response()->json(['success' => true, 'message' => 'Cliente removido!']);
     }
 }

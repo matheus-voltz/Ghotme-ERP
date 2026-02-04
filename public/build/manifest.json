@@ -4055,7 +4055,7 @@
     "isEntry": true
   },
   "resources/js/laravel-clients.js": {
-    "file": "assets/laravel-clients-nLstnRck.js",
+    "file": "assets/laravel-clients-C3EbPDIq.js",
     "name": "laravel-clients",
     "src": "resources/js/laravel-clients.js",
     "isEntry": true
@@ -4064,6 +4064,12 @@
     "file": "assets/laravel-user-management-DN_WE5Dk.js",
     "name": "laravel-user-management",
     "src": "resources/js/laravel-user-management.js",
+    "isEntry": true
+  },
+  "resources/js/laravel-vehicles.js": {
+    "file": "assets/laravel-vehicles-t6BbO03_.js",
+    "name": "laravel-vehicles",
+    "src": "resources/js/laravel-vehicles.js",
     "isEntry": true
   },
   "resources/js/service-packages.js": {

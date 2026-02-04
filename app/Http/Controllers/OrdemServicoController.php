@@ -7,7 +7,7 @@ use App\Models\OrdemServico;
 use App\Models\OrdemServicoItem;
 use App\Models\OrdemServicoPart;
 use App\Models\Clients;
-use App\Models\Veiculos;
+use App\Models\Vehicles;
 use App\Models\Service;
 use App\Models\InventoryItem;
 use Illuminate\Support\Facades\DB;
@@ -118,7 +118,7 @@ class OrdemServicoController extends Controller
 
     public function getVehiclesByClient($clientId)
     {
-        $vehicles = Veiculos::where('cliente_id', $clientId)->get();
+        $vehicles = Vehicles::where('cliente_id', $clientId)->get();
         return response()->json($vehicles);
     }
 }

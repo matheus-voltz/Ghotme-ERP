@@ -28,7 +28,17 @@ class InventoryItemController extends Controller
         $limit = $request->input('length');
         $start = $request->input('start');
         
-        $columns = ['id', 'name', 'sku', 'quantity', 'selling_price', 'location', 'is_active'];
+        $columns = [
+            0 => 'id',
+            1 => 'id',
+            2 => 'name',
+            3 => 'sku',
+            4 => 'quantity',
+            5 => 'selling_price',
+            6 => 'location',
+            7 => 'is_active',
+            8 => 'id'
+        ];
         $orderColumnIndex = $request->input('order.0.column');
         $order = $columns[$orderColumnIndex] ?? 'id';
         $dir = $request->input('order.0.dir') ?? 'desc';

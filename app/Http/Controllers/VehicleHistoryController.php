@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Veiculos;
+use App\Models\Vehicles;
 use App\Models\VehicleHistory;
 use Illuminate\Support\Facades\Auth;
 
@@ -24,9 +24,9 @@ class VehicleHistoryController extends Controller
     {
         $term = $request->input('q');
         
-        $vehicles = Veiculos::where('placa', 'LIKE', "%{$term}%")
+        $vehicles = Vehicles::where('placa', 'LIKE', "%{$term}%")
             ->orWhere('chassi', 'LIKE', "%{$term}%")
-            ->with('cliente') // Assumindo relação definida no Model Veiculos
+            ->with('cliente') // Assumindo relação definida no Model Vehicles
             ->limit(10)
             ->get();
 
@@ -80,7 +80,7 @@ class VehicleHistoryController extends Controller
         $history = VehicleHistory::create($validated);
         
         // Atualiza KM do veículo se o novo for maior
-        $vehicle = Veiculos::find($validated['veiculo_id']);
+        $vehicle = Vehicles::find($validated['veiculo_id']);
         if ($vehicle && $validated['km'] > $vehicle->km_atual) {
             $vehicle->km_atual = $validated['km'];
             $vehicle->save();

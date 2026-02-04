@@ -27,7 +27,7 @@ class VehicleHistory extends Model
 
     public function veiculo(): BelongsTo
     {
-        return $this->belongsTo(Veiculos::class, 'veiculo_id');
+        return $this->belongsTo(Vehicles::class, 'veiculo_id');
     }
 
     public function ordemServico(): BelongsTo

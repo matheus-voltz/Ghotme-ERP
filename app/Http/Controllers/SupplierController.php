@@ -26,7 +26,17 @@ class SupplierController extends Controller
         $limit = $request->input('length');
         $start = $request->input('start');
         
-        $columns = ['id', 'name', 'contact_name', 'email', 'phone', 'city', 'is_active']; 
+        $columns = [
+            0 => 'id',
+            1 => 'id',
+            2 => 'name',
+            3 => 'contact_name',
+            4 => 'email',
+            5 => 'phone',
+            6 => 'city',
+            7 => 'is_active',
+            8 => 'id'
+        ];
         $orderColumnIndex = $request->input('order.0.column');
         $order = $columns[$orderColumnIndex] ?? 'id';
         $dir = $request->input('order.0.dir') ?? 'desc';

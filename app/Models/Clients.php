@@ -35,4 +35,9 @@ class Clients extends Model
     {
         return $this->hasMany(ClientFieldValue::class);
     }
+
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicles::class, 'cliente_id');
+    }
 }

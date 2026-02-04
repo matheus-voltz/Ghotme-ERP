@@ -3,42 +3,48 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class OrdemServico extends Model
+class Budget extends Model
 {
     protected $fillable = [
         'client_id',
         'veiculo_id',
         'user_id',
         'status',
+        'valid_until',
         'description',
-        'scheduled_at',
-        'km_entry',
+        'notes'
     ];
 
-    public function client()
+    protected $casts = [
+        'valid_until' => 'date',
+    ];
+
+    public function client(): BelongsTo
     {
         return $this->belongsTo(Clients::class, 'client_id');
     }
 
-    public function veiculo()
+    public function veiculo(): BelongsTo
     {
         return $this->belongsTo(Vehicles::class, 'veiculo_id');
     }
 
-    public function history()
+    public function user(): BelongsTo
     {
-        return $this->hasOne(VehicleHistory::class, 'ordem_servico_id');
+        return $this->belongsTo(User::class);
     }
 
-    public function items()
+    public function items(): HasMany
     {
-        return $this->hasMany(\App\Models\OrdemServicoItem::class);
+        return $this->hasMany(BudgetItem::class);
     }
 
-    public function parts()
+    public function parts(): HasMany
     {
-        return $this->hasMany(\App\Models\OrdemServicoPart::class);
+        return $this->hasMany(BudgetPart::class);
     }
 
     public function getTotalAttribute()
@@ -46,10 +52,5 @@ class OrdemServico extends Model
         $servicesTotal = $this->items->sum(fn($i) => $i->price * $i->quantity);
         $partsTotal = $this->parts->sum(fn($p) => $p->price * $p->quantity);
         return $servicesTotal + $partsTotal;
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

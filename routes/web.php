@@ -28,6 +28,8 @@ use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\IntegrationSettingController;
+use App\Http\Controllers\PrintTemplateController;
+use App\Http\Controllers\BudgetController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -81,9 +83,24 @@ Route::middleware([
     Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
     Route::get('/api/clients/{id}/vehicles', [OrdemServicoController::class, 'getVehiclesByClient']);
 
+    // Budgets
+    Route::get('/budgets/pending', [BudgetController::class, 'index'])->name('budgets.pending');
+    Route::get('/budgets/approved', [BudgetController::class, 'index'])->name('budgets.approved');
+    Route::get('/budgets/rejected', [BudgetController::class, 'index'])->name('budgets.rejected');
+    Route::get('/budgets/create', [BudgetController::class, 'create'])->name('budgets.create');
+    Route::get('/budgets/data', [BudgetController::class, 'dataBase'])->name('budgets.data');
+    Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');
+    Route::post('/budgets/{id}/status', [BudgetController::class, 'updateStatus'])->name('budgets.status');
+    Route::post('/budgets/{id}/convert', [BudgetController::class, 'convertToOS'])->name('budgets.convert');
+    Route::get('/budgets/{id}/whatsapp', [BudgetController::class, 'sendWhatsApp'])->name('budgets.whatsapp');
+
     // Clients
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
+    Route::post('/clients-list', [ClientsController::class, 'store'])->name('clients-list.store');
+    Route::get('/clients-list/{id}/edit', [ClientsController::class, 'edit'])->name('clients-list.edit');
+    Route::put('/clients-list/{id}', [ClientsController::class, 'update'])->name('clients-list.update');
+    Route::delete('/clients-list/{id}', [ClientsController::class, 'destroy'])->name('clients-list.destroy');
 
     // Vehicles
     Route::get('/vehicles', [VehiclesController::class, 'index'])->name('vehicles');
@@ -181,6 +198,11 @@ Route::middleware([
     // Integrations
     Route::get('/settings/integrations', [IntegrationSettingController::class, 'index'])->name('settings.integrations');
     Route::post('/settings/integrations', [IntegrationSettingController::class, 'update'])->name('settings.integrations.update');
+
+    // Print Templates
+    Route::get('/settings/print-templates', [PrintTemplateController::class, 'index'])->name('settings.print-templates');
+    Route::get('/settings/print-templates/{id}/edit', [PrintTemplateController::class, 'edit'])->name('settings.print-templates.edit');
+    Route::post('/settings/print-templates/{id}', [PrintTemplateController::class, 'update'])->name('settings.print-templates.update');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
