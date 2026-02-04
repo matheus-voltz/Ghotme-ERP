@@ -27,6 +27,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\AppSettingController;
+use App\Http\Controllers\IntegrationSettingController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -176,6 +177,10 @@ Route::middleware([
     // OS Settings
     Route::get('/settings/os-settings', [AppSettingController::class, 'index'])->name('settings.os-settings');
     Route::post('/settings/os-settings', [AppSettingController::class, 'update'])->name('settings.os-settings.update');
+
+    // Integrations
+    Route::get('/settings/integrations', [IntegrationSettingController::class, 'index'])->name('settings.integrations');
+    Route::post('/settings/integrations', [IntegrationSettingController::class, 'update'])->name('settings.integrations.update');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
