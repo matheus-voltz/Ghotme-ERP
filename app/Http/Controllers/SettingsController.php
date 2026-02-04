@@ -34,18 +34,22 @@ class SettingsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Check if there is a pending selected plan
-        $pendingPlan = BillingHistory::where('user_id', $user->id)
-            ->where('status', 'pending')
-            ->orderBy('created_at', 'desc')
-            ->first();
+        // Selected Plan Details (if any)
+        $selectedPlanDetails = null;
+        if ($user->selected_plan && $user->selected_plan !== 'free') {
+            $plans = [
+                'padrao' => ['monthly' => '149,00', 'yearly' => '1.490,00'],
+                'enterprise' => ['monthly' => '279,00', 'yearly' => '2.790,00'],
+            ];
+            $amount = $plans[$user->selected_plan][$user->plan_type] ?? '0,00';
+            $selectedPlanDetails = [
+                'name' => ucfirst($user->selected_plan),
+                'amount' => $amount,
+                'type' => $user->plan_type === 'yearly' ? 'Anual' : 'Mensal'
+            ];
+        }
 
         // Current Plan Details
-        $plans = [
-            'padrao' => ['monthly' => '149,00', 'yearly' => '1.490,00'],
-            'enterprise' => ['monthly' => '279,00', 'yearly' => '2.790,00'],
-        ];
-
         $planDetails = [
             'name' => 'Padrão',
             'price' => '149,00',
@@ -76,30 +80,7 @@ class SettingsController extends Controller
             ];
         }
 
-        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'daysUsed', 'billingHistory', 'planDetails', 'trialExpired', 'pendingPlan'));
-    }
-
-    public function updateProfile(Request $request)
-    {
-        $user = auth()->user();
-        
-        // Clean formatting
-        $cleanCpfCnpj = preg_replace('/\D/', '', $request->cpf_cnpj);
-        $cleanZip = preg_replace('/\D/', '', $request->zipCode);
-
-        $user->update([
-            'company' => $request->companyName,
-            'email' => $request->billingEmail,
-            'cpf_cnpj' => $cleanCpfCnpj,
-            'contact_number' => $request->mobileNumber,
-            'country' => $request->country,
-            'billing_address' => $request->billingAddress,
-            'city' => $request->city,
-            'state' => $request->state,
-            'zip_code' => $cleanZip,
-        ]);
-
-        return response()->json(['success' => true, 'message' => 'Perfil de cobrança atualizado!']);
+        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'daysUsed', 'billingHistory', 'planDetails', 'trialExpired', 'selectedPlanDetails'));
     }
 
     public function selectPlan(Request $request)
@@ -107,79 +88,22 @@ class SettingsController extends Controller
         $user = auth()->user();
         $plan = $request->plan; // padrao, enterprise
         $type = $request->type; // monthly, yearly
-        $method = $request->method ?? 'pix'; // default method for initial generation
 
-        // Safety: Pix is not allowed for yearly plans
-        if ($type === 'yearly' && $method === 'pix') {
-            $method = 'boleto';
-        }
-
-        $plans = [
-            'padrao' => ['monthly' => 149.00, 'yearly' => 1490.00],
-            'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
-        ];
-
-        if (!isset($plans[$plan])) {
+        $validPlans = ['padrao', 'enterprise'];
+        if (!in_array($plan, $validPlans)) {
             return response()->json(['success' => false, 'message' => 'Plano inválido.']);
         }
 
-        $amount = $plans[$plan][$type];
-        $description = "Plano " . ucfirst($plan) . " - Ghotme (" . ($type === 'monthly' ? 'Mensal' : 'Anual') . ")";
+        // Apenas salva a intenção, não gera cobrança ainda
+        $user->update([
+            'selected_plan' => $plan,
+            'plan_type' => $type
+        ]);
 
-        if (!$user->cpf_cnpj) {
-            return response()->json(['success' => false, 'message' => 'Por favor, preencha seu CPF ou CNPJ no perfil antes de escolher um plano.']);
-        }
-
-        try {
-            $customerId = $this->asaas->getOrCreateCustomer($user);
-            
-            if ($type === 'monthly') {
-                // Cria Assinatura
-                $result = $this->asaas->createSubscription($customerId, $method, $amount, $description);
-            } else {
-                // Cria Pagamento Único
-                $result = $this->asaas->createPayment($customerId, $method, $amount, $description);
-            }
-
-            if (!isset($result['id'])) {
-                return response()->json(['success' => false, 'message' => $result['errors'][0]['description'] ?? 'Erro ao processar no Asaas.']);
-            }
-
-            // Salva a intenção do tipo de plano (mensal/anual) mas mantém o plano atual (ex: free)
-            $user->update([
-                'plan_type' => $type
-            ]);
-
-            // Registra no histórico
-            BillingHistory::create([
-                'user_id' => $user->id,
-                'plan_name' => ucfirst($plan) . " (" . ($type === 'monthly' ? 'Mensal' : 'Anual') . ")",
-                'amount' => $amount,
-                'payment_method' => ucfirst($method),
-                'payment_url' => $result['invoiceUrl'] ?? null,
-                'status' => 'pending',
-            ]);
-
-            $invoiceUrl = $result['invoiceUrl'] ?? null;
-
-            // If it's a subscription, we might need to fetch the first payment's URL
-            if ($type === 'monthly' && !$invoiceUrl && isset($result['id'])) {
-                $payments = $this->asaas->getSubscriptionPayments($result['id']);
-                if (!empty($payments['data'])) {
-                    $invoiceUrl = $payments['data'][0]['invoiceUrl'] ?? null;
-                }
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Plano selecionado com sucesso! Aguardando pagamento.',
-                'redirect_url' => $invoiceUrl,
-                'invoice_url' => $invoiceUrl
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
-        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Plano selecionado com sucesso! Agora escolha o método de pagamento abaixo.'
+        ]);
     }
 
     public function generatePayment(Request $request)
@@ -187,8 +111,10 @@ class SettingsController extends Controller
         $user = auth()->user();
         $method = $request->method; // pix, boleto, credit_card
         
-        if ($user->plan === 'free') {
-            return response()->json(['success' => false, 'message' => 'Por favor, selecione um plano pago no botão "Escolher um Plano" antes de gerar uma cobrança.']);
+        // Verifica se selecionou um plano no modal primeiro
+        $planToCharge = $user->selected_plan;
+        if (!$planToCharge || $planToCharge === 'free') {
+            return response()->json(['success' => false, 'message' => 'Por favor, selecione um plano no botão "Escolher um Plano" antes de gerar a cobrança.']);
         }
 
         $plans = [
@@ -196,8 +122,8 @@ class SettingsController extends Controller
             'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
         ];
 
-        $amount = $plans[$user->plan][$user->plan_type ?? 'monthly'] ?? 149.00;
-        $description = "Assinatura Plano " . ucfirst($user->plan) . " - Ghotme (" . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ")";
+        $amount = $plans[$planToCharge][$user->plan_type ?? 'monthly'] ?? 149.00;
+        $description = "Assinatura Plano " . ucfirst($planToCharge) . " - Ghotme (" . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ")";
 
         if (!$user->cpf_cnpj) {
             return response()->json(['success' => false, 'message' => 'Por favor, preencha seu CPF ou CNPJ no perfil antes de gerar a cobrança.']);
@@ -205,33 +131,47 @@ class SettingsController extends Controller
 
         try {
             $customerId = $this->asaas->getOrCreateCustomer($user);
-            if (!$customerId) throw new \Exception("Erro ao processar cliente no Asaas.");
-
-            $payment = $this->asaas->createPayment($customerId, $method, $amount, $description);
             
-            if (!isset($payment['id'])) {
-                return response()->json(['success' => false, 'message' => $payment['errors'][0]['description'] ?? 'Erro no Asaas']);
+            if ($user->plan_type === 'monthly') {
+                // Cria Assinatura Recorrente
+                $result = $this->asaas->createSubscription($customerId, $method, $amount, $description);
+            } else {
+                // Cria Pagamento Único
+                $result = $this->asaas->createPayment($customerId, $method, $amount, $description);
             }
 
-            // Registra no histórico local como pendente
+            if (!isset($result['id'])) {
+                return response()->json(['success' => false, 'message' => $result['errors'][0]['description'] ?? 'Erro no Asaas']);
+            }
+
+            $invoiceUrl = $result['invoiceUrl'] ?? null;
+            if ($user->plan_type === 'monthly' && !$invoiceUrl) {
+                $payments = $this->asaas->getSubscriptionPayments($result['id']);
+                if (!empty($payments['data'])) {
+                    $invoiceUrl = $payments['data'][0]['invoiceUrl'] ?? null;
+                }
+            }
+
+            // Registra no histórico
             BillingHistory::create([
                 'user_id' => $user->id,
-                'plan_name' => 'Oficina Pro',
+                'plan_name' => ucfirst($planToCharge) . " (" . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ")",
                 'amount' => $amount,
                 'payment_method' => ucfirst($method),
+                'payment_url' => $invoiceUrl,
                 'status' => 'pending',
             ]);
 
             $responseData = [
                 'success' => true,
-                'payment_id' => $payment['id'],
+                'payment_id' => $result['id'],
                 'amount' => number_format($amount, 2, ',', '.'),
-                'invoice_url' => $payment['invoiceUrl'] ?? null,
-                'bank_slip_url' => $payment['bankSlipUrl'] ?? null,
+                'invoice_url' => $invoiceUrl,
+                'bank_slip_url' => $result['bankSlipUrl'] ?? null,
             ];
 
             if ($method === 'pix') {
-                $pixData = $this->asaas->getPixData($payment['id']);
+                $pixData = $this->asaas->getPixData($result['id']);
                 $responseData['pix_code'] = $pixData['payload'] ?? null;
                 $responseData['pix_qr'] = $pixData['encodedImage'] ?? null;
             }

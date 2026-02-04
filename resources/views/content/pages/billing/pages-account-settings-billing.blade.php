@@ -186,10 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function(data) {
                 if (data.success) {
-                    if (data.redirect_url || data.invoice_url) {
-                        window.open(data.redirect_url || data.invoice_url, '_blank');
-                    }
-                    location.reload();
+                    location.reload(); // Just reload to show the "Selected" message
                 } else {
                     $btn.html(originalText).prop('disabled', false);
                     Swal.fire({ icon: 'error', title: 'Erro', text: data.message });
@@ -242,14 +239,14 @@ function copyPix() {
             </div>
             <div>
               <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
-              @if($user->plan === 'free' && $user->cpf_cnpj && !$pendingPlan)
+              @if($user->plan === 'free' && $user->cpf_cnpj && !$selectedPlanDetails)
                 <p class="text-primary fw-bold mt-2 animate__animated animate__pulse animate__infinite">
                   <i class="icon-base ti tabler-arrow-narrow-right"></i> Selecione um plano para continuar
                 </p>
               @endif
-              @if($user->plan === 'free' && $pendingPlan)
+              @if($user->plan === 'free' && $selectedPlanDetails)
                 <p class="text-success fw-bold mt-2">
-                  <i class="icon-base ti tabler-check"></i> Plano Selecionado: R$ {{ number_format($pendingPlan->amount, 2, ',', '.') }}
+                  <i class="icon-base ti tabler-check"></i> Plano Selecionado: R$ {{ $selectedPlanDetails['amount'] }} {{ $selectedPlanDetails['type'] }}
                 </p>
               @endif
             </div>
