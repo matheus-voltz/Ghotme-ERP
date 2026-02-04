@@ -373,26 +373,25 @@ $pageConfigs = [
         feitos para você
       </h4>
       <p class="text-center pb-2 mb-7">Todos os planos incluem recursos essenciais para impulsionar sua empresa.<br />Escolha o melhor plano para suas necessidades.</p>
-      <div class="text-center mb-12">
-        <div class="position-relative d-inline-block pt-3 pt-md-0">
-          <label class="switch switch-sm switch-primary me-0">
-            <span class="switch-label fs-6 text-body me-3">Mensal</span>
-            <input type="checkbox" class="switch-input price-duration-toggler" />
-            <span class="switch-toggle-slider">
-              <span class="switch-on"></span>
-              <span class="switch-off"></span>
-            </span>
-            <span class="switch-label fs-6 text-body ms-3">Anual</span>
-          </label>
-          <div class="pricing-plans-item position-absolute d-flex">
-            <img src="{{ asset('assets/img/front-pages/icons/pricing-plans-arrow.png') }}" alt="pricing plans arrow"
-              class="scaleX-n1-rtl" />
-            <span class="fw-medium mt-2 ms-1"> Ganhe 2 meses grátis</span>
-          </div>
+      
+      <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 pt-12 pb-4">
+        <span class="switch-label fs-6 text-body">Mensal</span>
+        <label class="switch switch-sm switch-primary me-0">
+          <input type="checkbox" class="switch-input price-duration-toggler" />
+          <span class="switch-toggle-slider">
+            <span class="switch-on"></span>
+            <span class="switch-off"></span>
+          </span>
+        </label>
+        <span class="switch-label fs-6 text-body">Anual</span>
+        <div class="mt-n5 ms-2 mb-12 d-none d-sm-flex align-items-center gap-1">
+          <i class="ti tabler-corner-left-down icon-lg text-body-secondary scaleX-n1-rtl"></i>
+          <span class="badge badge-sm bg-label-primary rounded-1 mb-2 ">Ganhe 2 meses grátis</span>
         </div>
       </div>
+
       <div class="row g-6 pt-lg-5">
-        <!-- Basic Plan: Start -->
+        <!-- Basic -->
         <div class="col-xl-4 col-lg-6">
           <div class="card">
             <div class="card-header">
@@ -401,12 +400,11 @@ $pageConfigs = [
                   class="mb-8 pb-2" />
                 <h4 class="mb-0">Básico</h4>
                 <div class="d-flex align-items-center justify-content-center">
-                  <span class="price-monthly h2 text-primary fw-extrabold mb-0">R$ 0</span>
-                  <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">Teste Agora</span>
+                  <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
+                  <h1 class="price-monthly text-primary mb-0">0</h1>
+                  <h1 class="price-yearly text-primary mb-0 d-none">0</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
-                </div>
-                <div class="position-relative pt-2">
-                  <div class="price-yearly text-body-secondary price-yearly-toggle d-none">30 dias plano Padrão</div>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
               </div>
             </div>
@@ -433,22 +431,23 @@ $pageConfigs = [
             </div>
           </div>
         </div>
-        <!-- Basic Plan: End -->
 
-        <!-- Standard Plan: Start -->
+        <!-- Padrão -->
         <div class="col-xl-4 col-lg-6">
           <div class="card border border-primary shadow-xl">
             <div class="card-header">
-              <div class="text-center">
+              <div class="text-center position-relative">
+                <div class="position-absolute end-0 top-0 mt-n2">
+                  <span class="badge bg-label-primary rounded-1">Popular</span>
+                </div>
                 <img src="{{ asset('assets/img/front-pages/icons/plane.png') }}" alt="plane icon" class="mb-8 pb-2" />
                 <h4 class="mb-0">Padrão</h4>
                 <div class="d-flex align-items-center justify-content-center">
-                  <span class="price-monthly h2 text-primary fw-extrabold mb-0">R$ 149</span>
-                  <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">Teste Agora</span>
+                  <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
+                  <h1 class="price-monthly text-primary mb-0">149</h1>
+                  <h1 class="price-yearly text-primary mb-0 d-none">1.490</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
-                </div>
-                <div class="position-relative pt-2">
-                  <div class="price-yearly text-body-secondary price-yearly-toggle d-none">R$ 1.490 / ano</div>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
               </div>
             </div>
@@ -499,9 +498,8 @@ $pageConfigs = [
             </div>
           </div>
         </div>
-        <!-- Standard Plan: End -->
 
-        <!-- Enterprise Plan: Start -->
+        <!-- Enterprise -->
         <div class="col-xl-4 col-lg-6">
           <div class="card">
             <div class="card-header">
@@ -510,12 +508,11 @@ $pageConfigs = [
                   class="mb-8 pb-2" />
                 <h4 class="mb-0">Enterprise</h4>
                 <div class="d-flex align-items-center justify-content-center">
-                  <span class="price-monthly h2 text-primary fw-extrabold mb-0">R$ 279</span>
-                  <span class="price-yearly h2 text-primary fw-extrabold mb-0 d-none">Teste Agora</span>
+                  <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
+                  <h1 class="price-monthly text-primary mb-0">279</h1>
+                  <h1 class="price-yearly text-primary mb-0 d-none">2.790</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
-                </div>
-                <div class="position-relative pt-2">
-                  <div class="price-yearly text-body-secondary price-yearly-toggle d-none">R$ 2.790 / ano</div>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
               </div>
             </div>
@@ -566,7 +563,6 @@ $pageConfigs = [
             </div>
           </div>
         </div>
-        <!-- Enterprise Plan: End -->
       </div>
     </div>
   </section>
