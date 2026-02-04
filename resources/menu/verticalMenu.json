@@ -17,33 +17,13 @@
           "slug": "ordens-servico"
         },
         {
-          "url": "/newOS",
+          "url": "/ordens-servico/create",
           "name": "Criar OS",
           "slug": "newOS"
         },
         {
-          "url": "/runningOS",
-          "name": "OS em andamento",
-          "slug": "runningOS"
-        },
-        {
-          "url": "/endOS",
-          "name": "OS finalizadas",
-          "slug": "endOS"
-        },
-        {
-          "url": "/canceledOS",
-          "name": "OS canceladas",
-          "slug": "canceledOS"
-        },
-        {
-          "url": "/waitingOS",
-          "name": "OS aguardando aprovação",
-          "slug": "waitingOS"
-        },
-        {
-          "url": "/checklist",
-          "name": "Checklist do veiculo",
+          "url": "/ordens-servico/checklist",
+          "name": "Checklist de Entrada",
           "slug": "checklist"
         }
       ]

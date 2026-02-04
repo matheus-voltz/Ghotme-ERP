@@ -30,6 +30,7 @@ use App\Http\Controllers\AppSettingController;
 use App\Http\Controllers\IntegrationSettingController;
 use App\Http\Controllers\PrintTemplateController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\VehicleChecklistController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -83,10 +84,16 @@ Route::middleware([
     Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
     Route::get('/api/clients/{id}/vehicles', [OrdemServicoController::class, 'getVehiclesByClient']);
 
+    Route::get('/ordens-servico/checklist', [VehicleChecklistController::class, 'index'])->name('ordens-servico.checklist');
+    Route::get('/ordens-servico/checklist/create', [VehicleChecklistController::class, 'create'])->name('ordens-servico.checklist.create');
+    Route::post('/ordens-servico/checklist', [VehicleChecklistController::class, 'store'])->name('ordens-servico.checklist.store');
+    Route::get('/ordens-servico/checklist/{id}', [VehicleChecklistController::class, 'show'])->name('ordens-servico.checklist.show');
+
     // Budgets
     Route::get('/budgets/pending', [BudgetController::class, 'index'])->name('budgets.pending');
     Route::get('/budgets/approved', [BudgetController::class, 'index'])->name('budgets.approved');
     Route::get('/budgets/rejected', [BudgetController::class, 'index'])->name('budgets.rejected');
+    Route::get('/budgets/send-whatsapp', [BudgetController::class, 'index'])->name('budgets.send-whatsapp');
     Route::get('/budgets/create', [BudgetController::class, 'create'])->name('budgets.create');
     Route::get('/budgets/data', [BudgetController::class, 'dataBase'])->name('budgets.data');
     Route::post('/budgets', [BudgetController::class, 'store'])->name('budgets.store');

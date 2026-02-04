@@ -101,6 +101,11 @@ class OrdemServicoController extends Controller
             }
 
             DB::commit();
+            
+            if ($request->has('redirect_to_checklist')) {
+                return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])->with('success', 'OS Criada! Realize o checklist agora.');
+            }
+
             return redirect()->route('ordens-servico')->with('success', 'OS Criada!');
 
         } catch (\Exception $e) {

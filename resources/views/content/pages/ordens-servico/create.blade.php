@@ -128,6 +128,12 @@
                     <h5 class="card-title mb-0">Ações</h5>
                 </div>
                 <div class="card-body pt-4">
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="redirect_to_checklist" id="redirect_to_checklist" value="1" checked>
+                            <label class="form-check-input-label" for="redirect_to_checklist">Realizar checklist de entrada após salvar</label>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-primary w-100 mb-3">Abrir Ordem de Serviço</button>
                     <a href="{{ route('ordens-servico') }}" class="btn btn-label-secondary w-100">Cancelar</a>
                 </div>
