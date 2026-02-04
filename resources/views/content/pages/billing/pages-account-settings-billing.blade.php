@@ -242,9 +242,14 @@ function copyPix() {
             </div>
             <div>
               <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
-              @if($user->plan === 'free' && $user->cpf_cnpj)
+              @if($user->plan === 'free' && $user->cpf_cnpj && !$pendingPlan)
                 <p class="text-primary fw-bold mt-2 animate__animated animate__pulse animate__infinite">
                   <i class="icon-base ti tabler-arrow-narrow-right"></i> Selecione um plano para continuar
+                </p>
+              @endif
+              @if($user->plan === 'free' && $pendingPlan)
+                <p class="text-success fw-bold mt-2">
+                  <i class="icon-base ti tabler-check"></i> Plano Selecionado: R$ {{ number_format($pendingPlan->amount, 2, ',', '.') }}
                 </p>
               @endif
             </div>
@@ -264,13 +269,13 @@ function copyPix() {
               <div class="plan-statistics">
                 <div class="d-flex justify-content-between mb-1">
                   <h6 class="mb-0">Dias de Uso</h6>
-                  <h6 class="mb-0">{{ number_format($daysUsed, 12, '.', '') }} de 30 Dias</h6>
+                  <h6 class="mb-0">{{ (int)$daysUsed }} de 30 Dias</h6>
                 </div>
                 <div class="progress mb-1" style="height: 8px;">
-                  @php $percent = min(100, max(0, ($daysUsed / 30) * 100)); @endphp
+                  @php $percent = min(100, max(0, ((int)$daysUsed / 30) * 100)); @endphp
                   <div class="progress-bar {{ $trialExpired ? 'bg-danger' : '' }}" role="progressbar" style="width: {{ $percent }}%"></div>
                 </div>
-                <small>{{ number_format(max(0, $trialDaysLeft), 12, '.', '') }} dias restantes de teste grátis</small>
+                <small>{{ (int)max(0, $trialDaysLeft) }} dias restantes de teste grátis</small>
               </div>
             @endif
           </div>

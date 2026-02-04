@@ -34,6 +34,12 @@ class SettingsController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Check if there is a pending selected plan
+        $pendingPlan = BillingHistory::where('user_id', $user->id)
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
         // Current Plan Details
         $plans = [
             'padrao' => ['monthly' => '149,00', 'yearly' => '1.490,00'],
@@ -70,7 +76,7 @@ class SettingsController extends Controller
             ];
         }
 
-        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'daysUsed', 'billingHistory', 'planDetails', 'trialExpired'));
+        return view('content.pages.billing.pages-account-settings-billing', compact('user', 'trialDaysLeft', 'daysUsed', 'billingHistory', 'planDetails', 'trialExpired', 'pendingPlan'));
     }
 
     public function updateProfile(Request $request)
