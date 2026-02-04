@@ -33,14 +33,25 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     protected $fillable = [
         'name',
         'email',
+        'cpf_cnpj',
         'password',
         'company',
         'country',
         'plan',
+        'plan_type',
+        'trial_ends_at',
         'role',
         'contact_number',
-        
+        'billing_address',
+        'city',
+        'state',
+        'zip_code',
     ];
+
+    public function billingHistory()
+    {
+        return $this->hasMany(BillingHistory::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -78,6 +89,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'trial_ends_at' => 'datetime',
         ];
     }
 

@@ -31,6 +31,7 @@ use App\Http\Controllers\IntegrationSettingController;
 use App\Http\Controllers\PrintTemplateController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\VehicleChecklistController;
+use App\Http\Controllers\SupportController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -221,6 +222,15 @@ Route::middleware([
 
     //settings billing
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::post('/settings/generate-payment', [SettingsController::class, 'generatePayment'])->name('settings.generate-payment');
+    Route::post('/settings/select-plan', [SettingsController::class, 'selectPlan'])->name('settings.select-plan');
+    Route::post('/settings/update-profile', [SettingsController::class, 'updateProfile'])->name('settings.update-profile');
+
+    // Support
+    Route::get('/support/chat-whatsapp', [SupportController::class, 'chatWhatsapp'])->name('support.whatsapp');
+    Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
+    Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
+    Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');
 });
 
 

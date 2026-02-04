@@ -90,7 +90,7 @@
                     <li class="mb-0">Suporte básico (horário comercial)</li>
                     </ul>
 
-                    <button type="button" class="btn btn-primary d-grid w-100" data-bs-dismiss="modal">Upgrade</button>
+                    <button type="button" class="btn btn-primary d-grid w-100 btn-upgrade-plan" data-plan="padrao">Upgrade</button>
                   </div>
                   </div>
                 </div>
@@ -129,7 +129,7 @@
                     <li class="mb-0">Recursos avançados (relatórios, integrações, automações)</li>
                     </ul>
 
-                  <button type="button" class="btn btn-label-primary d-grid w-100" data-bs-dismiss="modal">Upgrade</button>
+                  <button type="button" class="btn btn-label-primary d-grid w-100 btn-upgrade-plan" data-plan="enterprise">Upgrade</button>
                 </div>
               </div>
             </div>

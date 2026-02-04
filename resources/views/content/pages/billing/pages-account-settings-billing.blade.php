@@ -14,7 +14,151 @@
 
 <!-- Page Scripts -->
 @section('page-script')
-@vite(['resources/assets/js/pages-pricing.js', 'resources/assets/js/pages-account-settings-billing.js', 'resources/assets/js/app-invoice-list.js', 'resources/assets/js/modal-edit-cc.js'])
+@vite(['resources/assets/js/pages-pricing.js', 'resources/assets/js/modal-edit-cc.js'])
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(document).ready(function() {
+    const $form = $('#formAccountSettings');
+    const $btnSave = $('#btnSaveProfile');
+
+    // Masks logic
+    $('.zip-code-mask').on('input', function() {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
+        this.value = v;
+    });
+
+    $('.phone-mask').on('input', function() {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 10) v = v.slice(0, 2) + ' ' + v.slice(2, 7) + '-' + v.slice(7, 11);
+        else if (v.length > 6) v = v.slice(0, 2) + ' ' + v.slice(2, 6) + '-' + v.slice(6, 10);
+        else if (v.length > 2) v = v.slice(0, 2) + ' ' + v.slice(2);
+        this.value = v;
+    });
+
+    $('.cpf-cnpj-mask').on('input', function() {
+        let v = this.value.replace(/\D/g, '');
+        if (v.length > 11) { // CNPJ
+            v = v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '/' + v.slice(8, 12) + '-' + v.slice(12, 14);
+        } else if (v.length > 0) { // CPF
+            v = v.slice(0, 3) + '.' + v.slice(3, 6) + '.' + v.slice(6, 9) + '-' + v.slice(9, 11);
+        }
+        this.value = v;
+    });
+
+    // SAVE PROFILE
+    $btnSave.on('click', function(e) {
+        e.preventDefault();
+        const originalText = $btnSave.html();
+        $btnSave.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('settings.update-profile') }}",
+            method: 'POST',
+            data: $form.serialize(),
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(data) {
+                $btnSave.html(originalText).prop('disabled', false);
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Erro!', text: data.message });
+                }
+            },
+            error: function() {
+                $btnSave.html(originalText).prop('disabled', false);
+                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Erro ao salvar perfil.' });
+            }
+        });
+    });
+
+    // GENERATE PAYMENT
+    const $resultContainer = $('#payment-result-container');
+    const $infoDefault = $('#payment-info-default');
+    const $resultContent = $('#payment-result-content');
+
+    $('.btn-generate-payment').on('click', function(e) {
+        e.preventDefault();
+        const $btn = $(this);
+        const method = $btn.data('method');
+        const originalText = $btn.html();
+        
+        $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('settings.generate-payment') }}",
+            method: 'POST',
+            data: JSON.stringify({ method: method }),
+            contentType: 'application/json',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(data) {
+                $btn.html(originalText).prop('disabled', false);
+                if (data.success) {
+                    $infoDefault.addClass('d-none');
+                    $resultContainer.removeClass('d-none');
+                    let html = '';
+                    if (method === 'pix') {
+                        html = `<h6 class="mb-4 text-success">Pagamento via PIX</h6><img src="data:image/png;base64,${data.pix_qr}" class="img-fluid mb-4 shadow-sm rounded" style="max-width: 200px"><div class="mb-4"><small class="text-muted d-block mb-2">Copia e Cola:</small><div class="input-group"><input type="text" class="form-control form-control-sm" value="${data.pix_code}" id="pix-code" readonly><button class="btn btn-primary btn-sm" onclick="copyPix()">Copiar</button></div></div><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+                    } else if (method === 'boleto') {
+                        html = `<h6 class="mb-4 text-info">Boleto Gerado</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-barcode fs-1 text-primary mb-3 d-block"></i><p class="mb-0">Valor: <strong>R$ ${data.amount}</strong></p></div><a href="${data.bank_slip_url}" target="_blank" class="btn btn-primary w-100 mb-3">Imprimir Boleto</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+                    } else {
+                        html = `<h6 class="mb-4 text-primary">Cartão de Crédito</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-credit-card fs-1 text-primary mb-3 d-block"></i><p>Conclua o pagamento no ambiente seguro do Asaas.</p></div><a href="${data.invoice_url || data.redirect_url}" target="_blank" class="btn btn-primary w-100 mb-3">Pagar Agora</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+                    }
+                    $resultContent.html(html);
+                    Swal.fire({ icon: 'success', title: 'Cobrança Gerada!', timer: 2000, showConfirmButton: false });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Erro!', text: data.message });
+                }
+            },
+            error: function() {
+                $btn.html(originalText).prop('disabled', false);
+                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Erro ao gerar pagamento.' });
+            }
+        });
+    });
+
+    // SELECT PLAN (UPGRADE)
+    $('.btn-upgrade-plan').on('click', function() {
+        const $btn = $(this);
+        const plan = $btn.data('plan');
+        const type = $('.price-duration-toggler').is(':checked') ? 'yearly' : 'monthly';
+        const originalText = $btn.html();
+
+        $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('settings.select-plan') }}",
+            method: 'POST',
+            data: JSON.stringify({ plan: plan, type: type }),
+            contentType: 'application/json',
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function(data) {
+                if (data.success) {
+                    if (data.redirect_url || data.invoice_url) {
+                        window.open(data.redirect_url || data.invoice_url, '_blank');
+                    }
+                    location.reload();
+                } else {
+                    $btn.html(originalText).prop('disabled', false);
+                    Swal.fire({ icon: 'error', title: 'Erro', text: data.message });
+                }
+            }
+        });
+    });
+});
+
+function showPaymentInfo() {
+    $('#payment-result-container').addClass('d-none');
+    $('#payment-info-default').removeClass('d-none');
+}
+
+function copyPix() {
+    const copyText = document.getElementById("pix-code");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    Swal.fire({ icon: 'success', title: 'Copiado!', timer: 1000, showConfirmButton: false });
+}
+</script>
 @endsection
 
 @section('content')
@@ -23,10 +167,10 @@
     <div class="nav-align-top">
       <ul class="nav nav-pills flex-column flex-md-row mb-6">
         <li class="nav-item">
-          <a class="nav-link" href="{{ route('profile.show') }}"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Account</a>
+          <a class="nav-link" href="{{ route('profile.show') }}"><i class="icon-base ti tabler-user-circle icon-sm me-1_5"></i> Minha Conta</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Billing & Plans</a>
+          <a class="nav-link active" href="{{ route('settings') }}"><i class="icon-base ti tabler-receipt-2 icon-sm me-1_5"></i> Faturamento & Planos</a>
         </li>
       </ul>
     </div>
@@ -37,40 +181,43 @@
         <div class="row row-gap-6">
           <div class="col-md-6 mb-1">
             <div class="mb-6">
-              <h6 class="mb-1">Seu plano atual é Básico</h6>
-              <p>Um começo simples para todos</p>
+              <h6 class="mb-1">Seu plano atual é {{ $planDetails['name'] }}</h6>
+              <p>Gerencie sua assinatura e detalhes do plano.</p>
             </div>
             <div class="mb-6">
-              <h6 class="mb-1">Ativo até 09 de Dezembro de 2021</h6>
-              <p>Enviaremos uma notificação quando a assinatura expirar</p>
+              <h6 class="mb-1">Situação: {{ $user->plan === 'free' ? 'Período de Teste' : 'Assinatura Ativa' }}</h6>
+              <p>{{ $planDetails['description'] }}</p>
             </div>
             <div>
-              <h6 class="mb-1"><span class="me-1">$199 Per Month</span> <span class="badge bg-label-primary rounded-pill">Popular</span></h6>
-              <p class="mb-1">Plano padrão para pequenas e médias empresas</p>
+              <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
+              @if($user->plan === 'free')
+                <p class="mb-1 text-muted small">Após o término do teste, o valor será de R$ 149,00/mês.</p>
+              @endif
             </div>
           </div>
           <div class="col-md-6">
+            @if($trialDaysLeft <= 5)
             <div class="alert alert-warning mb-6" role="alert">
               <h5 class="alert-heading mb-1 d-flex align-items-center">
-                <span class="alert-icon rounded"><i class="icon-base ti tabler-alert-triangle icon-md"></i></span>
-                <span>Nós precisamos da sua atenção!</span>
+                <span class="alert-icon rounded"><i class="icon-base ti tabler-alert-circle icon-md"></i></span>
+                <span>Seu período de teste está acabando!</span>
               </h5>
-              <span class="ms-11 ps-1">Seu plano precisa ser atualizado</span>
+              <span class="ms-11 ps-1">Faltam apenas {{ $trialDaysLeft }} dias para o fim do teste grátis.</span>
             </div>
+            @endif
             <div class="plan-statistics">
               <div class="d-flex justify-content-between">
-                <h6 class="mb-1">Dias</h6>
-                <h6 class="mb-1">12 de 30 Dias</h6>
+                <h6 class="mb-1">Dias de Uso</h6>
+                <h6 class="mb-1">{{ 30 - $trialDaysLeft }} de 30 Dias</h6>
               </div>
               <div class="progress rounded mb-1">
-                <div class="progress-bar w-25 rounded" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress-bar" role="progressbar" style="width: {{ ((30 - $trialDaysLeft) / 30) * 100 }}%" aria-valuenow="{{ ((30 - $trialDaysLeft) / 30) * 100 }}" aria-valuemin="0" aria-valuemax="100"></div>
               </div>
-              <small>18 dias restantes até que seu plano precise ser atualizado</small>
+              <small>{{ $trialDaysLeft }} dias restantes de teste grátis</small>
             </div>
           </div>
           <div class="col-12 d-flex gap-2 flex-wrap">
-            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#pricingModal">Fazer o upgrade</button>
-            <button class="btn btn-label-danger cancel-subscription">Cancelar assinatura</button>
+            <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#pricingModal"><i class="ti tabler-rocket me-1"></i> Escolher um Plano</button>
           </div>
         </div>
       </div>
@@ -81,93 +228,67 @@
       <div class="card-body">
         <div class="row gx-6">
           <div class="col-md-6">
-            <form id="creditCardForm" class="row g-6" onsubmit="return false">
-              <div class="col-12 mb-2">
-                <div class="form-check form-check-inline my-2 ms-2 me-6">
-                  <input name="collapsible-payment" class="form-check-input" type="radio" value="" id="collapsible-payment-cc" checked="" />
-                  <label class="form-check-label" for="collapsible-payment-cc">Cartão de Crédito</label>
+            <div class="payment-methods-list">
+              <div class="d-flex align-items-center mb-4 p-3 border rounded">
+                <div class="avatar flex-shrink-0 me-3 bg-label-success p-2">
+                  <i class="ti tabler-qrcode fs-3"></i>
                 </div>
-                <div class="form-check form-check-inline ms-2 my-2">
-                  <input name="collapsible-payment" class="form-check-input" type="radio" value="" id="collapsible-payment-cash" />
-                  <label class="form-check-label" for="collapsible-payment-cash">Pix</label>
-                </div>
-              </div>
-              <div class="col-12">
-                <label class="form-label w-100" for="paymentCard">Número do Cartão</label>
-                <div class="input-group input-group-merge">
-                  <input id="paymentCard" name="paymentCard" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" aria-describedby="paymentCard2" />
-                  <span class="input-group-text cursor-pointer" id="paymentCard2"><span class="card-type"></span></span>
-                </div>
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label" for="paymentName">Nome</label>
-                <input type="text" id="paymentName" class="form-control" placeholder="Luke Skywalker" />
-              </div>
-              <div class="col-6 col-md-3">
-                <label class="form-label" for="paymentExpiryDate">Data de Expiração</label>
-                <input type="text" id="paymentExpiryDate" class="form-control expiry-date-mask" placeholder="MM/AA" />
-              </div>
-              <div class="col-6 col-md-3">
-                <label class="form-label" for="paymentCvv">Código CVV</label>
-                <div class="input-group input-group-merge">
-                  <input type="text" id="paymentCvv" class="form-control cvv-code-mask" maxlength="3" placeholder="654" />
-                  <span class="input-group-text cursor-pointer" id="paymentCvv2"><i class="icon-base ti tabler-help-circle text-body-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Card Verification Value"></i></span>
-                </div>
-              </div>
-              <div class="col-12">
-                <div class="form-check form-switch ms-2 my-2">
-                  <input type="checkbox" class="form-check-input" id="future-billing" />
-                  <label for="future-billing" class="switch-label">Salvar cartão para faturamento futuro?</label>
-                </div>
-              </div>
-              <div class="col-12 mt-6">
-                <button type="submit" class="btn btn-primary me-3">Salvar Alterações</button>
-                <button type="reset" class="btn btn-label-secondary">Cancelar</button>
-              </div>
-            </form>
-          </div>
-          <div class="col-md-6 mt-12 mt-md-0">
-            <h6 class="mb-6">Meus Cartões</h6>
-            <div class="added-cards">
-              <div class="cardMaster p-6 bg-lighter rounded mb-6">
-                <div class="d-flex justify-content-between flex-sm-row flex-column">
-                  <div class="card-information me-2">
-                    <img class="mb-2" src="{{ asset('assets/img/icons/payments/mastercard.png') }}" alt="Master Card" />
-                    <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
-                      <h6 class="mb-0 me-2">Tom McBride</h6>
-                      <span class="badge bg-label-primary">Primary</span>
-                    </div>
-                    <span class="card-number">&#8727;&#8727;&#8727;&#8727; &#8727;&#8727;&#8727;&#8727; 9856</span>
+                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                  <div class="me-2">
+                    <h6 class="mb-0">Pix</h6>
+                    <small class="text-muted">Aprovação imediata</small>
                   </div>
-                  <div class="d-flex flex-column text-start text-lg-end">
-                    <div class="d-flex order-sm-0 order-1 mt-sm-0 mt-4">
-                      <button class="btn btn-sm btn-label-primary me-4" data-bs-toggle="modal" data-bs-target="#editCCModal">Edit</button>
-                      <button class="btn btn-sm btn-label-danger">Delete</button>
-                    </div>
-                    <small class="mt-sm-4 mt-2 order-sm-1 order-0">Card expires at 12/26</small>
+                  <div class="user-progress">
+                    <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
                   </div>
                 </div>
               </div>
-              <div class="cardMaster p-6 bg-lighter rounded">
-                <div class="d-flex justify-content-between flex-sm-row flex-column">
-                  <div class="card-information me-2">
-                    <img class="mb-2" src="{{ asset('assets/img/icons/payments/visa.png') }}" alt="Visa Card" />
-                    <h6 class="mb-2">Mildred Wagner</h6>
-                    <span class="card-number">&#8727;&#8727;&#8727;&#8727; &#8727;&#8727;&#8727;&#8727; 5896</span>
+              <div class="d-flex align-items-center mb-4 p-3 border rounded">
+                <div class="avatar flex-shrink-0 me-3 bg-label-info p-2">
+                  <i class="ti tabler-barcode fs-3"></i>
+                </div>
+                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                  <div class="me-2">
+                    <h6 class="mb-0">Boleto Bancário</h6>
+                    <small class="text-muted">Aprovação em até 48h</small>
                   </div>
-                  <div class="d-flex flex-column text-start text-lg-end">
-                    <div class="d-flex order-sm-0 order-1 mt-sm-0 mt-4">
-                      <button class="btn btn-sm btn-label-primary me-4" data-bs-toggle="modal" data-bs-target="#editCCModal">Edit</button>
-                      <button class="btn btn-sm btn-label-danger">Delete</button>
-                    </div>
-                    <small class="mt-sm-4 mt-2 order-sm-1 order-0">Card expires at 10/27</small>
+                  <div class="user-progress">
+                    <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center mb-4 p-3 border rounded">
+                <div class="avatar flex-shrink-0 me-3 bg-label-primary p-2">
+                  <i class="ti tabler-credit-card fs-3"></i>
+                </div>
+                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                  <div class="me-2">
+                    <h6 class="mb-0">Cartão de Crédito</h6>
+                    <small class="text-muted">Faturamento recorrente</small>
+                  </div>
+                  <div class="user-progress">
+                    <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- Modal -->
-            @include('_partials/_modals/modal-edit-cc')
-            <!--/ Modal -->
+          </div>
+          <div class="col-md-6 mt-6 mt-md-0">
+            <div id="payment-result-container" class="d-none">
+                <div class="card bg-label-secondary border-0 shadow-none">
+                    <div class="card-body text-center" id="payment-result-content">
+                        <!-- Conteúdo dinâmico via JS -->
+                    </div>
+                </div>
+            </div>
+            <div id="payment-info-default">
+                <h6 class="mb-6">Pagamento Seguro</h6>
+                <p>Utilizamos o <strong>Asaas</strong> para processar seus pagamentos com segurança. Suas informações de cartão são criptografadas e nunca ficam salvas em nossos servidores.</p>
+                <div class="d-flex align-items-center gap-3">
+                  <img src="https://static.asaas.com/img/brand/asaas-logo.png" alt="Asaas" height="30">
+                  <span class="badge bg-label-primary">Ambiente Seguro</span>
+                </div>
+            </div>
           </div>
         </div>
       </div>
@@ -176,56 +297,71 @@
       <!-- Billing Address -->
       <h5 class="card-header">Endereço de Cobrança</h5>
       <div class="card-body">
-        <form id="formAccountSettings" onsubmit="return false">
+        <form id="formAccountSettings" onsubmit="return false;">
           <div class="row g-6">
             <div class="col-sm-6 form-control-validation">
               <label for="companyName" class="form-label">Nome da Empresa</label>
-              <input type="text" id="companyName" name="companyName" class="form-control" placeholder="{{ config('variables.creatorName') }}" />
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-building"></i></span>
+                <input type="text" id="companyName" name="companyName" class="form-control" value="{{ $user->company }}" placeholder="Nome da sua oficina" />
+              </div>
             </div>
             <div class="col-sm-6 form-control-validation">
               <label for="billingEmail" class="form-label">Email de Cobrança</label>
-              <input class="form-control" type="text" id="billingEmail" name="billingEmail" placeholder="john.doe@example.com" />
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-mail"></i></span>
+                <input class="form-control" type="text" id="billingEmail" name="billingEmail" value="{{ $user->email }}" placeholder="john.doe@example.com" />
+              </div>
             </div>
             <div class="col-sm-6">
-              <label for="taxId" class="form-label">ID Fiscal</label>
-              <input type="text" id="taxId" name="taxId" class="form-control" placeholder="Enter Tax ID" />
-            </div>
-            <div class="col-sm-6">
-              <label for="vatNumber" class="form-label">Número VAT</label>
-              <input class="form-control" type="text" id="vatNumber" name="vatNumber" placeholder="Enter VAT Number" />
+              <label for="cpf_cnpj" class="form-label">CPF ou CNPJ</label>
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-id"></i></span>
+                <input type="text" id="cpf_cnpj" name="cpf_cnpj" class="form-control cpf-cnpj-mask" value="{{ $user->cpf_cnpj }}" placeholder="000.000.000-00" />
+              </div>
             </div>
             <div class="col-sm-6">
               <label for="mobileNumber" class="form-label">Celular</label>
               <div class="input-group input-group-merge">
-                <span class="input-group-text">BR (+55)</span>
-                <input class="form-control mobile-number" type="text" id="mobileNumber" name="mobileNumber" placeholder="202 555 0111" />
+                <span class="input-group-text"><i class="ti tabler-device-mobile"></i></span>
+                <input class="form-control mobile-number phone-mask" type="text" id="mobileNumber" name="mobileNumber" value="{{ $user->contact_number }}" placeholder="11 99999-9999" />
               </div>
             </div>
             <div class="col-sm-6">
               <label for="country" class="form-label">País</label>
               <select id="country" class="form-select select2" name="country">
-                <option selected>Brasil</option>
-                <option>Canada</option>
-                <option>UK</option>
-                <option>Germany</option>
-                <option>France</option>
+                <option value="Brasil" {{ $user->country == 'Brasil' ? 'selected' : '' }}>Brasil</option>
+                <option value="Portugal" {{ $user->country == 'Portugal' ? 'selected' : '' }}>Portugal</option>
               </select>
+            </div>
+            <div class="col-sm-6">
+              <label for="city" class="form-label">Cidade</label>
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-map-pin"></i></span>
+                <input class="form-control" type="text" id="city" name="city" value="{{ $user->city }}" placeholder="Sua Cidade" />
+              </div>
             </div>
             <div class="col-12">
               <label for="billingAddress" class="form-label">Endereço de Cobrança</label>
-              <input type="text" class="form-control" id="billingAddress" name="billingAddress" placeholder="Billing Address" />
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-home"></i></span>
+                <input type="text" class="form-control" id="billingAddress" name="billingAddress" value="{{ $user->billing_address }}" placeholder="Rua, Número, Bairro" />
+              </div>
             </div>
             <div class="col-sm-6">
               <label for="state" class="form-label">Estado</label>
-              <input class="form-control" type="text" id="state" name="state" placeholder="California" />
+              <input class="form-control" type="text" id="state" name="state" value="{{ $user->state }}" placeholder="Ex: PR" />
             </div>
             <div class="col-sm-6">
               <label for="zipCode" class="form-label">CEP</label>
-              <input type="text" class="form-control zip-code" id="zipCode" name="zipCode" placeholder="231465" maxlength="6" />
+              <div class="input-group input-group-merge">
+                <span class="input-group-text"><i class="ti tabler-map"></i></span>
+                <input type="text" class="form-control zip-code-mask" id="zipCode" name="zipCode" value="{{ $user->zip_code }}" placeholder="00000-000" maxlength="9" />
+              </div>
             </div>
           </div>
           <div class="mt-6">
-            <button type="submit" class="btn btn-primary me-3">Salvar alterações</button>
+            <button type="button" class="btn btn-primary me-3" id="btnSaveProfile"><i class="ti tabler-device-floppy me-1"></i> Salvar alterações</button>
             <button type="reset" class="btn btn-label-secondary">Descartar</button>
           </div>
         </form>
@@ -235,22 +371,42 @@
     <div class="card">
       <!-- Billing History -->
       <h5 class="card-header text-md-start text-center">Histórico de Cobrança</h5>
-      <div class="card-datatable border-top">
-        <table class="invoice-list-table table border-top">
+      <div class="table-responsive text-nowrap">
+        <table class="table">
           <thead>
             <tr>
-              <th></th>
-              <th></th>
-              <th>#</th>
-              <th><i class="icon-base ti tabler-trending-up"></i></th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th class="text-truncate">Issued Date</th>
-              <th>Balance</th>
-              <th>Invoice Status</th>
-              <th class="cell-fit">Action</th>
+              <th>ID</th>
+              <th>Plano</th>
+              <th>Método</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Data</th>
             </tr>
           </thead>
+          <tbody class="table-border-bottom-0">
+            @forelse($billingHistory as $history)
+            <tr>
+              <td>#{{ $history->id }}</td>
+              <td><strong>{{ $history->plan_name }}</strong></td>
+              <td>{{ $history->payment_method }}</td>
+              <td>R$ {{ number_format($history->amount, 2, ',', '.') }}</td>
+              <td>
+                @php
+                  $statusColors = ['paid' => 'success', 'pending' => 'warning', 'expired' => 'secondary', 'failed' => 'danger'];
+                  $statusLabels = ['paid' => 'Pago', 'pending' => 'Pendente', 'expired' => 'Expirado', 'failed' => 'Falhou'];
+                @endphp
+                <span class="badge bg-label-{{ $statusColors[$history->status] ?? 'secondary' }}">
+                  {{ $statusLabels[$history->status] ?? $history->status }}
+                </span>
+              </td>
+              <td>{{ $history->created_at->format('d/m/Y H:i') }}</td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="6" class="text-center">Nenhuma cobrança encontrada.</td>
+            </tr>
+            @endforelse
+          </tbody>
         </table>
       </div>
       <!--/ Billing History -->
