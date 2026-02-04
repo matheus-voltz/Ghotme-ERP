@@ -56,6 +56,28 @@
               <div class="{{ $container }} flex-grow-1 container-p-y">
           @endif
 
+          @auth
+            @if(auth()->user()->plan === 'free')
+              @php
+                $creationDate = auth()->user()->created_at;
+                $trialEnds = auth()->user()->trial_ends_at ?? $creationDate->addDays(30);
+                $isExpired = now()->greaterThan($trialEnds);
+              @endphp
+
+              @if($isExpired)
+                <div class="alert alert-danger d-flex align-items-center mb-6" role="alert">
+                  <span class="alert-icon rounded-circle bg-danger p-1 me-3">
+                    <i class="icon-base ti tabler-alert-triangle text-white"></i>
+                  </span>
+                  <div class="d-flex flex-column">
+                    <h6 class="alert-heading mb-1 text-danger">Seu período de teste grátis expirou!</h6>
+                    <span>Acesse as <a href="{{ route('settings') }}" class="fw-bold text-danger text-decoration-underline">Configurações de Faturamento</a> para escolher um plano e continuar usando o sistema sem interrupções.</span>
+                  </div>
+                </div>
+              @endif
+            @endif
+          @endauth
+
           @yield('content')
 
         </div>
