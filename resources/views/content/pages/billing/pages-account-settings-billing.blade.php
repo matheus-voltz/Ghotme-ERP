@@ -73,6 +73,7 @@ $(document).ready(function() {
     });
 
     // GENERATE PAYMENT
+    let pendingMethod = null;
     const $resultContainer = $('#payment-result-container');
     const $infoDefault = $('#payment-info-default');
     const $resultContent = $('#payment-result-content');
@@ -82,6 +83,23 @@ $(document).ready(function() {
         const $btn = $(this);
         const method = $btn.data('method');
         const originalText = $btn.html();
+        
+        // Force plan selection if user is on 'free' plan
+        const currentPlan = "{{ $user->plan }}";
+        if (currentPlan === 'free') {
+            pendingMethod = method;
+            Swal.fire({
+                icon: 'info',
+                title: 'Selecione um Plano',
+                text: 'Para gerar um pagamento, você precisa primeiro escolher qual plano deseja assinar.',
+                confirmButtonText: 'Ver Planos',
+                customClass: { confirmButton: 'btn btn-primary' },
+                buttonsStyling: false
+            }).then(() => {
+                $('#pricingModal').modal('show');
+            });
+            return;
+        }
         
         // Client-side validation for CPF/CNPJ
         const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
@@ -164,7 +182,7 @@ $(document).ready(function() {
         $.ajax({
             url: "{{ route('settings.select-plan') }}",
             method: 'POST',
-            data: JSON.stringify({ plan: plan, type: type }),
+            data: JSON.stringify({ plan: plan, type: type, method: pendingMethod }),
             contentType: 'application/json',
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
             success: function(data) {
@@ -225,6 +243,11 @@ function copyPix() {
             </div>
             <div>
               <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
+              @if($user->plan === 'free' && $user->cpf_cnpj)
+                <p class="text-primary fw-bold mt-2 animate__animated animate__pulse animate__infinite">
+                  <i class="icon-base ti tabler-arrow-narrow-right"></i> Selecione um plano para continuar
+                </p>
+              @endif
             </div>
           </div>
           <div class="col-md-6">

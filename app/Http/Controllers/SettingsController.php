@@ -35,6 +35,11 @@ class SettingsController extends Controller
             ->get();
 
         // Current Plan Details
+        $plans = [
+            'padrao' => ['monthly' => '149,00', 'yearly' => '1.490,00'],
+            'enterprise' => ['monthly' => '279,00', 'yearly' => '2.790,00'],
+        ];
+
         $planDetails = [
             'name' => 'Padrão',
             'price' => '149,00',
@@ -182,15 +187,17 @@ class SettingsController extends Controller
         $user = auth()->user();
         $method = $request->method; // pix, boleto, credit_card
         
-        // Define prices mapping
-        $planPrices = [
-            'free' => 149.00, // Default to standard if on trial
-            'padrao' => 149.00,
-            'enterprise' => 279.00
+        if ($user->plan === 'free') {
+            return response()->json(['success' => false, 'message' => 'Por favor, selecione um plano pago no botão "Escolher um Plano" antes de gerar uma cobrança.']);
+        }
+
+        $plans = [
+            'padrao' => ['monthly' => 149.00, 'yearly' => 1490.00],
+            'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
         ];
 
-        $amount = $planPrices[$user->plan] ?? 149.00;
-        $description = "Assinatura Plano " . ucfirst($user->plan === 'free' ? 'Padrão' : $user->plan) . " - Ghotme";
+        $amount = $plans[$user->plan][$user->plan_type ?? 'monthly'] ?? 149.00;
+        $description = "Assinatura Plano " . ucfirst($user->plan) . " - Ghotme (" . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ")";
 
         if (!$user->cpf_cnpj) {
             return response()->json(['success' => false, 'message' => 'Por favor, preencha seu CPF ou CNPJ no perfil antes de gerar a cobrança.']);
