@@ -9,7 +9,7 @@
       <div class="card-body">
         <h4 class="mb-4">Como podemos ajudar você hoje?</h4>
         <div class="input-group input-group-merge">
-          <span class="input-group-text" id="basic-addon-search31"><i class="ti ti-search"></i></span>
+          <span class="input-group-text" id="basic-addon-search31"><i class="ti tabler-search"></i></span>
           <input type="text" class="form-control" placeholder="Busque por tutoriais ou dúvidas..." aria-label="Search..." aria-describedby="basic-addon-search31" />
         </div>
       </div>
@@ -21,7 +21,7 @@
   <div class="col-md-4">
     <div class="card mb-4">
       <div class="card-body text-center">
-        <i class="ti ti-file-text icon-xl mb-3 text-primary"></i>
+        <i class="ti tabler-file-text icon-xl mb-3 text-primary"></i>
         <h5>Primeiros Passos</h5>
         <p>Aprenda a cadastrar seus primeiros clientes e veículos no sistema.</p>
         <a href="javascript:void(0)" class="btn btn-label-primary">Ver tutoriais</a>
@@ -31,7 +31,7 @@
   <div class="col-md-4">
     <div class="card mb-4">
       <div class="card-body text-center">
-        <i class="ti ti-wallet icon-xl mb-3 text-success"></i>
+        <i class="ti tabler-wallet icon-xl mb-3 text-success"></i>
         <h5>Financeiro</h5>
         <p>Como gerenciar contas a pagar, receber e conciliação bancária.</p>
         <a href="javascript:void(0)" class="btn btn-label-success">Ver tutoriais</a>
@@ -41,7 +41,7 @@
   <div class="col-md-4">
     <div class="card mb-4">
       <div class="card-body text-center">
-        <i class="ti ti-settings icon-xl mb-3 text-warning"></i>
+        <i class="ti tabler-settings icon-xl mb-3 text-warning"></i>
         <h5>Configurações</h5>
         <p>Personalize os modelos de impressão e integre com o WhatsApp.</p>
         <a href="javascript:void(0)" class="btn btn-label-warning">Ver tutoriais</a>

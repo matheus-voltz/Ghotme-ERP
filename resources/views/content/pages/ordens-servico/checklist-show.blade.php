@@ -6,7 +6,7 @@
 <div class="card mb-4">
   <div class="card-header d-flex justify-content-between">
     <h5 class="mb-0">Checklist #{{ $inspection->id }}</h5>
-    <button onclick="window.print()" class="btn btn-label-secondary"><i class="ti ti-printer me-1"></i> Imprimir</button>
+    <button onclick="window.print()" class="btn btn-label-secondary"><i class="ti tabler-printer me-1"></i> Imprimir</button>
   </div>
   <div class="card-body">
     <div class="row mb-4">

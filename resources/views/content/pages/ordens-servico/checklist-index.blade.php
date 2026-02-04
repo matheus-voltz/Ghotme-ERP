@@ -31,7 +31,7 @@
           <td>{{ $inspection->created_at->format('d/m/Y H:i') }}</td>
           <td>
             <a href="{{ route('ordens-servico.checklist.show', $inspection->id) }}" class="btn btn-sm btn-icon btn-label-secondary">
-              <i class="ti ti-eye"></i>
+              <i class="ti tabler-eye"></i>
             </a>
           </td>
         </tr>

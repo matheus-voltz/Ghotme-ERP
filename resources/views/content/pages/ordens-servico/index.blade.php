@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (full.status !== 'finalized') {
                             html += `<button class="btn btn-sm btn-success finalize-os" data-id="${data}">Finalizar</button>`;
                         }
-                        html += `<a href="${baseUrl}ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="Checklist"><i class="ti ti-clipboard-check"></i></a>`;
+                        html += `<a href="${baseUrl}ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="Checklist"><i class="ti tabler-clipboard-check"></i></a>`;
                         html += `</div>`;
                         return html;
                     }
