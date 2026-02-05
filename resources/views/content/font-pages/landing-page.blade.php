@@ -374,19 +374,23 @@ $pageConfigs = [
       </h4>
       <p class="text-center pb-2 mb-7">Todos os planos incluem recursos essenciais para impulsionar sua empresa.<br />Escolha o melhor plano para suas necessidades.</p>
       
-      <div class="d-flex align-items-center justify-content-center flex-wrap gap-2 pt-12 pb-4">
-        <span class="switch-label fs-6 text-body">Mensal</span>
-        <label class="switch switch-sm switch-primary me-0">
-          <input type="checkbox" class="switch-input price-duration-toggler" />
-          <span class="switch-toggle-slider">
-            <span class="switch-on"></span>
-            <span class="switch-off"></span>
-          </span>
-        </label>
-        <span class="switch-label fs-6 text-body">Anual</span>
-        <div class="mt-n5 ms-2 mb-12 d-none d-sm-flex align-items-center gap-1">
-          <i class="ti tabler-corner-left-down icon-lg text-body-secondary scaleX-n1-rtl"></i>
-          <span class="badge badge-sm bg-label-primary rounded-1 mb-2 ">Ganhe 2 meses grátis</span>
+      <div class="text-center mb-12">
+        <div class="position-relative d-inline-block pt-3 pt-md-0">
+          <div class="d-flex align-items-center justify-content-center">
+            <span class="fs-6 text-body me-3">Mensal</span>
+            <label class="switch switch-primary me-3">
+              <input type="checkbox" class="switch-input price-duration-toggler" />
+              <span class="switch-toggle-slider">
+                <span class="switch-on"></span>
+                <span class="switch-off"></span>
+              </span>
+            </label>
+            <span class="fs-6 text-body">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Anual</span>
+          </div>
+          <div class="d-none d-sm-flex align-items-center gap-1 position-absolute" style="top: -30px; left: 65%; width: max-content;">
+            <i class="ti tabler-corner-left-down icon-lg text-body-secondary scaleX-n1-rtl"></i>
+            <span class="badge badge-sm bg-label-primary rounded-1">Ganhe 2 meses grátis</span>
+          </div>
         </div>
       </div>
 
@@ -401,8 +405,8 @@ $pageConfigs = [
                 <h4 class="mb-0">Básico</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
-                  <h1 class="price-monthly text-primary mb-0">0</h1>
-                  <h1 class="price-yearly text-primary mb-0 d-none">0</h1>
+                  <h1 class="price-toggle price-monthly text-primary mb-0">0</h1>
+                  <h1 class="price-toggle price-yearly text-primary mb-0 d-none">0</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
@@ -444,8 +448,8 @@ $pageConfigs = [
                 <h4 class="mb-0">Padrão</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
-                  <h1 class="price-monthly text-primary mb-0">149</h1>
-                  <h1 class="price-yearly text-primary mb-0 d-none">1.490</h1>
+                  <h1 class="price-toggle price-monthly text-primary mb-0">149</h1>
+                  <h1 class="price-toggle price-yearly text-primary mb-0 d-none">1.490</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
@@ -509,8 +513,8 @@ $pageConfigs = [
                 <h4 class="mb-0">Enterprise</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
-                  <h1 class="price-monthly text-primary mb-0">279</h1>
-                  <h1 class="price-yearly text-primary mb-0 d-none">2.790</h1>
+                  <h1 class="price-toggle price-monthly text-primary mb-0">279</h1>
+                  <h1 class="price-toggle price-yearly text-primary mb-0 d-none">2.790</h1>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/mês</sub>
                   <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/ano</sub>
                 </div>
