@@ -185,10 +185,11 @@ class BudgetController extends Controller
     public function sendWhatsApp($id)
     {
         $budget = Budget::with(['client', 'veiculo', 'items', 'parts'])->findOrFail($id);
-        $phone = $budget->client->mobile ?? $budget->client->phone;
+        // Tenta primeiro a coluna 'whatsapp', depois 'phone'
+        $phone = $budget->client->whatsapp ?? $budget->client->phone;
         
         if (!$phone) {
-            return response()->json(['success' => false, 'message' => 'Cliente sem telefone cadastrado.']);
+            return response()->json(['success' => false, 'message' => 'Cliente sem telefone cadastrado (campos whatsapp e phone vazios).']);
         }
 
         $phone = preg_replace('/\D/', '', $phone);
