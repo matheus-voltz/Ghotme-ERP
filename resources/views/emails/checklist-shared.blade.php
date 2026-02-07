@@ -44,24 +44,24 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Checklist de Entrada</h2>
-            <p>Olá, <strong>{{ $inspection->veiculo->client->name ?? 'Cliente' }}</strong>!</p>
+            <h2>{{ __('Checklist de Entrada') }}</h2>
+            <p>{{ __('Olá') }}, <strong>{{ $inspection->veiculo->client->name ?? __('Cliente') }}</strong>!</p>
         </div>
 
-        <p>Seguem os detalhes da inspeção realizada na entrada do seu veículo <strong>{{ $inspection->veiculo->marca }} {{ $inspection->veiculo->modelo }} (Placa: {{ $inspection->veiculo->placa }})</strong>.</p>
+        <p>{{ __('Seguem os detalhes da inspeção realizada na entrada do seu veículo') }} <strong>{{ $inspection->veiculo->marca }} {{ $inspection->veiculo->modelo }} ({{ __('Placa') }}: {{ $inspection->veiculo->placa }})</strong>.</p>
 
-        <p>Você pode visualizar o checklist completo, incluindo fotos das avarias, clicando no botão abaixo:</p>
+        <p>{{ __('Você pode visualizar o checklist completo, incluindo fotos das avarias, clicando no botão abaixo:') }}</p>
 
         <p style="text-align: center;">
-            <a href="{{ route('public.checklist.show', $inspection->id) }}?token={{ $inspection->token }}" class="button">Ver Checklist Completo</a>
+            <a href="{{ route('public.checklist.show', $inspection->id) }}?token={{ $inspection->token }}" class="button">{{ __('Ver Checklist Completo') }}</a>
         </p>
 
-        <p>Atenciosamente,<br>
+        <p>{{ __('Atenciosamente') }},<br>
             <strong>{{ $inspection->company->name ?? config('app.name') }}</strong>
         </p>
 
         <div class="footer">
-            Este é um e-mail automático, por favor não responda.
+            {{ __('Este é um e-mail automático, por favor não responda.') }}
         </div>
     </div>
 </body>

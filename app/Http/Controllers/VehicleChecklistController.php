@@ -82,10 +82,10 @@ class VehicleChecklistController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('ordens-servico.checklist')->with('success', 'Checklist de entrada realizado com sucesso!');
+            return redirect()->route('ordens-servico.checklist')->with('success', __('Checklist de entrada realizado com sucesso!'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erro ao salvar checklist: ' . $e->getMessage());
+            return back()->with('error', __('Erro ao salvar checklist: ') . $e->getMessage());
         }
     }
 
@@ -105,8 +105,9 @@ class VehicleChecklistController extends Controller
             ]);
         }
 
+        // Se não houver token, exige login e usa layout padrão
         if (!Auth::check()) {
-            abort(403, 'Acesso negado. Token de segurança necessário.');
+            abort(403, __('Acesso negado. Token de segurança necessário.'));
         }
 
         $inspection = $query->findOrFail($id);
@@ -127,14 +128,14 @@ class VehicleChecklistController extends Controller
         $email = $inspection->veiculo->client->email;
 
         if (!$email) {
-            return response()->json(['success' => false, 'message' => 'Cliente sem e-mail cadastrado.']);
+            return response()->json(['success' => false, 'message' => __('Cliente sem e-mail cadastrado.')]);
         }
 
         try {
             Mail::to($email)->send(new ChecklistSharedMail($inspection));
-            return response()->json(['success' => true, 'message' => 'E-mail enviado com sucesso para ' . $email]);
+            return response()->json(['success' => true, 'message' => __('E-mail enviado com sucesso para ') . $email]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Erro ao enviar e-mail: ' . $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => __('Erro ao enviar e-mail: ') . $e->getMessage()]);
         }
     }
 }

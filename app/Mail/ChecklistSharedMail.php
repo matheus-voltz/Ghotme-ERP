@@ -23,7 +23,7 @@ class ChecklistSharedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Checklist de Entrada - Veículo ' . $this->inspection->veiculo->placa,
+            subject: __('Checklist de Entrada') . ' - ' . __('Veículo') . ' ' . $this->inspection->veiculo->placa,
         );
     }
 

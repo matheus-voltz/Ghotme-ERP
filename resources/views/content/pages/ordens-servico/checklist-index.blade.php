@@ -1,22 +1,22 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Checklists de Entrada')
+@section('title', __('Checklists de Entrada'))
 
 @section('content')
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">Histórico de Checklists</h5>
-    <a href="{{ route('ordens-servico.checklist.create') }}" class="btn btn-primary">Novo Checklist</a>
+    <h5 class="mb-0">{{ __('Histórico de Checklists') }}</h5>
+    <a href="{{ route('ordens-servico.checklist.create') }}" class="btn btn-primary">{{ __('Novo Checklist') }}</a>
   </div>
   <div class="table-responsive text-nowrap">
     <table class="table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>Veículo</th>
-          <th>Responsável</th>
-          <th>Data</th>
-          <th>Ações</th>
+          <th>{{ __('Veículo') }}</th>
+          <th>{{ __('Responsável') }}</th>
+          <th>{{ __('Data') }}</th>
+          <th>{{ __('Ações') }}</th>
         </tr>
       </thead>
       <tbody class="table-border-bottom-0">
@@ -31,10 +31,10 @@
           <td>{{ $inspection->created_at->format('d/m/Y H:i') }}</td>
           <td>
             <div class="d-flex gap-2">
-              <a href="{{ route('ordens-servico.checklist.show', $inspection->id) }}" class="btn btn-sm btn-icon btn-label-secondary" title="Visualizar">
+              <a href="{{ route('ordens-servico.checklist.show', $inspection->id) }}" class="btn btn-sm btn-icon btn-label-secondary" title="{{ __('Visualizar') }}">
                 <i class="ti tabler-eye"></i>
               </a>
-              <button type="button" class="btn btn-sm btn-icon btn-label-primary btn-send-email" data-id="{{ $inspection->id }}" title="Enviar por E-mail">
+              <button type="button" class="btn btn-sm btn-icon btn-label-primary btn-send-email" data-id="{{ $inspection->id }}" title="{{ __('Enviar por E-mail') }}">
                 <i class="ti tabler-mail"></i>
               </button>
             </div>
@@ -83,7 +83,7 @@
         .then(res => {
           const swalConfig = {
             icon: res.success ? 'success' : 'error',
-            title: res.success ? 'Sucesso!' : 'Ops!',
+            title: res.success ? "{{ __('Sucesso!') }}" : "{{ __('Ops!') }}",
             text: res.message
           };
           if (typeof Swal !== 'undefined') {
@@ -96,8 +96,8 @@
           console.error('Error:', err);
           Swal.fire({
             icon: 'error',
-            title: 'Erro!',
-            text: 'Falha na comunicação com o servidor.'
+            title: "{{ __('Erro!') }}",
+            text: "{{ __('Falha na comunicação com o servidor.') }}"
           });
         })
         .finally(() => {

@@ -1,6 +1,6 @@
 @extends($layout)
 
-@section('title', 'Detalhes do Checklist')
+@section('title', __('Detalhes do Checklist'))
 
 @section('vendor-style')
 @vite([
@@ -32,25 +32,25 @@
 
   @if(!$isPublic && Auth::check())
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="mb-0">Detalhes do Checklist</h4>
+    <h4 class="mb-0">{{ __('Detalhes do Checklist') }}</h4>
     <a href="{{ route('ordens-servico.checklist') }}" class="btn btn-label-secondary">
-      <i class="ti tabler-arrow-left me-1"></i> Voltar
+      <i class="ti tabler-arrow-left me-1"></i> {{ __('Voltar') }}
     </a>
   </div>
   @else
   <div class="text-center mb-6">
-    <h3 class="mb-1 fw-bold">Checklist de Entrada</h3>
-    <p class="text-muted">Documento gerado pela oficina para sua segurança.</p>
+    <h3 class="mb-1 fw-bold">{{ __('Checklist de Entrada') }}</h3>
+    <p class="text-muted">{{ __('Documento gerado pela oficina para sua segurança.') }}</p>
   </div>
   @endif
 
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between flex-wrap gap-3">
-      <h5 class="mb-0">Checklist #{{ $inspection->id }}</h5>
+      <h5 class="mb-0">{{ __('Checklist') }} #{{ $inspection->id }}</h5>
       @if(!$isPublic && auth()->check())
       <div class="d-flex gap-2">
         <button onclick="window.print()" class="btn btn-label-secondary">
-          <i class="ti tabler-printer me-1"></i> Imprimir
+          <i class="ti tabler-printer me-1"></i> {{ __('Imprimir') }}
         </button>
 
         @php
@@ -67,7 +67,7 @@
           <i class="ti tabler-brand-whatsapp me-1"></i> WhatsApp
         </a>
         <button type="button" class="btn btn-primary btn-send-email" data-id="{{ $inspection->id }}">
-          <i class="ti tabler-mail me-1"></i> E-mail
+          <i class="ti tabler-mail me-1"></i> {{ __('E-mail') }}
         </button>
       </div>
       @endif
@@ -75,22 +75,22 @@
     <div class="card-body">
       <div class="row mb-4">
         <div class="col-md-4">
-          <h6>Veículo</h6>
-          <p><strong>Placa:</strong> {{ $inspection->veiculo->placa }}<br>
-            <strong>Modelo:</strong> {{ $inspection->veiculo->modelo }}<br>
-            <strong>KM:</strong> {{ $inspection->km_current }}
+          <h6>{{ __('Veículo') }}</h6>
+          <p><strong>{{ __('Placa') }}:</strong> {{ $inspection->veiculo->placa }}<br>
+            <strong>{{ __('Modelo') }}:</strong> {{ $inspection->veiculo->modelo }}<br>
+            <strong>{{ __('KM') }}:</strong> {{ $inspection->km_current }}
           </p>
         </div>
         <div class="col-md-4">
-          <h6>Informações</h6>
-          <p><strong>Data:</strong> {{ $inspection->created_at->format('d/m/Y H:i') }}<br>
-            <strong>Responsável:</strong> {{ $inspection->user->name }}<br>
-            <strong>Combustível:</strong> {{ $inspection->fuel_level }}
+          <h6>{{ __('Informações') }}</h6>
+          <p><strong>{{ __('Data') }}:</strong> {{ $inspection->created_at->format('d/m/Y H:i') }}<br>
+            <strong>{{ __('Responsável') }}:</strong> {{ $inspection->user->name }}<br>
+            <strong>{{ __('Combustível') }}:</strong> {{ $inspection->fuel_level }}
           </p>
         </div>
         @if($inspection->notes)
         <div class="col-md-4">
-          <h6>Observações Gerais</h6>
+          <h6>{{ __('Observações Gerais') }}</h6>
           <p>{{ $inspection->notes }}</p>
         </div>
         @endif
@@ -100,10 +100,10 @@
         <table class="table table-striped border-top">
           <thead>
             <tr>
-              <th>Item</th>
-              <th class="text-center">Status</th>
-              <th>Observações</th>
-              <th class="text-center">Foto</th>
+              <th>{{ __('Item') }}</th>
+              <th class="text-center">{{ __('Status') }}</th>
+              <th>{{ __('Observações') }}</th>
+              <th class="text-center">{{ __('Foto') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -114,7 +114,7 @@
                 @if($item->status === 'ok')
                 <span class="badge bg-label-success">OK</span>
                 @elseif($item->status === 'not_ok')
-                <span class="badge bg-label-danger">RUIM</span>
+                <span class="badge bg-label-danger">{{ __('RUIM') }}</span>
                 @else
                 <span class="badge bg-label-secondary">N/A</span>
                 @endif
@@ -123,7 +123,7 @@
               <td class="text-center">
                 @if($item->photo_path)
                 <img src="{{ asset('storage/' . $item->photo_path) }}"
-                  alt="Evidência"
+                  alt="{{ __('Evidência') }}"
                   class="rounded cursor-pointer shadow-sm"
                   style="width: 40px; height: 40px; object-fit: cover;"
                   data-bs-toggle="modal"
@@ -168,7 +168,7 @@
       const baseUrl = window.location.origin;
 
       btn.classList.add('disabled');
-      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> {{ __("Enviando...") }}';
 
       fetch(`${baseUrl}/ordens-servico/checklist/${id}/send-email`, {
           method: 'POST',
@@ -182,7 +182,7 @@
         .then(res => {
           const swalConfig = {
             icon: res.success ? 'success' : 'error',
-            title: res.success ? 'Sucesso!' : 'Ops!',
+            title: res.success ? "{{ __('Sucesso!') }}" : "{{ __('Ops!') }}",
             text: res.message
           };
           if (typeof Swal !== 'undefined') {
@@ -195,8 +195,8 @@
           console.error('Error:', err);
           Swal.fire({
             icon: 'error',
-            title: 'Erro!',
-            text: 'Falha na comunicação com o servidor.'
+            title: "{{ __('Erro!') }}",
+            text: "{{ __('Falha na comunicação com o servidor.') }}"
           });
         })
         .finally(() => {
