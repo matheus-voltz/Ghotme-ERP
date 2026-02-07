@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
 
+use Illuminate\Support\Str;
+
 class OrdemServico extends Model
 {
     use BelongsToCompany;
 
     protected $fillable = [
         'company_id',
+        'uuid',
         'client_id',
         'veiculo_id',
         'user_id',
@@ -19,6 +22,16 @@ class OrdemServico extends Model
         'scheduled_at',
         'km_entry',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->uuid) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
 
     public function client()
     {

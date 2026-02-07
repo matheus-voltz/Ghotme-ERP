@@ -78,6 +78,7 @@ class ClientsController extends Controller
             $nestedData['whatsapp'] = $client->whatsapp;
             $nestedData['document'] = $client->type === 'PF' ? $client->cpf : $client->cnpj;
             $nestedData['vehicles_count'] = $client->vehicles_count;
+            $nestedData['uuid'] = $client->uuid;
             $nestedData['is_active'] = true;
             $nestedData['action'] = '';
 

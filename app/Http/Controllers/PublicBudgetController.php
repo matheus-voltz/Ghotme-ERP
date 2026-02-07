@@ -31,6 +31,7 @@ class PublicBudgetController extends Controller
             // Atualiza o orçamento
             $budget->update([
                 'status' => 'approved',
+                'early_payment' => $request->early_payment,
                 'approved_at' => now(),
                 'approval_ip' => $request->ip()
             ]);

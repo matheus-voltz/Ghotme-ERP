@@ -10,7 +10,7 @@ class Vehicles extends Model
     use BelongsToCompany;
 
     protected $table = 'veiculos';
-    
+
     protected $fillable = [
         'company_id',
         'cliente_id',
@@ -37,5 +37,10 @@ class Vehicles extends Model
     public function client()
     {
         return $this->belongsTo(Clients::class, 'cliente_id');
+    }
+
+    public function history()
+    {
+        return $this->hasMany(VehicleHistory::class, 'veiculo_id');
     }
 }

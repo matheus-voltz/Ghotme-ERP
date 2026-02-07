@@ -70,9 +70,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         const whatsappBtn = full.whatsapp
                             ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></a>`
                             : '';
+                        const portalLink = `${baseUrl}portal/${full.uuid}`;
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
                             whatsappBtn +
+                            `<button class="btn btn-sm btn-icon copy-portal" data-link="${portalLink}" title="Copiar Link do Portal"><i class="ti tabler-link"></i></button>` +
                             `<button class="btn btn-sm btn-icon view-record" data-id="${full.id}"><i class="ti tabler-eye"></i></button>` +
                             `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddClients" title="Editar"><i class="ti tabler-edit"></i></button>` +
                             `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="Excluir"><i class="ti tabler-trash"></i></button>` +
@@ -82,6 +84,22 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 }
             ],
             order: [[1, 'desc']]
+        });
+
+        // Copy Portal Link
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('.copy-portal')) {
+                const link = e.target.closest('.copy-portal').dataset.link;
+                navigator.clipboard.writeText(link).then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Link Copiado!',
+                        text: 'O link do portal do cliente foi copiado para a área de transferência.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+            }
         });
 
         // View Record Modal

@@ -20,6 +20,7 @@ class Budget extends Model
         'veiculo_id',
         'user_id',
         'status',
+        'early_payment',
         'valid_until',
         'description',
         'notes',

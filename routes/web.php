@@ -35,6 +35,7 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PublicBudgetController;
 use App\Http\Controllers\SystemErrorController;
+use App\Http\Controllers\CustomerPortalController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -90,6 +91,10 @@ Route::post('/view-budget/{uuid}/reject', [PublicBudgetController::class, 'rejec
 // Public Checklist View
 Route::get('/view-checklist/{id}', [VehicleChecklistController::class, 'show'])->name('public.checklist.show');
 Route::post('/ordens-servico/checklist/{id}/send-email', [VehicleChecklistController::class, 'sendEmail'])->name('ordens-servico.checklist.send-email');
+
+// Customer Portal
+Route::get('/portal/{uuid}', [CustomerPortalController::class, 'index'])->name('customer.portal.index');
+Route::get('/portal/os/{uuid}', [CustomerPortalController::class, 'showOrder'])->name('customer.portal.order');
 
 Route::middleware([
     'auth:sanctum',

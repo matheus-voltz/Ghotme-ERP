@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
 
+use Illuminate\Support\Str;
+
 class Clients extends Model
 {
     use BelongsToCompany;
@@ -13,6 +15,7 @@ class Clients extends Model
 
     protected $fillable = [
         'company_id',
+        'uuid',
         'type',
         'name',
         'cpf',
@@ -35,9 +38,19 @@ class Clients extends Model
         'estado',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            if (!$model->uuid) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
     public function fieldValues()
     {
-        return $this->hasMany(ClientFieldValue::class);
+        return $this->hasMany(ClientFieldValue::class, 'client_id');
     }
 
     public function vehicles()
