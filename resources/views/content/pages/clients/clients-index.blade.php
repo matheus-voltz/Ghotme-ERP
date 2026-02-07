@@ -153,19 +153,27 @@
             </div>
         </div>
 
-        <h6 class="mb-4" id="vehicleFormTitle"><i class="ti tabler-car me-1"></i> Adicionar Veículo</h6>
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <label class="form-label text-primary">Placa</label>
-                <input type="text" name="veiculo_placa" class="form-control" placeholder="ABC-1234" />
-            </div>
-            <div class="col-md-6 mb-4">
-                <label class="form-label">Marca</label>
-                <input type="text" name="veiculo_marca" class="form-control" placeholder="Ex: Toyota" />
-            </div>
-            <div class="col-md-12 mb-4">
-                <label class="form-label">Modelo</label>
-                <input type="text" name="veiculo_modelo" class="form-control" placeholder="Ex: Corolla" />
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="mb-0" id="vehicleFormTitle"><i class="ti tabler-car me-1"></i> Dados do Veículo</h6>
+            <a href="javascript:void(0)" id="btnToggleVehicle" class="btn btn-sm btn-label-primary d-none">
+                <i class="ti tabler-plus me-1"></i> Adicionar Mais
+            </a>
+        </div>
+
+        <div id="vehicleFieldsContainer">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label class="form-label text-primary">Placa</label>
+                    <input type="text" name="veiculo_placa" class="form-control" placeholder="ABC-1234" />
+                </div>
+                <div class="col-md-6 mb-4">
+                    <label class="form-label">Marca</label>
+                    <input type="text" name="veiculo_marca" class="form-control" placeholder="Ex: Toyota" />
+                </div>
+                <div class="col-md-12 mb-4">
+                    <label class="form-label">Modelo</label>
+                    <input type="text" name="veiculo_modelo" class="form-control" placeholder="Ex: Corolla" />
+                </div>
             </div>
         </div>
 

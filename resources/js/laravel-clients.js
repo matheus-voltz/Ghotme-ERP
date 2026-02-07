@@ -161,7 +161,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         // Mostrar veículos existentes
                         const existingSection = document.getElementById('existingVehiclesSection');
                         const listContainer = document.getElementById('existingVehiclesList');
-                        const vehicleTitle = document.getElementById('vehicleFormTitle');
+                        const vehicleFields = document.getElementById('vehicleFieldsContainer');
+                        const btnToggle = document.getElementById('btnToggleVehicle');
                         
                         if (data.vehicles && data.vehicles.length > 0) {
                             existingSection.classList.remove('d-none');
@@ -174,12 +175,28 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                     <a href="/vehicles" class="btn btn-sm btn-label-secondary btn-icon"><i class="ti tabler-external-link"></i></a>
                                 </div>
                             `).join('');
-                            vehicleTitle.innerHTML = '<i class="ti tabler-plus me-1"></i> Adicionar Mais um Veículo';
+                            
+                            // Na edição, se já tem carro, esconde o form de "novo carro" por padrão
+                            vehicleFields.classList.add('d-none');
+                            btnToggle.classList.remove('d-none');
                         } else {
                             existingSection.classList.add('d-none');
-                            vehicleTitle.innerHTML = '<i class="ti tabler-car me-1"></i> Dados do Veículo (Opcional)';
+                            vehicleFields.classList.remove('d-none');
+                            btnToggle.classList.add('d-none');
                         }
                     });
+            }
+        });
+
+        // Toggle Vehicle Fields logic
+        document.getElementById('btnToggleVehicle').addEventListener('click', function() {
+            const container = document.getElementById('vehicleFieldsContainer');
+            if (container.classList.contains('d-none')) {
+                container.classList.remove('d-none');
+                this.innerHTML = '<i class="ti tabler-minus me-1"></i> Ocultar Adição';
+            } else {
+                container.classList.add('d-none');
+                this.innerHTML = '<i class="ti tabler-plus me-1"></i> Adicionar Mais';
             }
         });
 
@@ -191,8 +208,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formClient.reset();
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
+                
+                // No cadastro novo, sempre mostra os campos do veículo
                 document.getElementById('existingVehiclesSection').classList.add('d-none');
-                document.getElementById('vehicleFormTitle').innerHTML = '<i class="ti tabler-car me-1"></i> Dados do Veículo (Opcional)';
+                document.getElementById('vehicleFieldsContainer').classList.remove('d-none');
+                document.getElementById('btnToggleVehicle').classList.add('d-none');
             });
         }
     }
