@@ -1,19 +1,44 @@
-@extends('layouts/layoutMaster')
+@php
+$customizerHidden = 'customizer-hide';
+@endphp
+
+@extends('layouts/blankLayout')
 
 @section('title', 'Aprovação de Orçamento')
 
 @section('page-style')
 <style>
+    /* Força o fundo em todo o body e wrapper */
+    body { background-color: #f4f3ff !important; }
+    .budget-wrapper { min-height: 100vh; background-color: #f4f3ff !important; padding-bottom: 3rem; }
+    
+    /* Remove o botão de engrenagem do Customizer do Vuexy */
+    .template-customizer-open-btn { display: none !important; }
+    
     .budget-header { background: linear-gradient(135deg, #7367f0 0%, #9e95f5 100%); color: white; border-radius: 0.5rem 0.5rem 0 0; }
     .status-badge { font-size: 1.2rem; padding: 0.5rem 1rem; }
+    .company-banner { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #e6e5f3; padding: 2.5rem 0; margin-bottom: 2rem; }
+    .card { border: none; border-radius: 1rem; box-shadow: 0 0.5rem 1.5rem rgba(115, 103, 240, 0.08) !important; }
 </style>
 @endsection
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
-    <div class="row justify-content-center">
-        <div class="col-lg-9 col-12">
-            <div class="card mb-4 shadow-sm">
+<div class="budget-wrapper">
+    <!-- Banner da Empresa -->
+    <div class="company-banner">
+        <div class="container text-center">
+            @if($budget->company->logo_path)
+                <img src="{{ asset('storage/' . $budget->company->logo_path) }}" alt="Logo" class="mb-3" style="max-height: 100px;">
+            @endif
+            <h3 class="mb-0 fw-bold" style="color: #444;">{{ $budget->company->name ?? 'Oficina' }}</h3>
+            <small class="text-muted text-uppercase fw-medium" style="letter-spacing: 2px;">Orçamento Digital</small>
+        </div>
+    </div>
+
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-12">
+                <div class="card mb-4 shadow-sm">
                 <div class="p-4 budget-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0 text-white">Orçamento #{{ $budget->id }}</h4>

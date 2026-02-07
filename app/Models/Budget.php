@@ -39,6 +39,8 @@ class Budget extends Model
 
     protected $casts = [
         'valid_until' => 'date',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
     ];
 
     public function client(): BelongsTo

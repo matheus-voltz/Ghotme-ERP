@@ -189,7 +189,9 @@ class BudgetController extends Controller
         $message = "Olá, " . ($budget->client->name ?? $budget->client->company_name) . "!\n";
         $message .= "Segue o orçamento para o veículo " . $budget->veiculo->modelo . " (Placa: " . $budget->veiculo->placa . "):\n\n";
         $message .= "Total: R$ " . number_format($budget->total, 2, ',', '.') . "\n";
-        $message .= "Válido até: " . $budget->valid_until->format('d/m/Y') . "\n\n";
+        $message .= "Válido até: " . ($budget->valid_until ? $budget->valid_until->format('d/m/Y') : 'N/A') . "\n\n";
+        $message .= "Você pode visualizar os detalhes e aprovar online através do link abaixo:\n";
+        $message .= route('public.budget.show', $budget->uuid) . "\n\n";
         $message .= "Podemos prosseguir com o serviço?";
 
         $url = "https://api.whatsapp.com/send?phone=" . $phone . "&text=" . urlencode($message);

@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Budget;
+use App\Models\BudgetApproval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PublicBudgetController extends Controller
 {
     public function show($uuid)
     {
-        // Buscamos o orçamento pelo UUID, ignorando o escopo de empresa pois o cliente é externo
         $budget = Budget::withoutGlobalScope('company')
             ->with(['client', 'veiculo', 'items.service', 'parts.part', 'company'])
             ->where('uuid', $uuid)
@@ -26,11 +27,23 @@ class PublicBudgetController extends Controller
             return back()->with('error', 'Este orçamento já foi processado.');
         }
 
-        $budget->update([
-            'status' => 'approved',
-            'approved_at' => now(),
-            'approval_ip' => $request->ip()
-        ]);
+        DB::transaction(function () use ($budget, $request) {
+            // Atualiza o orçamento
+            $budget->update([
+                'status' => 'approved',
+                'approved_at' => now(),
+                'approval_ip' => $request->ip()
+            ]);
+
+            // Cria o registro histórico
+            BudgetApproval::create([
+                'company_id' => $budget->company_id,
+                'budget_id' => $budget->id,
+                'status' => 'approved',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        });
 
         return back()->with('success', 'Orçamento aprovado com sucesso!');
     }
@@ -43,12 +56,25 @@ class PublicBudgetController extends Controller
 
         $budget = Budget::withoutGlobalScope('company')->where('uuid', $uuid)->firstOrFail();
 
-        $budget->update([
-            'status' => 'rejected',
-            'rejected_at' => now(),
-            'rejection_reason' => $request->rejection_reason,
-            'approval_ip' => $request->ip()
-        ]);
+        DB::transaction(function () use ($budget, $request) {
+            // Atualiza o orçamento
+            $budget->update([
+                'status' => 'rejected',
+                'rejected_at' => now(),
+                'rejection_reason' => $request->rejection_reason,
+                'approval_ip' => $request->ip()
+            ]);
+
+            // Cria o registro histórico
+            BudgetApproval::create([
+                'company_id' => $budget->company_id,
+                'budget_id' => $budget->id,
+                'status' => 'rejected',
+                'reason' => $request->rejection_reason,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        });
 
         return back()->with('success', 'Orçamento rejeitado.');
     }
