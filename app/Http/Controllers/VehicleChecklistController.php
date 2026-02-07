@@ -44,6 +44,10 @@ class VehicleChecklistController extends Controller
             'km_current' => 'required|integer',
             'notes' => 'nullable|string',
             'items' => 'required|array',
+            'items.*.id' => 'required|exists:checklist_items,id', // Valida o ID selecionado
+            'items.*.status' => 'required|in:ok,not_ok,na',
+            'items.*.observations' => 'nullable|string',
+            'items.*.photo' => 'nullable|image|max:5120', // Validação da foto (5MB)
         ]);
 
         try {
@@ -59,11 +63,19 @@ class VehicleChecklistController extends Controller
             ]);
 
             foreach ($validated['items'] as $itemId => $data) {
+                $photoPath = null;
+                
+                // Processar Upload de Foto
+                if (isset($data['photo']) && $request->hasFile("items.$itemId.photo")) {
+                    $photoPath = $request->file("items.$itemId.photo")->store('checklists', 'public');
+                }
+
                 VehicleInspectionItem::create([
                     'vehicle_inspection_id' => $inspection->id,
-                    'checklist_item_id' => $itemId,
+                    'checklist_item_id' => $data['id'], // ID do item vindo do select
                     'status' => $data['status'],
                     'observations' => $data['observations'] ?? null,
+                    'photo_path' => $photoPath, // Salva o caminho da foto
                 ]);
             }
 

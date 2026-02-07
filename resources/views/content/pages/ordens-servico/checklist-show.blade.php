@@ -37,6 +37,7 @@
             <th>Item</th>
             <th class="text-center">Status</th>
             <th>Observações</th>
+            <th class="text-center">Foto</th>
           </tr>
         </thead>
         <tbody>
@@ -53,6 +54,33 @@
               @endif
             </td>
             <td>{{ $item->observations ?? '-' }}</td>
+            <td class="text-center">
+                @if($item->photo_path)
+                    <img src="{{ asset('storage/' . $item->photo_path) }}" 
+                         alt="Evidência" 
+                         class="rounded cursor-pointer shadow-sm" 
+                         style="width: 40px; height: 40px; object-fit: cover;"
+                         data-bs-toggle="modal" 
+                         data-bs-target="#photoModal{{ $item->id }}">
+
+                    <!-- Modal para Foto Grande -->
+                    <div class="modal fade" id="photoModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title">{{ $item->checklistItem->name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <img src="{{ asset('storage/' . $item->photo_path) }}" class="img-fluid rounded w-100 shadow">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <span class="text-muted small">-</span>
+                @endif
+            </td>
           </tr>
           @endforeach
         </tbody>

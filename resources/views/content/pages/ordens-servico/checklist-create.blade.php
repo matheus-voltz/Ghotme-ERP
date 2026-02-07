@@ -103,7 +103,19 @@
                 </div>
             </td>
             <td>
-                <input type="text" name="items[INDEX][observations]" class="form-control form-control-sm obs-input" placeholder="...">
+                <input type="text" name="items[INDEX][observations]" class="form-control form-control-sm obs-input mb-1" placeholder="...">
+                
+                <!-- Upload de Foto -->
+                <div class="d-flex align-items-center mt-1">
+                    <label class="btn btn-sm btn-icon btn-label-secondary me-2 cursor-pointer" title="Anexar Foto">
+                        <i class="ti tabler-camera"></i>
+                        <input type="file" name="items[INDEX][photo]" class="d-none photo-input" accept="image/*">
+                    </label>
+                    <span class="photo-preview d-none">
+                        <img src="" class="rounded border" style="width: 30px; height: 30px; object-fit: cover;">
+                        <i class="ti tabler-circle-x text-danger cursor-pointer remove-photo ms-1" style="font-size: 14px;"></i>
+                    </span>
+                </div>
             </td>
             <td>
                 <button type="button" class="btn btn-sm btn-icon btn-label-danger remove-item"><i class="ti tabler-trash"></i></button>
