@@ -31,6 +31,42 @@ $pageConfigs = [
 <!-- Page Scripts -->
 @section('page-script')
 @vite(['resources/assets/js/front-page-landing.js'])
+<script>
+  // Script de emergência injetado diretamente
+  (function() {
+    function init() {
+      const toggler = document.querySelector('.price-duration-toggler');
+      const menuBtn = document.querySelector('.navbar-toggler');
+      const menuCollapse = document.getElementById('navbarSupportedContent');
+
+      // Troca de Preços
+      if (toggler) {
+        toggler.addEventListener('change', function() {
+          const isYearly = this.checked;
+          document.querySelectorAll('.price-monthly').forEach(el => el.classList.toggle('d-none', isYearly));
+          document.querySelectorAll('.price-yearly').forEach(el => el.classList.toggle('d-none', !isYearly));
+          document.querySelectorAll('.plan-action-btn').forEach(btn => {
+            const link = isYearly ? btn.getAttribute('data-yearly-link') : btn.getAttribute('data-monthly-link');
+            if (link) btn.setAttribute('href', link);
+          });
+        });
+      }
+
+      // Menu Mobile (Correção para o erro de travamento)
+      if (menuBtn && menuCollapse) {
+        menuBtn.addEventListener('click', function() {
+          menuCollapse.classList.toggle('show');
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>
 @endsection
 
 
