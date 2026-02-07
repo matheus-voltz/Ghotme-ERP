@@ -4,12 +4,12 @@
       "url": "/dashboard",
       "name": "Home",
       "icon": "menu-icon icon-base ti tabler-smart-home",
-      "slug": "pages-home"
+      "slug": "dashboard"
     },
     {
       "name": "Ordens de Serviço",
       "icon": "menu-icon icon-base ti tabler-file",
-      "slug": "allorders",
+      "slug": "ordens",
       "submenu": [
         {
           "url": "/ordens-servico",
@@ -19,12 +19,12 @@
         {
           "url": "/ordens-servico/create",
           "name": "Criar OS",
-          "slug": "newOS"
+          "slug": "ordens-servico.create"
         },
         {
           "url": "/ordens-servico/checklist",
           "name": "Checklist de Entrada",
-          "slug": "checklist"
+          "slug": "ordens-servico.checklist"
         }
       ]
     },
@@ -36,29 +36,29 @@
         {
           "url": "/budgets/pending",
           "name": "Aguardando aprovação",
-          "slug": "pending"
+          "slug": "budgets.pending"
         },
         {
           "url": "/budgets/approved",
           "name": "Aprovados",
-          "slug": "approved"
+          "slug": "budgets.approved"
         },
         {
           "url": "/budgets/rejected",
           "name": "Reprovados",
-          "slug": "rejected"
+          "slug": "budgets.rejected"
         },
         {
           "url": "/budgets/send-whatsapp",
           "name": "Enviar por WhatsApp",
-          "slug": "send-whatsapp"
+          "slug": "budgets.send-whatsapp"
         }
       ]
     },
     {
       "name": "Clientes & Veículos",
       "icon": "menu-icon icon-base ti tabler-users",
-      "slug": "clients-vehicles",
+      "slug": ["clients", "vehicles", "vehicle-history"],
       "submenu": [
       {
         "url": "/clients",
@@ -85,32 +85,32 @@
         {
           "url": "/inventory/items",
           "name": "Itens/Peças",
-          "slug": "items"
+          "slug": "inventory.items"
         },
         {
           "url": "/inventory/stock-in",
           "name": "Entrada de estoque",
-          "slug": "stock-in"
+          "slug": "inventory.stock-in"
         },
         {
           "url": "/inventory/stock-out",
           "name": "Saída de estoque",
-          "slug": "stock-out"
+          "slug": "inventory.stock-out"
         },
         {
           "url": "/inventory/adjustments",
           "name": "Ajustes",
-          "slug": "adjustments"
+          "slug": "inventory.adjustments"
         },
         {
           "url": "/inventory/critical-stock",
           "name": "Estoque crítico / alerta",
-          "slug": "critical-stock"
+          "slug": "inventory.critical-stock"
         },
         {
           "url": "/inventory/suppliers",
           "name": "Fornecedores",
-          "slug": "suppliers"
+          "slug": "inventory.suppliers"
         }
       ]
     },
@@ -122,12 +122,12 @@
         {
           "url": "/services/table",
           "name": "Tabela de serviços",
-          "slug": "services-table"
+          "slug": "services.table"
         },
         {
           "url": "/services/packages",
           "name": "Pacotes de serviço",
-          "slug": "service-packages"
+          "slug": "services.packages"
         }
       ]
     },
@@ -139,27 +139,27 @@
         {
           "url": "/finance/accounts-receivable",
           "name": "Contas a receber",
-          "slug": "accounts-receivable"
+          "slug": "finance.receivables"
         },
         {
           "url": "/finance/accounts-payable",
           "name": "Contas a pagar",
-          "slug": "accounts-payable"
+          "slug": "finance.payables"
         },
         {
           "url": "/finance/cash-flow",
           "name": "Fluxo de caixa",
-          "slug": "cash-flow"
+          "slug": "finance.cash-flow"
         },
         {
           "url": "/finance/payment-methods",
           "name": "Formas de pagamento",
-          "slug": "payment-methods"
+          "slug": "finance.payment-methods"
         },
         {
           "url": "/finance/reports",
           "name": "Relatórios financeiros",
-          "slug": "financial-reports"
+          "slug": "finance.reports"
         }
       ]
     },
@@ -171,32 +171,32 @@
         {
           "url": "/reports/os-status",
           "name": "OS por status",
-          "slug": "os-status"
+          "slug": "reports.os-status"
         },
         {
           "url": "/reports/revenue",
           "name": "Faturamento",
-          "slug": "revenue"
+          "slug": "reports.revenue"
         },
         {
           "url": "/reports/cost-per-service",
           "name": "Custo por serviço",
-          "slug": "cost-per-service"
+          "slug": "reports.cost-per-service"
         },
         {
           "url": "/reports/consumed-stock",
           "name": "Estoque consumido",
-          "slug": "consumed-stock"
+          "slug": "reports.consumed-stock"
         },
         {
           "url": "/reports/mechanic-performance",
           "name": "Desempenho por mecânico",
-          "slug": "mechanic-performance"
+          "slug": "reports.mechanic-performance"
         },
         {
           "url": "/reports/average-time-per-service",
           "name": "Tempo médio por serviço",
-          "slug": "average-time-per-service"
+          "slug": "reports.average-time"
         }
       ]
     },
@@ -213,27 +213,27 @@
         {
           "url": "/settings/custom-checklist",
           "name": "Checklist personalizado",
-          "slug": "custom-checklist"
+          "slug": "settings.custom-checklist"
         },
         {
           "url": "/settings/os-settings",
           "name": "Configurações da OS",
-          "slug": "os-settings"
+          "slug": "settings.os-settings"
         },
         {
           "url": "/settings/integrations",
           "name": "Integrações (WhatsApp, API)",
-          "slug": "integrations"
+          "slug": "settings.integrations"
         },
         {
           "url": "/settings/company-data",
           "name": "Dados da empresa",
-          "slug": "company-data"
+          "slug": "settings.company-data"
         },
         {
           "url": "/settings/print-templates",
           "name": "Modelos de impressão",
-          "slug": "print-templates"
+          "slug": "settings.print-templates"
         }
       ]
     },
@@ -245,22 +245,22 @@
         {
           "url": "/support/chat-whatsapp",
           "name": "Chat / WhatsApp",
-          "slug": "chat-whatsapp"
+          "slug": "support.whatsapp"
         },
         {
           "url": "/support/knowledge-base",
           "name": "Base de conhecimento",
-          "slug": "knowledge-base"
+          "slug": "support.knowledge-base"
         },
         {
           "url": "/support/open-ticket",
           "name": "Abrir chamado",
-          "slug": "open-ticket"
+          "slug": "support.open-ticket"
         },
         {
           "url": "/settings/system-errors",
           "name": "Logs de Erro (Dev)",
-          "slug": "system-errors"
+          "slug": "settings.system-errors"
         }
       ]
     }
