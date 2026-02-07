@@ -66,7 +66,7 @@
       e.preventDefault();
       const id = btn.getAttribute('data-id');
       const originalHtml = btn.innerHTML;
-      const baseUrl = '{{ url(' / ') }}';
+      const baseUrl = window.location.origin;
 
       btn.classList.add('disabled');
       btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';

@@ -19,6 +19,7 @@ class VehicleInspection extends Model
         'fuel_level',
         'km_current',
         'notes',
+        'token',
     ];
 
     public function veiculo(): BelongsTo

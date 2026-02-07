@@ -1,4 +1,4 @@
-@extends($layout ?? 'layouts/layoutMaster')
+@extends('layouts/layoutMaster')
 
 @section('title', 'Detalhes do Checklist')
 
@@ -17,7 +17,11 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
-  @if(auth()->check())
+  @php
+  $isPublic = request()->has('token');
+  @endphp
+
+  @if(!$isPublic && auth()->check())
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Detalhes do Checklist</h4>
     <a href="{{ route('ordens-servico.checklist') }}" class="btn btn-label-secondary">
@@ -34,18 +38,19 @@
   <div class="card mb-4">
     <div class="card-header d-flex justify-content-between flex-wrap gap-3">
       <h5 class="mb-0">Checklist #{{ $inspection->id }}</h5>
-      @if(auth()->check())
+      @if(!$isPublic && auth()->check())
       <div class="d-flex gap-2">
         <button onclick="window.print()" class="btn btn-label-secondary">
           <i class="ti tabler-printer me-1"></i> Imprimir
         </button>
 
         @php
-        $whatsappMsg = "Olá! Segue o checklist de entrada do seu veículo " . $inspection->veiculo->modelo . " (" . $inspection->veiculo->placa . ").\nVocê pode visualizar os detalhes e fotos aqui: " . route('public.checklist.show', $inspection->id);
+        $url = route('public.checklist.show', $inspection->id) . ($inspection->token ? "?token=" . $inspection->token : "");
+        $whatsappMsg = "Olá! Segue o checklist de entrada do seu veículo " . $inspection->veiculo->modelo . " (" . $inspection->veiculo->placa . ").\nVocê pode visualizar os detalhes e fotos aqui: " . $url;
         $whatsappUrl = "https://api.whatsapp.com/send?phone=55" . preg_replace('/\D/', '', $inspection->veiculo->client->whatsapp ?? '') . "&text=" . urlencode($whatsappMsg);
 
         $emailSubject = "Checklist de Entrada - Veículo " . $inspection->veiculo->placa;
-        $emailBody = "Olá, segue o link do seu checklist: " . route('public.checklist.show', $inspection->id);
+        $emailBody = "Olá, segue o link do seu checklist: " . $url;
         $emailUrl = "mailto:" . ($inspection->veiculo->client->email ?? '') . "?subject=" . urlencode($emailSubject) . "&body=" . urlencode($emailBody);
         @endphp
 
@@ -151,7 +156,7 @@
       e.preventDefault();
       const id = btn.getAttribute('data-id');
       const originalHtml = btn.innerHTML;
-      const baseUrl = '{{ url(' / ') }}';
+      const baseUrl = window.location.origin;
 
       btn.classList.add('disabled');
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';

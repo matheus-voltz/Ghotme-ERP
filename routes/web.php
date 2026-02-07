@@ -194,9 +194,9 @@ Route::middleware([
     Route::post('/finance/transactions', [FinanceController::class, 'store'])->name('finance.transactions.store');
     Route::post('/finance/transactions/{id}/pay', [FinanceController::class, 'markAsPaid'])->name('finance.transactions.pay');
     Route::delete('/finance/transactions/{id}', [FinanceController::class, 'destroy'])->name('finance.transactions.destroy');
-    
+
     Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
-    
+
     Route::get('/finance/payment-methods', [PaymentMethodController::class, 'index'])->name('finance.payment-methods');
     Route::get('/finance/payment-methods-list', [PaymentMethodController::class, 'dataBase'])->name('finance.payment-methods.list');
     Route::post('/finance/payment-methods', [PaymentMethodController::class, 'store'])->name('finance.payment-methods.store');
