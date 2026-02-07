@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Clients;
 use App\Models\Vehicles;
+use App\Models\VehicleHistory;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -133,7 +134,7 @@ class ClientsController extends Controller
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
             // Veículo
-            'veiculo_placa' => 'nullable|string|max:10',
+            'veiculo_placa' => 'nullable|string|max:10|unique:veiculos,placa',
             'veiculo_marca' => 'required_with:veiculo_placa|nullable|string|max:50',
             'veiculo_modelo' => 'required_with:veiculo_placa|nullable|string|max:80',
         ], [
@@ -163,12 +164,24 @@ class ClientsController extends Controller
             $client = Clients::create($validated);
 
             if ($request->filled('veiculo_placa')) {
-                Vehicles::create([
+                $vehicle = Vehicles::create([
                     'company_id' => Auth::user()->company_id,
                     'cliente_id' => $client->id,
                     'placa' => strtoupper($request->veiculo_placa),
                     'marca' => $request->veiculo_marca,
                     'modelo' => $request->veiculo_modelo,
+                ]);
+
+                // Adicionar evento na linha do tempo
+                VehicleHistory::create([
+                    'veiculo_id' => $vehicle->id,
+                    'date' => now(),
+                    'km' => 0,
+                    'event_type' => 'entrada_oficina',
+                    'title' => 'Entrada na Oficina',
+                    'description' => 'Veículo cadastrado junto com o cliente e disponível para ordens de serviço.',
+                    'performer' => Auth::user()->name,
+                    'created_by' => Auth::id()
                 ]);
             }
 

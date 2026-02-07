@@ -332,17 +332,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                     // Inserir após o input (ou após o container do input se for um grupo)
                                     if (input.closest('.input-group')) {
                                         input.closest('.input-group').after(feedback);
+                                    } else if (input.classList.contains('select2-hidden-accessible')) {
+                                        const select2Container = input.nextElementSibling;
+                                        if (select2Container && select2Container.classList.contains('select2-container')) {
+                                            select2Container.after(feedback);
+                                        }
                                     } else {
                                         input.after(feedback);
                                     }
                                 }
-                            });
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erro de Validação',
-                                text: 'Por favor, verifique os campos em vermelho.',
-                                customClass: { confirmButton: 'btn btn-primary' }
                             });
                         } else {
                             Swal.fire({

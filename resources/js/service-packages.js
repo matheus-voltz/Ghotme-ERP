@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         partsList = document.getElementById('selected-parts-list');
 
     // Select2
-    $('.select2').each(function() {
+    $('.select2').each(function () {
         var $this = $(this);
         $this.wrap('<div class="position-relative"></div>').select2({
             dropdownParent: $this.parent(),
@@ -36,28 +36,28 @@ document.addEventListener('DOMContentLoaded', function (e) {
             columnDefs: [
                 {
                     targets: 1,
-                    render: function(data) { return `<span class="fw-medium text-heading">${data}</span>`; }
+                    render: function (data) { return `<span class="fw-medium text-heading">${data}</span>`; }
                 },
                 {
                     targets: 2,
-                    render: function(data, type, full) {
+                    render: function (data, type, full) {
                         return `<small>${full.services_count} serv. / ${full.parts_count} peças</small>`;
                     }
                 },
                 {
                     targets: 3,
-                    render: function(data) { return data ? `R$ ${parseFloat(data).toFixed(2)}` : '<span class="text-muted">Calculado</span>'; }
+                    render: function (data) { return data ? `R$ ${parseFloat(data).toFixed(2)}` : '<span class="text-muted">Calculado</span>'; }
                 },
                 {
                     targets: 4,
                     className: 'text-center',
-                    render: function(data) { return data ? '<span class="badge bg-label-success">Ativo</span>' : '<span class="badge bg-label-danger">Inativo</span>'; }
+                    render: function (data) { return data ? '<span class="badge bg-label-success">Ativo</span>' : '<span class="badge bg-label-danger">Inativo</span>'; }
                 },
                 {
                     targets: 5,
                     title: 'Ações',
                     orderable: false,
-                    render: function(data, type, full) {
+                    render: function (data, type, full) {
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
                             `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasPackage"><i class="ti tabler-edit"></i></button>` +
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Add part to list
-        addPartSelect.on('select2:select', function(e) {
+        addPartSelect.on('select2:select', function (e) {
             const id = e.params.data.id;
             const name = $(e.params.data.element).data('name');
             if (!id) return;
@@ -110,19 +110,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
             partsList.appendChild(row);
         }
 
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.remove-part')) {
                 e.target.closest('.remove-part').parentElement.remove();
             }
         });
 
         // Edit
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasPackageLabel').innerHTML = 'Editar Pacote';
                 partsList.innerHTML = '';
-                
+
                 fetch(`${baseUrl}services/packages/${id}/edit`)
                     .then(response => response.json())
                     .then(data => {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.getElementById('package-name').value = data.name;
                         document.getElementById('package-total-price').value = data.total_price || '';
                         document.getElementById('package-description').value = data.description || '';
-                        
+
                         const serviceIds = data.services.map(s => s.id);
                         $('#package-services').val(serviceIds).trigger('change');
 
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
         const addNewBtn = document.querySelector('.add-new');
         if (addNewBtn) {
-            addNewBtn.addEventListener('click', function() {
+            addNewBtn.addEventListener('click', function () {
                 document.getElementById('package_id').value = '';
                 document.getElementById('offcanvasPackageLabel').innerHTML = 'Novo Pacote';
                 formPackage.reset();
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Submit
     if (formPackage) {
-        formPackage.addEventListener('submit', function(e) {
+        formPackage.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(formPackage);
             const id = formData.get('id');
@@ -169,13 +169,48 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
-            }).then(response => response.json()).then(data => {
-                if (data.success) {
+            })
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422 && data.errors) {
+                            formPackage.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            formPackage.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                            Object.keys(data.errors).forEach(key => {
+                                const input = formPackage.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+
+                                    if (input.nextElementSibling && input.nextElementSibling.classList.contains('select2-container')) {
+                                        input.nextElementSibling.after(feedback);
+                                    } else {
+                                        input.after(feedback);
+                                    }
+                                }
+                            });
+                            return;
+                        }
+                        throw new Error(data.message || 'Erro inesperado');
+                    }
+
                     bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
                     new DataTable(dt_table).draw();
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
-                }
-            });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: data.message,
+                        customClass: { confirmButton: 'btn btn-success' }
+                    });
+                })
+                .catch(err => {
+                    if (err.message) {
+                        Swal.fire({ icon: 'error', title: 'Erro!', text: err.message, customClass: { confirmButton: 'btn btn-primary' } });
+                    }
+                });
         });
     }
 });

@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     searchable: false,
                     orderable: false,
                     render: function (data, type, full, meta) {
-                         return (
+                        return (
                             '<div class="d-flex align-items-center gap-4">' +
                             `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddSuppliers"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
                             `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasAddSuppliersLabel').innerHTML = 'Editar Fornecedor';
-                
+
                 fetch(`${baseUrl}inventory/suppliers/${id}/edit`)
                     .then(response => response.json())
                     .then(data => {
@@ -225,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             const formData = new FormData(addNewSuppliersForm);
             const formDataObj = {};
             formData.forEach((value, key) => formDataObj[key] = value);
-            
+
             const id = formDataObj['id'];
             const url = id ? `${baseUrl}inventory/suppliers/${id}` : `${baseUrl}inventory/suppliers`;
             const method = id ? 'PUT' : 'POST';
@@ -239,14 +239,37 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 method: method,
                 headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: searchParams.toString()
-            }).then(response => {
-                if (!response.ok) throw new Error('Error');
-                return response.json();
-            }).then(data => {
-                dt_suppliers_table && new DataTable(dt_suppliers_table).draw();
-                bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
-                Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
-            });
+            })
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422 && data.errors) {
+                            addNewSuppliersForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            addNewSuppliersForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                            Object.keys(data.errors).forEach(key => {
+                                const input = addNewSuppliersForm.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+                                    input.after(feedback);
+                                }
+                            });
+                            return;
+                        }
+                        throw new Error(data.message || 'Erro inesperado');
+                    }
+                    dt_suppliers_table && new DataTable(dt_suppliers_table).draw();
+                    bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
+                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
+                })
+                .catch(err => {
+                    if (err.message) {
+                        Swal.fire({ icon: 'error', title: 'Erro!', text: err.message, customClass: { confirmButton: 'btn btn-primary' } });
+                    }
+                });
         });
     }
 });

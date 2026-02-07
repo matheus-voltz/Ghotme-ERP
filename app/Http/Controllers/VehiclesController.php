@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Vehicles;
+use App\Models\VehicleHistory;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class VehiclesController extends Controller
 {
@@ -99,9 +102,16 @@ class VehiclesController extends Controller
      */
     public function store(Request $request)
     {
+        $vehicleId = $request->id;
+
         $validated = $request->validate([
             'cliente_id' => 'required|exists:clients,id',
-            'placa' => 'required|string|max:10',
+            'placa' => [
+                'required',
+                'string',
+                'max:10',
+                Rule::unique('veiculos', 'placa')->ignore($vehicleId)
+            ],
             'marca' => 'required|string|max:50',
             'modelo' => 'required|string|max:80',
             'ano_fabricacao' => 'nullable|numeric',
@@ -113,8 +123,6 @@ class VehiclesController extends Controller
             'marca' => 'Marca',
             'modelo' => 'Modelo'
         ]);
-
-        $vehicleId = $request->id;
 
         $data = [
             'cliente_id' => $request->cliente_id,
@@ -132,8 +140,20 @@ class VehiclesController extends Controller
             $vehicle->update($data);
             $status = 'atualizado';
         } else {
-            Vehicles::create($data);
+            $vehicle = Vehicles::create($data);
             $status = 'criado';
+
+            // Adicionar evento na linha do tempo
+            VehicleHistory::create([
+                'veiculo_id' => $vehicle->id,
+                'date' => now(),
+                'km' => $vehicle->km_atual ?? 0,
+                'event_type' => 'entrada_oficina',
+                'title' => 'Entrada na Oficina',
+                'description' => 'Veículo cadastrado no sistema e disponível para ordens de serviço.',
+                'performer' => Auth::user()->name,
+                'created_by' => Auth::id()
+            ]);
         }
 
         return response()->json(['success' => true, 'message' => "Veículo {$status} com sucesso!"]);

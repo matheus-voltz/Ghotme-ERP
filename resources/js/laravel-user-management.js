@@ -141,11 +141,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
           className: 'text-center',
           render: function (data, type, full, meta) {
             const verified = full['email_verified_at'];
-            return `${
-              verified
+            return `${verified
                 ? '<i class="icon-base ti fs-4 tabler-shield-check text-success"></i>'
                 : '<i class="icon-base ti fs-4 tabler-shield-x text-danger" ></i>'
-            }`;
+              }`;
           }
         },
         {
@@ -154,11 +153,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
           className: 'text-center',
           render: function (data, type, full, meta) {
             const isActive = full['is_active'];
-            return `${
-              isActive
+            return `${isActive
                 ? '<span class="badge bg-success">Ativo</span>'
                 : '<span class="badge bg-danger">Inativo</span>'
-            }`;
+              }`;
           }
         },
         {
@@ -177,7 +175,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
               '<a href="' +
               userView +
               '" class="dropdown-item">View</a>' +
-              '<a href="'+userSuspend+'" class="dropdown-item">Suspend</a>' +
+              '<a href="' + userSuspend + '" class="dropdown-item">Suspend</a>' +
               '</div>' +
               '</div>'
             );
@@ -731,13 +729,34 @@ document.addEventListener('DOMContentLoaded', function (e) {
         },
         body: searchParams.toString()
       })
-        .then(response => {
+        .then(async response => {
+          const data = await response.json();
           if (!response.ok) {
-            throw new Error('Network response was not ok');
+            if (response.status === 422 && data.errors) {
+              // Limpar erros anteriores
+              addNewUserForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+              addNewUserForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+              Object.keys(data.errors).forEach(key => {
+                const input = addNewUserForm.querySelector(`[name="${key}"]`);
+                if (input) {
+                  input.classList.add('is-invalid');
+                  const feedback = document.createElement('div');
+                  feedback.className = 'invalid-feedback';
+                  feedback.innerText = data.errors[key][0];
+
+                  if (input.nextElementSibling && input.nextElementSibling.classList.contains('select2-container')) {
+                    input.nextElementSibling.after(feedback);
+                  } else {
+                    input.after(feedback);
+                  }
+                }
+              });
+              return;
+            }
+            throw new Error(data.message || 'Erro inesperado');
           }
-          return response.text();
-        })
-        .then(status => {
+
           // Refresh DataTable
           dt_user_table && new DataTable(dt_user_table).draw();
 
@@ -748,26 +767,24 @@ document.addEventListener('DOMContentLoaded', function (e) {
           // sweetalert
           Swal.fire({
             icon: 'success',
-            title: `${status} com sucesso!`,
-            text: `Usuário ${status} com sucesso.`,
+            title: `Sucesso!`,
+            text: `Usuário processado com sucesso.`,
             customClass: {
               confirmButton: 'btn btn-success'
             }
           });
         })
         .catch(err => {
-          // Hide offcanvas
-          const offcanvasInstance = bootstrap.Offcanvas.getInstance(offCanvasForm);
-          offcanvasInstance && offcanvasInstance.hide();
-
-          Swal.fire({
-            title: 'Duplicate Entry!',
-            text: 'Your email should be unique.',
-            icon: 'error',
-            customClass: {
-              confirmButton: 'btn btn-success'
-            }
-          });
+          if (err.message) {
+            Swal.fire({
+              title: 'Erro!',
+              text: err.message,
+              icon: 'error',
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            });
+          }
         });
     });
 
@@ -782,40 +799,40 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
   // Phone Number
   function formatBRPhone(digits) {
-  // só números e no máximo 11
-  digits = (digits || '').replace(/\D/g, '').slice(0, 11);
+    // só números e no máximo 11
+    digits = (digits || '').replace(/\D/g, '').slice(0, 11);
 
-  const ddd = digits.slice(0, 2);
-  const part1 = digits.slice(2);
+    const ddd = digits.slice(0, 2);
+    const part1 = digits.slice(2);
 
-  // enquanto digita, vai montando aos poucos
-  let out = '';
-  if (ddd.length) out = `(${ddd}`;
-  if (ddd.length === 2) out += ') ';
+    // enquanto digita, vai montando aos poucos
+    let out = '';
+    if (ddd.length) out = `(${ddd}`;
+    if (ddd.length === 2) out += ') ';
 
-  // 10 dígitos total: (DD) 0000-0000  => part1: 8
-  // 11 dígitos total: (DD) 00000-0000 => part1: 9
-  if (part1.length) {
-    const isMobile = digits.length > 10; // 11 dígitos
-    const firstLen = isMobile ? 5 : 4;
+    // 10 dígitos total: (DD) 0000-0000  => part1: 8
+    // 11 dígitos total: (DD) 00000-0000 => part1: 9
+    if (part1.length) {
+      const isMobile = digits.length > 10; // 11 dígitos
+      const firstLen = isMobile ? 5 : 4;
 
-    const a = part1.slice(0, firstLen);
-    const b = part1.slice(firstLen, firstLen + 4);
+      const a = part1.slice(0, firstLen);
+      const b = part1.slice(firstLen, firstLen + 4);
 
-    out += a;
-    if (b.length) out += `-${b}`;
+      out += a;
+      if (b.length) out += `-${b}`;
+    }
+
+    return out;
   }
 
-  return out;
-}
+  if (phoneMaskList && phoneMaskList.length) {
+    phoneMaskList.forEach(phoneMask => {
+      phoneMask.addEventListener('input', event => {
+        event.target.value = formatBRPhone(event.target.value);
+      });
 
-if (phoneMaskList && phoneMaskList.length) {
-  phoneMaskList.forEach(phoneMask => {
-    phoneMask.addEventListener('input', event => {
-      event.target.value = formatBRPhone(event.target.value);
+
     });
-
-
-  });
-}
+  }
 });

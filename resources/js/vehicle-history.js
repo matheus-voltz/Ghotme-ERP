@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     function loadVehicleData(data) {
         const v = data.full_data;
-        
+
         // Show cards
         vehicleInfoCard.classList.remove('d-none');
         timelineCard.classList.remove('d-none');
         btnAddHistory.disabled = false;
-        
+
         // Fill Info Card
         document.getElementById('info-plate').textContent = v.placa;
         document.getElementById('info-brand-model').textContent = `${v.marca} ${v.modelo}`;
@@ -63,17 +63,17 @@ document.addEventListener('DOMContentLoaded', function (e) {
         document.getElementById('info-chassis').textContent = v.chassi || '-';
         document.getElementById('info-color').textContent = v.cor || '-';
         document.getElementById('info-year').textContent = v.ano_modelo || v.ano_fabricacao || '-';
-        
+
         // Modal Hidden Field
         document.getElementById('modal-vehicle-id').value = v.id;
-        
+
         // Load Timeline
         fetchTimeline(v.id);
     }
 
     function fetchTimeline(vehicleId) {
         vehicleTimeline.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
-        
+
         fetch(baseUrl + 'vehicle-history/timeline/' + vehicleId)
             .then(response => response.json())
             .then(data => {
@@ -90,9 +90,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
         let html = '';
         data.forEach(item => {
             const date = moment(item.date).format('DD/MM/YYYY');
-            const iconClass = item.event_type === 'os_finalizada' ? 'ti-file-check text-success' : 'ti-tool text-primary';
-            const badgeColor = item.event_type === 'os_finalizada' ? 'success' : 'info';
-            const typeLabel = item.event_type === 'os_finalizada' ? 'Ordem de Serviço' : 'Registro Manual';
+            let iconClass = 'ti-tool text-primary';
+            let badgeColor = 'info';
+            let typeLabel = 'Registro Manual';
+
+            if (item.event_type === 'os_finalizada') {
+                iconClass = 'ti-file-check text-success';
+                badgeColor = 'success';
+                typeLabel = 'Ordem de Serviço';
+            } else if (item.event_type === 'entrada_oficina') {
+                iconClass = 'ti-home-check text-warning';
+                badgeColor = 'warning';
+                typeLabel = 'Entrada';
+            }
 
             html += `
                 <div class="timeline-item">
@@ -125,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         formAddHistory.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(formAddHistory);
-            
+
             fetch(baseUrl + 'vehicle-history', {
                 method: 'POST',
                 body: new URLSearchParams(formData),
@@ -134,23 +144,23 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sucesso!',
-                        text: data.message,
-                        customClass: { confirmButton: 'btn btn-success' }
-                    });
-                    $('#modalAddHistory').modal('hide');
-                    formAddHistory.reset();
-                    // Reload timeline and update KM
-                    const vehicleId = document.getElementById('modal-vehicle-id').value;
-                    fetchTimeline(vehicleId);
-                    document.getElementById('info-km').textContent = parseInt(formData.get('km')).toLocaleString() + ' KM';
-                }
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message,
+                            customClass: { confirmButton: 'btn btn-success' }
+                        });
+                        $('#modalAddHistory').modal('hide');
+                        formAddHistory.reset();
+                        // Reload timeline and update KM
+                        const vehicleId = document.getElementById('modal-vehicle-id').value;
+                        fetchTimeline(vehicleId);
+                        document.getElementById('info-km').textContent = parseInt(formData.get('km')).toLocaleString() + ' KM';
+                    }
+                });
         });
     }
 });

@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         let color = 'success';
                         if (qty <= min) color = 'danger';
                         else if (qty <= min * 1.2) color = 'warning';
-                        
+
                         return `<span class="badge bg-label-${color}">${qty}</span>`;
                     }
                 },
@@ -241,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 }
             },
             initComplete: function () {
-                 document.querySelectorAll('.dt-buttons .btn').forEach(btn => {
+                document.querySelectorAll('.dt-buttons .btn').forEach(btn => {
                     btn.classList.remove('btn-secondary');
                 });
             }
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.delete-record')) {
                 const deleteBtn = e.target.closest('.delete-record');
                 const id = deleteBtn.dataset.id;
-                
+
                 Swal.fire({
                     title: 'Você tem certeza?',
                     text: "Você não poderá reverter isso!",
@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.edit-record')) {
                 const editBtn = e.target.closest('.edit-record');
                 const id = editBtn.dataset.id;
-                
+
                 // changing the title of offcanvas
                 document.getElementById('offcanvasAddItemsLabel').innerHTML = 'Editar Item';
 
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
                         const $supplier = $('#add-item-supplier');
                         if ($supplier.length && $supplier.hasClass('select2-hidden-accessible')) {
-                             $supplier.val(data.supplier_id).trigger('change');
+                            $supplier.val(data.supplier_id).trigger('change');
                         }
                     });
             }
@@ -330,17 +330,17 @@ document.addEventListener('DOMContentLoaded', function (e) {
         const addNewBtn = document.querySelector('.add-new');
         if (addNewBtn) {
             addNewBtn.addEventListener('click', function () {
-                document.getElementById('item_id').value = ''; 
+                document.getElementById('item_id').value = '';
                 document.getElementById('offcanvasAddItemsLabel').innerHTML = 'Adicionar Item';
                 document.getElementById('addNewItemsForm').reset();
                 $('#add-item-supplier').val(null).trigger('change');
             });
         }
-        
+
         // Timeout for styles
         setTimeout(() => {
-             // ... same style adjustments ...
-             const elementsToModify = [
+            // ... same style adjustments ...
+            const elementsToModify = [
                 { selector: '.dt-buttons .btn', classToRemove: 'btn-secondary' },
                 { selector: '.dt-search .form-control', classToRemove: 'form-control-sm' },
                 { selector: '.dt-length .form-select', classToRemove: 'form-select-sm', classToAdd: 'ms-0' },
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 { selector: '.dt-buttons', classToAdd: 'd-flex gap-4 mb-md-0 mb-4' }
             ];
-             elementsToModify.forEach(({ selector, classToRemove, classToAdd }) => {
+            elementsToModify.forEach(({ selector, classToRemove, classToAdd }) => {
                 document.querySelectorAll(selector).forEach(element => {
                     if (classToRemove) classToRemove.split(' ').forEach(className => element.classList.remove(className));
                     if (classToAdd) classToAdd.split(' ').forEach(className => element.classList.add(className));
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             const formData = new FormData(addNewItemsForm);
             const formDataObj = {};
             formData.forEach((value, key) => formDataObj[key] = value);
-            
+
             // Determine method (POST or PUT) based on ID existence
             const id = formDataObj['id'];
             const url = id ? `${baseUrl}inventory/items/${id}` : `${baseUrl}inventory/items`;
@@ -405,11 +405,34 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 body: searchParams.toString()
             })
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422 && data.errors) {
+                            // Limpar erros anteriores
+                            addNewItemForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            addNewItemForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                            Object.keys(data.errors).forEach(key => {
+                                const input = addNewItemForm.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+
+                                    if (input.nextElementSibling && input.nextElementSibling.classList.contains('select2-container')) {
+                                        input.nextElementSibling.after(feedback);
+                                    } else {
+                                        input.after(feedback);
+                                    }
+                                }
+                            });
+                            return; // Encerra sem fechar o offcanvas
+                        }
+                        throw new Error(data.message || 'Erro inesperado');
+                    }
+
                     dt_items_table && new DataTable(dt_items_table).draw();
                     const offcanvasInstance = bootstrap.Offcanvas.getInstance(offCanvasForm);
                     offcanvasInstance && offcanvasInstance.hide();
@@ -421,12 +444,14 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     });
                 })
                 .catch(err => {
-                    Swal.fire({
-                        title: 'Erro!',
-                        text: 'Ocorreu um erro ao salvar o item.',
-                        icon: 'error',
-                        customClass: { confirmButton: 'btn btn-success' }
-                    });
+                    if (err.message) {
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: err.message,
+                            icon: 'error',
+                            customClass: { confirmButton: 'btn btn-success' }
+                        });
+                    }
                 });
         });
 

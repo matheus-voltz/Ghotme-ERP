@@ -163,13 +163,43 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
-            }).then(response => response.json()).then(data => {
-                if (data.success) {
+            })
+                .then(async response => {
+                    const data = await response.json();
+                    if (!response.ok) {
+                        if (response.status === 422 && data.errors) {
+                            formService.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            formService.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                            Object.keys(data.errors).forEach(key => {
+                                const input = formService.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+                                    input.after(feedback);
+                                }
+                            });
+                            return;
+                        }
+                        throw new Error(data.message || 'Erro inesperado');
+                    }
+
                     bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
                     new DataTable(dt_table).draw();
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
-                }
-            });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: data.message,
+                        customClass: { confirmButton: 'btn btn-success' }
+                    });
+                })
+                .catch(err => {
+                    if (err.message) {
+                        Swal.fire({ icon: 'error', title: 'Erro!', text: err.message, customClass: { confirmButton: 'btn btn-primary' } });
+                    }
+                });
         });
     }
 });

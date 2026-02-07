@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     targets: 1, render: (data, type, full) => `<span>${full.fake_id}</span>`
                 },
                 {
-                    targets: 2, 
+                    targets: 2,
                     render: (data, type, full) => `<a href="javascript:void(0)" class="fw-bold text-primary view-dossier" data-id="${full.id}">${data}</a>`
                 },
                 {
@@ -66,12 +66,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Dossier Modal
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.view-dossier')) {
                 const id = e.target.closest('.view-dossier').dataset.id;
                 $('#viewDossierModal').modal('show');
                 $('#dossierModalContent').html('<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>');
-                
+
                 fetch(`${baseUrl}vehicles/${id}/dossier`)
                     .then(res => res.text())
                     .then(html => {
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Delete
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.delete-record')) {
                 const id = e.target.closest('.delete-record').dataset.id;
                 Swal.fire({
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Edit
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Editar Veículo';
@@ -135,39 +135,69 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Submit
     if (formVehicle) {
-        formVehicle.addEventListener('submit', function(e) {
+        formVehicle.addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(formVehicle);
-            
+
             fetch(`${baseUrl}vehicles-list`, {
                 method: 'POST',
                 body: formData,
-                headers: { 
+                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                     'Accept': 'application/json'
                 }
             })
-            .then(async res => {
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
-                    location.reload();
-                } else {
-                    let errorMsg = 'Verifique os dados informados.';
-                    if (data.errors) {
-                        errorMsg = '<ul class="text-start">';
-                        Object.keys(data.errors).forEach(key => {
-                            errorMsg += `<li>${data.errors[key][0]}</li>`;
+                .then(async res => {
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message,
+                            customClass: { confirmButton: 'btn btn-primary' },
+                            buttonsStyling: false
+                        }).then(() => {
+                            location.reload();
                         });
-                        errorMsg += '</ul>';
+                    } else {
+                        // Limpar erros anteriores
+                        formVehicle.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                        formVehicle.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(key => {
+                                const input = formVehicle.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+
+                                    // Criar div de erro
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+
+                                    // Inserir após o input (ou após o container do input se for um grupo)
+                                    if (input.closest('.input-group')) {
+                                        input.closest('.input-group').after(feedback);
+                                    } else if (input.classList.contains('select2-hidden-accessible')) {
+                                        // Para Select2
+                                        const select2Container = input.nextElementSibling;
+                                        if (select2Container && select2Container.classList.contains('select2-container')) {
+                                            select2Container.after(feedback);
+                                        }
+                                    } else {
+                                        input.after(feedback);
+                                    }
+                                }
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Erro!', text: data.message || 'Erro inesperado' });
+                        }
                     }
-                    Swal.fire({ icon: 'error', title: 'Erro de Validação', html: errorMsg });
-                }
-            })
-            .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
-            });
+                })
+                .catch(err => {
+                    Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
+                });
         });
     }
 });
