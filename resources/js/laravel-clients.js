@@ -132,7 +132,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasAddClientsLabel').innerHTML = 'Editar Cliente';
-                formClient.reset(); // Clear before loading
+                formClient.reset(); 
+                
                 fetch(`${baseUrl}clients-list/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
@@ -157,8 +158,27 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.querySelector('[name="cidade"]').value = data.cidade || '';
                         document.querySelector('[name="estado"]').value = data.estado || '';
                         
-                        // Hide vehicle section on edit for now to avoid confusion
-                        document.querySelector('.ti-car').closest('div').classList.add('d-none');
+                        // Mostrar veículos existentes
+                        const existingSection = document.getElementById('existingVehiclesSection');
+                        const listContainer = document.getElementById('existingVehiclesList');
+                        const vehicleTitle = document.getElementById('vehicleFormTitle');
+                        
+                        if (data.vehicles && data.vehicles.length > 0) {
+                            existingSection.classList.remove('d-none');
+                            listContainer.innerHTML = data.vehicles.map(v => `
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-2">
+                                    <div>
+                                        <span class="fw-bold text-primary">${v.placa}</span> - 
+                                        <small>${v.marca} ${v.modelo}</small>
+                                    </div>
+                                    <a href="/vehicles" class="btn btn-sm btn-label-secondary btn-icon"><i class="ti tabler-external-link"></i></a>
+                                </div>
+                            `).join('');
+                            vehicleTitle.innerHTML = '<i class="ti tabler-plus me-1"></i> Adicionar Mais um Veículo';
+                        } else {
+                            existingSection.classList.add('d-none');
+                            vehicleTitle.innerHTML = '<i class="ti tabler-car me-1"></i> Dados do Veículo (Opcional)';
+                        }
                     });
             }
         });
@@ -171,7 +191,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formClient.reset();
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
-                document.querySelector('.ti-car').closest('div').classList.remove('d-none');
+                document.getElementById('existingVehiclesSection').classList.add('d-none');
+                document.getElementById('vehicleFormTitle').innerHTML = '<i class="ti tabler-car me-1"></i> Dados do Veículo (Opcional)';
             });
         }
     }

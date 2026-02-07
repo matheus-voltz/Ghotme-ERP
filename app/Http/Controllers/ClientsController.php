@@ -144,7 +144,7 @@ class ClientsController extends Controller
      */
     public function edit($id)
     {
-        $client = Clients::findOrFail($id);
+        $client = Clients::with('vehicles')->findOrFail($id);
         return response()->json($client);
     }
 

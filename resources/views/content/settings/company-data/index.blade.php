@@ -52,7 +52,7 @@
           <div class="row">
             <div class="col-md-2 mb-4">
               <label class="form-label">CEP</label>
-              <input type="text" name="zip_code" class="form-control" value="{{ $settings->zip_code }}" placeholder="00000-000" />
+              <input type="text" name="zip_code" class="form-control cep-lookup" value="{{ $settings->zip_code }}" placeholder="00000-000" />
             </div>
             <div class="col-md-8 mb-4">
               <label class="form-label">Logradouro (Rua/Av)</label>
@@ -100,6 +100,10 @@
     </div>
   </div>
 </div>
+
+@section('page-script')
+@vite(['resources/js/cep-lookup.js'])
+@endsection
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

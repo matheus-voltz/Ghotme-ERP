@@ -28,7 +28,7 @@
 @endsection
 
 @section('page-script')
-@vite(['resources/js/laravel-clients.js'])
+@vite(['resources/js/laravel-clients.js', 'resources/js/cep-lookup.js'])
 @endsection
 
 @section('content')
@@ -121,7 +121,7 @@
         <div class="row">
             <div class="col-md-4 mb-4">
                 <label class="form-label">CEP</label>
-                <input type="text" name="cep" class="form-control cep-mask" placeholder="00000-000" />
+                <input type="text" name="cep" class="form-control cep-mask cep-lookup" placeholder="00000-000" />
             </div>
             <div class="col-md-8 mb-4">
                 <label class="form-label">Rua</label>
@@ -146,7 +146,14 @@
         </div>
 
         <hr class="my-4">
-        <h6 class="mb-4"><i class="ti tabler-car me-1"></i> Dados do Veículo (Opcional)</h6>
+        <div id="existingVehiclesSection" class="mb-4 d-none">
+            <h6 class="mb-2"><i class="ti tabler-car-garage me-1"></i> Veículos do Cliente</h6>
+            <div id="existingVehiclesList" class="list-group list-group-flush mb-3 border rounded">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+
+        <h6 class="mb-4" id="vehicleFormTitle"><i class="ti tabler-car me-1"></i> Adicionar Veículo</h6>
         <div class="row">
             <div class="col-md-6 mb-4">
                 <label class="form-label text-primary">Placa</label>
