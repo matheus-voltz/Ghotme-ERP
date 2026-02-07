@@ -1,4 +1,4 @@
-@extends('layouts/layoutMaster')
+@extends($layout)
 
 @section('title', 'Detalhes do Checklist')
 
@@ -16,12 +16,21 @@
 @endsection
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
-  @php
-  $isPublic = request()->has('token');
-  @endphp
+<style>
+  @if($isPublic) .layout-menu, .template-customizer-open-btn {
+    display: none !important;
+  }
 
-  @if(!$isPublic && auth()->check())
+  .layout-page {
+    padding-left: 0 !important;
+  }
+
+  @endif
+</style>
+
+<div class="container-xxl flex-grow-1 container-p-y">
+
+  @if(!$isPublic && Auth::check())
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Detalhes do Checklist</h4>
     <a href="{{ route('ordens-servico.checklist') }}" class="btn btn-label-secondary">

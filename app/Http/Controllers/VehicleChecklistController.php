@@ -89,38 +89,33 @@ class VehicleChecklistController extends Controller
         }
     }
 
-    public function show($id, Request $request = null)
+    public function show(Request $request, $id)
     {
-        $token = $request ? $request->query('token') : null;
+        $token = $request->query('token');
 
         $query = VehicleInspection::withoutGlobalScope('company')
             ->with(['veiculo.client', 'user', 'items.checklistItem', 'company']);
 
         if ($token) {
             $inspection = $query->where('token', $token)->firstOrFail();
-
-            // Configurações para página pública totalmente limpa
-            $pageConfigs = [
-                'myLayout' => 'blank',
-                'hasCustomizer' => false,
-                'displayCustomizer' => false
-            ];
-
             return view('content.pages.ordens-servico.checklist-show', [
                 'inspection' => $inspection,
-                'pageConfigs' => $pageConfigs,
-                'customizerHidden' => 'customizer-hide'
+                'isPublic' => true,
+                'layout' => 'layouts/blankLayout'
             ]);
         }
 
-        // Se não houver token, exige login e usa layout padrão
         if (!Auth::check()) {
             abort(403, 'Acesso negado. Token de segurança necessário.');
         }
 
         $inspection = $query->findOrFail($id);
 
-        return view('content.pages.ordens-servico.checklist-show', compact('inspection'));
+        return view('content.pages.ordens-servico.checklist-show', [
+            'inspection' => $inspection,
+            'isPublic' => false,
+            'layout' => 'layouts/layoutMaster'
+        ]);
     }
 
     public function sendEmail($id)
