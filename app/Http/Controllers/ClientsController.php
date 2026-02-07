@@ -108,9 +108,13 @@ class ClientsController extends Controller
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
             // Veículo
-            'veiculo_placa' => 'nullable|string|max:10',
-            'veiculo_marca' => 'nullable|string|max:50',
-            'veiculo_modelo' => 'nullable|string|max:80',
+            'veiculo_placa' => 'nullable|string|max:10|unique:veiculos,placa',
+            'veiculo_marca' => 'required_with:veiculo_placa|nullable|string|max:50',
+            'veiculo_modelo' => 'required_with:veiculo_placa|nullable|string|max:80',
+        ], [
+            'veiculo_placa.unique' => 'Esta placa já está cadastrada no sistema.',
+            'veiculo_marca.required_with' => 'Informe a marca do veículo.',
+            'veiculo_modelo.required_with' => 'Informe o modelo do veículo.'
         ]);
 
         return DB::transaction(function() use ($request, $validated) {
@@ -122,6 +126,7 @@ class ClientsController extends Controller
                     'placa' => strtoupper($request->veiculo_placa),
                     'marca' => $request->veiculo_marca,
                     'modelo' => $request->veiculo_modelo,
+                    'company_id' => auth()->user()->company_id // Garante o vínculo
                 ]);
             }
 

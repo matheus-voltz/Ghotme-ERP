@@ -170,4 +170,19 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Visualizar Dados do Cliente -->
+<div class="modal fade" id="viewClientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Dados Completos do Cliente</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="clientModalContent">
+        <div class="text-center p-4"><div class="spinner-border text-primary"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection

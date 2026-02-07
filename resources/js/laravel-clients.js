@@ -1,5 +1,5 @@
 /**
- * Professional Clients Management
+ * Professional Clients Management with Vehicle support
  */
 
 'use strict';
@@ -40,10 +40,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             ],
             columnDefs: [
                 {
-                    className: 'control',
-                    orderable: false,
-                    targets: 0,
-                    render: () => ''
+                    className: 'control', orderable: false, targets: 0, render: () => ''
                 },
                 {
                     targets: 2,
@@ -71,23 +68,34 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     render: (data, type, full) => {
                         const whatsappLink = full.whatsapp ? `https://api.whatsapp.com/send?phone=55${full.whatsapp.replace(/\D/g, '')}` : '#';
                         const whatsappBtn = full.whatsapp 
-                            ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success"><i class="ti tabler-brand-whatsapp"></i></a>` 
+                            ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></a>` 
                             : '';
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
                             whatsappBtn +
-                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddClients"><i class="ti tabler-edit"></i></button>` +
-                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}"><i class="ti tabler-trash"></i></button>` +
+                            `<button class="btn btn-sm btn-icon view-record" data-id="${full.id}"><i class="ti tabler-eye"></i></button>` +
+                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddClients" title="Editar"><i class="ti tabler-edit"></i></button>` +
+                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="Excluir"><i class="ti tabler-trash"></i></button>` +
                             '</div>'
                         );
                     }
                 }
             ],
-            order: [[1, 'desc']],
-            layout: {
-                topEnd: {
-                    features: [{ search: { placeholder: 'Buscar cliente...' } }]
-                }
+            order: [[1, 'desc']]
+        });
+
+        // View Record Modal
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.view-record')) {
+                const id = e.target.closest('.view-record').dataset.id;
+                $('#viewClientModal').modal('show');
+                $('#clientModalContent').html('<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>');
+                
+                fetch(`${baseUrl}clients/${id}/quick-view`)
+                    .then(res => res.text())
+                    .then(html => {
+                        $('#clientModalContent').html(html);
+                    });
             }
         });
 
@@ -101,14 +109,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Sim, excluir',
-                    customClass: { confirmButton: 'btn btn-primary me-3', cancelButton: 'btn btn-label-secondary' },
+                    customClass: { confirmButton: 'btn btn-danger me-3', cancelButton: 'btn btn-label-secondary' },
                     buttonsStyling: false
                 }).then(result => {
-                    if (result.value) {
+                    if (result.isConfirmed) {
                         fetch(`${baseUrl}clients-list/${id}`, {
                             method: 'DELETE',
                             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-                        }).then(() => dt_clients.draw());
+                        }).then(res => res.json()).then(data => {
+                            if (data.success) {
+                                Swal.fire({ icon: 'success', title: 'Excluído!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
+                                dt_clients.ajax.reload();
+                            }
+                        });
                     }
                 });
             }
@@ -119,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasAddClientsLabel').innerHTML = 'Editar Cliente';
+                formClient.reset(); // Clear before loading
                 fetch(`${baseUrl}clients-list/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
@@ -126,13 +140,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         if (data.type === 'PF') {
                             document.getElementById('typePF').checked = true;
                             sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
-                            document.querySelector('[name="name"]').value = data.name;
-                            document.querySelector('[name="cpf"]').value = data.cpf;
+                            document.querySelector('[name="name"]').value = data.name || '';
+                            document.querySelector('[name="cpf"]').value = data.cpf || '';
                         } else {
                             document.getElementById('typePJ').checked = true;
                             sectionPF.classList.add('d-none'); sectionPJ.classList.remove('d-none');
-                            document.querySelector('[name="company_name"]').value = data.company_name;
-                            document.querySelector('[name="cnpj"]').value = data.cnpj;
+                            document.querySelector('[name="company_name"]').value = data.company_name || '';
+                            document.querySelector('[name="cnpj"]').value = data.cnpj || '';
                         }
                         document.querySelector('[name="email"]').value = data.email || '';
                         document.querySelector('[name="whatsapp"]').value = data.whatsapp || '';
@@ -142,6 +156,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.querySelector('[name="bairro"]').value = data.bairro || '';
                         document.querySelector('[name="cidade"]').value = data.cidade || '';
                         document.querySelector('[name="estado"]').value = data.estado || '';
+                        
+                        // Hide vehicle section on edit for now to avoid confusion
+                        document.querySelector('.ti-car').closest('div').classList.add('d-none');
                     });
             }
         });
@@ -154,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formClient.reset();
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
+                document.querySelector('.ti-car').closest('div').classList.remove('d-none');
             });
         }
     }
@@ -166,18 +184,35 @@ document.addEventListener('DOMContentLoaded', function (e) {
             const url = id ? `${baseUrl}clients-list/${id}` : `${baseUrl}clients-list`;
             const method = id ? 'PUT' : 'POST';
 
+            // Use FormData directly for reliable field capturing
+            const formData = new FormData(formClient);
+            if (id) formData.append('_method', 'PUT');
+
             fetch(url, {
-                method: method,
-                body: new URLSearchParams(new FormData(formClient)),
+                method: 'POST', // Always POST for Laravel when sending files/formdata, with _method override
+                body: formData,
                 headers: { 
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Accept': 'application/json'
                 }
-            }).then(res => res.json()).then(data => {
-                if (data.success) {
+            })
+            .then(async res => {
+                const data = await res.json();
+                if (res.ok && data.success) {
                     bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
-                    location.reload(); // Reload to simplify for now
+                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
+                    location.reload();
+                } else {
+                    // Tratar erros de validação
+                    let errorMsg = 'Verifique os dados informados.';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join('<br>');
+                    }
+                    Swal.fire({ icon: 'error', title: 'Erro de Validação', html: errorMsg });
                 }
+            })
+            .catch(err => {
+                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
             });
         });
     }
