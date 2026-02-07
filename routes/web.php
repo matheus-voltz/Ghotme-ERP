@@ -86,6 +86,7 @@ Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-
 
 // Public Budget Approval
 Route::get('/view-budget/{uuid}', [PublicBudgetController::class, 'show'])->name('public.budget.show');
+Route::get('/view-budget/{uuid}/checkout', [PublicBudgetController::class, 'checkout'])->name('public.budget.checkout');
 Route::post('/view-budget/{uuid}/approve', [PublicBudgetController::class, 'approve'])->name('public.budget.approve');
 Route::post('/view-budget/{uuid}/reject', [PublicBudgetController::class, 'reject'])->name('public.budget.reject');
 
@@ -217,7 +218,9 @@ Route::middleware([
     Route::get('/reports/consumed-stock', [ReportController::class, 'consumedStock'])->name('reports.consumed-stock');
     Route::get('/reports/revenue', [ReportController::class, 'revenue'])->name('reports.revenue');
     Route::get('/reports/mechanic-performance', [ReportController::class, 'mechanicPerformance'])->name('reports.mechanic-performance');
+    Route::get('/reports/cost-per-service', [ReportController::class, 'costPerService'])->name('reports.cost-per-service');
     Route::get('/reports/average-time', [ReportController::class, 'averageTime'])->name('reports.average-time');
+    Route::get('/reports/average-time-per-service', [ReportController::class, 'averageTimePerService'])->name('reports.average-time-per-service');
 
     // Settings
     Route::get('/settings/company-data', [CompanySettingController::class, 'index'])->name('settings.company-data');

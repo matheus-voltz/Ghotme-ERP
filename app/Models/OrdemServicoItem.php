@@ -12,4 +12,9 @@ class OrdemServicoItem extends Model
     {
         return $this->belongsTo(Service::class);
     }
+
+    public function ordemServico()
+    {
+        return $this->belongsTo(OrdemServico::class);
+    }
 }

@@ -4,59 +4,133 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('page-script')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dt_table = document.querySelector('.datatables-methods');
-    if (dt_table) {
-        const dt = new DataTable(dt_table, {
-            ajax: baseUrl + 'finance/payment-methods-list',
-            columns: [
-                { data: 'id' },
-                { data: 'name' },
-                { data: 'type' },
-                { data: 'is_active' },
-                { data: 'id' }
-            ],
-            columnDefs: [
-                {
-                    targets: 3,
-                    render: (data) => data ? '<span class="badge bg-success">Ativo</span>' : '<span class="badge bg-danger">Inativo</span>'
-                },
-                {
-                    targets: 4,
-                    render: (data) => `<button class="btn btn-sm btn-icon delete-record" data-id="${data}"><i class="ti tabler-trash"></i></button>`
-                }
-            ]
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        const dt_table = document.querySelector('.datatables-methods');
+        if (dt_table) {
+            const dt = new DataTable(dt_table, {
+                ajax: baseUrl + 'finance/payment-methods-list',
+                columns: [{
+                        data: 'id'
+                    },
+                    {
+                        data: 'name'
+                    },
+                    {
+                        data: 'type'
+                    },
+                    {
+                        data: 'is_active'
+                    },
+                    {
+                        data: 'id'
+                    }
+                ],
+                columnDefs: [{
+                        targets: 3,
+                        render: (data) => data ? '<span class="badge bg-success">Ativo</span>' : '<span class="badge bg-danger">Inativo</span>'
+                    },
+                    {
+                        targets: 4,
+                        render: (data) => `<button class="btn btn-sm btn-icon delete-record" data-id="${data}"><i class="ti tabler-trash"></i></button>`
+                    }
+                ]
+            });
 
-        document.addEventListener('submit', function(e) {
-            if (e.target.id === 'formMethod') {
-                e.preventDefault();
-                fetch("{{ route('finance.payment-methods.store') }}", {
-                    method: 'POST',
-                    body: new URLSearchParams(new FormData(e.target)),
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-                }).then(() => {
-                    bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMethod')).hide();
-                    dt.ajax.reload();
-                });
-            }
-        });
-    }
-});
+            document.addEventListener('submit', function(e) {
+                if (e.target.id === 'formMethod') {
+                    e.preventDefault();
+                    // Send Request
+                    fetch("{{ route('finance.payment-methods.store') }}", {
+                            method: 'POST',
+                            body: new FormData(e.target),
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMethod'));
+                            offcanvas.hide();
+                            e.target.reset(); // Clear form
+                            dt.ajax.reload();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: 'Forma de pagamento salva.',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        })
+                        .catch(err => Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: 'Algo deu errado.'
+                        }));
+                }
+            });
+
+            // Delete Listener
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.delete-record');
+                if (btn) {
+                    const id = btn.getAttribute('data-id');
+                    Swal.fire({
+                        title: 'Tem certeza?',
+                        text: "Não será possível reverter isso!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sim, excluir!',
+                        cancelButtonText: 'Cancelar',
+                        customClass: {
+                            confirmButton: 'btn btn-primary me-3',
+                            cancelButton: 'btn btn-label-secondary'
+                        },
+                        buttonsStyling: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`${baseUrl}finance/payment-methods/${id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                                }
+                            }).then(response => {
+                                if (response.ok) {
+                                    dt.ajax.reload();
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Excluído!',
+                                        text: 'Registro apagado.',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Erro!',
+                                        text: 'Não foi possível excluir.'
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
 </script>
 @endsection
 

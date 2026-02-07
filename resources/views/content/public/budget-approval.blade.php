@@ -1,8 +1,9 @@
 @php
+$configData = Helper::appClasses();
 $customizerHidden = 'customizer-hide';
 @endphp
 
-@extends('layouts/layoutPublic')
+@extends('layouts/commonMaster')
 
 @section('title', 'Aprovação de Orçamento')
 
@@ -30,13 +31,20 @@ $customizerHidden = 'customizer-hide';
         background: linear-gradient(135deg, #7367f0 0%, #4831d4 100%);
         padding: 4rem 0 6rem;
         color: white;
-        border-radius: 0 0 3rem 3rem;
         text-align: center;
+        border-radius: 0 0 3rem 3rem;
         box-shadow: 0 10px 40px rgba(115, 103, 240, 0.15);
+        position: relative;
+        z-index: 1;
+    }
+
+    .detail-container {
+        margin-top: -4rem;
+        position: relative;
+        z-index: 2;
     }
 
     .detail-card {
-        margin-top: -4rem;
         border: none;
         border-radius: 2rem;
         box-shadow: 0 15px 50px rgba(0, 0, 0, 0.05);
@@ -116,26 +124,27 @@ $customizerHidden = 'customizer-hide';
 </style>
 @endsection
 
-@section('content')
-<div class="container py-4">
-    <div class="mb-4 d-flex justify-content-between align-items-center animate-up">
-        <a href="{{ route('customer.portal.index', $budget->client->uuid) }}" class="btn btn-label-secondary rounded-pill">
-            <i class="ti tabler-arrow-left me-2"></i> Voltar ao Portal
-        </a>
-        <span class="badge bg-label-primary px-3 py-2 rounded-pill">Orçamento Digital</span>
-    </div>
+@section('layoutContent')
 
-    <!-- Header -->
-    <div class="budget-header animate-up" style="animation-delay: 0.1s">
-        <div class="container">
-            @if($budget->company->logo_path)
-            <img src="{{ asset('storage/' . $budget->company->logo_path) }}" alt="Logo" class="mb-4 bg-white p-2 rounded-3" style="max-height: 70px;">
-            @endif
-            <h1 class="text-white fw-bold mb-2">Orçamento #{{ $budget->id }}</h1>
-            <p class="text-white opacity-75 fs-5">{{ $budget->company->name }}</p>
+<!-- Header -->
+<div class="budget-header w-100 animate-up" style="animation-delay: 0.1s">
+    <div class="container">
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a href="{{ route('customer.portal.index', $budget->client->uuid) }}" class="btn bg-white text-primary rounded-pill shadow-sm border-0">
+                <i class="ti tabler-arrow-left me-2"></i> Voltar ao Portal
+            </a>
+            <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">Orçamento Digital</span>
         </div>
-    </div>
 
+        @if($budget->company->logo_path)
+        <img src="{{ asset('storage/' . $budget->company->logo_path) }}" alt="Logo" class="mb-4 bg-white p-2 rounded-3 shadow-sm" style="max-height: 70px;">
+        @endif
+        <h1 class="text-white fw-bold mb-2">Orçamento #{{ $budget->id }}</h1>
+        <p class="text-white opacity-75 fs-5">{{ $budget->company->name }}</p>
+    </div>
+</div>
+
+<div class="container detail-container pb-5">
     <!-- Conteúdo do Orçamento -->
     <div class="detail-card animate-up" style="animation-delay: 0.2s">
         <div class="card-body p-4 p-lg-5">
@@ -200,21 +209,21 @@ $customizerHidden = 'customizer-hide';
             <!-- Área de Ação -->
             <div class="mt-5 pt-4 border-top">
                 @if($budget->status == 'pending')
-                <form action="{{ route('public.budget.approve', $budget->uuid) }}" method="POST" id="approvalForm">
+                <form action="{{ route('public.budget.approve', $budget->uuid) }}" method="POST" id="approvalForm" onsubmit="return handleApproval(event)">
                     @csrf
                     <div class="row g-4 mb-5">
                         <div class="col-12 text-center">
                             <h5 class="fw-bold mb-4">Deseja realizar o pagamento antecipado?</h5>
                         </div>
                         <div class="col-md-6">
-                            <input type="radio" name="early_payment" value="1" id="early_yes" class="payment-option-input d-none" checked>
+                            <input type="radio" name="early_payment" value="1" id="early_yes" class="payment-option-input d-none" checked onchange="updateButtonText()">
                             <label for="early_yes" class="payment-option-card w-100 h-100">
                                 <h6 class="fw-bold mb-2">Sim, antecipado</h6>
                                 <p class="text-muted small mb-0">Agilize a liberação das peças e a entrega do seu veículo.</p>
                             </label>
                         </div>
                         <div class="col-md-6">
-                            <input type="radio" name="early_payment" value="0" id="early_no" class="payment-option-input d-none">
+                            <input type="radio" name="early_payment" value="0" id="early_no" class="payment-option-input d-none" onchange="updateButtonText()">
                             <label for="early_no" class="payment-option-card w-100 h-100">
                                 <h6 class="fw-bold mb-2">Não, pagar na retirada</h6>
                                 <p class="text-muted small mb-0">O pagamento será realizado integralmente no momento da entrega.</p>
@@ -226,11 +235,40 @@ $customizerHidden = 'customizer-hide';
                         <button type="button" class="btn btn-outline-danger btn-lg px-5 rounded-pill" data-bs-toggle="modal" data-bs-target="#rejectModal">
                             Rejeitar Orçamento
                         </button>
-                        <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg">
-                            Aprovar Orçamento Agora <i class="ti tabler-check ms-2"></i>
+                        <button type="submit" id="btnApprove" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg">
+                            Pagar Agora e Aprovar <i class="ti tabler-credit-card ms-2"></i>
                         </button>
                     </div>
                 </form>
+
+                <script>
+                    function updateButtonText() {
+                        const isEarly = document.getElementById('early_yes').checked;
+                        const btn = document.getElementById('btnApprove');
+                        if (isEarly) {
+                            btn.innerHTML = 'Pagar Agora e Aprovar <i class="ti tabler-credit-card ms-2"></i>';
+                            btn.classList.add('btn-success');
+                            btn.classList.remove('btn-primary');
+                        } else {
+                            btn.innerHTML = 'Aprovar Orçamento <i class="ti tabler-check ms-2"></i>';
+                            btn.classList.add('btn-primary');
+                            btn.classList.remove('btn-success');
+                        }
+                    }
+
+                    function handleApproval(e) {
+                        const isEarly = document.getElementById('early_yes').checked;
+                        if (isEarly) {
+                            e.preventDefault();
+                            window.location.href = "{{ route('public.budget.checkout', $budget->uuid) }}";
+                            return false;
+                        }
+                        return true;
+                    }
+
+                    // Run on load
+                    document.addEventListener('DOMContentLoaded', updateButtonText);
+                </script>
                 @elseif($budget->status == 'approved')
                 <div class="text-center py-5">
                     <div class="avatar avatar-xl bg-label-success m-auto mb-4 rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
@@ -284,4 +322,5 @@ $customizerHidden = 'customizer-hide';
 <a href="https://wa.me/{{ preg_replace('/\D/', '', $budget->company->phone ?? '') }}" target="_blank" class="whatsapp-fab">
     <i class="ti tabler-brand-whatsapp"></i>
 </a>
+
 @endsection

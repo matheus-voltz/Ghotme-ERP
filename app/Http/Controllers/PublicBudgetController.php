@@ -22,6 +22,25 @@ class PublicBudgetController extends Controller
         return view('content.public.budget-approval', compact('budget'));
     }
 
+    public function checkout($uuid)
+    {
+        $budget = Budget::withoutGlobalScope('company')
+            ->with(['company'])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
+
+        // Check if already approved/rejected
+        if ($budget->status !== 'pending') {
+            return redirect()->route('public.budget.show', $uuid)->with('info', 'Este orçamento já foi processado.');
+        }
+
+        $paymentMethods = \App\Models\PaymentMethod::where('company_id', $budget->company_id)
+            ->where('is_active', true)
+            ->get();
+
+        return view('content.public.budget-checkout', compact('budget', 'paymentMethods'));
+    }
+
     public function approve(Request $request, $uuid)
     {
         $budget = Budget::withoutGlobalScope('company')
