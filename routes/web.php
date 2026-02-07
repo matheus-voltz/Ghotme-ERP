@@ -33,6 +33,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\VehicleChecklistController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\PublicBudgetController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -79,6 +80,11 @@ Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-e
 // authentication
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
+
+// Public Budget Approval
+Route::get('/view-budget/{uuid}', [PublicBudgetController::class, 'show'])->name('public.budget.show');
+Route::post('/view-budget/{uuid}/approve', [PublicBudgetController::class, 'approve'])->name('public.budget.approve');
+Route::post('/view-budget/{uuid}/reject', [PublicBudgetController::class, 'reject'])->name('public.budget.reject');
 
 Route::middleware([
     'auth:sanctum',

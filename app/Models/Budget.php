@@ -7,20 +7,35 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Traits\BelongsToCompany;
 
+use Illuminate\Support\Str;
+
 class Budget extends Model
 {
     use BelongsToCompany;
 
     protected $fillable = [
         'company_id',
+        'uuid',
         'client_id',
         'veiculo_id',
         'user_id',
         'status',
         'valid_until',
         'description',
-        'notes'
+        'notes',
+        'approved_at',
+        'rejected_at',
+        'approval_ip',
+        'rejection_reason'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($model) {
+            $model->uuid = (string) Str::uuid();
+        });
+    }
 
     protected $casts = [
         'valid_until' => 'date',
