@@ -1,98 +1,114 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Clients')
-@section('content')
-
+@section('title', 'Veículos')
 
 @section('vendor-style')
-@vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
-'resources/assets/vendor/libs/select2/select2.scss',
-'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-'resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
+@vite([
+  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+  'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
+  'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
+  'resources/assets/vendor/libs/select2/select2.scss',
+  'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+  'resources/assets/vendor/libs/animate-css/animate.scss', 
+  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+])
 @endsection
 
-<!-- Vendor Scripts -->
 @section('vendor-script')
-@vite(['resources/assets/vendor/libs/moment/moment.js',
-'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-'resources/assets/vendor/libs/select2/select2.js', 'resources/assets/vendor/libs/@form-validation/popular.js',
-'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
-'resources/assets/vendor/libs/@form-validation/auto-focus.js', 'resources/assets/vendor/libs/cleave-zen/cleave-zen.js',
-'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
+@vite([
+  'resources/assets/vendor/libs/moment/moment.js',
+  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+  'resources/assets/vendor/libs/select2/select2.js', 
+  'resources/assets/vendor/libs/@form-validation/popular.js',
+  'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
+  'resources/assets/vendor/libs/@form-validation/auto-focus.js', 
+  'resources/assets/vendor/libs/cleave-zen/cleave-zen.js',
+  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+])
 @endsection
 
 @section('page-script')
 @vite(['resources/js/laravel-vehicles.js'])
 @endsection
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddVehicles" aria-labelledby="offcanvasAddVehiclesLabel">
-  <div class="offcanvas-header">
-    <h5 id="offcanvasAddVehiclesLabel" class="offcanvas-title">Add Vehicle</h5>
-    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-  </div>
-  <div class="offcanvas-body mx-0 flex-grow-0">
-    <form class="add-new-clients pt-0" id="addNewClientsForm">
-      ...
-      ...
-    </form>
-  </div>
-</div>
+
+@section('content')
 <div class="card">
-  <div class="card-header border-bottom">
+  <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Gestão de Veículos</h5>
+    <button class="btn btn-primary add-new" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddVehicles">
+        <i class="ti tabler-plus me-1"></i> Adicionar Veículo
+    </button>
   </div>
-  <div class="card-datatable">
+  <div class="card-datatable table-responsive">
     <table class="datatables-vehicles table border-top">
       <thead>
         <tr>
           <th></th>
-          <th>Id</th>
+          <th>ID</th>
           <th>Placa</th>
-          <th>Renavam</th>
           <th>Marca</th>
           <th>Modelo</th>
-          <th>Ano Fabricacao</th>
+          <th>Cliente</th>
           <th>Ativo</th>
           <th>Ações</th>
         </tr>
       </thead>
     </table>
   </div>
-  <!-- Offcanvas to add new client -->
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddVehicles" aria-labelledby="offcanvasAddVehiclesLabel">
+
+  <!-- Offcanvas to add new vehicle -->
+  <div class="offcanvas offcanvas-end" style="width: 500px !important;" tabindex="-1" id="offcanvasAddVehicles" aria-labelledby="offcanvasAddVehiclesLabel">
     <div class="offcanvas-header border-bottom">
-      <h5 id="offcanvasAddVehiclesLabel" class="offcanvas-title">Adicionar Veículo</h5>
+      <h5 id="offcanvasAddVehiclesLabel" class="offcanvas-title">Cadastrar Veículo</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
       <form class="add-new-vehicles pt-0" id="addNewVehiclesForm">
         @csrf
         <input type="hidden" name="id" id="vehicle_id">
-        <div class="mb-6 form-control-validation">
+        
+        <div class="mb-6">
+          <label class="form-label" for="vehicle-cliente">Cliente</label>
+          <select id="vehicle-cliente" name="cliente_id" class="select2 form-select" required>
+            <option value="">Selecione o Cliente</option>
+            @foreach(\App\Models\Clients::orderBy('name')->get() as $client)
+                <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="mb-6">
           <label class="form-label" for="add-vehicle-placa">Placa</label>
-          <input type="text" class="form-control" id="add-vehicle-placa" placeholder="ABC-1234" name="placa"
-            aria-label="Placa" />
+          <input type="text" class="form-control" id="add-vehicle-placa" placeholder="ABC-1234" name="placa" required />
         </div>
-        <div class="mb-6 form-control-validation">
-          <label class="form-label" for="add-vehicle-renavam">Renavam</label>
-          <input type="text" id="add-vehicle-renavam" class="form-control" placeholder="12345678901"
-            aria-label="Renavam" name="renavan" />
+
+        <div class="row">
+            <div class="col-md-6 mb-6">
+              <label class="form-label">Marca</label>
+              <input type="text" name="marca" class="form-control" placeholder="Ex: Toyota" required />
+            </div>
+            <div class="col-md-6 mb-6">
+              <label class="form-label">Modelo</label>
+              <input type="text" name="modelo" class="form-control" placeholder="Ex: Corolla" required />
+            </div>
         </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-6">
+              <label class="form-label">Ano Fabricação</label>
+              <input type="number" name="ano_fabricacao" class="form-control" placeholder="2022" />
+            </div>
+            <div class="col-md-6 mb-6">
+              <label class="form-label">Ano Modelo</label>
+              <input type="number" name="ano_modelo" class="form-control" placeholder="2022" />
+            </div>
+        </div>
+
         <div class="mb-6">
-          <label class="form-label" for="add-vehicle-marca">Marca</label>
-          <input type="text" id="add-vehicle-marca" class="form-control" placeholder="Toyota" aria-label="Marca"
-            name="marca" />
+          <label class="form-label">Renavam</label>
+          <input type="text" name="renavan" class="form-control" placeholder="Opcional" />
         </div>
-        <div class="mb-6">
-          <label class="form-label" for="add-vehicle-modelo">Modelo</label>
-          <input type="text" id="add-vehicle-modelo" class="form-control" placeholder="Corolla" aria-label="Modelo"
-            name="modelo" />
-        </div>
-        <div class="mb-6">
-          <label class="form-label" for="add-vehicle-ano-fabricacao">Ano Fabricação</label>
-          <input type="text" id="add-vehicle-ano-fabricacao" class="form-control" placeholder="2022" aria-label="Ano Fabricação"
-            name="ano_fabricacao" />
-        </div>
+
         <div class="mb-6">
           <label class="form-label" for="vehicle-status">Ativo</label>
           <select id="vehicle-status" class="form-select" name="ativo">
@@ -100,11 +116,13 @@
             <option value="0">Não</option>
           </select>
         </div>
-        <button type="submit" class="btn btn-primary me-3 data-submit">Enviar</button>
-        <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancelar</button>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary me-3 data-submit">Salvar Veículo</button>
+            <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancelar</button>
+        </div>
       </form>
     </div>
   </div>
 </div>
-
 @endsection

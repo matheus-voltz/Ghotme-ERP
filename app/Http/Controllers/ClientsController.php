@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Clients;
+use App\Models\Vehicles;
 use Illuminate\Support\Facades\DB;
 
 class ClientsController extends Controller
@@ -32,9 +33,9 @@ class ClientsController extends Controller
             1 => 'id', 
             2 => 'type', 
             3 => 'name', 
-            4 => 'cpf', // document mapping
+            4 => 'cpf', 
             5 => 'email', 
-            6 => 'id', // vehicles_count (sorting on count is complex, using id for now)
+            6 => 'id', 
             7 => 'id'
         ];
         $orderColumnIndex = $request->input('order.0.column');
@@ -106,11 +107,26 @@ class ClientsController extends Controller
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
+            // Veículo
+            'veiculo_placa' => 'nullable|string|max:10',
+            'veiculo_marca' => 'nullable|string|max:50',
+            'veiculo_modelo' => 'nullable|string|max:80',
         ]);
 
-        $client = Clients::create($validated);
+        return DB::transaction(function() use ($request, $validated) {
+            $client = Clients::create($validated);
 
-        return response()->json(['success' => true, 'message' => 'Cliente cadastrado com sucesso!']);
+            if ($request->filled('veiculo_placa')) {
+                Vehicles::create([
+                    'cliente_id' => $client->id,
+                    'placa' => strtoupper($request->veiculo_placa),
+                    'marca' => $request->veiculo_marca,
+                    'modelo' => $request->veiculo_modelo,
+                ]);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Cliente e Veículo cadastrados com sucesso!']);
+        });
     }
 
     /**
@@ -153,46 +169,45 @@ class ClientsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-        public function destroy($id)
-        {
-            $client = Clients::findOrFail($id);
-            $client->delete();
-            return response()->json(['success' => true, 'message' => 'Cliente removido!']);
-        }
-    
-        public function quickView($id)
-        {
-            $client = Clients::findOrFail($id);
-            
-            $html = '<div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Tipo:</strong></span>
-                            <span>'.($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica').'</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>Documento:</strong></span>
-                            <span>'.($client->type == 'PF' ? $client->cpf : $client->cnpj).'</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>E-mail:</strong></span>
-                            <span>'.$client->email.'</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><strong>WhatsApp:</strong></span>
-                            <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> '.$client->whatsapp.'</span>
-                        </div>';
-    
-            if($client->rua) {
-                $html .= '<div class="list-group-item">
-                            <strong>Endereço:</strong><br>
-                            '.$client->rua.', '.$client->numero.' - '.$client->bairro.'<br>
-                            '.$client->cidade.'/'.$client->estado.'
-                        </div>';
-            }
-    
-            $html .= '</div>';
-    
-            return response($html);
-        }
+    public function destroy($id)
+    {
+        $client = Clients::findOrFail($id);
+        $client->delete();
+        return response()->json(['success' => true, 'message' => 'Cliente removido!']);
     }
-    
+
+    public function quickView($id)
+    {
+        $client = Clients::findOrFail($id);
+        
+        $html = '<div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>Tipo:</strong></span>
+                        <span>'.($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica').'</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>Documento:</strong></span>
+                        <span>'.($client->type == 'PF' ? $client->cpf : $client->cnpj).'</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>E-mail:</strong></span>
+                        <span>'.$client->email.'</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>WhatsApp:</strong></span>
+                        <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> '.$client->whatsapp.'</span>
+                    </div>';
+
+        if($client->rua) {
+            $html .= '<div class="list-group-item">
+                        <strong>Endereço:</strong><br>
+                        '.$client->rua.', '.$client->numero.' - '.$client->bairro.'<br>
+                        '.$client->cidade.'/'.$client->estado.'
+                    </div>';
+        }
+
+        $html .= '</div>';
+
+        return response($html);
+    }
+}
