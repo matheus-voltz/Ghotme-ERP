@@ -144,10 +144,45 @@ document.addEventListener('DOMContentLoaded', function() {
 
         $(document).on('click', '.btn-reject', function() {
             var id = $(this).data('id');
-            var reason = prompt('Motivo da rejeição:');
-            if(reason) {
-                $.post('/budgets/' + id + '/status', { _token: '{{ csrf_token() }}', status: 'rejected', reason: reason }, function() { dt.draw(); });
-            }
+            
+            Swal.fire({
+                title: 'Rejeitar Orçamento',
+                text: 'Informe o motivo da rejeição:',
+                input: 'textarea',
+                inputPlaceholder: 'Ex: Valor acima do esperado...',
+                inputAttributes: {
+                    'aria-label': 'Motivo da rejeição'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Confirmar Rejeição',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-3',
+                    cancelButton: 'btn btn-label-secondary'
+                },
+                buttonsStyling: false,
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'Você precisa informar um motivo!'
+                    }
+                }
+            }).then(function(result) {
+                if (result.isConfirmed) {
+                    $.post('/budgets/' + id + '/status', { 
+                        _token: '{{ csrf_token() }}', 
+                        status: 'rejected', 
+                        reason: result.value 
+                    }, function() { 
+                        dt.draw();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Rejeitado!',
+                            text: 'O orçamento foi marcado como rejeitado.',
+                            customClass: { confirmButton: 'btn btn-success' }
+                        });
+                    });
+                }
+            });
         });
     }
 });
