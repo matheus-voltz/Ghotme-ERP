@@ -1,15 +1,27 @@
-name: Remote SSH Command
-on: [push]
+name: Deploy ERP Ghotme
+on:
+  push:
+    branches: [ main ] # Sobe para o servidor sempre que você der push na main
+
 jobs:
-  build:
-    name: Build
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Execute remote SSH commands using password
-        uses: appleboy/ssh-action@v1
+      - name: Executar comandos de Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
           username: ${{ secrets.HOSTINGER_USER }}
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: ${{ secrets.HOSTINGER_PORT }}
-          script: whoami
+          script: |
+            cd domains/seu-dominio.com.br/public_html # ajuste para a sua pasta real
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            npm install
+            npm run build
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            echo "✅ Deploy concluído com sucesso!"
