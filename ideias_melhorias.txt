@@ -1,0 +1,25 @@
+# IDEIAS DE MELHORIAS - PROJETO GHOTME
+
+## 1. EXPERIÊNCIA DO CLIENTE (PORTAL DO CLIENTE)
+- Aprovação Digital: Link único para o cliente aprovar orçamentos online com registro de IP.
+- Tracker de Status: Visualização em tempo real da etapa atual do veículo (Entrada, Manutenção, Lavagem, Pronto).
+- Histórico Digital: Área para o cliente baixar notas e histórico de serviços.
+
+## 2. EFICIÊNCIA DA OFICINA (MODO MECÂNICO)
+- Cronômetro de Serviços: Botão de Start/Stop para medir o tempo real gasto em cada serviço na OS.
+- Diagnóstico por Voz: Uso de API de voz para ditar problemas e observações.
+- Upload de Fotos: Interface mobile rápida para anexar fotos de peças com defeito diretamente na OS.
+
+## 3. AGENDAMENTO E CALENDÁRIO
+- Gestão de Box/Elevador: Calendário visual para organizar qual veículo ocupa cada espaço físico da oficina.
+- Agendamento Online: Landing page para clientes marcarem serviços conforme horários livres.
+
+## 4. AUTOMAÇÃO E INTELIGÊNCIA (CRM)
+- Lembretes Automáticos: Disparo de WhatsApp/E-mail para revisões periódicas (Troca de óleo, correia, etc).
+- Consulta de Placa (API): Preenchimento automático de dados do veículo ao digitar a placa.
+- Tabela FIPE: Exibição do valor de mercado do veículo na ficha do cliente.
+
+## 5. GESTÃO VISUAL E B2B
+- Quadro Kanban: Visualização das Ordens de Serviço em colunas (Trello style).
+- Faturamento de Frotas: Agrupamento de várias OS de uma mesma empresa para cobrança mensal única.
+- Relatórios de Lucratividade: Cálculo automático de margem bruta considerando custo de peças e horas de mão de obra.

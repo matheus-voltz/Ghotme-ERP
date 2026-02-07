@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToCompany;
 
 class Clients extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'clients';
 
     protected $fillable = [
+        'company_id',
         'type',
         'name',
         'cpf',

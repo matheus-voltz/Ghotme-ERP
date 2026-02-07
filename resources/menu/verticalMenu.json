@@ -1,7 +1,7 @@
 {
   "menu": [
     {
-      "url": "/",
+      "url": "/dashboard",
       "name": "Home",
       "icon": "menu-icon icon-base ti tabler-smart-home",
       "slug": "pages-home"

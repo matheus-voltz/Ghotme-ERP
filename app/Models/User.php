@@ -13,7 +13,7 @@ use App\Notifications\ResetPasswordCustom;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmailCustom;
-
+use App\Traits\BelongsToCompany; // Import Trait
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    // use BelongsToCompany; // Commented for debug
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      * @var array<int, string>
      */
     protected $fillable = [
+        'company_id', // New Field
         'name',
         'email',
         'cpf_cnpj',

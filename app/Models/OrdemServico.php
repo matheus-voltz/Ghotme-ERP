@@ -3,10 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToCompany;
 
 class OrdemServico extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'client_id',
         'veiculo_id',
         'user_id',
