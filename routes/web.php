@@ -87,6 +87,10 @@ Route::get('/view-budget/{uuid}', [PublicBudgetController::class, 'show'])->name
 Route::post('/view-budget/{uuid}/approve', [PublicBudgetController::class, 'approve'])->name('public.budget.approve');
 Route::post('/view-budget/{uuid}/reject', [PublicBudgetController::class, 'reject'])->name('public.budget.reject');
 
+// Public Checklist View
+Route::get('/view-checklist/{id}', [VehicleChecklistController::class, 'show'])->name('public.checklist.show');
+Route::post('/ordens-servico/checklist/{id}/send-email', [VehicleChecklistController::class, 'sendEmail'])->name('ordens-servico.checklist.send-email');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

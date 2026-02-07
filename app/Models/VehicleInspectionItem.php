@@ -12,6 +12,7 @@ class VehicleInspectionItem extends Model
         'checklist_item_id',
         'status',
         'observations',
+        'photo_path',
     ];
 
     public function inspection(): BelongsTo

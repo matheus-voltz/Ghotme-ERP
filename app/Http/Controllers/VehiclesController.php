@@ -21,12 +21,11 @@ class VehiclesController extends Controller
             0 => 'id',
             1 => 'id',
             2 => 'placa',
-            3 => 'renavan',
-            4 => 'marca',
-            5 => 'modelo',
-            6 => 'ano_fabricacao',
-            7 => 'ativo',
-            8 => 'id',
+            3 => 'marca',
+            4 => 'modelo',
+            5 => 'ano_fabricacao',
+            6 => 'ativo',
+            7 => 'id',
         ];
 
         $totalData = Vehicles::count();
@@ -47,7 +46,7 @@ class VehiclesController extends Controller
 
             $vehicles = Vehicles::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('placa', 'LIKE', "%{$search}%")
-                ->orWhere('renavan', 'LIKE', "%{$search}%")
+                ->orWhere('renavam', 'LIKE', "%{$search}%")
                 ->orWhere('marca', 'LIKE', "%{$search}%")
                 ->orWhere('modelo', 'LIKE', "%{$search}%")
                 ->offset($start)
@@ -57,7 +56,7 @@ class VehiclesController extends Controller
 
             $totalFiltered = Vehicles::where('id', 'LIKE', "%{$search}%")
                 ->orWhere('placa', 'LIKE', "%{$search}%")
-                ->orWhere('renavan', 'LIKE', "%{$search}%")
+                ->orWhere('renavam', 'LIKE', "%{$search}%")
                 ->orWhere('marca', 'LIKE', "%{$search}%")
                 ->orWhere('modelo', 'LIKE', "%{$search}%")
                 ->count();
@@ -70,7 +69,7 @@ class VehiclesController extends Controller
             $nestedData['fake_id'] = ++$ids;
             $nestedData['id'] = $vehicle->id;
             $nestedData['placa'] = $vehicle->placa;
-            $nestedData['renavam'] = $vehicle->renavan; // JS expects 'renavam'
+            $nestedData['renavam'] = $vehicle->renavam; // JS expects 'renavam'
             $nestedData['ativo'] = $vehicle->ativo;
             $nestedData['marca'] = $vehicle->marca;
             $nestedData['modelo'] = $vehicle->modelo;
@@ -106,7 +105,7 @@ class VehiclesController extends Controller
             'marca' => 'required|string|max:50',
             'modelo' => 'required|string|max:80',
             'ano_fabricacao' => 'nullable|numeric',
-            'renavan' => 'nullable|string|max:20',
+            'renavam' => 'nullable|string|max:20',
             'ativo' => 'required|boolean',
         ], [], [
             'cliente_id' => 'Cliente',
@@ -120,7 +119,7 @@ class VehiclesController extends Controller
         $data = [
             'cliente_id' => $request->cliente_id,
             'placa' => strtoupper($request->placa),
-            'renavam' => $request->renavan,
+            'renavam' => $request->renavam,
             'marca' => $request->marca,
             'modelo' => $request->modelo,
             'ano_fabricacao' => $request->ano_fabricacao,
@@ -178,7 +177,7 @@ class VehiclesController extends Controller
     public function getDossier($id)
     {
         $vehicle = Vehicles::with(['client', 'company'])->findOrFail($id);
-        
+
         // Buscar Histórico de OS (Concluídas e Em andamento)
         $history = \App\Models\OrdemServico::where('veiculo_id', $id)
             ->with(['items.service', 'parts.inventoryItem']) // Carregar itens e peças

@@ -30,9 +30,14 @@
           <td>{{ $inspection->user->name }}</td>
           <td>{{ $inspection->created_at->format('d/m/Y H:i') }}</td>
           <td>
-            <a href="{{ route('ordens-servico.checklist.show', $inspection->id) }}" class="btn btn-sm btn-icon btn-label-secondary">
-              <i class="ti tabler-eye"></i>
-            </a>
+            <div class="d-flex gap-2">
+              <a href="{{ route('ordens-servico.checklist.show', $inspection->id) }}" class="btn btn-sm btn-icon btn-label-secondary" title="Visualizar">
+                <i class="ti tabler-eye"></i>
+              </a>
+              <button type="button" class="btn btn-sm btn-icon btn-label-primary btn-send-email" data-id="{{ $inspection->id }}" title="Enviar por E-mail">
+                <i class="ti tabler-mail"></i>
+              </button>
+            </div>
           </td>
         </tr>
         @endforeach
@@ -40,4 +45,67 @@
     </table>
   </div>
 </div>
+@section('vendor-style')
+@vite([
+'resources/assets/vendor/libs/animate-css/animate.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+])
+@endsection
+
+@section('vendor-script')
+@vite([
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+])
+@endsection
+
+@section('page-script')
+<script>
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.btn-send-email');
+    if (btn) {
+      e.preventDefault();
+      const id = btn.getAttribute('data-id');
+      const originalHtml = btn.innerHTML;
+      const baseUrl = '{{ url(' / ') }}';
+
+      btn.classList.add('disabled');
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+      fetch(`${baseUrl}/ordens-servico/checklist/${id}/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+          }
+        })
+        .then(response => response.json())
+        .then(res => {
+          const swalConfig = {
+            icon: res.success ? 'success' : 'error',
+            title: res.success ? 'Sucesso!' : 'Ops!',
+            text: res.message
+          };
+          if (typeof Swal !== 'undefined') {
+            Swal.fire(swalConfig);
+          } else {
+            alert(res.message);
+          }
+        })
+        .catch(err => {
+          console.error('Error:', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Falha na comunicação com o servidor.'
+          });
+        })
+        .finally(() => {
+          btn.classList.remove('disabled');
+          btn.innerHTML = originalHtml;
+        });
+    }
+  });
+</script>
+@endsection
 @endsection

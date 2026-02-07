@@ -23,18 +23,19 @@ class VehicleHistoryController extends Controller
     public function search(Request $request)
     {
         $term = $request->input('q');
-        
+
         $vehicles = Vehicles::where('placa', 'LIKE', "%{$term}%")
+            ->orWhere('renavam', 'LIKE', "%{$term}%")
             ->orWhere('chassi', 'LIKE', "%{$term}%")
-            ->with('cliente') // Assumindo relação definida no Model Vehicles
+            ->with('client') // Relacionamento correto definido no Model Vehicles
             ->limit(10)
             ->get();
 
-        return response()->json($vehicles->map(function($v) {
+        return response()->json($vehicles->map(function ($v) {
             return [
                 'id' => $v->id,
                 'text' => "{$v->placa} - {$v->modelo} ({$v->marca})",
-                'client_name' => $v->cliente ? ($v->cliente->name ?? $v->cliente->company_name) : 'Sem dono',
+                'client_name' => $v->client ? ($v->client->name ?? $v->client->company_name) : 'Sem dono',
                 'full_data' => $v
             ];
         }));
@@ -50,7 +51,7 @@ class VehicleHistoryController extends Controller
             ->orderBy('date', 'desc')
             ->orderBy('id', 'desc')
             ->get();
-            
+
         return response()->json($histories);
     }
 
@@ -71,14 +72,14 @@ class VehicleHistoryController extends Controller
         ]);
 
         $validated['created_by'] = Auth::id();
-        
+
         // Se for manutenção externa, o performer é obrigatório ou default
         if (empty($validated['performer'])) {
             $validated['performer'] = 'Externo / Desconhecido';
         }
 
         $history = VehicleHistory::create($validated);
-        
+
         // Atualiza KM do veículo se o novo for maior
         $vehicle = Vehicles::find($validated['veiculo_id']);
         if ($vehicle && $validated['km'] > $vehicle->km_atual) {

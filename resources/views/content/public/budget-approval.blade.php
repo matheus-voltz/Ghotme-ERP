@@ -2,7 +2,7 @@
 $customizerHidden = 'customizer-hide';
 @endphp
 
-@extends('layouts/blankLayout')
+@extends('layouts/layoutPublic')
 
 @section('title', 'Aprovação de Orçamento')
 
@@ -23,37 +23,19 @@ $customizerHidden = 'customizer-hide';
 @endsection
 
 @section('content')
-<div class="budget-wrapper">
-    <!-- Banner da Empresa -->
-    <div class="company-banner">
-        <div class="container text-center">
+<!-- Card do Orçamento -->
+<div class="card">
+    <div class="card-body">
+        <!-- Banner da Empresa -->
+        <div class="text-center mb-4">
             @if($budget->company->logo_path)
-                <img src="{{ asset('storage/' . $budget->company->logo_path) }}" alt="Logo" class="mb-3" style="max-height: 100px;">
+                <img src="{{ asset('storage/' . $budget->company->logo_path) }}" alt="Logo" class="mb-3" style="max-height: 60px;">
             @endif
-            <h3 class="mb-0 fw-bold" style="color: #444;">{{ $budget->company->name ?? 'Oficina' }}</h3>
-            <small class="text-muted text-uppercase fw-medium" style="letter-spacing: 2px;">Orçamento Digital</small>
+            <h4 class="mb-1 fw-bold">{{ $budget->company->name ?? 'Oficina' }}</h4>
+            <span class="badge bg-label-primary">Orçamento #{{ $budget->id }}</span>
         </div>
-    </div>
 
-    <div class="container-xxl flex-grow-1 container-p-y">
-        <div class="row justify-content-center">
-            <div class="col-lg-9 col-12">
-                <div class="card mb-4 shadow-sm">
-                <div class="p-4 budget-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 text-white">Orçamento #{{ $budget->id }}</h4>
-                        @if($budget->status == 'approved')
-                            <span class="badge bg-success status-badge">APROVADO</span>
-                        @elseif($budget->status == 'rejected')
-                            <span class="badge bg-danger status-badge">REJEITADO</span>
-                        @else
-                            <span class="badge bg-warning status-badge">AGUARDANDO APROVAÇÃO</span>
-                        @endif
-                    </div>
-                </div>
-                
-                <div class="card-body mt-4">
-                    <div class="row mb-4">
+        <div class="row mb-4">
                         <div class="col-md-6">
                             <h6><strong>Oficina:</strong> {{ $budget->company->name ?? 'Nossa Oficina' }}</h6>
                             <p class="mb-1">{{ $budget->company->address ?? '' }}</p>
@@ -136,9 +118,6 @@ $customizerHidden = 'customizer-hide';
                         <p class="mb-0">Motivo: {{ $budget->rejection_reason }}</p>
                     </div>
                     @endif
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

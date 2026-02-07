@@ -10,6 +10,8 @@ use App\Models\VehicleInspectionItem;
 use App\Models\OrdemServico;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ChecklistSharedMail;
 
 class VehicleChecklistController extends Controller
 {
@@ -44,10 +46,10 @@ class VehicleChecklistController extends Controller
             'km_current' => 'required|integer',
             'notes' => 'nullable|string',
             'items' => 'required|array',
-            'items.*.id' => 'required|exists:checklist_items,id', // Valida o ID selecionado
+            'items.*.id' => 'required|exists:checklist_items,id',
             'items.*.status' => 'required|in:ok,not_ok,na',
             'items.*.observations' => 'nullable|string',
-            'items.*.photo' => 'nullable|image|max:5120', // Validação da foto (5MB)
+            'items.*.photo' => 'nullable|image|max:5120',
         ]);
 
         try {
@@ -65,17 +67,16 @@ class VehicleChecklistController extends Controller
             foreach ($validated['items'] as $itemId => $data) {
                 $photoPath = null;
                 
-                // Processar Upload de Foto
                 if (isset($data['photo']) && $request->hasFile("items.$itemId.photo")) {
                     $photoPath = $request->file("items.$itemId.photo")->store('checklists', 'public');
                 }
 
                 VehicleInspectionItem::create([
                     'vehicle_inspection_id' => $inspection->id,
-                    'checklist_item_id' => $data['id'], // ID do item vindo do select
+                    'checklist_item_id' => $data['id'],
                     'status' => $data['status'],
                     'observations' => $data['observations'] ?? null,
-                    'photo_path' => $photoPath, // Salva o caminho da foto
+                    'photo_path' => $photoPath,
                 ]);
             }
 
@@ -90,7 +91,32 @@ class VehicleChecklistController extends Controller
 
     public function show($id)
     {
-        $inspection = VehicleInspection::with(['veiculo', 'user', 'items.checklistItem'])->findOrFail($id);
-        return view('content.pages.ordens-servico.checklist-show', compact('inspection'));
+        $inspection = VehicleInspection::withoutGlobalScope('company')
+            ->with(['veiculo.client', 'user', 'items.checklistItem', 'company'])
+            ->findOrFail($id);
+
+        $layout = auth()->check() ? 'layouts/layoutMaster' : 'layouts/layoutPublic';
+        
+        return view('content.pages.ordens-servico.checklist-show', compact('inspection', 'layout'));
+    }
+
+    public function sendEmail($id)
+    {
+        $inspection = VehicleInspection::withoutGlobalScope('company')
+            ->with(['veiculo.client', 'company'])
+            ->findOrFail($id);
+            
+        $email = $inspection->veiculo->client->email;
+
+        if (!$email) {
+            return response()->json(['success' => false, 'message' => 'Cliente sem e-mail cadastrado.']);
+        }
+
+        try {
+            Mail::to($email)->send(new ChecklistSharedMail($inspection));
+            return response()->json(['success' => true, 'message' => 'E-mail enviado com sucesso para ' . $email]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao enviar e-mail: ' . $e->getMessage()]);
+        }
     }
 }

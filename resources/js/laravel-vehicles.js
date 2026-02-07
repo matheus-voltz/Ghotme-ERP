@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.getElementById('add-vehicle-marca').value = data.marca;
                         document.getElementById('add-vehicle-modelo').value = data.modelo;
                         document.getElementById('add-vehicle-ano-fabricacao').value = data.ano_fabricacao || '';
-                        document.getElementById('add-vehicle-renavam').value = data.renavan || '';
+                        document.getElementById('add-vehicle-renavam').value = data.renavam || '';
                         $('#vehicle-cliente').val(data.cliente_id).trigger('change');
                         $('#vehicle-status').val(data.ativo ? '1' : '0');
                     });
