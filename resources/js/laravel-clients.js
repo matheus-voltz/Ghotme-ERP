@@ -99,6 +99,47 @@ document.addEventListener('DOMContentLoaded', function (e) {
             }
         });
 
+        // View Dossier from Client Edit
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.view-vehicle-dossier')) {
+                const id = e.target.closest('.view-vehicle-dossier').dataset.id;
+                
+                // Precisamos garantir que o modal exista na página. 
+                // Se não existir (estamos na página de clientes, não veículos), precisamos criar ou redirecionar.
+                // Como o modal é grande, o ideal é ter ele na página.
+                // Vou injetar o modal dinamicamente se não existir.
+                
+                let modalEl = document.getElementById('viewDossierModal');
+                if (!modalEl) {
+                    const modalHtml = `
+                        <div class="modal fade" id="viewDossierModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+                          <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title">Dossiê do Veículo</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                              </div>
+                              <div class="modal-body" id="dossierModalContent"></div>
+                            </div>
+                          </div>
+                        </div>`;
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+                    modalEl = document.getElementById('viewDossierModal');
+                }
+
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                
+                document.getElementById('dossierModalContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
+                
+                fetch(`${baseUrl}vehicles/${id}/dossier`)
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('dossierModalContent').innerHTML = html;
+                    });
+            }
+        });
+
         // Delete
         document.addEventListener('click', function(e) {
             if (e.target.closest('.delete-record')) {
@@ -172,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                         <span class="fw-bold text-primary">${v.placa}</span> - 
                                         <small>${v.marca} ${v.modelo}</small>
                                     </div>
-                                    <a href="/vehicles" class="btn btn-sm btn-label-secondary btn-icon"><i class="ti tabler-external-link"></i></a>
+                                    <button type="button" class="btn btn-sm btn-label-info btn-icon view-vehicle-dossier" data-id="${v.id}"><i class="ti tabler-eye"></i></button>
                                 </div>
                             `).join('');
                             

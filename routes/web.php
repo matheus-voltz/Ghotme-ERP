@@ -34,6 +34,7 @@ use App\Http\Controllers\VehicleChecklistController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PublicBudgetController;
+use App\Http\Controllers\SystemErrorController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -129,6 +130,7 @@ Route::middleware([
     Route::delete('/clients-list/{id}', [ClientsController::class, 'destroy'])->name('clients-list.destroy');
 
     // Vehicles
+    Route::get('/vehicles/{id}/dossier', [VehiclesController::class, 'getDossier'])->name('vehicles.dossier');
     Route::get('/vehicles', [VehiclesController::class, 'index'])->name('vehicles');
     Route::get('/vehicles-list', [VehiclesController::class, 'dataBase'])->name('vehicles-list');
     Route::get('/vehicles-list/{id}/edit', [VehiclesController::class, 'edit'])->name('vehicles-list.edit');
@@ -229,6 +231,11 @@ Route::middleware([
     Route::get('/settings/print-templates', [PrintTemplateController::class, 'index'])->name('settings.print-templates');
     Route::get('/settings/print-templates/{id}/edit', [PrintTemplateController::class, 'edit'])->name('settings.print-templates.edit');
     Route::post('/settings/print-templates/{id}', [PrintTemplateController::class, 'update'])->name('settings.print-templates.update');
+
+    // System Errors
+    Route::get('/settings/system-errors', [SystemErrorController::class, 'index'])->name('settings.system-errors');
+    Route::get('/settings/system-errors/{id}', [SystemErrorController::class, 'show'])->name('settings.system-errors.show');
+    Route::delete('/settings/system-errors/clear', [SystemErrorController::class, 'destroyAll'])->name('settings.system-errors.clear');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');

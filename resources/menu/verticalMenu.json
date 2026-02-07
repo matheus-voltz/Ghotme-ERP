@@ -256,6 +256,11 @@
           "url": "/support/open-ticket",
           "name": "Abrir chamado",
           "slug": "open-ticket"
+        },
+        {
+          "url": "/settings/system-errors",
+          "name": "Logs de Erro (Dev)",
+          "slug": "system-errors"
         }
       ]
     }

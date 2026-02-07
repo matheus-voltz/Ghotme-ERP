@@ -16,7 +16,7 @@ class Vehicles extends Model
         'cliente_id',
         'placa',
         'ano',
-        'renavan',
+        'renavam',
         'chassi',
         'marca',
         'modelo',
@@ -33,4 +33,9 @@ class Vehicles extends Model
         'ativo',
         'status',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Clients::class, 'cliente_id');
+    }
 }

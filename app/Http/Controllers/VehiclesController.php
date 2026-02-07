@@ -120,7 +120,7 @@ class VehiclesController extends Controller
         $data = [
             'cliente_id' => $request->cliente_id,
             'placa' => strtoupper($request->placa),
-            'renavan' => $request->renavan,
+            'renavam' => $request->renavan,
             'marca' => $request->marca,
             'modelo' => $request->modelo,
             'ano_fabricacao' => $request->ano_fabricacao,
@@ -173,5 +173,18 @@ class VehiclesController extends Controller
         $vehicle = Vehicles::findOrFail($id);
         $vehicle->delete();
         return response()->json(['message' => 'Vehicle deleted successfully']);
+    }
+
+    public function getDossier($id)
+    {
+        $vehicle = Vehicles::with(['client', 'company'])->findOrFail($id);
+        
+        // Buscar Histórico de OS (Concluídas e Em andamento)
+        $history = \App\Models\OrdemServico::where('veiculo_id', $id)
+            ->with(['items.service', 'parts.inventoryItem']) // Carregar itens e peças
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('content.pages.vehicles.partials.dossier', compact('vehicle', 'history'));
     }
 }

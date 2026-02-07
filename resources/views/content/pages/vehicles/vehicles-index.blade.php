@@ -113,12 +113,52 @@
           </select>
         </div>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-primary me-3 data-submit">Salvar Veículo</button>
-            <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancelar</button>
+                <div class="mt-4">
+
+                    <button type="submit" class="btn btn-primary me-3 data-submit">Salvar Veículo</button>
+
+                    <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancelar</button>
+
+                </div>
+
+              </form>
+
+            </div>
+
+          </div>
+
         </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endsection
+
+        
+
+        <!-- Modal Dossiê do Veículo -->
+
+        <div class="modal fade" id="viewDossierModal" tabindex="-1" aria-hidden="true">
+
+          <div class="modal-dialog modal-dialog-centered modal-lg">
+
+            <div class="modal-content">
+
+              <div class="modal-header">
+
+                <h5 class="modal-title">Dossiê do Veículo</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+              </div>
+
+              <div class="modal-body" id="dossierModalContent">
+
+                <div class="text-center p-5"><div class="spinner-border text-primary"></div></div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        @endsection
+
+        

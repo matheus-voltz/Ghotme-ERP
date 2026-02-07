@@ -95,9 +95,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     render: function(data, type, full) {
                         var btns = '<div class="d-flex gap-2">';
                         btns += '<button class="btn btn-sm btn-icon btn-label-secondary btn-view" data-id="'+data+'" title="Visualizar"><i class="ti tabler-eye"></i></button>';
-                        if(full.has_phone) {
-                            btns += '<button class="btn btn-sm btn-icon btn-label-info btn-whatsapp" data-id="'+data+'" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></button>';
-                        }
+                        
+                        // Botão WhatsApp sempre visível
+                        btns += '<button class="btn btn-sm btn-icon btn-label-info btn-whatsapp" data-id="'+data+'" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></button>';
+                        
                         if(full.status === 'pending') {
                             btns += '<button class="btn btn-sm btn-icon btn-label-success btn-approve" data-id="'+data+'" title="Aprovar"><i class="ti tabler-check"></i></button>';
                             btns += '<button class="btn btn-sm btn-icon btn-label-danger btn-reject" data-id="'+data+'" title="Reprovar"><i class="ti tabler-x"></i></button>';

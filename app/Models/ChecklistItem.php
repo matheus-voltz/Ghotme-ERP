@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\BelongsToCompany;
 
 class ChecklistItem extends Model
 {
-    protected $fillable = ['name', 'category', 'order', 'is_active'];
+    use BelongsToCompany;
+
+    protected $fillable = ['company_id', 'name', 'category', 'order', 'is_active'];
 }

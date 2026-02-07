@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     targets: 1, render: (data, type, full) => `<span>${full.fake_id}</span>`
                 },
                 {
-                    targets: 2, render: (data) => `<span class="fw-bold text-primary">${data}</span>`
+                    targets: 2, 
+                    render: (data, type, full) => `<a href="javascript:void(0)" class="fw-bold text-primary view-dossier" data-id="${full.id}">${data}</a>`
                 },
                 {
                     targets: 6,
@@ -62,6 +63,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 }
             ],
             order: [[1, 'desc']]
+        });
+
+        // Dossier Modal
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.view-dossier')) {
+                const id = e.target.closest('.view-dossier').dataset.id;
+                $('#viewDossierModal').modal('show');
+                $('#dossierModalContent').html('<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>');
+                
+                fetch(`${baseUrl}vehicles/${id}/dossier`)
+                    .then(res => res.text())
+                    .then(html => {
+                        $('#dossierModalContent').html(html);
+                    });
+            }
         });
 
         // Delete

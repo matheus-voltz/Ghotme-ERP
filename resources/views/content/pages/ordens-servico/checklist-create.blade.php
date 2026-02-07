@@ -109,10 +109,36 @@
 
 @section('page-script')
 <script>
-  $(function() {
-    if($('.select2').length) {
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inicializa Select2 se existir
+    if(typeof $ !== 'undefined' && $('.select2').length) {
       $('.select2').select2();
     }
+
+    // Listener de Mudança nos Botões do Checklist
+    $(document).on('change', '.btn-check', function() {
+        const $input = $(this);
+        const itemId = $input.attr('id').split('-')[1];
+        const status = $input.val();
+        const $obsInput = $(`input[name="items[${itemId}][observations]"]`);
+
+        // Feedback visual na linha/input
+        if (status === 'not_ok') {
+            $obsInput.addClass('border-danger bg-label-danger').attr('placeholder', 'DESCREVA O DEFEITO AQUI...').focus();
+        } else {
+            $obsInput.removeClass('border-danger bg-label-danger').attr('placeholder', '...');
+        }
+
+        // Garante que o rótulo (label) do botão clicado fique em destaque
+        // O Bootstrap 5 já faz isso com a classe .btn-check, mas vamos forçar se necessário
+        console.log('Item:', itemId, 'Status:', status);
+    });
   });
 </script>
+<style>
+    /* Estilo extra para garantir que os botões selecionados fiquem bem visíveis */
+    .btn-check:checked + .btn-outline-success { background-color: #28c76f !important; color: #fff !important; }
+    .btn-check:checked + .btn-outline-danger { background-color: #ea5455 !important; color: #fff !important; }
+    .btn-check:checked + .btn-outline-secondary { background-color: #82868b !important; color: #fff !important; }
+</style>
 @endsection
