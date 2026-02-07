@@ -50,45 +50,66 @@
       </div>
 
       <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">Itens de Inspeção</h5>
+          <button type="button" class="btn btn-primary btn-sm" id="btnAddChecklistItem">
+            <i class="ti tabler-plus me-1"></i> Adicionar Item
+          </button>
         </div>
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-bordered">
+            <table class="table table-bordered" id="checklistTable">
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Status</th>
+                  <th style="width: 40%;">Item</th>
+                  <th style="width: 30%;">Status</th>
                   <th>Observação</th>
+                  <th style="width: 50px;"></th>
                 </tr>
               </thead>
-              <tbody>
-                @foreach($checklistItems as $item)
-                <tr>
-                  <td>{{ $item->name }}</td>
-                  <td>
-                    <div class="btn-group" role="group">
-                      <input type="radio" class="btn-check" name="items[{{ $item->id }}][status]" id="ok-{{ $item->id }}" value="ok" checked>
-                      <label class="btn btn-outline-success btn-sm" for="ok-{{ $item->id }}">OK</label>
-
-                      <input type="radio" class="btn-check" name="items[{{ $item->id }}][status]" id="nok-{{ $item->id }}" value="not_ok">
-                      <label class="btn btn-outline-danger btn-sm" for="nok-{{ $item->id }}">RUIM</label>
-
-                      <input type="radio" class="btn-check" name="items[{{ $item->id }}][status]" id="na-{{ $item->id }}" value="na">
-                      <label class="btn btn-outline-secondary btn-sm" for="na-{{ $item->id }}">N/A</label>
-                    </div>
-                  </td>
-                  <td>
-                    <input type="text" name="items[{{ $item->id }}][observations]" class="form-control form-control-sm" placeholder="...">
-                  </td>
-                </tr>
-                @endforeach
+              <tbody id="checklistContainer">
+                <!-- Itens serão adicionados aqui via JS -->
               </tbody>
             </table>
           </div>
+          <div id="emptyState" class="text-center py-5 text-muted">
+            <i class="ti tabler-list-check display-6 mb-2"></i>
+            <p>Nenhum item adicionado ainda.</p>
+          </div>
         </div>
       </div>
+
+      <!-- Template Oculto para Novos Itens -->
+      <template id="checklistItemTemplate">
+        <tr>
+            <td>
+                <select name="items[INDEX][id]" class="form-select form-select-sm item-select" required>
+                    <option value="">Selecione...</option>
+                    @foreach($checklistItems as $item)
+                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <div class="btn-group w-100" role="group">
+                    <input type="radio" class="btn-check status-ok" name="items[INDEX][status]" id="ok-INDEX" value="ok" checked>
+                    <label class="btn btn-outline-success btn-sm" for="ok-INDEX">OK</label>
+
+                    <input type="radio" class="btn-check status-nok" name="items[INDEX][status]" id="nok-INDEX" value="not_ok">
+                    <label class="btn btn-outline-danger btn-sm" for="nok-INDEX">RUIM</label>
+
+                    <input type="radio" class="btn-check status-na" name="items[INDEX][status]" id="na-INDEX" value="na">
+                    <label class="btn btn-outline-secondary btn-sm" for="na-INDEX">N/A</label>
+                </div>
+            </td>
+            <td>
+                <input type="text" name="items[INDEX][observations]" class="form-control form-control-sm obs-input" placeholder="...">
+            </td>
+            <td>
+                <button type="button" class="btn btn-sm btn-icon btn-label-danger remove-item"><i class="ti tabler-trash"></i></button>
+            </td>
+        </tr>
+      </template>
 
       <div class="card mb-4">
         <div class="card-header">
@@ -110,33 +131,60 @@
 @section('page-script')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Inicializa Select2 se existir
+    // Inicializa Select2 globalmente
     if(typeof $ !== 'undefined' && $('.select2').length) {
       $('.select2').select2();
     }
 
-    // Listener de Mudança nos Botões do Checklist
-    $(document).on('change', '.btn-check', function() {
-        const $input = $(this);
-        const itemId = $input.attr('id').split('-')[1];
-        const status = $input.val();
-        const $obsInput = $(`input[name="items[${itemId}][observations]"]`);
+    let itemIndex = 0;
+    const container = document.getElementById('checklistContainer');
+    const emptyState = document.getElementById('emptyState');
+    const template = document.getElementById('checklistItemTemplate');
 
-        // Feedback visual na linha/input
+    // Adicionar Item
+    document.getElementById('btnAddChecklistItem').addEventListener('click', function() {
+        itemIndex++;
+        const clone = template.content.cloneNode(true);
+        
+        // Substitui INDEX pelo número atual para garantir IDs únicos
+        clone.querySelectorAll('[name*="INDEX"]').forEach(el => {
+            el.name = el.name.replace('INDEX', itemIndex);
+        });
+        clone.querySelectorAll('[id*="INDEX"]').forEach(el => {
+            el.id = el.id.replace('INDEX', itemIndex);
+        });
+        clone.querySelectorAll('label[for*="INDEX"]').forEach(el => {
+            el.setAttribute('for', el.getAttribute('for').replace('INDEX', itemIndex));
+        });
+
+        container.appendChild(clone);
+        emptyState.classList.add('d-none');
+    });
+
+    // Remover Item
+    $(document).on('click', '.remove-item', function() {
+        $(this).closest('tr').remove();
+        if(container.children.length === 0) {
+            emptyState.classList.remove('d-none');
+        }
+    });
+
+    // Interatividade dos Botões (OK/RUIM)
+    $(document).on('change', '.btn-check', function() {
+        const $row = $(this).closest('tr');
+        const status = $(this).val();
+        const $obsInput = $row.find('.obs-input');
+
         if (status === 'not_ok') {
-            $obsInput.addClass('border-danger bg-label-danger').attr('placeholder', 'DESCREVA O DEFEITO AQUI...').focus();
+            $obsInput.addClass('border-danger bg-label-danger').attr('placeholder', 'DESCREVA O DEFEITO...').focus();
         } else {
             $obsInput.removeClass('border-danger bg-label-danger').attr('placeholder', '...');
         }
-
-        // Garante que o rótulo (label) do botão clicado fique em destaque
-        // O Bootstrap 5 já faz isso com a classe .btn-check, mas vamos forçar se necessário
-        console.log('Item:', itemId, 'Status:', status);
     });
   });
 </script>
 <style>
-    /* Estilo extra para garantir que os botões selecionados fiquem bem visíveis */
+    /* Estilo para botões de rádio selecionados */
     .btn-check:checked + .btn-outline-success { background-color: #28c76f !important; color: #fff !important; }
     .btn-check:checked + .btn-outline-danger { background-color: #ea5455 !important; color: #fff !important; }
     .btn-check:checked + .btn-outline-secondary { background-color: #82868b !important; color: #fff !important; }
