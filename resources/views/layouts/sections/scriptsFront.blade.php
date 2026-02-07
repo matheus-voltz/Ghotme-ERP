@@ -1,5 +1,5 @@
 <!-- BEGIN: Vendor JS-->
-@vite(['resources/assets/vendor/js/dropdown-hover.js', 'resources/assets/vendor/js/mega-dropdown.js', 'resources/assets/vendor/libs/popper/popper.js', 'resources/assets/vendor/js/bootstrap.js', 'resources/assets/vendor/libs/node-waves/node-waves.js'])
+@vite(['resources/assets/vendor/libs/jquery/jquery.js', 'resources/assets/vendor/js/dropdown-hover.js', 'resources/assets/vendor/js/mega-dropdown.js', 'resources/assets/vendor/libs/popper/popper.js', 'resources/assets/vendor/js/bootstrap.js', 'resources/assets/vendor/libs/node-waves/node-waves.js'])
 
 @if ($configData['hasCustomizer'])
   @vite(['resources/assets/vendor/libs/pickr/pickr.js'])
