@@ -142,7 +142,7 @@ $customizerHidden = 'customizer-hide';
                     <h6 class="text-white opacity-75 text-uppercase fw-bold mb-2">Ordem de Serviço</h6>
                     <h1 class="text-white fw-bold mb-3">Protocolo #{{ $order->id }}</h1>
                     <div class="d-flex align-items-center">
-                        <div class="p-2 bg-white rounded-3 me-3">
+                        <div class="p-2 bg-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                             <i class="ti tabler-car-suv text-primary fs-3"></i>
                         </div>
                         <div>
@@ -226,7 +226,7 @@ $customizerHidden = 'customizer-hide';
                         @foreach($order->items as $item)
                         <div class="item-list-row d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="p-2 bg-label-primary rounded-3 me-3">
+                                <div class="p-2 bg-label-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
                                     <i class="ti tabler-settings"></i>
                                 </div>
                                 <span>{{ $item->service->name ?? $item->description }}</span>
@@ -238,7 +238,7 @@ $customizerHidden = 'customizer-hide';
                         @foreach($order->parts as $part)
                         <div class="item-list-row d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
-                                <div class="p-2 bg-label-secondary rounded-3 me-3">
+                                <div class="p-2 bg-label-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
                                     <i class="ti tabler-package"></i>
                                 </div>
                                 <span>{{ $part->part->name ?? $part->description }}</span>

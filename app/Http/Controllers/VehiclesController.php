@@ -132,7 +132,7 @@ class VehiclesController extends Controller
             'modelo' => $request->modelo,
             'ano_fabricacao' => $request->ano_fabricacao,
             'ativo' => $request->ativo,
-            'company_id' => auth()->user()->company_id // Garante o Multi-tenancy
+            'company_id' => Auth::user()->company_id // Garante o Multi-tenancy
         ];
 
         if ($vehicleId) {
@@ -198,10 +198,11 @@ class VehiclesController extends Controller
     {
         $vehicle = Vehicles::with(['client', 'company'])->findOrFail($id);
 
-        // Buscar Histórico de OS (Concluídas e Em andamento)
-        $history = \App\Models\OrdemServico::where('veiculo_id', $id)
-            ->with(['items.service', 'parts.inventoryItem']) // Carregar itens e peças
-            ->orderBy('created_at', 'desc')
+        // Buscar Histórico completo da Linha do Tempo
+        $history = \App\Models\VehicleHistory::where('veiculo_id', $id)
+            ->with(['ordemServico.items.service', 'ordemServico.parts.inventoryItem'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return view('content.pages.vehicles.partials.dossier', compact('vehicle', 'history'));

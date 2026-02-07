@@ -74,7 +74,7 @@ $customizerHidden = 'customizer-hide';
         width: 50px;
         height: 50px;
         line-height: 50px;
-        border-radius: 12px;
+        border-radius: 50%;
         margin: 0 auto 1rem;
         font-size: 1.5rem;
     }
@@ -137,7 +137,7 @@ $customizerHidden = 'customizer-hide';
         top: 2rem;
         right: 2rem;
         padding: 0.75rem;
-        border-radius: 1rem;
+        border-radius: 50%;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.3);
@@ -234,6 +234,57 @@ $customizerHidden = 'customizer-hide';
     <div class="row">
         <!-- Coluna Principal (8) -->
         <div class="col-lg-8 animate-up" style="animation-delay: 0.5s">
+            <!-- Seção de Veículos -->
+            <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
+                <h4 class="mb-0 fw-bold"><i class="ti tabler-car me-2 text-primary"></i>Meus Veículos</h4>
+            </div>
+
+            <div class="row g-4 mb-5">
+                @forelse($client->vehicles as $vehicle)
+                <div class="col-md-6">
+                    <div class="vehicle-card p-3 shadow-none border h-100">
+                        <div class="d-flex align-items-center">
+                            <div class="p-2 bg-label-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                <i class="ti tabler-car-suv fs-3"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6 class="mb-0 fw-bold">{{ $vehicle->modelo }}</h6>
+                                    @php
+                                    // Verificar se há OS em andamento para este veículo
+                                    $currentOS = $orders->where('veiculo_id', $vehicle->id)
+                                    ->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'awaiting_approval'])
+                                    ->first();
+
+                                    $statusClass = 'bg-label-success';
+                                    $statusText = 'Disponível';
+
+                                    if ($currentOS) {
+                                    $statusClass = 'bg-label-warning';
+                                    $statusText = 'Na Oficina';
+                                    if ($currentOS->status == 'completed') {
+                                    $statusClass = 'bg-label-info';
+                                    $statusText = 'Pronto';
+                                    }
+                                    }
+                                    @endphp
+                                    <span class="badge {{ $statusClass }} rounded-pill">{{ $statusText }}</span>
+                                </div>
+                                <div class="d-flex gap-2 mt-1">
+                                    <small class="text-uppercase fw-medium badge bg-dark text-white p-1 px-2" style="font-size: 0.7rem;">{{ $vehicle->placa }}</small>
+                                    <small class="text-muted">{{ $vehicle->marca }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="col-12 text-center py-4 bg-white rounded-4 border">
+                    <p class="text-muted mb-0 small">Nenhum veículo cadastrado.</p>
+                </div>
+                @endforelse
+            </div>
+
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status na Oficina</h4>
             </div>
@@ -243,7 +294,7 @@ $customizerHidden = 'customizer-hide';
                 <div class="row align-items-center">
                     <div class="col-md-7">
                         <div class="d-flex align-items-center mb-3">
-                            <div class="p-3 bg-label-primary rounded-4 me-3">
+                            <div class="p-3 bg-label-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
                                 <i class="ti tabler-car-suv fs-2"></i>
                             </div>
                             <div>
@@ -325,7 +376,7 @@ $customizerHidden = 'customizer-hide';
                 <h5 class="fw-bold mb-4">Orçamentos Pendentes</h5>
                 @forelse($budgets->where('status', 'pending') as $budget)
                 <a href="{{ route('public.budget.show', $budget->uuid) }}" class="quick-action-link shadow-sm">
-                    <div class="p-2 bg-label-warning rounded-3 me-3">
+                    <div class="p-2 bg-label-warning rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                         <i class="ti tabler-currency-real"></i>
                     </div>
                     <div class="flex-grow-1">

@@ -12,23 +12,23 @@ $isDark = $configData['theme'] === 'dark';
   <!-- Theme Toggle Button -->
   <div class="p-3 text-end d-flex justify-content-end align-items-center" style="position: absolute; top: 0; right: 0; z-index: 1100;">
     <div class="nav-item dropdown me-2">
-      <a class="nav-link dropdown-toggle hide-arrow p-2 bg-white rounded-circle shadow-sm theme-switcher" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-        <i class="ti tabler-sun icon-md theme-icon-active text-primary"></i>
+      <a class="nav-link dropdown-toggle hide-arrow bg-white shadow-sm theme-switcher d-flex align-items-center justify-content-center" id="nav-theme" href="javascript:void(0);" data-bs-toggle="dropdown" style="width: 40px; height: 40px; border-radius: 50% !important; padding: 0 !important;">
+        <i class="ti tabler-sun ti-md theme-icon-active text-primary"></i>
       </a>
       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-theme">
         <li>
-          <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="light">
-            <i class="ti tabler-sun me-2"></i>Claro
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+            <i class="ti tabler-sun me-2 ti-sm"></i>Claro
           </button>
         </li>
         <li>
-          <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="dark">
-            <i class="ti tabler-moon me-2"></i>Escuro
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+            <i class="ti tabler-moon me-2 ti-sm"></i>Escuro
           </button>
         </li>
         <li>
-          <button type="button" class="dropdown-item align-items-center" data-bs-theme-value="system">
-            <i class="ti tabler-device-desktop me-2"></i>Sistema
+          <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="system">
+            <i class="ti tabler-device-desktop me-2 ti-sm"></i>Sistema
           </button>
         </li>
       </ul>
@@ -55,23 +55,28 @@ $isDark = $configData['theme'] === 'dark';
     };
 
     const setTheme = theme => {
-      if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-bs-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-bs-theme', theme === 'system' ? getPreferredTheme() : theme);
-      }
+      const themeValue = theme === 'system' ? getPreferredTheme() : theme;
+      document.documentElement.setAttribute('data-bs-theme', themeValue);
 
       // Update icon
       const activeIcon = document.querySelector('.theme-icon-active');
       if (activeIcon) {
-        const themeValue = theme === 'system' ? getPreferredTheme() : theme;
-        activeIcon.className = `ti tabler-${themeValue === 'dark' ? 'moon' : 'sun'} icon-md theme-icon-active text-primary`;
+        activeIcon.className = `ti tabler-${themeValue === 'dark' ? 'moon' : 'sun'} ti-md theme-icon-active text-primary`;
       }
+
+      // Update active state in dropdown
+      document.querySelectorAll('[data-bs-theme-value]').forEach(el => {
+        el.classList.remove('active');
+        if (el.getAttribute('data-bs-theme-value') === theme) {
+          el.classList.add('active');
+        }
+      });
     };
 
-    setTheme(getPreferredTheme());
-
     window.addEventListener('DOMContentLoaded', () => {
+      const currentTheme = getStoredTheme();
+      setTheme(currentTheme);
+
       document.querySelectorAll('[data-bs-theme-value]').forEach(toggle => {
         toggle.addEventListener('click', () => {
           const theme = toggle.getAttribute('data-bs-theme-value');

@@ -233,7 +233,7 @@ $customizerHidden = 'customizer-hide';
                 </form>
                 @elseif($budget->status == 'approved')
                 <div class="text-center py-5">
-                    <div class="avatar avatar-xl bg-label-success m-auto mb-4" style="width: 80px; height: 80px;">
+                    <div class="avatar avatar-xl bg-label-success m-auto mb-4 rounded-circle d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                         <i class="ti tabler-circle-check fs-1"></i>
                     </div>
                     <h3 class="fw-bold text-success">Orçamento Aprovado!</h3>
