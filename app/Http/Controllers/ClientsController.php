@@ -153,10 +153,46 @@ class ClientsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
-    {
-        $client = Clients::findOrFail($id);
-        $client->delete();
-        return response()->json(['success' => true, 'message' => 'Cliente removido!']);
+        public function destroy($id)
+        {
+            $client = Clients::findOrFail($id);
+            $client->delete();
+            return response()->json(['success' => true, 'message' => 'Cliente removido!']);
+        }
+    
+        public function quickView($id)
+        {
+            $client = Clients::findOrFail($id);
+            
+            $html = '<div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Tipo:</strong></span>
+                            <span>'.($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica').'</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>Documento:</strong></span>
+                            <span>'.($client->type == 'PF' ? $client->cpf : $client->cnpj).'</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>E-mail:</strong></span>
+                            <span>'.$client->email.'</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><strong>WhatsApp:</strong></span>
+                            <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> '.$client->whatsapp.'</span>
+                        </div>';
+    
+            if($client->rua) {
+                $html .= '<div class="list-group-item">
+                            <strong>Endereço:</strong><br>
+                            '.$client->rua.', '.$client->numero.' - '.$client->bairro.'<br>
+                            '.$client->cidade.'/'.$client->estado.'
+                        </div>';
+            }
+    
+            $html .= '</div>';
+    
+            return response($html);
+        }
     }
-}
+    

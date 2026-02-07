@@ -107,6 +107,7 @@ Route::middleware([
     Route::get('/ordens-servico/checklist/{id}', [VehicleChecklistController::class, 'show'])->name('ordens-servico.checklist.show');
 
     // Budgets
+    Route::get('/budgets/{id}/quick-view', [BudgetController::class, 'quickView'])->name('budgets.quick-view');
     Route::get('/budgets/pending', [BudgetController::class, 'index'])->name('budgets.pending');
     Route::get('/budgets/approved', [BudgetController::class, 'index'])->name('budgets.approved');
     Route::get('/budgets/rejected', [BudgetController::class, 'index'])->name('budgets.rejected');
@@ -119,6 +120,7 @@ Route::middleware([
     Route::get('/budgets/{id}/whatsapp', [BudgetController::class, 'sendWhatsApp'])->name('budgets.whatsapp');
 
     // Clients
+    Route::get('/clients/{id}/quick-view', [ClientsController::class, 'quickView'])->name('clients.quick-view');
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
     Route::post('/clients-list', [ClientsController::class, 'store'])->name('clients-list.store');

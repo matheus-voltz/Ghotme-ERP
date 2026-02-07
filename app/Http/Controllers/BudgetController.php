@@ -38,8 +38,11 @@ class BudgetController extends Controller
 
         $data = [];
         foreach ($items as $item) {
+            $hasPhone = $item->client && ($item->client->phone || $item->client->whatsapp);
             $data[] = [
                 'id' => $item->id,
+                'client_id' => $item->client_id,
+                'has_phone' => $hasPhone, // Nova flag
                 'client' => $item->client ? ($item->client->name ?? $item->client->company_name) : '-',
                 'vehicle' => $item->veiculo ? "{$item->veiculo->placa} - {$item->veiculo->modelo}" : '-',
                 'status' => $item->status,
@@ -198,4 +201,65 @@ class BudgetController extends Controller
 
         return response()->json(['success' => true, 'url' => $url]);
     }
-}
+
+    
+
+        public function quickView($id)
+
+        {
+
+            $budget = Budget::with(['client', 'veiculo', 'items.service', 'parts.part'])->findOrFail($id);
+
+            
+
+            $html = '<div class="row mb-3">
+
+                        <div class="col-6"><strong>Cliente:</strong><br>'.$budget->client->name.'</div>
+
+                        <div class="col-6 text-end"><strong>Veículo:</strong><br>'.$budget->veiculo->marca.' '.$budget->veiculo->modelo.' ('.$budget->veiculo->placa.')</div>
+
+                     </div>';
+
+            
+
+            $html .= '<table class="table table-sm border">
+
+                        <thead class="table-light"><tr><th>Item</th><th class="text-center">Qtd</th><th class="text-end">Valor</th></tr></thead>
+
+                        <tbody>';
+
+            
+
+            foreach($budget->items as $item) {
+
+                $html .= '<tr><td>'.$item->service->name.'</td><td class="text-center">'.$item->quantity.'</td><td class="text-end">R$ '.number_format($item->price, 2, ',', '.').'</td></tr>';
+
+            }
+
+            foreach($budget->parts as $part) {
+
+                $html .= '<tr><td>'.$part->part->name.' (Peça)</td><td class="text-center">'.$part->quantity.'</td><td class="text-end">R$ '.number_format($part->price, 2, ',', '.').'</td></tr>';
+
+            }
+
+            
+
+            $html .= '</tbody><tfoot class="table-light"><tr><th colspan="2" class="text-end">Total:</th><th class="text-end">R$ '.number_format($budget->total, 2, ',', '.').'</th></tr></tfoot></table>';
+
+            
+
+            if($budget->description) {
+
+                $html .= '<div class="mt-3 small text-muted"><strong>Obs:</strong> '.$budget->description.'</div>';
+
+            }
+
+    
+
+            return response($html);
+
+        }
+
+    }
+
+    

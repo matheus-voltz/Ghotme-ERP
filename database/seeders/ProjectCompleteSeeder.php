@@ -117,13 +117,14 @@ class ProjectCompleteSeeder extends Seeder
             ['marca' => 'Ford', 'modelo' => 'Ka', 'placa' => 'GHT-0004'],
         ];
 
-        foreach ($clientsData as $c) {
+        foreach ($clientsData as $index => $c) {
             $client = Clients::create([
                 'company_id' => $company->id,
                 'name' => $c['name'],
                 'type' => $c['type'],
                 'email' => strtolower(explode(' ', $c['name'])[0]) . '@email.com',
-                'phone' => '(11) 98888-' . rand(1000, 9999),
+                'phone' => $index === 0 ? '(11) 99999-9999' : '(11) 9' . rand(7000, 9999) . '-' . rand(1000, 9999),
+                'whatsapp' => $index === 0 ? '(11) 99999-9999' : '(11) 9' . rand(7000, 9999) . '-' . rand(1000, 9999),
             ]);
 
             // Criar 1 ou 2 veículos para cada cliente
