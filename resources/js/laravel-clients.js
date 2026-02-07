@@ -203,12 +203,23 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
                     location.reload();
                 } else {
-                    // Tratar erros de validação
-                    let errorMsg = 'Verifique os dados informados.';
+                    // Tratar erros de validação de forma detalhada
+                    let errorMsg = '<ul class="text-start">';
                     if (data.errors) {
-                        errorMsg = Object.values(data.errors).flat().join('<br>');
+                        Object.keys(data.errors).forEach(key => {
+                            errorMsg += `<li><strong>${key.replace('veiculo_', 'Veículo ').replace('_', ' ')}:</strong> ${data.errors[key][0]}</li>`;
+                        });
+                    } else {
+                        errorMsg += `<li>${data.message || 'Erro desconhecido'}</li>`;
                     }
-                    Swal.fire({ icon: 'error', title: 'Erro de Validação', html: errorMsg });
+                    errorMsg += '</ul>';
+                    
+                    Swal.fire({ 
+                        icon: 'error', 
+                        title: 'Erro de Validação', 
+                        html: errorMsg,
+                        customClass: { confirmButton: 'btn btn-primary' }
+                    });
                 }
             })
             .catch(err => {

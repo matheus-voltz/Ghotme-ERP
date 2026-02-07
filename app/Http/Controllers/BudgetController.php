@@ -42,7 +42,7 @@ class BudgetController extends Controller
             $data[] = [
                 'id' => $item->id,
                 'client_id' => $item->client_id,
-                'has_phone' => $hasPhone, // Nova flag
+                'has_phone' => $hasPhone,
                 'client' => $item->client ? ($item->client->name ?? $item->client->company_name) : '-',
                 'vehicle' => $item->veiculo ? "{$item->veiculo->placa} - {$item->veiculo->modelo}" : '-',
                 'status' => $item->status,
@@ -52,7 +52,12 @@ class BudgetController extends Controller
             ];
         }
 
-        return response()->json(['data' => $data]);
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => count($data),
+            'recordsFiltered' => count($data),
+            'data' => $data
+        ]);
     }
 
     public function create()

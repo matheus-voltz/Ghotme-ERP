@@ -13,7 +13,7 @@ class Vehicles extends Model
     
     protected $fillable = [
         'company_id',
-        'client_id',
+        'cliente_id',
         'placa',
         'ano',
         'renavan',

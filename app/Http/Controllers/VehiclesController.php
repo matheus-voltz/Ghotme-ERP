@@ -100,36 +100,44 @@ class VehiclesController extends Controller
      */
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'cliente_id' => 'required|exists:clients,id',
+            'placa' => 'required|string|max:10',
+            'marca' => 'required|string|max:50',
+            'modelo' => 'required|string|max:80',
+            'ano_fabricacao' => 'nullable|numeric',
+            'renavan' => 'nullable|string|max:20',
+            'ativo' => 'required|boolean',
+        ], [], [
+            'cliente_id' => 'Cliente',
+            'placa' => 'Placa',
+            'marca' => 'Marca',
+            'modelo' => 'Modelo'
+        ]);
+
         $vehicleId = $request->id;
 
+        $data = [
+            'cliente_id' => $request->cliente_id,
+            'placa' => strtoupper($request->placa),
+            'renavan' => $request->renavan,
+            'marca' => $request->marca,
+            'modelo' => $request->modelo,
+            'ano_fabricacao' => $request->ano_fabricacao,
+            'ativo' => $request->ativo,
+            'company_id' => auth()->user()->company_id // Garante o Multi-tenancy
+        ];
+
         if ($vehicleId) {
-            // Update
-            $vehicle = Vehicles::updateOrCreate(
-                ['id' => $vehicleId],
-                [
-                    'placa' => $request->placa,
-                    'renavan' => $request->renavan,
-                    'marca' => $request->marca,
-                    'modelo' => $request->modelo,
-                    'ano_fabricacao' => $request->ano_fabricacao,
-                    'ativo' => $request->ativo,
-                ]
-            );
-
-            return response()->json('Atualizado');
+            $vehicle = Vehicles::findOrFail($vehicleId);
+            $vehicle->update($data);
+            $status = 'atualizado';
         } else {
-            // Create
-            $vehicle = Vehicles::create([
-                'placa' => $request->placa,
-                'renavan' => $request->renavan,
-                'marca' => $request->marca,
-                'modelo' => $request->modelo,
-                'ano_fabricacao' => $request->ano_fabricacao,
-                'ativo' => $request->ativo,
-            ]);
-
-            return response()->json('Criado');
+            Vehicles::create($data);
+            $status = 'criado';
         }
+
+        return response()->json(['success' => true, 'message' => "Veículo {$status} com sucesso!"]);
     }
 
     /**

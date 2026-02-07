@@ -108,25 +108,30 @@ class ClientsController extends Controller
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
             // Veículo
-            'veiculo_placa' => 'nullable|string|max:10|unique:veiculos,placa',
+            'veiculo_placa' => 'nullable|string|max:10',
             'veiculo_marca' => 'required_with:veiculo_placa|nullable|string|max:50',
             'veiculo_modelo' => 'required_with:veiculo_placa|nullable|string|max:80',
-        ], [
-            'veiculo_placa.unique' => 'Esta placa já está cadastrada no sistema.',
-            'veiculo_marca.required_with' => 'Informe a marca do veículo.',
-            'veiculo_modelo.required_with' => 'Informe o modelo do veículo.'
+        ], [], [
+            'name' => 'Nome',
+            'cpf' => 'CPF',
+            'company_name' => 'Razão Social',
+            'cnpj' => 'CNPJ',
+            'veiculo_placa' => 'Placa do Veículo',
+            'veiculo_marca' => 'Marca do Veículo',
+            'veiculo_modelo' => 'Modelo do Veículo',
         ]);
 
         return DB::transaction(function() use ($request, $validated) {
+            // Cria o cliente (o company_id é injetado automaticamente pela Trait se o user estiver logado)
             $client = Clients::create($validated);
 
             if ($request->filled('veiculo_placa')) {
                 Vehicles::create([
+                    'company_id' => auth()->user()->company_id,
                     'cliente_id' => $client->id,
                     'placa' => strtoupper($request->veiculo_placa),
                     'marca' => $request->veiculo_marca,
                     'modelo' => $request->veiculo_modelo,
-                    'company_id' => auth()->user()->company_id // Garante o vínculo
                 ]);
             }
 
@@ -183,9 +188,9 @@ class ClientsController extends Controller
 
     public function quickView($id)
     {
-        $client = Clients::findOrFail($id);
+        $client = Clients::with('vehicles')->findOrFail($id);
         
-        $html = '<div class="list-group list-group-flush">
+        $html = '<div class="list-group list-group-flush mb-4">
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>Tipo:</strong></span>
                         <span>'.($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica').'</span>
@@ -212,6 +217,21 @@ class ClientsController extends Controller
         }
 
         $html .= '</div>';
+
+        // Seção de Veículos
+        $html .= '<h6 class="px-3 mb-2 mt-4"><i class="ti tabler-car me-1"></i> Veículos Cadastrados</h6>';
+        if($client->vehicles->count() > 0) {
+            $html .= '<div class="table-responsive px-3">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light"><tr><th>Placa</th><th>Marca/Modelo</th></tr></thead>
+                            <tbody>';
+            foreach($client->vehicles as $v) {
+                $html .= '<tr><td><strong>'.$v->placa.'</strong></td><td>'.$v->marca.' '.$v->modelo.'</td></tr>';
+            }
+            $html .= '</tbody></table></div>';
+        } else {
+            $html .= '<p class="px-3 text-muted small">Nenhum veículo vinculado.</p>';
+        }
 
         return response($html);
     }
