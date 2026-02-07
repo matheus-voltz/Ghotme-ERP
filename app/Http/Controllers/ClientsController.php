@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Clients;
 use App\Models\Vehicles;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use App\Rules\Cpf;
+use App\Rules\Cnpj;
 
 class ClientsController extends Controller
 {
@@ -27,15 +31,15 @@ class ClientsController extends Controller
 
         $limit = $request->input('length');
         $start = $request->input('start');
-        
+
         $columns = [
-            0 => 'id', 
-            1 => 'id', 
-            2 => 'type', 
-            3 => 'name', 
-            4 => 'cpf', 
-            5 => 'email', 
-            6 => 'id', 
+            0 => 'id',
+            1 => 'id',
+            2 => 'type',
+            3 => 'name',
+            4 => 'cpf',
+            5 => 'email',
+            6 => 'id',
             7 => 'id'
         ];
         $orderColumnIndex = $request->input('order.0.column');
@@ -46,12 +50,12 @@ class ClientsController extends Controller
 
         if (!empty($request->input('search.value'))) {
             $search = $request->input('search.value');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('company_name', 'LIKE', "%{$search}%")
-                  ->orWhere('email', 'LIKE', "%{$search}%")
-                  ->orWhere('cpf', 'LIKE', "%{$search}%")
-                  ->orWhere('cnpj', 'LIKE', "%{$search}%");
+                    ->orWhere('company_name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('cpf', 'LIKE', "%{$search}%")
+                    ->orWhere('cnpj', 'LIKE', "%{$search}%");
             });
             $totalFiltered = $query->count();
         }
@@ -93,12 +97,32 @@ class ClientsController extends Controller
      */
     public function store(Request $request)
     {
+        // Limpar CPF/CNPJ para validação e persistência (remover pontos e traços)
+        if ($request->filled('cpf')) {
+            $request->merge(['cpf' => preg_replace('/\D/', '', $request->cpf)]);
+        }
+        if ($request->filled('cnpj')) {
+            $request->merge(['cnpj' => preg_replace('/\D/', '', $request->cnpj)]);
+        }
+
         $validated = $request->validate([
             'type' => 'required|in:PF,PJ',
             'name' => 'required_if:type,PF|nullable|string|max:255',
-            'cpf' => 'required_if:type,PF|nullable|string|max:20',
+            'cpf' => [
+                'required_if:type,PF',
+                'nullable',
+                'digits:11',
+                new Cpf,
+                Rule::unique('clients', 'cpf')->where('company_id', Auth::user()->company_id)
+            ],
             'company_name' => 'required_if:type,PJ|nullable|string|max:255',
-            'cnpj' => 'required_if:type,PJ|nullable|string|max:20',
+            'cnpj' => [
+                'required_if:type,PJ',
+                'nullable',
+                'digits:14',
+                new Cnpj,
+                Rule::unique('clients', 'cnpj')->where('company_id', Auth::user()->company_id)
+            ],
             'email' => 'nullable|email|max:255',
             'whatsapp' => 'nullable|string|max:20',
             'cep' => 'nullable|string|max:10',
@@ -111,7 +135,19 @@ class ClientsController extends Controller
             'veiculo_placa' => 'nullable|string|max:10',
             'veiculo_marca' => 'required_with:veiculo_placa|nullable|string|max:50',
             'veiculo_modelo' => 'required_with:veiculo_placa|nullable|string|max:80',
-        ], [], [
+        ], [
+            'name.required_if' => 'O nome é obrigatório para pessoa física.',
+            'cpf.required_if' => 'O CPF é obrigatório para pessoa física.',
+            'cpf.digits' => 'O CPF deve ter exatamente 11 números.',
+            'cpf.unique' => 'Este CPF já está cadastrado para outro cliente nesta empresa.',
+            'company_name.required_if' => 'A razão social é obrigatória para pessoa jurídica.',
+            'cnpj.required_if' => 'O CNPJ é obrigatório para pessoa jurídica.',
+            'cnpj.digits' => 'O CNPJ deve ter exatamente 14 números.',
+            'cnpj.unique' => 'Este CNPJ já está cadastrado para outro cliente nesta empresa.',
+            'email.email' => 'Informe um e-mail válido.',
+            'veiculo_marca.required_with' => 'A marca é obrigatória ao informar uma placa.',
+            'veiculo_modelo.required_with' => 'O modelo é obrigatório ao informar uma placa.',
+        ], [
             'name' => 'Nome',
             'cpf' => 'CPF',
             'company_name' => 'Razão Social',
@@ -121,13 +157,13 @@ class ClientsController extends Controller
             'veiculo_modelo' => 'Modelo do Veículo',
         ]);
 
-        return DB::transaction(function() use ($request, $validated) {
+        return DB::transaction(function () use ($request, $validated) {
             // Cria o cliente (o company_id é injetado automaticamente pela Trait se o user estiver logado)
             $client = Clients::create($validated);
 
             if ($request->filled('veiculo_placa')) {
                 Vehicles::create([
-                    'company_id' => auth()->user()->company_id,
+                    'company_id' => Auth::user()->company_id,
                     'cliente_id' => $client->id,
                     'placa' => strtoupper($request->veiculo_placa),
                     'marca' => $request->veiculo_marca,
@@ -154,13 +190,33 @@ class ClientsController extends Controller
     public function update(Request $request, $id)
     {
         $client = Clients::findOrFail($id);
-        
+
+        // Limpar CPF/CNPJ para validação e persistência
+        if ($request->filled('cpf')) {
+            $request->merge(['cpf' => preg_replace('/\D/', '', $request->cpf)]);
+        }
+        if ($request->filled('cnpj')) {
+            $request->merge(['cnpj' => preg_replace('/\D/', '', $request->cnpj)]);
+        }
+
         $validated = $request->validate([
             'type' => 'required|in:PF,PJ',
             'name' => 'required_if:type,PF|nullable|string|max:255',
-            'cpf' => 'required_if:type,PF|nullable|string|max:20',
+            'cpf' => [
+                'required_if:type,PF',
+                'nullable',
+                'digits:11',
+                new Cpf,
+                Rule::unique('clients', 'cpf')->ignore($id)->where('company_id', Auth::user()->company_id)
+            ],
             'company_name' => 'required_if:type,PJ|nullable|string|max:255',
-            'cnpj' => 'required_if:type,PJ|nullable|string|max:20',
+            'cnpj' => [
+                'required_if:type,PJ',
+                'nullable',
+                'digits:14',
+                new Cnpj,
+                Rule::unique('clients', 'cnpj')->ignore($id)->where('company_id', Auth::user()->company_id)
+            ],
             'email' => 'nullable|email|max:255',
             'whatsapp' => 'nullable|string|max:20',
             'cep' => 'nullable|string|max:10',
@@ -169,6 +225,16 @@ class ClientsController extends Controller
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
+        ], [
+            'name.required_if' => 'O nome é obrigatório para pessoa física.',
+            'cpf.required_if' => 'O CPF é obrigatório para pessoa física.',
+            'cpf.digits' => 'O CPF deve ter exatamente 11 números.',
+            'cpf.unique' => 'Este CPF já está cadastrado para outro cliente.',
+            'company_name.required_if' => 'A razão social é obrigatória para pessoa jurídica.',
+            'cnpj.required_if' => 'O CNPJ é obrigatório para pessoa jurídica.',
+            'cnpj.digits' => 'O CNPJ deve ter exatamente 14 números.',
+            'cnpj.unique' => 'Este CNPJ já está cadastrado para outro cliente.',
+            'email.email' => 'Informe um e-mail válido.',
         ]);
 
         $client->update($validated);
@@ -189,30 +255,30 @@ class ClientsController extends Controller
     public function quickView($id)
     {
         $client = Clients::with('vehicles')->findOrFail($id);
-        
+
         $html = '<div class="list-group list-group-flush mb-4">
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>Tipo:</strong></span>
-                        <span>'.($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica').'</span>
+                        <span>' . ($client->type == 'PF' ? 'Pessoa Física' : 'Pessoa Jurídica') . '</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>Documento:</strong></span>
-                        <span>'.($client->type == 'PF' ? $client->cpf : $client->cnpj).'</span>
+                        <span>' . ($client->type == 'PF' ? $client->cpf : $client->cnpj) . '</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>E-mail:</strong></span>
-                        <span>'.$client->email.'</span>
+                        <span>' . $client->email . '</span>
                     </div>
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>WhatsApp:</strong></span>
-                        <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> '.$client->whatsapp.'</span>
+                        <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> ' . $client->whatsapp . '</span>
                     </div>';
 
-        if($client->rua) {
+        if ($client->rua) {
             $html .= '<div class="list-group-item">
                         <strong>Endereço:</strong><br>
-                        '.$client->rua.', '.$client->numero.' - '.$client->bairro.'<br>
-                        '.$client->cidade.'/'.$client->estado.'
+                        ' . $client->rua . ', ' . $client->numero . ' - ' . $client->bairro . '<br>
+                        ' . $client->cidade . '/' . $client->estado . '
                     </div>';
         }
 
@@ -220,13 +286,13 @@ class ClientsController extends Controller
 
         // Seção de Veículos
         $html .= '<h6 class="px-3 mb-2 mt-4"><i class="ti tabler-car me-1"></i> Veículos Cadastrados</h6>';
-        if($client->vehicles->count() > 0) {
+        if ($client->vehicles->count() > 0) {
             $html .= '<div class="table-responsive px-3">
                         <table class="table table-sm table-bordered">
                             <thead class="table-light"><tr><th>Placa</th><th>Marca/Modelo</th></tr></thead>
                             <tbody>';
-            foreach($client->vehicles as $v) {
-                $html .= '<tr><td><strong>'.$v->placa.'</strong></td><td>'.$v->marca.' '.$v->modelo.'</td></tr>';
+            foreach ($client->vehicles as $v) {
+                $html .= '<tr><td><strong>' . $v->placa . '</strong></td><td>' . $v->marca . ' ' . $v->modelo . '</td></tr>';
             }
             $html .= '</tbody></table></div>';
         } else {

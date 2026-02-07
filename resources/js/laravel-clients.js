@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Toggle PF/PJ
     document.querySelectorAll('.client-type-toggle').forEach(radio => {
-        radio.addEventListener('change', function() {
+        radio.addEventListener('change', function () {
             if (this.value === 'PF') {
                 sectionPF.classList.remove('d-none');
                 sectionPJ.classList.add('d-none');
@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     orderable: false,
                     render: (data, type, full) => {
                         const whatsappLink = full.whatsapp ? `https://api.whatsapp.com/send?phone=55${full.whatsapp.replace(/\D/g, '')}` : '#';
-                        const whatsappBtn = full.whatsapp 
-                            ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></a>` 
+                        const whatsappBtn = full.whatsapp
+                            ? `<a href="${whatsappLink}" target="_blank" class="btn btn-sm btn-icon text-success" title="WhatsApp"><i class="ti tabler-brand-whatsapp"></i></a>`
                             : '';
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
@@ -85,12 +85,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // View Record Modal
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.view-record')) {
                 const id = e.target.closest('.view-record').dataset.id;
                 $('#viewClientModal').modal('show');
                 $('#clientModalContent').html('<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>');
-                
+
                 fetch(`${baseUrl}clients/${id}/quick-view`)
                     .then(res => res.text())
                     .then(html => {
@@ -100,15 +100,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // View Dossier from Client Edit
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.view-vehicle-dossier')) {
                 const id = e.target.closest('.view-vehicle-dossier').dataset.id;
-                
+
                 // Precisamos garantir que o modal exista na página. 
                 // Se não existir (estamos na página de clientes, não veículos), precisamos criar ou redirecionar.
                 // Como o modal é grande, o ideal é ter ele na página.
                 // Vou injetar o modal dinamicamente se não existir.
-                
+
                 let modalEl = document.getElementById('viewDossierModal');
                 if (!modalEl) {
                     const modalHtml = `
@@ -129,9 +129,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
                 const modal = new bootstrap.Modal(modalEl);
                 modal.show();
-                
+
                 document.getElementById('dossierModalContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
-                
+
                 fetch(`${baseUrl}vehicles/${id}/dossier`)
                     .then(res => res.text())
                     .then(html => {
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Delete
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.delete-record')) {
                 const id = e.target.closest('.delete-record').dataset.id;
                 Swal.fire({
@@ -169,12 +169,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Edit
-        document.addEventListener('click', function(e) {
+        document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
                 document.getElementById('offcanvasAddClientsLabel').innerHTML = 'Editar Cliente';
-                formClient.reset(); 
-                
+                formClient.reset();
+
                 fetch(`${baseUrl}clients-list/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
@@ -198,13 +198,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.querySelector('[name="bairro"]').value = data.bairro || '';
                         document.querySelector('[name="cidade"]').value = data.cidade || '';
                         document.querySelector('[name="estado"]').value = data.estado || '';
-                        
+
                         // Mostrar veículos existentes
                         const existingSection = document.getElementById('existingVehiclesSection');
                         const listContainer = document.getElementById('existingVehiclesList');
                         const vehicleFields = document.getElementById('vehicleFieldsContainer');
                         const btnToggle = document.getElementById('btnToggleVehicle');
-                        
+
                         if (data.vehicles && data.vehicles.length > 0) {
                             existingSection.classList.remove('d-none');
                             listContainer.innerHTML = data.vehicles.map(v => `
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                     <button type="button" class="btn btn-sm btn-label-info btn-icon view-vehicle-dossier" data-id="${v.id}"><i class="ti tabler-eye"></i></button>
                                 </div>
                             `).join('');
-                            
+
                             // Na edição, se já tem carro, esconde o form de "novo carro" por padrão
                             vehicleFields.classList.add('d-none');
                             btnToggle.classList.remove('d-none');
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
 
         // Toggle Vehicle Fields logic
-        document.getElementById('btnToggleVehicle').addEventListener('click', function() {
+        document.getElementById('btnToggleVehicle').addEventListener('click', function () {
             const container = document.getElementById('vehicleFieldsContainer');
             if (container.classList.contains('d-none')) {
                 container.classList.remove('d-none');
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formClient.reset();
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
-                
+
                 // No cadastro novo, sempre mostra os campos do veículo
                 document.getElementById('existingVehiclesSection').classList.add('d-none');
                 document.getElementById('vehicleFieldsContainer').classList.remove('d-none');
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Submit
     if (formClient) {
-        formClient.addEventListener('submit', function(e) {
+        formClient.addEventListener('submit', function (e) {
             e.preventDefault();
             const id = document.getElementById('client_id').value;
             const url = id ? `${baseUrl}clients-list/${id}` : `${baseUrl}clients-list`;
@@ -268,45 +268,77 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
             // Use FormData directly for reliable field capturing
             const formData = new FormData(formClient);
+
+            // Garantir que CPF/CNPJ vão limpos para o servidor para bater com a validação
+            if (formData.get('cpf')) formData.set('cpf', formData.get('cpf').replace(/\D/g, ''));
+            if (formData.get('cnpj')) formData.set('cnpj', formData.get('cnpj').replace(/\D/g, ''));
+
             if (id) formData.append('_method', 'PUT');
 
             fetch(url, {
                 method: 'POST', // Always POST for Laravel when sending files/formdata, with _method override
                 body: formData,
-                headers: { 
+                headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
                     'Accept': 'application/json'
                 }
             })
-            .then(async res => {
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
-                    location.reload();
-                } else {
-                    // Tratar erros de validação de forma detalhada
-                    let errorMsg = '<ul class="text-start">';
-                    if (data.errors) {
-                        Object.keys(data.errors).forEach(key => {
-                            errorMsg += `<li><strong>${key.replace('veiculo_', 'Veículo ').replace('_', ' ')}:</strong> ${data.errors[key][0]}</li>`;
+                .then(async res => {
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message,
+                            customClass: { confirmButton: 'btn btn-primary' }
+                        }).then(() => {
+                            location.reload();
                         });
                     } else {
-                        errorMsg += `<li>${data.message || 'Erro desconhecido'}</li>`;
+                        // Limpar erros anteriores
+                        formClient.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                        formClient.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                        if (data.errors) {
+                            Object.keys(data.errors).forEach(key => {
+                                const input = formClient.querySelector(`[name="${key}"]`);
+                                if (input) {
+                                    input.classList.add('is-invalid');
+
+                                    // Criar div de erro
+                                    const feedback = document.createElement('div');
+                                    feedback.className = 'invalid-feedback';
+                                    feedback.innerText = data.errors[key][0];
+
+                                    // Inserir após o input (ou após o container do input se for um grupo)
+                                    if (input.closest('.input-group')) {
+                                        input.closest('.input-group').after(feedback);
+                                    } else {
+                                        input.after(feedback);
+                                    }
+                                }
+                            });
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro de Validação',
+                                text: 'Por favor, verifique os campos em vermelho.',
+                                customClass: { confirmButton: 'btn btn-primary' }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: data.message || 'Erro inesperado',
+                                customClass: { confirmButton: 'btn btn-primary' }
+                            });
+                        }
                     }
-                    errorMsg += '</ul>';
-                    
-                    Swal.fire({ 
-                        icon: 'error', 
-                        title: 'Erro de Validação', 
-                        html: errorMsg,
-                        customClass: { confirmButton: 'btn btn-primary' }
-                    });
-                }
-            })
-            .catch(err => {
-                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
-            });
+                })
+                .catch(err => {
+                    Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
+                });
         });
     }
 });

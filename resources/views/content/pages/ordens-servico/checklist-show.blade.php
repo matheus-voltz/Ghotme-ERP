@@ -15,23 +15,94 @@
 ])
 @endsection
 
-@section('content')
+@section('page-style')
 <style>
-  @if($isPublic) .layout-menu, .template-customizer-open-btn {
+  /* Esconde absolutamente tudo que não seja o conteúdo se for público */
+  @if($isPublic) .layout-menu,
+  .template-customizer-open-btn,
+  .layout-navbar,
+  .content-footer,
+  #primary-color-style,
+  .layout-page::before,
+  .content-wrapper::before,
+  .layout-wrapper::before,
+  [class*="layout-page"]::before {
     display: none !important;
+    visibility: hidden !important;
+    content: none !important;
+    height: 0 !important;
   }
 
-  .layout-page {
-    padding-left: 0 !important;
+  /* Reset total para um "Esqueleto" branco puro */
+  html,
+  body,
+  .layout-wrapper,
+  .layout-container,
+  .layout-page,
+  .content-wrapper,
+  .container-xxl {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #e0e0e0 !important;
+    background: #fff !important;
+  }
+
+  .container-p-y {
+    padding-top: 2rem !important;
   }
 
   @endif
-</style>
+  /* Estilos para impressão */
+  @media print {
 
+    .layout-menu,
+    .layout-navbar,
+    .content-footer,
+    .no-print,
+    .template-customizer-open-btn,
+    .btn {
+      display: none !important;
+    }
+
+    .layout-page,
+    .content-wrapper,
+    .container-xxl {
+      padding: 0 !important;
+      margin: 0 !important;
+      max-width: 100% !important;
+    }
+
+    .card {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    body {
+      background: white !important;
+    }
+
+    .card-header .d-flex {
+      display: none !important;
+    }
+  }
+</style>
+@endsection
+
+@section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
 
-  @if(!$isPublic && Auth::check())
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  @if(!$isPublic && auth()->check())
+  <div class="d-flex justify-content-between align-items-center mb-4 no-print">
     <h4 class="mb-0">{{ __('Detalhes do Checklist') }}</h4>
     <a href="{{ route('ordens-servico.checklist') }}" class="btn btn-label-secondary">
       <i class="ti tabler-arrow-left me-1"></i> {{ __('Voltar') }}
@@ -48,7 +119,7 @@
     <div class="card-header d-flex justify-content-between flex-wrap gap-3">
       <h5 class="mb-0">{{ __('Checklist') }} #{{ $inspection->id }}</h5>
       @if(!$isPublic && auth()->check())
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-2 no-print">
         <button onclick="window.print()" class="btn btn-label-secondary">
           <i class="ti tabler-printer me-1"></i> {{ __('Imprimir') }}
         </button>
