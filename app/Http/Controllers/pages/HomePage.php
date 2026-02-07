@@ -53,15 +53,69 @@ class HomePage extends Controller
       ->limit(5)
       ->get();
 
+    // Chart Data: Revenue vs Expenses (Last 6 Months)
+    $months = [];
+    $revenueTrends = [];
+    $expenseTrends = [];
+
+    for ($i = 5; $i >= 0; $i--) {
+      $monthDate = Carbon::now()->subMonths($i);
+      $months[] = $monthDate->translatedFormat('M');
+
+      $revenueTrends[] = FinancialTransaction::where('type', 'in')
+        ->where('status', 'paid')
+        ->whereMonth('paid_at', $monthDate->month)
+        ->whereYear('paid_at', $monthDate->year)
+        ->sum('amount');
+
+      $expenseTrends[] = FinancialTransaction::where('type', 'out')
+        ->where('status', 'paid')
+        ->whereMonth('paid_at', $monthDate->month)
+        ->whereYear('paid_at', $monthDate->year)
+        ->sum('amount');
+    }
+
+    // OS Distribution Chart
+    $osDistribution = [
+      'pending' => OrdemServico::where('status', 'pending')->count(),
+      'running' => OrdemServico::where('status', 'running')->count(),
+      'finalized' => OrdemServico::where('status', 'finalized')->count(),
+    ];
+
+    // Budget Conversion Metrics
+    $totalBudgetsMonth = Budget::whereMonth('created_at', Carbon::now()->month)->count();
+    $approvedBudgetsMonth = Budget::where('status', 'approved')
+      ->whereMonth('updated_at', Carbon::now()->month)
+      ->count();
+
+    $conversionRate = $totalBudgetsMonth > 0 ? ($approvedBudgetsMonth / $totalBudgetsMonth) * 100 : 0;
+
+    // Budget Trends (Last 6 Months)
+    $budgetTrends = [];
+    for ($i = 5; $i >= 0; $i--) {
+      $monthDate = Carbon::now()->subMonths($i);
+      $budgetTrends[] = Budget::whereMonth('created_at', $monthDate->month)
+        ->whereYear('created_at', $monthDate->year)
+        ->count();
+    }
+
     return view('content.pages.dashboard.dashboards-analytics', compact(
-      'osStats', 
-      'revenueMonth', 
-      'receivablesPending', 
-      'payablesPending', 
-      'totalClients', 
-      'lowStockItems', 
+      'osStats',
+      'revenueMonth',
+      'receivablesPending',
+      'payablesPending',
+      'totalClients',
+      'lowStockItems',
       'pendingBudgets',
-      'recentOS'
+      'recentOS',
+      'months',
+      'revenueTrends',
+      'expenseTrends',
+      'osDistribution',
+      'conversionRate',
+      'budgetTrends',
+      'totalBudgetsMonth',
+      'approvedBudgetsMonth'
     ));
   }
 }
