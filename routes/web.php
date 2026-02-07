@@ -36,6 +36,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PublicBudgetController;
 use App\Http\Controllers\SystemErrorController;
 use App\Http\Controllers\CustomerPortalController;
+use App\Http\Controllers\NotificationController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -265,6 +266,11 @@ Route::middleware([
     Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
     Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
     Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.individual.mark-as-read');
 });
 
 

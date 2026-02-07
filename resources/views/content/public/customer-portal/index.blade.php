@@ -289,7 +289,7 @@ $customizerHidden = 'customizer-hide';
                 <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status na Oficina</h4>
             </div>
 
-            @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed']) as $order)
+            @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed', 'awaiting_approval']) as $order)
             <div class="vehicle-card p-4 mb-4 shadow-sm border-0">
                 <div class="row align-items-center">
                     <div class="col-md-7">
@@ -393,23 +393,43 @@ $customizerHidden = 'customizer-hide';
                 @endforelse
             </div>
 
-            <!-- Histórico -->
+            <!-- Linha do Tempo Unificada -->
             <div class="mb-4">
-                <h5 class="fw-bold mb-4">Finalizados Recente</h5>
-                <div class="glass-card p-2">
-                    @forelse($orders->where('status', 'completed')->take(3) as $history)
-                    <div class="p-3 @if(!$loop->last) border-bottom @endif">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold">{{ $history->veiculo->modelo }}</span>
-                            <small class="text-muted">{{ $history->created_at->format('d/m/y') }}</small>
-                        </div>
-                        <small class="badge bg-label-success mt-1">Concluído</small>
-                    </div>
-                    @empty
-                    <div class="p-4 text-center opacity-50">
-                        <small>Sem histórico disponível.</small>
-                    </div>
-                    @endforelse
+                <h5 class="fw-bold mb-4">Linha do Tempo</h5>
+                <div class="glass-card p-3 shadow-none border">
+                    <ul class="timeline timeline-advance mb-0">
+                        @forelse($unifiedHistory as $history)
+                        @php
+                        $iconColor = 'primary';
+                        $icon = 'ti-tool';
+
+                        switch($history->event_type) {
+                        case 'entrada_oficina': $iconColor = 'warning'; $icon = 'tabler-home-check'; break;
+                        case 'aguardando_orcamento': $iconColor = 'warning'; $icon = 'tabler-clipboard-list'; break;
+                        case 'os_aberta': $iconColor = 'info'; $icon = 'tabler-file-plus'; break;
+                        case 'orcamento_aprovado': $iconColor = 'success'; $icon = 'tabler-currency-dollar'; break;
+                        case 'os_finalizada': $iconColor = 'success'; $icon = 'tabler-file-check'; break;
+                        }
+                        @endphp
+                        <li class="timeline-item timeline-item-transparent @if(!$loop->last) border-left-dashed @endif pb-4">
+                            <span class="timeline-point timeline-point-{{ $iconColor }}"></span>
+                            <div class="timeline-event">
+                                <div class="timeline-header mb-1">
+                                    <h6 class="mb-0 fw-bold">{{ $history->title }}</h6>
+                                    <small class="text-muted">{{ $history->date->format('d/m/Y') }}</small>
+                                </div>
+                                <p class="mb-0 small text-muted">{{ $history->description }}</p>
+                                @if($history->ordemServico)
+                                <a href="{{ route('customer.portal.order', $history->ordemServico->uuid) }}" class="small mt-2 d-block">Ver Detalhes <i class="ti tabler-chevron-right fs-tiny"></i></a>
+                                @endif
+                            </div>
+                        </li>
+                        @empty
+                        <li class="p-4 text-center opacity-50 list-unstyled">
+                            <small>Nenhuma atividade registrada.</small>
+                        </li>
+                        @endforelse
+                    </ul>
                 </div>
             </div>
 

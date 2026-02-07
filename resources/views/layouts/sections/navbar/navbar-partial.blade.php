@@ -91,6 +91,83 @@ use Illuminate\Support\Facades\Route;
     </li>
     <!--/ Language -->
 
+    <!-- Notifications -->
+    <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+      <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        <div class="position-relative">
+          <i class="icon-base ti tabler-bell icon-md"></i>
+          @if(Auth::user()->unreadNotifications->count() > 0)
+          <span class="badge rounded-pill bg-danger badge-dot badge-notifications position-absolute top-0 start-100 translate-middle-x"></span>
+          @endif
+        </div>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end py-0">
+        <li class="dropdown-menu-header border-bottom">
+          <div class="dropdown-header d-flex align-items-center py-3">
+            <h6 class="mb-0 me-auto">Notificações</h6>
+            <div class="d-flex align-items-center h6 mb-0">
+              <span class="badge bg-label-primary me-2">{{ Auth::user()->unreadNotifications->count() }} Novas</span>
+              <a href="javascript:void(0)" class="dropdown-notifications-all mark-as-read-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Marcar todas como lidas">
+                <i class="icon-base ti tabler-mail-opened icon-md text-heading"></i>
+              </a>
+            </div>
+          </div>
+        </li>
+        <li class="dropdown-notifications-list scrollable-container">
+          <ul class="list-group list-group-flush">
+            @forelse(Auth::user()->unreadNotifications->take(10) as $notification)
+            <li class="list-group-item list-group-item-action dropdown-notifications-item" data-id="{{ $notification->id }}">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  <div class="avatar">
+                    <span class="avatar-initial rounded-circle bg-label-success">
+                      <i class="icon-base ti tabler-currency-dollar"></i>
+                    </span>
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1 small">{{ $notification->data['title'] ?? 'Notificação' }}</h6>
+                  <small class="mb-1 d-block text-body">{{ $notification->data['message'] ?? '' }}</small>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                    @php
+                    $url = $notification->data['url'] ?? null;
+                    if (isset($notification->data['budget_id'])) {
+                    $url = route('budgets.approved');
+                    }
+                    @endphp
+                    @if($url)
+                    <a href="{{ $url }}" class="btn btn-xs btn-link p-0">Mais detalhes</a>
+                    @endif
+                  </div>
+                </div>
+                <div class="flex-shrink-0 dropdown-notifications-actions">
+                  <a href="javascript:void(0)" class="dropdown-notifications-read individual-mark-as-read" title="Marcar como lida">
+                    <span class="badge badge-dot"></span>
+                  </a>
+                </div>
+              </div>
+            </li>
+            @empty
+            <li class="list-group-item list-group-item-action dropdown-notifications-item">
+              <div class="text-center p-3">
+                <small class="text-muted">Nenhuma notificação</small>
+              </div>
+            </li>
+            @endforelse
+          </ul>
+        </li>
+        <li class="border-top">
+          <div class="d-grid p-4">
+            <a class="btn btn-primary btn-sm d-flex" href="{{ route('notifications.index') }}">
+              <small class="align-middle">Ver todas as notificações</small>
+            </a>
+          </div>
+        </li>
+      </ul>
+    </li>
+    <!--/ Notifications -->
+
     <!-- User -->
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -217,3 +294,99 @@ use Illuminate\Support\Facades\Route;
     <!--/ User -->
   </ul>
 </div>
+
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const markAsReadBtn = document.querySelector('.mark-as-read-btn');
+    const updateHeaderBadge = (newCount) => {
+      const badge = document.querySelector('.badge-notifications');
+      const headerBadge = document.querySelector('.dropdown-header .badge');
+      if (newCount === 0 && badge) badge.remove();
+      if (headerBadge) headerBadge.textContent = `${newCount} Novas`;
+    };
+
+    // Marcar todas como lidas
+    if (markAsReadBtn) {
+      markAsReadBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        fetch('{{ route("notifications.mark-as-read") }}', {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              updateHeaderBadge(0);
+              const list = document.querySelector('.dropdown-notifications-list ul');
+              if (list) {
+                list.innerHTML = `
+                            <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                <div class="text-center p-3">
+                                    <small class="text-muted">Nenhuma notificação nova</small>
+                                </div>
+                            </li>`;
+              }
+            }
+          });
+      });
+    }
+
+    // Marcar individual
+    document.addEventListener('click', function(e) {
+      const individualBtn = e.target.closest('.individual-mark-as-read');
+      if (individualBtn) {
+        e.preventDefault();
+        const item = individualBtn.closest('.dropdown-notifications-item');
+        const id = item.dataset.id;
+
+        fetch(`/notifications/${id}/mark-as-read`, {
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': '{{ csrf_token() }}',
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              item.remove();
+
+              // Atualizar contadores
+              const navCountElem = document.querySelector('.dropdown-header .badge');
+              if (navCountElem) {
+                const currentCount = parseInt(navCountElem.textContent);
+                const newCount = Math.max(0, currentCount - 1);
+                updateHeaderBadge(newCount);
+
+                if (newCount === 0) {
+                  const list = document.querySelector('.dropdown-notifications-list ul');
+                  if (list) {
+                    list.innerHTML = `
+                                    <li class="list-group-item list-group-item-action dropdown-notifications-item">
+                                        <div class="text-center p-3">
+                                            <small class="text-muted">Nenhuma notificação nova</small>
+                                        </div>
+                                    </li>`;
+                  }
+                }
+              }
+            }
+          });
+      }
+    });
+  });
+</script>
+<style>
+  .marked-as-read {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .marked-as-read .small {
+    color: #a1a5b7 !important;
+  }
+</style>
+@endpush

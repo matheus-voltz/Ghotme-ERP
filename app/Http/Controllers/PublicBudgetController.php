@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Budget;
 use App\Models\BudgetApproval;
+use App\Models\User;
+use App\Notifications\BudgetApprovedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class PublicBudgetController extends Controller
 {
@@ -21,7 +24,12 @@ class PublicBudgetController extends Controller
 
     public function approve(Request $request, $uuid)
     {
-        $budget = Budget::withoutGlobalScope('company')->where('uuid', $uuid)->firstOrFail();
+        $budget = Budget::withoutGlobalScope('company')
+            ->with(['veiculo' => function ($q) {
+                $q->withoutGlobalScope('company');
+            }])
+            ->where('uuid', $uuid)
+            ->firstOrFail();
 
         if ($budget->status !== 'pending') {
             return back()->with('error', 'Este orçamento já foi processado.');
@@ -36,7 +44,7 @@ class PublicBudgetController extends Controller
                 'approval_ip' => $request->ip()
             ]);
 
-            // Cria o registro histórico
+            // Cria o registro histórico de aprovação
             BudgetApproval::create([
                 'company_id' => $budget->company_id,
                 'budget_id' => $budget->id,
@@ -44,6 +52,22 @@ class PublicBudgetController extends Controller
                 'ip_address' => $request->ip(),
                 'user_agent' => $request->userAgent(),
             ]);
+
+            // Adicionar à Linha do Tempo do Veículo
+            \App\Models\VehicleHistory::create([
+                'company_id' => $budget->company_id,
+                'veiculo_id' => $budget->veiculo_id,
+                'date' => now(),
+                'km' => $budget->veiculo->km_atual ?? 0,
+                'event_type' => 'orcamento_aprovado',
+                'title' => 'Orçamento Aprovado #' . $budget->id,
+                'description' => 'Serviços e peças autorizados pelo cliente via Portal Digital.' . ($request->early_payment ? ' Optou por pagamento antecipado.' : ''),
+                'performer' => 'Cliente (Portal Digital)',
+            ]);
+
+            // Notifica os usuários da oficina
+            $usersToNotify = User::where('company_id', $budget->company_id)->get();
+            Notification::send($usersToNotify, new BudgetApprovedNotification($budget));
         });
 
         return back()->with('success', 'Orçamento aprovado com sucesso!');

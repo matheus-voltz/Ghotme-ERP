@@ -67,9 +67,18 @@
                 if($item->event_type === 'os_finalizada') {
                 $badgeColor = 'success';
                 $icon = 'tabler-file-check';
+                } elseif($item->event_type === 'os_aberta') {
+                $badgeColor = 'primary';
+                $icon = 'tabler-file-plus';
                 } elseif($item->event_type === 'entrada_oficina') {
                 $badgeColor = 'warning';
                 $icon = 'tabler-home-check';
+                } elseif($item->event_type === 'aguardando_orcamento') {
+                $badgeColor = 'warning';
+                $icon = 'tabler-clipboard-list';
+                } elseif($item->event_type === 'orcamento_aprovado') {
+                $badgeColor = 'info';
+                $icon = 'tabler-currency-dollar';
                 }
                 @endphp
                 <li class="timeline-item timeline-item-transparent text-break">

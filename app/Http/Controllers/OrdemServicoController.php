@@ -23,7 +23,7 @@ class OrdemServicoController extends Controller
     public function dataBase(Request $request)
     {
         $query = OrdemServico::with(['client', 'veiculo']);
-        
+
         $totalData = $query->count();
         $totalFiltered = $totalData;
 
@@ -101,13 +101,40 @@ class OrdemServicoController extends Controller
             }
 
             DB::commit();
-            
+
+            // Adicionar ao Histórico do Veículo: Entrada na Oficina
+            \App\Models\VehicleHistory::create([
+                'company_id' => Auth::user()->company_id,
+                'veiculo_id' => $os->veiculo_id,
+                'ordem_servico_id' => $os->id,
+                'date' => now(),
+                'km' => $os->km_entry ?? 0,
+                'event_type' => 'entrada_oficina',
+                'title' => 'Entrada na Oficina',
+                'description' => 'O veículo deu entrada para avaliação técnica.',
+                'performer' => Auth::user()->name,
+                'created_by' => Auth::id()
+            ]);
+
+            // Adicionar ao Histórico do Veículo: Aguardando Orçamento
+            \App\Models\VehicleHistory::create([
+                'company_id' => Auth::user()->company_id,
+                'veiculo_id' => $os->veiculo_id,
+                'ordem_servico_id' => $os->id,
+                'date' => now(),
+                'km' => $os->km_entry ?? 0,
+                'event_type' => 'aguardando_orcamento',
+                'title' => 'Aguardando Orçamento',
+                'description' => 'A equipe técnica está avaliando o veículo para elaboração do orçamento.',
+                'performer' => Auth::user()->name,
+                'created_by' => Auth::id()
+            ]);
+
             if ($request->has('redirect_to_checklist')) {
                 return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])->with('success', 'OS Criada! Realize o checklist agora.');
             }
 
             return redirect()->route('ordens-servico')->with('success', 'OS Criada!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
@@ -117,7 +144,38 @@ class OrdemServicoController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $os = OrdemServico::findOrFail($id);
+        $oldStatus = $os->status;
         $os->update(['status' => $request->status]);
+
+        // Mapeamento de nomes amigáveis para o histórico
+        $statusLabels = [
+            'pending' => 'Pendente',
+            'in_progress' => 'Em Manutenção',
+            'testing' => 'Em Teste',
+            'cleaning' => 'Em Limpeza',
+            'completed' => 'Pronto para Retirada',
+            'paid' => 'Finalizado / Pago',
+            'awaiting_approval' => 'Aguardando Aprovação'
+        ];
+
+        // Se o status mudou para algo relevante, logar no histórico
+        if ($oldStatus !== $request->status && in_array($request->status, ['in_progress', 'testing', 'completed', 'paid'])) {
+            $eventType = $request->status === 'paid' || $request->status === 'completed' ? 'os_finalizada' : 'os_em_andamento';
+
+            \App\Models\VehicleHistory::create([
+                'company_id' => Auth::user()->company_id,
+                'veiculo_id' => $os->veiculo_id,
+                'ordem_servico_id' => $os->id,
+                'date' => now(),
+                'km' => $os->km_entry ?? 0,
+                'event_type' => $eventType,
+                'title' => 'Status da OS Atualizado: ' . ($statusLabels[$request->status] ?? $request->status),
+                'description' => 'A Ordem de Serviço #' . $os->id . ' avançou para o status ' . ($statusLabels[$request->status] ?? $request->status) . '.',
+                'performer' => Auth::user()->name ?? 'Sistema',
+                'created_by' => Auth::id()
+            ]);
+        }
+
         return response()->json(['success' => true]);
     }
 

@@ -38,7 +38,16 @@ class CustomerPortalController extends Controller
             }
         });
 
-        return view('content.public.customer-portal.index', compact('client', 'orders', 'budgets'));
+        // Buscar histórico unificado de todos os veículos do cliente
+        $vehicleIds = $client->vehicles->pluck('id');
+        $unifiedHistory = \App\Models\VehicleHistory::whereIn('veiculo_id', $vehicleIds)
+            ->with(['ordemServico'])
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->take(10)
+            ->get();
+
+        return view('content.public.customer-portal.index', compact('client', 'orders', 'budgets', 'unifiedHistory'));
     }
 
     public function showOrder($uuid)

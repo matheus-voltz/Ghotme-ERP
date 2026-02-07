@@ -27,12 +27,12 @@ class VehicleHistory extends Model
 
     public function veiculo(): BelongsTo
     {
-        return $this->belongsTo(Vehicles::class, 'veiculo_id');
+        return $this->belongsTo(Vehicles::class, 'veiculo_id')->withoutGlobalScope('company');
     }
 
     public function ordemServico(): BelongsTo
     {
-        return $this->belongsTo(OrdemServico::class, 'ordem_servico_id');
+        return $this->belongsTo(OrdemServico::class, 'ordem_servico_id')->withoutGlobalScope('company');
     }
 
     public function creator(): BelongsTo
