@@ -274,6 +274,12 @@ Route::middleware([
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-as-read');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.individual.mark-as-read');
+
+    // Mechanic Dashboard
+    Route::get('/mechanic', [App\Http\Controllers\MechanicDashboardController::class, 'index'])->name('mechanic.dashboard');
+    Route::get('/mechanic/os/{uuid}', [App\Http\Controllers\MechanicDashboardController::class, 'show'])->name('mechanic.os.show');
+    Route::post('/mechanic/timer/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'toggleTimer'])->name('mechanic.timer.toggle');
+    Route::post('/mechanic/complete/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'completeItem'])->name('mechanic.item.complete');
 });
 
 

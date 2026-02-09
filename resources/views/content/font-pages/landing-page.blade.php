@@ -2,10 +2,10 @@
 $configData = Helper::appClasses();
 $isFront = true;
 $pageConfigs = [
-  'myLayout' => 'front',
-  'myTheme' => 'light',
-  'customizerHidden' => true,
-  'displayCustomizer' => false
+'myLayout' => 'front',
+'myTheme' => 'light',
+'customizerHidden' => true,
+'displayCustomizer' => false
 ];
 @endphp
 
@@ -86,17 +86,17 @@ $pageConfigs = [
           </h2>
           <div class="landing-hero-btn d-inline-block position-relative">
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">Conheça nosso sistema <img
-              src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt="Seta junte-se à comunidade"
-              class="scaleX-n1-rtl" /></span>
+                src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt="Seta junte-se à comunidade"
+                class="scaleX-n1-rtl" /></span>
             <a href="#landingPricing" class="btn btn-primary btn-lg">Comece seu teste grátis</a>
           </div>
         </div>
-        <div id="heroDashboardAnimation" class="hero-animation-img">
+        <div id="heroDashboardAnimation" class="hero-animation-img mt-12">
           <a href="{{ url('/dashboard') }}" target="_blank">
             <div id="heroAnimationImg" class="position-relative hero-dashboard-img">
               <img
                 src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
-                alt="Ghotme Dashboard" class="animation-img"
+                alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
                 data-app-light-img="front-pages/landing-page/meu-sistema-light.png"
                 data-app-dark-img="front-pages/landing-page/meu-sistema-dark.png" />
             </div>
@@ -409,7 +409,7 @@ $pageConfigs = [
         feitos para você
       </h4>
       <p class="text-center pb-2 mb-7">Todos os planos incluem recursos essenciais para impulsionar sua empresa.<br />Escolha o melhor plano para suas necessidades.</p>
-      
+
       <div class="text-center mb-12">
         <div class="position-relative d-inline-block pt-3 pt-md-0">
           <div class="d-flex align-items-center justify-content-center">
@@ -530,10 +530,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-padrao-mensal" 
-                   data-monthly-link="https://www.asaas.com/c/plano-padrao-mensal"
-                   data-yearly-link="https://www.asaas.com/c/plano-padrao-anual"
-                   target="_blank" class="btn btn-primary plan-action-btn">Assinar Agora</a>
+                <a href="https://www.asaas.com/c/plano-padrao-mensal"
+                  data-monthly-link="https://www.asaas.com/c/plano-padrao-mensal"
+                  data-yearly-link="https://www.asaas.com/c/plano-padrao-anual"
+                  target="_blank" class="btn btn-primary plan-action-btn">Assinar Agora</a>
               </div>
             </div>
           </div>
@@ -595,10 +595,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-enterprise-mensal" 
-                   data-monthly-link="https://www.asaas.com/c/plano-enterprise-mensal"
-                   data-yearly-link="https://www.asaas.com/c/plano-enterprise-anual"
-                   target="_blank" class="btn btn-label-primary plan-action-btn">Assinar Agora</a>
+                <a href="https://www.asaas.com/c/plano-enterprise-mensal"
+                  data-monthly-link="https://www.asaas.com/c/plano-enterprise-mensal"
+                  data-yearly-link="https://www.asaas.com/c/plano-enterprise-anual"
+                  target="_blank" class="btn btn-label-primary plan-action-btn">Assinar Agora</a>
               </div>
             </div>
           </div>
@@ -759,7 +759,7 @@ $pageConfigs = [
           <a href="{{ url('/register') }}" class="btn btn-lg btn-primary">Quero Começar</a>
         </div>
         <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
-          <img src="{{ asset('assets/img/front-pages/landing-page/cta-dashboard.png') }}" alt="cta dashboard"
+          <img src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-dark.png') }}" alt="cta dashboard"
             class="img-fluid mt-lg-4" />
         </div>
       </div>

@@ -1,8 +1,9 @@
 @php
+$configData = Helper::appClasses();
 $customizerHidden = 'customizer-hide';
 @endphp
 
-@extends('layouts/layoutPublic')
+@extends('layouts/commonMaster')
 
 @section('title', 'Portal do Cliente')
 
@@ -27,38 +28,23 @@ $customizerHidden = 'customizer-hide';
     }
 
     .portal-header {
-        background: linear-gradient(135deg, #7367f0 0%, #4831d4 100%), url('https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&q=80&w=2000');
-        background-blend-mode: overlay;
-        background-size: cover;
-        background-position: center;
+        background: linear-gradient(135deg, #7367f0 0%, #4831d4 100%);
         padding: 5rem 0 7rem;
         border-radius: 0 0 3.5rem 3.5rem;
         box-shadow: 0 15px 50px rgba(115, 103, 240, 0.25);
+        position: relative;
+        z-index: 1;
     }
 
-    .portal-header::before {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 100%;
-        background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-    }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 1.5rem;
-        box-shadow: var(--portal-card-shadow);
+    .portal-wrapper {
+        margin-top: -4rem;
+        position: relative;
+        z-index: 2;
     }
 
     .stat-card {
         padding: 1.5rem;
         text-align: center;
-        margin-top: -4rem;
         transition: transform 0.3s ease;
         border: none;
         background: var(--bs-card-bg, white);
@@ -77,6 +63,9 @@ $customizerHidden = 'customizer-hide';
         border-radius: 50%;
         margin: 0 auto 1rem;
         font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .vehicle-card {
@@ -92,21 +81,29 @@ $customizerHidden = 'customizer-hide';
         border-color: var(--portal-primary);
     }
 
-    .status-timeline-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        position: relative;
-        z-index: 2;
+    .glass-card {
+        background: var(--bs-card-bg, white);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        border-radius: 1.5rem;
     }
 
-    .status-timeline-line {
-        height: 4px;
-        background: #eee;
-        flex-grow: 1;
-        margin: 0 -2px;
-        position: relative;
-        top: 4px;
+    .quick-action-link {
+        padding: 1.25rem;
+        border-radius: 1.25rem;
+        background: var(--bs-card-bg, white);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: #444;
+    }
+
+    .quick-action-link:hover {
+        background: #fdfdff;
+        border-color: var(--portal-primary);
+        color: var(--portal-primary);
     }
 
     .whatsapp-fab {
@@ -132,44 +129,6 @@ $customizerHidden = 'customizer-hide';
         color: white;
     }
 
-    .theme-toggle-btn {
-        position: absolute;
-        top: 2rem;
-        right: 2rem;
-        padding: 0.75rem;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s;
-        z-index: 100;
-    }
-
-    .theme-toggle-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-
-    .quick-action-link {
-        padding: 1.25rem;
-        border-radius: 1.25rem;
-        background: var(--bs-card-bg, white);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        color: #444;
-    }
-
-    .quick-action-link:hover {
-        background: #fdfdff;
-        border-color: var(--portal-primary);
-        color: var(--portal-primary);
-    }
-
     .animate-up {
         animation: fadeInUp 0.6s both;
     }
@@ -188,9 +147,9 @@ $customizerHidden = 'customizer-hide';
 </style>
 @endsection
 
-@section('content')
+@section('layoutContent')
 <!-- Header Estilizado -->
-<div class="portal-header d-flex align-items-center">
+<div class="portal-header d-flex align-items-center w-100">
     <div class="container text-center py-4">
         <h1 class="text-white fw-bold mb-3 animate-up">Olá, {{ explode(' ', $client->name)[0] }}! 👋</h1>
         <p class="text-white fs-5 opacity-75 animate-up" style="animation-delay: 0.1s">
@@ -199,7 +158,7 @@ $customizerHidden = 'customizer-hide';
     </div>
 </div>
 
-<div class="container portal-wrapper">
+<div class="container portal-wrapper pb-5">
     <!-- Cards de Resumo -->
     <div class="row g-4 mb-5 justify-content-center">
         <div class="col-md-3 col-6 animate-up" style="animation-delay: 0.2s">
@@ -391,46 +350,6 @@ $customizerHidden = 'customizer-hide';
                     <p class="mb-0 mt-2 small text-muted">Nenhum orçamento pendente.</p>
                 </div>
                 @endforelse
-            </div>
-
-            <!-- Linha do Tempo Unificada -->
-            <div class="mb-4">
-                <h5 class="fw-bold mb-4">Linha do Tempo</h5>
-                <div class="glass-card p-3 shadow-none border">
-                    <ul class="timeline timeline-advance mb-0">
-                        @forelse($unifiedHistory as $history)
-                        @php
-                        $iconColor = 'primary';
-                        $icon = 'ti-tool';
-
-                        switch($history->event_type) {
-                        case 'entrada_oficina': $iconColor = 'warning'; $icon = 'tabler-home-check'; break;
-                        case 'aguardando_orcamento': $iconColor = 'warning'; $icon = 'tabler-clipboard-list'; break;
-                        case 'os_aberta': $iconColor = 'info'; $icon = 'tabler-file-plus'; break;
-                        case 'orcamento_aprovado': $iconColor = 'success'; $icon = 'tabler-currency-dollar'; break;
-                        case 'os_finalizada': $iconColor = 'success'; $icon = 'tabler-file-check'; break;
-                        }
-                        @endphp
-                        <li class="timeline-item timeline-item-transparent @if(!$loop->last) border-left-dashed @endif pb-4">
-                            <span class="timeline-point timeline-point-{{ $iconColor }}"></span>
-                            <div class="timeline-event">
-                                <div class="timeline-header mb-1">
-                                    <h6 class="mb-0 fw-bold">{{ $history->title }}</h6>
-                                    <small class="text-muted">{{ $history->date->format('d/m/Y') }}</small>
-                                </div>
-                                <p class="mb-0 small text-muted">{{ $history->description }}</p>
-                                @if($history->ordemServico)
-                                <a href="{{ route('customer.portal.order', $history->ordemServico->uuid) }}" class="small mt-2 d-block">Ver Detalhes <i class="ti tabler-chevron-right fs-tiny"></i></a>
-                                @endif
-                            </div>
-                        </li>
-                        @empty
-                        <li class="p-4 text-center opacity-50 list-unstyled">
-                            <small>Nenhuma atividade registrada.</small>
-                        </li>
-                        @endforelse
-                    </ul>
-                </div>
             </div>
 
             <!-- Card de Apoio -->

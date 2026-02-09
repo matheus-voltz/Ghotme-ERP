@@ -4049,49 +4049,49 @@
     "isEntry": true
   },
   "resources/js/inventory-items.js": {
-    "file": "assets/inventory-items-YGhXP-7C.js",
+    "file": "assets/inventory-items-B0Tf-OK6.js",
     "name": "inventory-items",
     "src": "resources/js/inventory-items.js",
     "isEntry": true
   },
   "resources/js/inventory-suppliers.js": {
-    "file": "assets/inventory-suppliers-hAcNaW2i.js",
+    "file": "assets/inventory-suppliers-CKVnDVg_.js",
     "name": "inventory-suppliers",
     "src": "resources/js/inventory-suppliers.js",
     "isEntry": true
   },
   "resources/js/laravel-clients.js": {
-    "file": "assets/laravel-clients-poBetuPP.js",
+    "file": "assets/laravel-clients-BGv9FDby.js",
     "name": "laravel-clients",
     "src": "resources/js/laravel-clients.js",
     "isEntry": true
   },
   "resources/js/laravel-user-management.js": {
-    "file": "assets/laravel-user-management-DN_WE5Dk.js",
+    "file": "assets/laravel-user-management-CDCbsn8s.js",
     "name": "laravel-user-management",
     "src": "resources/js/laravel-user-management.js",
     "isEntry": true
   },
   "resources/js/laravel-vehicles.js": {
-    "file": "assets/laravel-vehicles-DhJ8oR-P.js",
+    "file": "assets/laravel-vehicles-BJjIuQ53.js",
     "name": "laravel-vehicles",
     "src": "resources/js/laravel-vehicles.js",
     "isEntry": true
   },
   "resources/js/service-packages.js": {
-    "file": "assets/service-packages-BdMqUnde.js",
+    "file": "assets/service-packages-BRTyhAmL.js",
     "name": "service-packages",
     "src": "resources/js/service-packages.js",
     "isEntry": true
   },
   "resources/js/services-table.js": {
-    "file": "assets/services-table-Bf5ZVvFB.js",
+    "file": "assets/services-table-BuzZB_v_.js",
     "name": "services-table",
     "src": "resources/js/services-table.js",
     "isEntry": true
   },
   "resources/js/vehicle-history.js": {
-    "file": "assets/vehicle-history-CXTQjr6U.js",
+    "file": "assets/vehicle-history-DNuWW9Z_.js",
     "name": "vehicle-history",
     "src": "resources/js/vehicle-history.js",
     "isEntry": true
