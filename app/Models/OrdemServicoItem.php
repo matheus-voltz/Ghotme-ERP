@@ -39,7 +39,7 @@ class OrdemServicoItem extends Model
             $total += $this->started_at->diffInSeconds(now());
         }
 
-        return $total;
+        return (int) $total;
     }
 
     public function startTimer()

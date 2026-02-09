@@ -27,8 +27,14 @@ class MechanicDashboardController extends Controller
     public function show($uuid)
     {
         $order = OrdemServico::where('uuid', $uuid)
-            ->with(['client', 'veiculo', 'items.service'])
+            ->with(['client', 'veiculo']) // Removed items.service form here to load manually
             ->firstOrFail();
+
+        // Explicitly load items to ensure they are retrieved
+        // Bypass any global scope issues on the relation by querying manually
+        $items = OrdemServicoItem::where('ordem_servico_id', $order->id)->with('service')->get();
+        // Manually set relation to avoid refactoring view
+        $order->setRelation('items', $items);
 
         return view('content.mechanic.show', compact('order'));
     }

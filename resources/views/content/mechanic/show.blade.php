@@ -19,6 +19,7 @@
         }
 
         function formatTime(seconds) {
+            seconds = Math.floor(seconds);
             const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
             const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
             const s = (seconds % 60).toString().padStart(2, '0');
@@ -51,7 +52,7 @@
 
                 if (data.status === 'in_progress') {
                     // Started
-                    btn.innerHTML = '<i class="ti tabler-player-pause"></i> Pausar';
+                    btn.innerHTML = '<i class="ti tabler-player-pause"></i>';
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-warning');
                     timerDisplay.dataset.status = 'in_progress';
@@ -59,7 +60,7 @@
                     statusBadge.textContent = 'Em Andamento';
                 } else {
                     // Paused
-                    btn.innerHTML = '<i class="ti tabler-player-play"></i> Continuar';
+                    btn.innerHTML = '<i class="ti tabler-player-play"></i>';
                     btn.classList.remove('btn-warning');
                     btn.classList.add('btn-success');
                     timerDisplay.dataset.status = 'paused';

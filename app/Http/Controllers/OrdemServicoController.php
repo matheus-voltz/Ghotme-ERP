@@ -184,4 +184,122 @@ class OrdemServicoController extends Controller
         $vehicles = Vehicles::where('cliente_id', $clientId)->get();
         return response()->json($vehicles);
     }
+
+    public function edit($id)
+    {
+        $order = OrdemServico::with(['items', 'parts'])->findOrFail($id);
+        $clients = Clients::all();
+        $services = Service::where('is_active', true)->get();
+        $parts = InventoryItem::where('is_active', true)->get();
+        
+        // Prepare pre-selected vehicles for the dropdown
+        $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
+
+        return view('content.pages.ordens-servico.edit', compact('order', 'clients', 'services', 'parts', 'vehicles'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'client_id' => 'required|exists:clients,id',
+            'veiculo_id' => 'required|exists:veiculos,id',
+            'status' => 'required',
+            'description' => 'nullable|string',
+            'km_entry' => 'nullable|integer',
+            'services' => 'nullable|array',
+            'parts' => 'nullable|array',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $os = OrdemServico::findOrFail($id);
+            $os->update([
+                'client_id' => $validated['client_id'],
+                'veiculo_id' => $validated['veiculo_id'],
+                'status' => $validated['status'],
+                'description' => $validated['description'],
+                'km_entry' => $validated['km_entry'],
+            ]);
+
+            // Sync Services
+            // Strategy: Get existing IDs, delete those not in request, update/create others
+            $submittedServices = $validated['services'] ?? [];
+            $existingItemIds = $os->items()->pluck('service_id')->toArray();
+
+            // 1. Remove items not selected anymore
+            // Filter submitted to only those with 'selected'
+            $selectedServiceIds = [];
+            foreach ($submittedServices as $sId => $data) {
+                if (isset($data['selected'])) {
+                    $selectedServiceIds[] = $sId;
+                }
+            }
+            
+            // Delete items where service_id is NOT in the selected list
+            $os->items()->whereNotIn('service_id', $selectedServiceIds)->delete();
+
+            // 2. Update or Create
+            foreach ($submittedServices as $serviceId => $data) {
+                if (!isset($data['selected'])) continue;
+
+                $item = $os->items()->where('service_id', $serviceId)->first();
+
+                if ($item) {
+                    $item->update([
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1
+                    ]);
+                } else {
+                    OrdemServicoItem::create([
+                        'ordem_servico_id' => $os->id,
+                        'service_id' => $serviceId,
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1,
+                        'status' => 'pending' // Default status for new items
+                    ]);
+                }
+            }
+
+            // Sync Parts (similar logic)
+            // Note: Simplification - not handling inventory stock adjustment on edit for now to keep it safe
+            $submittedParts = $validated['parts'] ?? [];
+            
+            $selectedPartIds = [];
+            foreach ($submittedParts as $pId => $data) {
+                if (isset($data['selected'])) {
+                    $selectedPartIds[] = $pId;
+                }
+            }
+            
+            $os->parts()->whereNotIn('inventory_item_id', $selectedPartIds)->delete();
+
+            foreach ($submittedParts as $partId => $data) {
+                if (!isset($data['selected'])) continue;
+
+                $part = $os->parts()->where('inventory_item_id', $partId)->first();
+
+                if ($part) {
+                    $part->update([
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1
+                    ]);
+                } else {
+                    OrdemServicoPart::create([
+                        'ordem_servico_id' => $os->id,
+                        'inventory_item_id' => $partId,
+                        'price' => $data['price'],
+                        'quantity' => $data['quantity'] ?? 1
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('ordens-servico')->with('success', 'OS Atualizada com Sucesso!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', $e->getMessage());
+        }
+    }
 }
