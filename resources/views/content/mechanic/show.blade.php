@@ -133,7 +133,7 @@
     <h5 class="mb-3">Serviços a Realizar</h5>
 
     <div class="row">
-        @foreach($order->items as $item)
+        @forelse($order->items as $item)
         <div class="col-12 mb-3">
             <div class="card border {{ $item->status == 'completed' ? 'bg-label-success border-success' : '' }}">
                 <div class="card-body p-3">
@@ -185,7 +185,16 @@
                 </div>
             </div>
         </div>
-        @endforeach
+
+        @empty
+        <div class="col-12 text-center py-5">
+            <span class="avatar avatar-xl rounded-circle bg-label-secondary mb-3">
+                <i class="ti tabler-clipboard-off fs-1"></i>
+            </span>
+            <h5 class="text-muted">Nenhum serviço listado</h5>
+            <p class="text-muted small">Esta Ordem de Serviço não possui itens cadastrados ainda.</p>
+        </div>
+        @endforelse
     </div>
 </div>
 @endsection
