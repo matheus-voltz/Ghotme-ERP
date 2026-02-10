@@ -43,6 +43,30 @@ class HomePage extends Controller
 
     $revenueMonth = $financialRevenue + $osRevenue;
 
+    // Revenue Last Month (for comparison)
+    $lastMonth = Carbon::now()->subMonth();
+    $financialRevenueLast = FinancialTransaction::where('type', 'in')
+      ->where('status', 'paid')
+      ->whereMonth('paid_at', $lastMonth->month)
+      ->whereYear('paid_at', $lastMonth->year)
+      ->sum('amount');
+
+    $osRevenueLast = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+      ->whereMonth('updated_at', $lastMonth->month)
+      ->whereYear('updated_at', $lastMonth->year)
+      ->with(['items', 'parts'])
+      ->get()
+      ->sum(fn($os) => $os->total);
+
+    $revenueLastMonth = $financialRevenueLast + $osRevenueLast;
+
+    $revenueGrowth = 0;
+    if ($revenueLastMonth > 0) {
+      $revenueGrowth = (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100;
+    } else if ($revenueMonth > 0) {
+      $revenueGrowth = 100;
+    }
+
     $receivablesPending = FinancialTransaction::where('type', 'in')
       ->where('status', 'pending')
       ->whereDate('due_date', '<=', Carbon::now()->addDays(7))
@@ -130,6 +154,15 @@ class HomePage extends Controller
         ->count();
     }
 
+    // Monthly Profitability
+    $monthlyExpenses = FinancialTransaction::where('type', 'out')
+      ->where('status', 'paid')
+      ->whereMonth('paid_at', Carbon::now()->month)
+      ->whereYear('paid_at', Carbon::now()->year)
+      ->sum('amount');
+
+    $monthlyProfitability = $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0;
+
     return view('content.pages.dashboard.dashboards-analytics', compact(
       'osStats',
       'revenueMonth',
@@ -148,7 +181,9 @@ class HomePage extends Controller
       'totalBudgetsMonth',
       'approvedBudgetsMonth',
       'topServiceLabels',
-      'topServiceData'
+      'topServiceData',
+      'revenueGrowth',
+      'monthlyProfitability'
     ));
   }
 }

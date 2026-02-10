@@ -44,85 +44,100 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
-<div class="row g-6">
+<div class="row g-4">
   <!-- Welcome & Highlights -->
   <div class="col-xl-8 col-lg-7 col-md-12">
-    <div class="card h-100 border-0 shadow-sm" style="background: linear-gradient(105deg, #7367f0 0%, #4844a3 100%); color: white; position: relative; overflow: hidden;">
-      <div class="card-body p-4">
-        <div class="row align-items-center position-relative" style="z-index: 2;">
-          <div class="col-md-9 col-12">
-            <h3 class="text-white fw-bold mb-1">Olá, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h3>
-            <p class="text-white mb-3 opacity-75 small">Você tem <strong>{{ $osStats['running'] }}</strong> ordens em execução.</p>
+    <div class="card h-100 border-0 shadow-sm" style="background: linear-gradient(72.47deg, #7367f0 22.16%, rgba(115, 103, 240, 0.7) 76.47%); color: white; position: relative; overflow: hidden;">
+      <div class="card-body p-4 position-relative z-1">
+        <div class="row align-items-center">
+          <div class="col-md-8 col-12">
+            <h4 class="text-white mb-2 fw-bold">Bem-vindo de volta, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h4>
+            <p class="text-white mb-4 opacity-75">Sua oficina tem <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> ordens em execução agora.</p>
 
-            <div class="row g-2">
-              <div class="col-3">
-                <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
-                  <h5 class="text-white mb-0 fw-bold">{{ $osStats['pending'] }}</h5>
-                  <small class="text-white opacity-75" style="font-size: 0.7rem;">Pendentes</small>
+            <div class="row g-3 mt-4">
+              <div class="col-sm-6 col-auto">
+                <div class="d-flex align-items-center bg-white rounded-3 p-3 shadow-sm" style="border: 1px solid rgba(255,255,255,0.5);">
+                  <div class="avatar avatar-md me-3">
+                    <span class="avatar-initial rounded-circle bg-label-warning shadow-sm">
+                      <i class="ti tabler-clock fs-3"></i>
+                    </span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <h4 class="mb-0 fw-bolder text-dark" style="color: #343a40 !important;">{{ $osStats['pending'] }}</h4>
+                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">Pendentes</span>
+                  </div>
                 </div>
               </div>
-              <div class="col-3">
-                <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
-                  <h5 class="text-white mb-0 fw-bold">{{ $osStats['running'] }}</h5>
-                  <small class="text-white opacity-75" style="font-size: 0.7rem;">Ativas</small>
-                </div>
-              </div>
-              <div class="col-3">
-                <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
-                  <h5 class="text-white mb-0 fw-bold">{{ $osStats['finalized_today'] }}</h5>
-                  <small class="text-white opacity-75" style="font-size: 0.7rem;">Hoje</small>
-                </div>
-              </div>
-              <div class="col-3">
-                <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
-                  <h5 class="text-white mb-0 fw-bold">{{ $osStats['total_month'] }}</h5>
-                  <small class="text-white opacity-75" style="font-size: 0.7rem;">Mês</small>
+
+              <div class="col-sm-6 col-auto">
+                <div class="d-flex align-items-center bg-white rounded-3 p-3 shadow-sm" style="border: 1px solid rgba(255,255,255,0.5);">
+                  <div class="avatar avatar-md me-3">
+                    <span class="avatar-initial rounded-circle bg-label-success shadow-sm">
+                      <i class="ti tabler-circle-check fs-3"></i>
+                    </span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <h4 class="mb-0 fw-bolder text-dark" style="color: #343a40 !important;">{{ $osStats['finalized_today'] }}</h4>
+                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">Concluídas Hoje</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <img src="{{ asset('assets/img/illustrations/boy-with-laptop-light.png') }}"
-          class="position-absolute bottom-0 end-0 d-none d-lg-block"
-          style="height: 120px; margin-right: -10px; margin-bottom: -10px; opacity: 0.8; z-index: 1;">
       </div>
+      <img src="{{ asset('assets/img/illustrations/boy-with-laptop-light.png') }}"
+        class="position-absolute bottom-0 end-0 d-none d-md-block me-4 mb-2"
+        style="height: 160px; object-fit: contain; z-index: 0;" alt="Welcome">
     </div>
   </div>
 
-  <!-- Quick Stats -->
+  <!-- Quick Stats Column -->
   <div class="col-xl-4 col-lg-5 col-md-12">
-    <div class="row g-4">
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body py-3">
-            <div class="d-flex align-items-center justify-content-between">
+    <div class="row g-4 h-100">
+      <!-- Receita Mensal -->
+      <div class="col-12 col-sm-6 col-md-12 h-50">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body d-flex flex-column justify-content-center p-4">
+            <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
-                <small class="text-muted d-block mb-1">Receita Mensal</small>
-                <h4 class="mb-0 fw-bold">R$ {{ number_format($revenueMonth, 2, ',', '.') }}</h4>
+                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">Receita Mensal</span>
+                <h3 class="mb-0 fw-bold text-heading">R$ {{ number_format($revenueMonth, 2, ',', '.') }}</h3>
               </div>
-              <div class="stat-icon bg-label-success mb-0">
-                <i class="ti tabler-currency-dollar fs-3"></i>
+              <div class="avatar avatar-md bg-label-success rounded p-1">
+                <i class="ti tabler-currency-dollar fs-2"></i>
               </div>
             </div>
+            @isset($revenueGrowth)
+            <div class="mt-2">
+              <span class="badge {{ $revenueGrowth >= 0 ? 'bg-label-success' : 'bg-label-danger' }} rounded-pill">
+                <i class="ti {{ $revenueGrowth >= 0 ? 'tabler-arrow-up' : 'tabler-arrow-down' }} fs-6 me-1"></i>
+                {{ number_format(abs($revenueGrowth), 1) }}%
+              </span>
+              <small class="text-muted ms-1">vs mês passado</small>
+            </div>
+            @endisset
           </div>
         </div>
       </div>
 
-      <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body py-3">
-            <div class="d-flex align-items-center justify-content-between">
+      <!-- Conversão -->
+      <div class="col-12 col-sm-6 col-md-12 h-50">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-body d-flex flex-column justify-content-center p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <small class="text-muted d-block mb-1">Conversão (Mês)</small>
-                <h4 class="mb-0 fw-bold">{{ round($conversionRate) }}%</h4>
+                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">Taxa de Conversão</span>
+                <h3 class="mb-0 fw-bold text-heading">{{ round($conversionRate) }}%</h3>
               </div>
-              <div class="stat-icon bg-label-info mb-0">
-                <i class="ti tabler-chart-pie fs-3"></i>
+              <div class="avatar avatar-md bg-label-info rounded p-1">
+                <i class="ti tabler-chart-pie fs-2"></i>
               </div>
             </div>
-            <div class="progress mt-3" style="height: 6px;">
-              <div class="progress-bar bg-info" style="width: {{ $conversionRate }}%"></div>
+            <div class="progress" style="height: 8px; border-radius: 4px;">
+              <div class="progress-bar bg-info" role="progressbar" style="width:{{ $conversionRate }}%" aria-valuenow="{{ $conversionRate }}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
+            <small class="text-muted mt-2">Orçamentos aprovados no mês</small>
           </div>
         </div>
       </div>
@@ -131,42 +146,73 @@ $configData = Helper::appClasses();
 
   <!-- Performance Chart -->
   <div class="col-xl-8 col-lg-7">
-    <div class="card h-100 shadow-sm">
-      <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">Atividade Comercial</h5>
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
+        <div>
+          <h5 class="card-title mb-0 fw-bold">Atividade Comercial</h5>
+          <small class="text-muted">Receitas, Despesas e Orçamentos</small>
+        </div>
         <div class="dropdown">
           <button class="btn p-0" type="button" data-bs-toggle="dropdown"><i class="ti tabler-dots-vertical fs-4 text-muted"></i></button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="javascript:void(0);">Relatórios</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0);">Relatórios Detalhados</a></li>
           </ul>
         </div>
       </div>
-      <div class="card-body">
+      <div class="card-body px-2 h-100">
         <div id="performanceCombinedChart"></div>
       </div>
     </div>
   </div>
 
-  <!-- OS Distribution -->
+  <!-- Status & Profitability Column -->
   <div class="col-xl-4 col-lg-5">
-    <div class="card h-100 shadow-sm border-0">
-      <div class="card-header py-3">
-        <h5 class="mb-0">Status das OS</h5>
+    <div class="row g-4 h-100">
+      <!-- Status OS -->
+      <div class="col-12">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header py-3 bg-transparent border-bottom">
+            <h5 class="mb-0 fw-bold">Status das OS</h5>
+          </div>
+          <div class="card-body d-flex align-items-center justify-content-center p-2">
+            <div class="w-100">
+              <div id="osDistributionChart"></div>
+            </div>
+          </div>
+          <div class="card-footer bg-transparent border-0 pt-0 pb-4">
+            <div class="d-flex justify-content-around text-center">
+              <div>
+                <strong class="d-block text-warning h6 mb-0">{{ round(($osDistribution['pending'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
+                <span class="text-muted small">Pendente</span>
+              </div>
+              <div>
+                <strong class="d-block text-info h6 mb-0">{{ round(($osDistribution['running'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
+                <span class="text-muted small">Execução</span>
+              </div>
+              <div>
+                <strong class="d-block text-success h6 mb-0">{{ round(($osDistribution['finalized'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
+                <span class="text-muted small">Finalizada</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="card-body d-flex flex-column justify-content-center">
-        <div id="osDistributionChart"></div>
-        <div class="mt-4">
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <small class="text-muted fw-medium"><i class="ti tabler-circle-filled text-warning me-2"></i>Pendentes</small>
-            <small class="fw-bold">{{ round(($osDistribution['pending'] / max(1, array_sum($osDistribution))) * 100) }}%</small>
+
+      <!-- Profitability -->
+      <div class="col-12">
+        <div class="card shadow-sm border-0 h-100">
+          <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold">Lucratividade</h5>
+            <span class="badge bg-label-primary">Mês Atual</span>
           </div>
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <small class="text-muted fw-medium"><i class="ti tabler-circle-filled text-info me-2"></i>Execução</small>
-            <small class="fw-bold">{{ round(($osDistribution['running'] / max(1, array_sum($osDistribution))) * 100) }}%</small>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <small class="text-muted fw-medium"><i class="ti tabler-circle-filled text-success me-2"></i>Finalizadas</small>
-            <small class="fw-bold">{{ round(($osDistribution['finalized'] / max(1, array_sum($osDistribution))) * 100) }}%</small>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
+            <div id="profitabilityRadialChart"></div>
+            <div class="text-center mt-n2">
+              <h2 class="mb-0 {{ $monthlyProfitability >= 0 ? 'text-success' : 'text-danger' }} fw-bolder">
+                {{ $monthlyProfitability >= 0 ? '+' : '' }}{{ number_format($monthlyProfitability, 1, ',', '.') }}%
+              </h2>
+              <span class="text-muted fw-medium">Margem Líquida</span>
+            </div>
           </div>
         </div>
       </div>
@@ -174,36 +220,56 @@ $configData = Helper::appClasses();
   </div>
 
   <!-- Recent Activities -->
-  <div class="col-xl-6">
-    <div class="card h-100 shadow-sm">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Últimas OS</h5>
-        <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-primary">Ver Tudo</a>
+  <div class="col-xl-6 col-lg-12">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Últimas Ordens de Serviço</h5>
+        <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-primary">Ver Todas</a>
       </div>
-      <div class="table-responsive">
-        <table class="table table-hover table-borderless align-middle table-sm">
-          <thead class="bg-lighter">
+      <div class="table-responsive text-nowrap">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
-              <th>ID</th>
-              <th>CLIENTE</th>
-              <th>STATUS</th>
+              <th class="ps-4 py-3 text-muted text-uppercase small fw-bold">OS / Cliente</th>
+              <th class="py-3 text-muted text-uppercase small fw-bold">Status</th>
+              <th class="text-end pe-4 py-3 text-muted text-uppercase small fw-bold">Valor</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody class="table-border-bottom-0">
             @foreach($recentOS as $os)
+            @php
+            $clientName = $os->client->name ?? $os->client->company_name ?? 'Consumidor';
+            $initials = collect(explode(' ', $clientName))->map(function($segment) { return strtoupper(substr($segment, 0, 1)); })->take(2)->join('');
+            $colors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
+            $randomColor = $colors[$loop->index % count($colors)];
+            @endphp
             <tr>
-              <td class="fw-bold">#{{ $os->id }}</td>
-              <td><span class="text-heading fw-medium small">{{ str($os->client->name ?? $os->client->company_name)->limit(15) }}</span></td>
+              <td class="ps-4">
+                <div class="d-flex align-items-center">
+                  <div class="avatar avatar-sm me-3">
+                    <span class="avatar-initial rounded-circle bg-label-{{ $randomColor }} fw-bold">{{ $initials }}</span>
+                  </div>
+                  <div class="d-flex flex-column">
+                    <a href="{{ route('ordens-servico.edit', $os->id) }}" class="text-heading fw-bold mb-0">#{{ $os->id }} - {{ str($clientName)->limit(15) }}</a>
+                    <small class="text-muted">{{ $os->veiculo->model ?? 'Veículo não inf.' }}</small>
+                  </div>
+                </div>
+              </td>
               <td>
                 @php
                 $statusConfig = [
-                'pending' => ['color' => 'warning', 'label' => 'Pendente'],
-                'running' => ['color' => 'info', 'label' => 'Execução'],
-                'finalized' => ['color' => 'success', 'label' => 'Finalizada']
+                'pending' => ['color' => 'warning', 'label' => 'Pendente', 'icon' => 'tabler-clock'],
+                'running' => ['color' => 'info', 'label' => 'Execução', 'icon' => 'tabler-tool'],
+                'finalized' => ['color' => 'success', 'label' => 'Finalizada', 'icon' => 'tabler-circle-check']
                 ];
-                $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => $os->status];
+                $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => $os->status, 'icon' => 'tabler-help'];
                 @endphp
-                <span class="badge badge-sm bg-label-{{ $conf['color'] }}">{{ $conf['label'] }}</span>
+                <span class="badge bg-label-{{ $conf['color'] }} rounded-pill px-3">
+                  {{ $conf['label'] }}
+                </span>
+              </td>
+              <td class="text-end pe-4 text-heading fw-bold">
+                R$ {{ number_format($os->total, 2, ',', '.') }}
               </td>
             </tr>
             @endforeach
@@ -214,49 +280,56 @@ $configData = Helper::appClasses();
   </div>
 
   <!-- Top Services Chart -->
-  <div class="col-xl-6">
-    <div class="card h-100 shadow-sm">
-      <div class="card-header py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Top 5 Serviços (Receita)</h5>
-        <i class="ti tabler-trending-up text-success fs-3"></i>
+  <div class="col-xl-6 col-lg-12">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">Top 5 Serviços (Receita)</h5>
+        <div class="avatar avatar-sm bg-label-success rounded">
+          <i class="ti tabler-trending-up fs-4"></i>
+        </div>
       </div>
-      <div class="card-body">
+      <div class="card-body px-2">
         <div id="topServicesChart"></div>
       </div>
     </div>
   </div>
 
   <!-- Critical Alerts -->
-  <div class="col-xl-6">
-    <div class="card h-100 shadow-sm">
-      <div class="card-header border-0 py-3 pb-0">
-        <h5 class="mb-0 text-danger fw-bold"><i class="ti tabler-urgent me-2"></i>Atenção</h5>
+  <div class="col-12">
+    <div class="card h-100 shadow-sm border-0 bg-label-secondary bg-opacity-25">
+      <div class="card-header bg-transparent border-0 py-3 pb-0">
+        <h5 class="mb-0 text-danger fw-bold d-flex align-items-center">
+          <i class="ti tabler-alert-triangle me-2"></i>Atenção Necessária
+        </h5>
       </div>
       <div class="card-body">
-        <div class="d-flex flex-column gap-3">
-          <div class="alert alert-danger d-flex align-items-center border-0 shadow-none mb-0 p-2">
-            <div class="stat-icon bg-danger-subtle text-danger me-3 mb-0" style="width: 32px; height: 32px;">
-              <i class="ti tabler-box fs-5"></i>
-            </div>
-            <div class="d-flex w-100 justify-content-between align-items-center">
-              <div>
-                <h7 class="mb-0 d-block fw-bold">Estoque Crítico</h7>
-                <small>{{ $lowStockItems }} produtos baixo.</small>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="alert alert-danger d-flex align-items-center border-0 shadow-sm mb-0 p-3 bg-white">
+              <div class="avatar avatar-md bg-label-danger me-3 rounded">
+                <span class="avatar-initial"><i class="ti tabler-box fs-3"></i></span>
               </div>
-              <a href="{{ route('inventory.items') }}" class="btn btn-danger btn-xs">Repor</a>
+              <div class="d-flex w-100 justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1 fw-bold text-danger">Estoque Baixo</h6>
+                  <p class="mb-0 small text-muted">{{ $lowStockItems }} produtos abaixo do mínimo.</p>
+                </div>
+                <a href="{{ route('inventory.items') }}" class="btn btn-danger btn-sm px-3">Repor</a>
+              </div>
             </div>
           </div>
-
-          <div class="alert alert-warning d-flex align-items-center border-0 shadow-none mb-0 p-2">
-            <div class="stat-icon bg-warning-subtle text-warning me-3 mb-0" style="width: 32px; height: 32px;">
-              <i class="ti tabler-file-invoice fs-5"></i>
-            </div>
-            <div class="d-flex w-100 justify-content-between align-items-center">
-              <div>
-                <h7 class="mb-0 d-block fw-bold">Orçamentos</h7>
-                <small>{{ $pendingBudgets }} pendentes.</small>
+          <div class="col-md-6">
+            <div class="alert alert-warning d-flex align-items-center border-0 shadow-sm mb-0 p-3 bg-white">
+              <div class="avatar avatar-md bg-label-warning me-3 rounded">
+                <span class="avatar-initial"><i class="ti tabler-file-invoice fs-3"></i></span>
               </div>
-              <a href="{{ route('budgets.pending') }}" class="btn btn-warning btn-xs text-white">Ver</a>
+              <div class="d-flex w-100 justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1 fw-bold text-warning">Orçamentos Pendentes</h6>
+                  <p class="mb-0 small text-muted">{{ $pendingBudgets }} aguardando aprovação.</p>
+                </div>
+                <a href="{{ route('budgets.pending') }}" class="btn btn-warning btn-sm px-3 text-white">Verificar</a>
+              </div>
             </div>
           </div>
         </div>
@@ -288,12 +361,14 @@ $configData = Helper::appClasses();
           }
         ],
         chart: {
-          height: 300,
+          height: 320,
           type: 'line',
           stacked: false,
           toolbar: {
             show: false
-          }
+          },
+          parentHeightOffset: 0,
+          fontFamily: 'inherit'
         },
         stroke: {
           width: [2, 2, 0],
@@ -301,13 +376,26 @@ $configData = Helper::appClasses();
         },
         plotOptions: {
           bar: {
-            columnWidth: '15%',
-            borderRadius: 3
+            columnWidth: '20%',
+            borderRadius: 6,
+            colors: {
+              backgroundBarOpacity: 1,
+            }
           }
         },
         colors: ['#28c76f', '#ea5455', '#7367f0'],
         fill: {
-          opacity: [0.3, 0.3, 1]
+          opacity: [0.1, 0.1, 1],
+          type: ['gradient', 'gradient', 'solid'],
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.4,
+            opacityTo: 0.1,
+            stops: [0, 90, 100]
+          }
+        },
+        dataLabels: {
+          enabled: false
         },
         xaxis: {
           categories: @json($months),
@@ -316,32 +404,55 @@ $configData = Helper::appClasses();
           },
           axisTicks: {
             show: false
+          },
+          labels: {
+            style: {
+              colors: '#aab3c3',
+              fontSize: '12px'
+            }
           }
         },
         yaxis: [{
             labels: {
-              formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
+              style: {
+                colors: '#aab3c3',
+                fontSize: '12px'
+              },
+              formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR', {
+                notation: "compact",
+                compactDisplay: "short"
+              })
             }
           },
           {
             opposite: true,
-            labels: {
-              show: false
-            }
+            show: false
           }
         ],
         grid: {
-          borderColor: '#f1f1f1',
+          borderColor: '#e7e7e7',
+          strokeDashArray: 5,
           padding: {
-            top: 0,
-            bottom: 0
+            top: -20,
+            bottom: 0,
+            left: 10,
+            right: 10
           }
         },
         tooltip: {
           shared: true,
           intersect: false,
+          theme: 'light',
           y: {
-            formatter: (val) => val.toLocaleString('pt-BR')
+            formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
+          }
+        },
+        legend: {
+          position: 'top',
+          horizontalAlign: 'left',
+          fontFamily: 'inherit',
+          labels: {
+            colors: '#5d596c'
           }
         }
       };
@@ -353,12 +464,14 @@ $configData = Helper::appClasses();
         series: [@json($osDistribution['pending']), @json($osDistribution['running']), @json($osDistribution['finalized'])],
         chart: {
           type: 'donut',
-          height: 200
+          height: 220,
+          fontFamily: 'inherit'
         },
         labels: ['Pendentes', 'Execução', 'Finalizadas'],
         colors: ['#ff9f43', '#00cfe8', '#28c76f'],
         stroke: {
-          width: 0
+          width: 4,
+          colors: ['#fff']
         },
         dataLabels: {
           enabled: false
@@ -369,17 +482,25 @@ $configData = Helper::appClasses();
         plotOptions: {
           pie: {
             donut: {
-              size: '75%',
+              size: '72%',
               labels: {
                 show: true,
                 value: {
-                  fontSize: '1.2rem',
+                  fontSize: '1.5rem',
                   fontWeight: '600',
+                  color: '#5d596c',
+                  offsetY: -15,
                   formatter: (val) => val
+                },
+                name: {
+                  offsetY: 20,
+                  fontFamily: 'inherit'
                 },
                 total: {
                   show: true,
                   label: 'Total',
+                  fontSize: '0.8rem',
+                  color: '#aab3c3',
                   formatter: () => @json(array_sum($osDistribution))
                 }
               }
@@ -398,26 +519,33 @@ $configData = Helper::appClasses();
         }],
         chart: {
           type: 'bar',
-          height: 250,
+          height: 300,
           toolbar: {
             show: false
-          }
+          },
+          fontFamily: 'inherit'
         },
         plotOptions: {
           bar: {
-            borderRadius: 4,
+            borderRadius: 6,
             horizontal: true,
             distributed: true,
-            barHeight: '60%',
+            barHeight: '55%',
+            dataLabels: {
+              position: 'bottom'
+            }
           }
         },
         colors: ['#7367f0', '#28c76f', '#00cfe8', '#ff9f43', '#ea5455'],
         dataLabels: {
           enabled: true,
-          formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR'),
+          textAnchor: 'start',
           style: {
-            fontSize: '10px'
-          }
+            colors: ['#fff'],
+            fontSize: '11px'
+          },
+          formatter: (val, opt) => opt.w.globals.labels[opt.dataPointIndex] + ": R$ " + val.toLocaleString('pt-BR'),
+          offsetX: 0,
         },
         xaxis: {
           categories: @json($topServiceLabels),
@@ -426,21 +554,124 @@ $configData = Helper::appClasses();
           },
           axisBorder: {
             show: false
+          },
+          axisTicks: {
+            show: false
+          }
+        },
+        yaxis: {
+          labels: {
+            show: false
           }
         },
         grid: {
-          show: false
+          show: false,
+          padding: {
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0
+          }
         },
         legend: {
           show: false
         },
         tooltip: {
+          theme: 'light',
           y: {
             formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
+          }
+        },
+        states: {
+          hover: {
+            filter: {
+              type: 'none'
+            }
+          },
+          active: {
+            filter: {
+              type: 'none'
+            }
           }
         }
       };
     if (topServicesEl) new ApexCharts(topServicesEl, topServicesConfig).render();
+
+    // Profitability Radial Chart
+    const profitabilityChartEl = document.querySelector('#profitabilityRadialChart'),
+      profitabilityChartConfig = {
+        series: [@json(abs(round($monthlyProfitability, 1)))],
+        chart: {
+          height: 240,
+          type: 'radialBar',
+          fontFamily: 'inherit'
+        },
+        plotOptions: {
+          radialBar: {
+            startAngle: -135,
+            endAngle: 135,
+            hollow: {
+              margin: 10,
+              size: '65%',
+              image: undefined,
+              imageOffsetX: 0,
+              imageOffsetY: 0,
+              position: 'front',
+              dropShadow: {
+                enabled: true,
+                top: 3,
+                left: 0,
+                blur: 4,
+                opacity: 0.1
+              }
+            },
+            track: {
+              background: '#f0f2f4',
+              strokeWidth: '100%',
+              margin: 0,
+            },
+            dataLabels: {
+              show: true,
+              name: {
+                offsetY: 20,
+                show: true,
+                color: '#888ea8',
+                fontSize: '13px'
+              },
+              value: {
+                offsetY: -10,
+                color: '#111',
+                fontSize: '24px',
+                fontWeight: 700,
+                show: true,
+                formatter: function(val) {
+                  return val + "%";
+                }
+              }
+            }
+          },
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shade: 'dark',
+            type: 'horizontal',
+            shadeIntensity: 0.5,
+            gradientToColors: ['{{ $monthlyProfitability >= 0 ? "#40CD88" : "#FF6B6B" }}'],
+            inverseColors: true,
+            opacityFrom: 1,
+            opacityTo: 1,
+            stops: [0, 100]
+          }
+        },
+        colors: ['{{ $monthlyProfitability >= 0 ? "#28c76f" : "#ea5455" }}'],
+        stroke: {
+          lineCap: 'round',
+          dashArray: 4
+        },
+        labels: ['Lucratividade'],
+      };
+    if (profitabilityChartEl) new ApexCharts(profitabilityChartEl, profitabilityChartConfig).render();
   });
 </script>
 @endpush
