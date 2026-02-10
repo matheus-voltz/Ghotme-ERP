@@ -617,27 +617,96 @@
             const visualName = visualCard.querySelector('.cc-holder .cc-val');
             const visualExpiry = visualCard.querySelector('.cc-expires .cc-val');
             const visualCvv = visualCard.querySelector('.cc-cvv-box');
+            const visualBrandIcon = visualCard.querySelector('.cc-front .ti'); // Target the brand icon
+            const inputBrandIcon = ccNumberInput.nextElementSibling.querySelector('i'); // Target input icon
 
+            // Card Brand Detection Helper
+            // Card Brand Detection Helper
+            function getCardType(number) {
+              const patterns = {
+                'visa': /^4/,
+                'mastercard': /^5[1-5]|^2[2-7]/,
+                'amex': /^3[47]/,
+                'discover': /^6(?:011|5)/,
+                'diners': /^3(?:0[0-5]|[68])/,
+                'jcb': /^(?:2131|1800|35)/,
+                'elo': /^4011|438935|45(1416|76|7393)|50(4175|6699|67|90[4-7])|63(6297|6368|6369)/,
+                'hipercard': /^(606282\d{10}(\d{3})?)|(3841\d{15})/
+              };
+              for (let brand in patterns) {
+                if (patterns[brand].test(number)) {
+                  return brand;
+                }
+              }
+              return 'credit-card'; // Default
+            }
+
+            // Input Formatting & Limits
             ccNumberInput.addEventListener('input', (e) => {
+              let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+              let formattedValue = '';
+              for (let i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) {
+                  formattedValue += ' ';
+                }
+                formattedValue += value[i];
+              }
+              e.target.value = formattedValue.substring(0, 19); // Limit chars
+
+              // Update Visual Card Number
               let val = e.target.value || '#### #### #### ####';
               visualNumber.textContent = val;
+
+              // Detect Brand
+              const brand = getCardType(value);
+
+              // Map brand to Image URL (Using Icons8 CDN for reliability as local assets are missing)
+              let imgUrl = 'https://img.icons8.com/color/48/000000/bank-card-back-side.png'; // Default
+              if (brand === 'visa') imgUrl = 'https://img.icons8.com/color/48/000000/visa.png';
+              else if (brand === 'mastercard') imgUrl = 'https://img.icons8.com/color/48/000000/mastercard.png';
+              else if (brand === 'amex') imgUrl = 'https://img.icons8.com/color/48/000000/amex.png';
+              else if (brand === 'discover') imgUrl = 'https://img.icons8.com/color/48/000000/discover.png';
+              else if (brand === 'elo') imgUrl = 'https://img.icons8.com/color/48/000000/elo.png';
+              else if (brand === 'hipercard') imgUrl = 'https://img.icons8.com/color/48/000000/hipercard.png';
+
+              // Update Visual Icon
+              const visualIconContainer = visualCard.querySelector('.cc-front div[style*="position: absolute"]');
+              if (visualIconContainer) {
+                visualIconContainer.innerHTML = `<img src="${imgUrl}" alt="${brand}" height="32">`;
+              }
+
+              // Update Input Icon
+              // Input icon usually expects a font class, but we can replace the i with img or just leave it generic.
+              // Let's replace the i with an img for consistency if possible, or just keep generic font icon.
+              // User asked for "bandeira no cartão" (on the card), so updating the visual card is priority.
+              // For input, let's keep it clean or try to inject img.
+              if (inputBrandIcon) {
+                // inputBrandIcon is an <i>. replacing it might break layout if not careful.
+                // Let's try to set style background image or just keep generic icon text-muted.
+                // Actually, replacing innerHTML of the span wrapper is better.
+                const inputIconWrapper = ccNumberInput.nextElementSibling;
+                if (inputIconWrapper) {
+                  inputIconWrapper.innerHTML = `<img src="${imgUrl}" alt="${brand}" width="24">`;
+                }
+              }
             });
 
-            ccNameInput.addEventListener('input', (e) => {
-              visualName.textContent = e.target.value.toUpperCase() || 'NOME NO CARTÃO';
-            });
-
+            // 2. Expiry Date Formatting (MM/AA, max 5 chars)
             ccExpiryInput.addEventListener('input', (e) => {
+              let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+              if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+              }
+              e.target.value = value.substring(0, 5); // Limit to 5 chars (MM/AA)
+
               visualExpiry.textContent = e.target.value || 'MM/AA';
             });
 
-            ccCvvInput.addEventListener('focus', () => {
-              visualCard.classList.add('flipped');
-            });
-            ccCvvInput.addEventListener('blur', () => {
-              visualCard.classList.remove('flipped');
-            });
+            // 3. CVV Formatting (Digits only, max 3 or 4 chars)
             ccCvvInput.addEventListener('input', (e) => {
+              let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+              e.target.value = value.substring(0, 4); // Allow up to 4 for Amex, though UI says 3. Safer to allow 4.
+
               visualCvv.textContent = e.target.value || '***';
             });
 
