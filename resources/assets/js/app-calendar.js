@@ -49,6 +49,19 @@ document.addEventListener('DOMContentLoaded', function () {
     const filterInputs = Array.from(document.querySelectorAll('.input-filter'));
     const inlineCalendar = document.querySelector('.inline-calendar');
 
+    const flatpickrPT = {
+        weekdays: {
+            shorthand: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+            longhand: ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"]
+        },
+        months: {
+            shorthand: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+            longhand: ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+        },
+        rangeSeparator: " até ",
+        time_24hr: true
+    };
+
     // Calendar settings
     const calendarColors = {
       Business: 'primary',
@@ -127,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
         static: true,
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
+        locale: flatpickrPT,
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -142,6 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
         static: true,
         enableTime: true,
         altFormat: 'Y-m-dTH:i:S',
+        locale: flatpickrPT,
         onReady: function (selectedDates, dateStr, instance) {
           if (instance.isMobile) {
             instance.mobileInput.setAttribute('step', null);
@@ -155,7 +170,8 @@ document.addEventListener('DOMContentLoaded', function () {
       inlineCalInstance = inlineCalendar.flatpickr({
         monthSelectorType: 'static',
         static: true,
-        inline: true
+        inline: true,
+        locale: flatpickrPT
       });
     }
 
@@ -169,9 +185,9 @@ document.addEventListener('DOMContentLoaded', function () {
       bsAddEventSidebar.show();
       // For update event set offcanvas title text: Update Event
       if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Update Event';
+        offcanvasTitle.innerHTML = 'Atualizar Evento';
       }
-      btnSubmit.innerHTML = 'Update';
+      btnSubmit.innerHTML = 'Atualizar';
       btnSubmit.classList.add('btn-update-event');
       btnSubmit.classList.remove('btn-add-event');
       btnDeleteEvent.classList.remove('d-none');
@@ -248,6 +264,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // ------------------------------------------------
     let calendar = new Calendar(calendarEl, {
       initialView: 'dayGridMonth',
+      locale: 'pt-br',
+      buttonText: {
+        today: 'Hoje',
+        month: 'Mês',
+        week: 'Semana',
+        day: 'Dia',
+        list: 'Agenda'
+      },
       events: fetchEvents,
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],
       editable: true,
@@ -278,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // For new event set offcanvas title text: Add Event
         if (offcanvasTitle) {
-          offcanvasTitle.innerHTML = 'Add Event';
+          offcanvasTitle.innerHTML = 'Adicionar Evento';
         }
-        btnSubmit.innerHTML = 'Add';
+        btnSubmit.innerHTML = 'Adicionar';
         btnSubmit.classList.remove('btn-update-event');
         btnSubmit.classList.add('btn-add-event');
         btnDeleteEvent.classList.add('d-none');
@@ -309,21 +333,21 @@ document.addEventListener('DOMContentLoaded', function () {
         eventTitle: {
           validators: {
             notEmpty: {
-              message: 'Please enter event title '
+              message: 'Por favor, digite o título do evento'
             }
           }
         },
         eventStartDate: {
           validators: {
             notEmpty: {
-              message: 'Please enter start date '
+              message: 'Por favor, digite a data de início'
             }
           }
         },
         eventEndDate: {
           validators: {
             notEmpty: {
-              message: 'Please enter end date '
+              message: 'Por favor, digite a data de término'
             }
           }
         }
@@ -538,9 +562,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Hide left sidebar if the right sidebar is open
     btnToggleSidebar.addEventListener('click', e => {
       if (offcanvasTitle) {
-        offcanvasTitle.innerHTML = 'Add Event';
+        offcanvasTitle.innerHTML = 'Adicionar Evento';
       }
-      btnSubmit.innerHTML = 'Add';
+      btnSubmit.innerHTML = 'Adicionar';
       btnSubmit.classList.remove('btn-update-event');
       btnSubmit.classList.add('btn-add-event');
       btnDeleteEvent.classList.add('d-none');
