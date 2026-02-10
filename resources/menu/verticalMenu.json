@@ -7,6 +7,12 @@
       "slug": "dashboard"
     },
     {
+      "url": "/calendar",
+      "name": "Calendário",
+      "icon": "menu-icon icon-base ti tabler-calendar",
+      "slug": "calendar"
+    },
+    {
       "name": "Ordens de Serviço",
       "icon": "menu-icon icon-base ti tabler-file",
       "slug": "ordens",
