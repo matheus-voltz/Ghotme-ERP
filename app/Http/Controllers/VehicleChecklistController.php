@@ -81,6 +81,22 @@ class VehicleChecklistController extends Controller
                 ]);
             }
 
+            // Save Visual Inspection Points
+            if ($request->filled('damage_points_json')) {
+                $damagePoints = json_decode($request->input('damage_points_json'), true);
+                if (is_array($damagePoints)) {
+                    foreach ($damagePoints as $point) {
+                        \App\Models\VehicleInspectionDamagePoint::create([
+                            'vehicle_inspection_id' => $inspection->id,
+                            'x_coordinate' => $point['x'],
+                            'y_coordinate' => $point['y'],
+                            'notes' => $point['note'],
+                            'type' => 'risk' // Default type
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
             return redirect()->route('ordens-servico.checklist')->with('success', __('Checklist de entrada realizado com sucesso!'));
         } catch (\Exception $e) {
@@ -94,7 +110,7 @@ class VehicleChecklistController extends Controller
         $token = $request->query('token');
 
         $query = VehicleInspection::withoutGlobalScope('company')
-            ->with(['veiculo.client', 'user', 'items.checklistItem', 'company']);
+            ->with(['veiculo.client', 'user', 'items.checklistItem', 'company', 'damagePoints']);
 
         if ($token) {
             $inspection = $query->where('token', $token)->firstOrFail();
