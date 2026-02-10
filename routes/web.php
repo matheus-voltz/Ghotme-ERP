@@ -280,6 +280,7 @@ Route::middleware([
 
     // Support
     Route::get('/support/chat-whatsapp', [SupportController::class, 'chatWhatsapp'])->name('support.whatsapp');
+    Route::get('/support/chat', [SupportController::class, 'chat'])->name('support.chat');
     Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
     Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
     Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');

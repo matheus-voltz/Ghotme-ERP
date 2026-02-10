@@ -10,6 +10,7 @@ use App\Models\Clients;
 use App\Models\InventoryItem;
 use App\Models\Budget;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class HomePage extends Controller
 {
@@ -109,6 +110,17 @@ class HomePage extends Controller
 
     $conversionRate = $totalBudgetsMonth > 0 ? ($approvedBudgetsMonth / $totalBudgetsMonth) * 100 : 0;
 
+    // Top 5 Services by Revenue
+    $topServices = \App\Models\OrdemServicoItem::join('services', 'ordem_servico_items.service_id', '=', 'services.id')
+      ->select('services.name as description', DB::raw('SUM(ordem_servico_items.price * ordem_servico_items.quantity) as total_revenue'))
+      ->groupBy('services.name')
+      ->orderBy('total_revenue', 'desc')
+      ->limit(5)
+      ->get();
+
+    $topServiceLabels = $topServices->pluck('description')->map(fn($item) => str($item)->limit(20))->toArray();
+    $topServiceData = $topServices->pluck('total_revenue')->toArray();
+
     // Budget Trends (Last 6 Months)
     $budgetTrends = [];
     for ($i = 5; $i >= 0; $i--) {
@@ -134,7 +146,9 @@ class HomePage extends Controller
       'conversionRate',
       'budgetTrends',
       'totalBudgetsMonth',
-      'approvedBudgetsMonth'
+      'approvedBudgetsMonth',
+      'topServiceLabels',
+      'topServiceData'
     ));
   }
 }

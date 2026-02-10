@@ -54,6 +54,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'state',
         'zip_code',
         'niche',
+        'telegram_chat_id',
+        'telegram_username',
     ];
 
     public function billingHistory()

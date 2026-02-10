@@ -18,6 +18,11 @@ class SupportController extends Controller
         return redirect()->away($url);
     }
 
+    public function chat()
+    {
+        return view('content.apps.app-chat');
+    }
+
     public function knowledgeBase()
     {
         return view('content.pages.support.knowledge-base');

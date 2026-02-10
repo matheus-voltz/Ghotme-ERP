@@ -213,6 +213,19 @@ $configData = Helper::appClasses();
     </div>
   </div>
 
+  <!-- Top Services Chart -->
+  <div class="col-xl-6">
+    <div class="card h-100 shadow-sm">
+      <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Top 5 Serviços (Receita)</h5>
+        <i class="ti tabler-trending-up text-success fs-3"></i>
+      </div>
+      <div class="card-body">
+        <div id="topServicesChart"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Critical Alerts -->
   <div class="col-xl-6">
     <div class="card h-100 shadow-sm">
@@ -375,6 +388,59 @@ $configData = Helper::appClasses();
         }
       };
     if (osChartEl) new ApexCharts(osChartEl, osChartConfig).render();
+
+    // Top Services Chart
+    const topServicesEl = document.querySelector('#topServicesChart'),
+      topServicesConfig = {
+        series: [{
+          name: 'Receita Total',
+          data: @json($topServiceData)
+        }],
+        chart: {
+          type: 'bar',
+          height: 250,
+          toolbar: {
+            show: false
+          }
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 4,
+            horizontal: true,
+            distributed: true,
+            barHeight: '60%',
+          }
+        },
+        colors: ['#7367f0', '#28c76f', '#00cfe8', '#ff9f43', '#ea5455'],
+        dataLabels: {
+          enabled: true,
+          formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR'),
+          style: {
+            fontSize: '10px'
+          }
+        },
+        xaxis: {
+          categories: @json($topServiceLabels),
+          labels: {
+            show: false
+          },
+          axisBorder: {
+            show: false
+          }
+        },
+        grid: {
+          show: false
+        },
+        legend: {
+          show: false
+        },
+        tooltip: {
+          y: {
+            formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
+          }
+        }
+      };
+    if (topServicesEl) new ApexCharts(topServicesEl, topServicesConfig).render();
   });
 </script>
 @endpush

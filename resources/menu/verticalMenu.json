@@ -243,8 +243,13 @@
       "slug": "support",
       "submenu": [
         {
+          "url": "/support/chat",
+          "name": "Chat Suporte",
+          "slug": "support.chat"
+        },
+        {
           "url": "/support/chat-whatsapp",
-          "name": "Chat / WhatsApp",
+          "name": "WhatsApp",
           "slug": "support.whatsapp"
         },
         {
