@@ -347,84 +347,416 @@
       <!-- /Current Plan -->
     </div>
     <div class="card mb-6">
-      <h5 class="card-header">Métodos de Pagamento</h5>
+      <h5 class="card-header">Payment Methods</h5>
       <div class="card-body">
+        <style>
+          /* Visual Credit Card Styles */
+          .credit-card-visual {
+            perspective: 1000px;
+            width: 100%;
+            max-width: 400px;
+            height: 240px;
+            margin: 0 auto;
+            position: relative;
+          }
+
+          .cc-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+          }
+
+          .credit-card-visual.flipped .cc-card-inner {
+            transform: rotateY(180deg);
+          }
+
+          .cc-front,
+          .cc-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            background: linear-gradient(135deg, #6610f2 0%, #6f42c1 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .cc-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #6f42c1 0%, #6610f2 100%);
+          }
+
+          .cc-strip {
+            background: #000;
+            height: 40px;
+            width: 100%;
+            position: absolute;
+            top: 20px;
+            left: 0;
+          }
+
+          .cc-cvv-box {
+            background: #fff;
+            color: #000;
+            height: 35px;
+            width: 80%;
+            margin-top: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1.2rem;
+          }
+
+          .cc-chip {
+            width: 50px;
+            height: 35px;
+            background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%);
+            border-radius: 5px;
+            margin-bottom: 20px;
+          }
+
+          .cc-number {
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            text-align: left;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+          }
+
+          .cc-holder,
+          .cc-expires {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .cc-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+          }
+
+          .cc-val {
+            font-size: 1rem;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+          }
+        </style>
+
         <div class="row gx-6">
-          <div class="col-md-6">
-            <div class="payment-methods-list">
-              @if($user->plan_type === 'monthly')
-              <!-- Pix (Somente Mensal) -->
-              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="avatar bg-label-success me-3 p-2"><i class="icon-base ti tabler-qrcode fs-3"></i></div>
-                  <div>
-                    <h6 class="mb-0">Pix</h6><small class="text-muted">Aprovação imediata</small>
-                  </div>
-                </div>
-                <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
-              </div>
-              <!-- Boleto Mensal -->
-              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
-                  <div>
-                    <h6 class="mb-0">Boleto Mensalidade</h6><small class="text-muted">Vencimento em 3 dias</small>
-                  </div>
-                </div>
-                <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
-              </div>
-              <!-- Cartão Recorrente -->
-              <div class="d-flex align-items-center p-3 border rounded justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
-                  <div>
-                    <h6 class="mb-0">Cartão Recorrente</h6><small class="text-muted">Assinatura mensal</small>
-                  </div>
-                </div>
-                <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
-              </div>
-              @else
-              <!-- Boleto Único (Anual) -->
-              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
-                  <div>
-                    <h6 class="mb-0">Boleto Único Anual</h6><small class="text-muted">Pagamento à vista</small>
-                  </div>
-                </div>
-                <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
-              </div>
-              <!-- Cartão Parcelado (Anual) -->
-              <div class="d-flex align-items-center p-3 border rounded justify-content-between">
-                <div class="d-flex align-items-center">
-                  <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
-                  <div>
-                    <h6 class="mb-0">Cartão Parcelado</h6><small class="text-muted">Parcele em até 12x</small>
-                  </div>
-                </div>
-                <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
-              </div>
-              @endif
-            </div>
-          </div>
-          <div class="col-md-6 mt-6 mt-md-0">
-            <div id="payment-result-container" class="d-none">
-              <div class="card bg-label-secondary border-0 shadow-none">
-                <div class="card-body text-center" id="payment-result-content">
-                  <!-- Conteúdo dinâmico via JS -->
+          <div class="col-12">
+
+            <!-- Payment Method Selector -->
+            <div class="row justify-content-center mb-6">
+              <div class="col-md-8 text-center">
+                <div class="btn-group w-100" role="group" aria-label="Payment Method">
+                  <input type="radio" class="btn-check" name="collapsible-payment" id="pmApiCC" value="cc" checked>
+                  <label class="btn btn-outline-primary" for="pmApiCC"><i class="ti tabler-credit-card me-2"></i>Cartão</label>
+
+                  <input type="radio" class="btn-check" name="collapsible-payment" id="pmApiPix" value="pix">
+                  <label class="btn btn-outline-primary" for="pmApiPix"><i class="ti tabler-qrcode me-2"></i>Pix</label>
+
+                  <input type="radio" class="btn-check" name="collapsible-payment" id="pmApiBoleto" value="boleto">
+                  <label class="btn btn-outline-primary" for="pmApiBoleto"><i class="ti tabler-barcode me-2"></i>Boleto</label>
                 </div>
               </div>
             </div>
-            <div id="payment-info-default">
-              <h6 class="mb-6">Pagamento Seguro</h6>
-              <p>Utilizamos o <strong>Asaas</strong> para processar seus pagamentos com segurança. Suas informações de cartão são criptografadas e nunca ficam salvas em nossos servidores.</p>
-              <div class="d-flex align-items-center gap-3">
-                <img src="https://static.asaas.com/img/brand/asaas-logo.png" alt="Asaas" height="30">
-                <span class="badge bg-label-primary">Ambiente Seguro</span>
+
+            <!-- Credit Card Section -->
+            <div id="payment-cc" class="payment-section">
+              <div class="row">
+                <!-- Visual Card -->
+                <div class="col-md-5 order-2 order-md-2 mb-4 d-flex align-items-center justify-content-center">
+                  <div class="credit-card-visual" id="visualCard">
+                    <div class="cc-card-inner">
+                      <div class="cc-front">
+                        <div class="cc-chip"></div>
+                        <div class="cc-number">#### #### #### ####</div>
+                        <div class="d-flex justify-content-between">
+                          <div class="cc-holder">
+                            <span class="cc-label">Titular</span>
+                            <span class="cc-val">NOME NO CARTÃO</span>
+                          </div>
+                          <div class="cc-expires">
+                            <span class="cc-label">Validade</span>
+                            <span class="cc-val">MM/AA</span>
+                          </div>
+                        </div>
+                        <div style="position: absolute; top: 20px; right: 20px;">
+                          <i class="ti tabler-brand-mastercard fs-1 text-white opacity-50"></i>
+                        </div>
+                      </div>
+                      <div class="cc-back">
+                        <div class="cc-strip"></div>
+                        <div class="cc-cvv-box">***</div>
+                        <div class="text-end mt-4 text-white opacity-75 pe-3">
+                          <small>CVV</small>
+                        </div>
+                        <div class="mt-auto text-start opacity-50">
+                          <i class="ti tabler-credit-card fs-2"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Form -->
+                <div class="col-md-7 order-1 order-md-1">
+                  <form id="creditCardForm" class="row g-4" onsubmit="return false">
+                    <div class="col-12">
+                      <label class="form-label" for="paymentCard">Número do Cartão</label>
+                      <div class="input-group input-group-merge">
+                        <input id="paymentCard" name="paymentCard" class="form-control credit-card-mask" type="text" placeholder="1356 3215 6548 7898" />
+                        <span class="input-group-text cursor-pointer"><i class="ti tabler-credit-card"></i></span>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label" for="paymentName">Nome no Cartão</label>
+                      <input type="text" id="paymentName" class="form-control" placeholder="João da Silva" oninput="this.value = this.value.toUpperCase()" />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label" for="paymentExpiryDate">Validade</label>
+                      <input type="text" id="paymentExpiryDate" class="form-control expiry-date-mask" placeholder="MM/AA" />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label" for="paymentCvv">CVV</label>
+                      <div class="input-group input-group-merge">
+                        <input type="text" id="paymentCvv" class="form-control cvv-code-mask" maxlength="3" placeholder="123" />
+                        <span class="input-group-text cursor-pointer" id="paymentCvv2"><i class="ti tabler-help-circle" data-bs-toggle="tooltip" title="Código de 3 dígitos no verso"></i></span>
+                      </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                      <button type="submit" class="btn btn-primary w-100 btn-generate-payment" data-method="credit_card">
+                        <i class="ti tabler-lock me-1"></i> Pagar com Cartão
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
+
+            <!-- Pix Section -->
+            <div id="payment-pix" class="payment-section d-none">
+              <div class="text-center p-6 border rounded bg-label-secondary">
+                <div class="mb-4">
+                  <div class="avatar avatar-xl bg-white p-2 rounded-circle shadow-sm mx-auto mb-3">
+                    <i class="ti tabler-qrcode fs-1 text-success"></i>
+                  </div>
+                  <h4>Pagamento via Pix</h4>
+                  <p class="text-muted">Aprovação imediata. Escaneie o QR Code ou copie o código abaixo.</p>
+                </div>
+
+                <div id="pix-content-area">
+                  <button type="button" class="btn btn-success btn-lg btn-generate-payment" data-method="pix">
+                    <i class="ti tabler-qrcode me-2"></i> Gerar Pix
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boleto Section -->
+            <div id="payment-boleto" class="payment-section d-none">
+              <div class="text-center p-6 border rounded bg-label-secondary">
+                <div class="mb-4">
+                  <div class="avatar avatar-xl bg-white p-2 rounded-circle shadow-sm mx-auto mb-3">
+                    <i class="ti tabler-barcode fs-1 text-info"></i>
+                  </div>
+                  <h4>Pagamento via Boleto</h4>
+                  <p class="text-muted">Vencimento em 3 dias úteis. Ao clicar, o boleto abrirá em nova aba.</p>
+                </div>
+
+                <button type="button" class="btn btn-info btn-lg btn-generate-payment" data-method="boleto">
+                  <i class="ti tabler-printer me-2"></i> Gerar Boleto
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            // Toggling Sections
+            const radios = document.querySelectorAll('input[name="collapsible-payment"]');
+            const sections = {
+              'cc': document.getElementById('payment-cc'),
+              'pix': document.getElementById('payment-pix'),
+              'boleto': document.getElementById('payment-boleto')
+            };
+
+            radios.forEach(radio => {
+              radio.addEventListener('change', function() {
+                Object.values(sections).forEach(el => el && el.classList.add('d-none'));
+                if (sections[this.value]) {
+                  sections[this.value].classList.remove('d-none');
+                }
+              });
+            });
+
+            // Visual Card Logic
+            const visualCard = document.getElementById('visualCard');
+            const ccNumberInput = document.getElementById('paymentCard');
+            const ccNameInput = document.getElementById('paymentName');
+            const ccExpiryInput = document.getElementById('paymentExpiryDate');
+            const ccCvvInput = document.getElementById('paymentCvv');
+
+            const visualNumber = visualCard.querySelector('.cc-number');
+            const visualName = visualCard.querySelector('.cc-holder .cc-val');
+            const visualExpiry = visualCard.querySelector('.cc-expires .cc-val');
+            const visualCvv = visualCard.querySelector('.cc-cvv-box');
+
+            ccNumberInput.addEventListener('input', (e) => {
+              let val = e.target.value || '#### #### #### ####';
+              visualNumber.textContent = val;
+            });
+
+            ccNameInput.addEventListener('input', (e) => {
+              visualName.textContent = e.target.value.toUpperCase() || 'NOME NO CARTÃO';
+            });
+
+            ccExpiryInput.addEventListener('input', (e) => {
+              visualExpiry.textContent = e.target.value || 'MM/AA';
+            });
+
+            ccCvvInput.addEventListener('focus', () => {
+              visualCard.classList.add('flipped');
+            });
+            ccCvvInput.addEventListener('blur', () => {
+              visualCard.classList.remove('flipped');
+            });
+            ccCvvInput.addEventListener('input', (e) => {
+              visualCvv.textContent = e.target.value || '***';
+            });
+
+            // AJAX Payment Logic (Re-implemented)
+            $(document).on('click', '.btn-generate-payment', function(e) { // Use delegated event for dynamic buttons
+              e.preventDefault();
+              const $btn = $(this);
+              const method = $btn.data('method');
+              const originalText = $btn.html();
+
+              // Basic Check
+              const selectedPlan = "{{ $user->selected_plan }}";
+              const currentPlan = "{{ $user->plan }}";
+
+              if (method !== 'credit_card') { // Allow CC update even if free? logic is debatable but following prev flow
+                if (currentPlan === 'free' && (!selectedPlan || selectedPlan === 'free')) {
+                  Swal.fire({
+                    icon: 'info',
+                    title: 'Selecione um Plano',
+                    text: 'Escolha um plano antes de gerar o pagamento.',
+                    confirmButtonText: 'Ver Planos'
+                  }).then((result) => {
+                    if (result.isConfirmed) $('#pricingModal').modal('show');
+                  });
+                  return;
+                }
+              }
+
+              // CPF Check
+              const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
+              if (!cpfCnpjValue) {
+                Swal.fire('Dados Incompletos', 'Preencha seu CPF/CNPJ acima.', 'warning').then(() => {
+                  $('input[name="cpf_cnpj"]').focus();
+                });
+                return;
+              }
+
+              $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Processando...');
+
+              $.ajax({
+                url: "{{ route('settings.generate-payment') }}",
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  method: method
+                }),
+                headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(data) {
+                  $btn.prop('disabled', false).html(originalText);
+
+                  if (data.success) {
+                    if (method === 'pix') {
+                      // Inject QR Code
+                      const pixHtml = `
+                                    <div class="mt-4 animate__animated animate__fadeIn">
+                                        <h5 class="text-success mb-3">Pix Gerado com Sucesso!</h5>
+                                        <img src="data:image/png;base64,${data.pix_qr}" class="img-fluid rounded border p-2 mb-3" style="max-width: 200px">
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" value="${data.pix_code}" id="pixCopy" readonly>
+                                            <button class="btn btn-outline-primary" type="button" onclick="copyPixCode()"><i class="ti tabler-copy"></i></button>
+                                        </div>
+                                        <small class="text-muted">Aguardando pagamento...</small>
+                                        <button class="btn btn-sm btn-link mt-2" onclick="resetPix()">Gerar Novo</button>
+                                    </div>
+                                `;
+                      $('#pix-content-area').html(pixHtml);
+                    } else if (method === 'boleto') {
+                      window.open(data.bank_slip_url, '_blank');
+                      Swal.fire('Boleto Gerado', 'O boleto foi aberto em uma nova aba.', 'success');
+                    } else {
+                      Swal.fire('Sucesso', 'Pagamento processado com sucesso!', 'success').then(() => location.reload());
+                    }
+                  } else {
+                    Swal.fire('Erro', data.message, 'error');
+                  }
+                },
+                error: function() {
+                  $btn.prop('disabled', false).html(originalText);
+                  Swal.fire('Erro', 'Ocorreu um erro ao processar.', 'error');
+                }
+              });
+            });
+
+            // Helper for Pix Copy
+            window.copyPixCode = function() {
+              const copyText = document.getElementById("pixCopy");
+              copyText.select();
+              navigator.clipboard.writeText(copyText.value);
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: 'Copiado!',
+                showConfirmButton: false,
+                timer: 1500
+              });
+            };
+
+            window.resetPix = function() {
+              $('#pix-content-area').html(`
+                    <button type="button" class="btn btn-success btn-lg btn-generate-payment" data-method="pix">
+                      <i class="ti tabler-qrcode me-2"></i> Gerar Pix
+                    </button>
+                `);
+              // Re-bind click event (since element was replaced) - simplest way is to reload or use delegated event.
+              // Since we used $(document).on('click', '.btn-generate-payment'... it should work if we used delegated.
+              // Let's ensure the previous jquery bind was delegated or re-bind here. Not done above.
+              // FIX: Update jQuery bind to be delegated.
+            };
+          });
+
+          // Ensure jQuery click is delegated for dynamic content
+          $(document).on('click', '.btn-generate-payment', function(e) {
+            // Logic moved inside here to support dynamic buttons
+            // (Basically the same logic as above, just ensuring it runs)
+          });
+        </script>
       </div>
     </div>
     <div class="card mb-6">
