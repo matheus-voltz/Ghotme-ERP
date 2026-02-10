@@ -234,9 +234,9 @@
 
         // Prompt
         Swal.fire({
-          title: 'Descreva a avaria',
+          title: '{{ niche("visual_inspection_prompt_title") }}',
           input: 'text',
-          inputPlaceholder: 'Ex: Risco, Amassado...',
+          inputPlaceholder: '{{ niche("visual_inspection_prompt_placeholder") }}',
           showCancelButton: true,
           confirmButtonText: 'Marcar',
           cancelButtonText: 'Cancelar',

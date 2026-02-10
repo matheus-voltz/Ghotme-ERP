@@ -69,18 +69,14 @@ $configData = Helper::appClasses();
         @endisset
         @php
         $menuName = isset($menu->name) ? __($menu->name) : '';
-        $userNiche = auth()->user()->niche ?? 'workshop';
 
-        if ($userNiche === 'tech_assistance') {
-        if ($menuName === 'Clientes & Veículos') $menuName = 'Clientes & Dispositivos';
-        if ($menuName === 'Veículos') $menuName = 'Dispositivos';
-        if ($menuName === 'Histórico do veículo') $menuName = 'Histórico do Dispositivo';
-        if ($menuName === 'Itens/Peças') $menuName = 'Peças/Componentes';
-        } elseif ($userNiche === 'pet_shop') {
-        if ($menuName === 'Clientes & Veículos') $menuName = 'Clientes & Pets';
-        if ($menuName === 'Veículos') $menuName = 'Pets';
-        if ($menuName === 'Histórico do veículo') $menuName = 'Prontuário Veterinário';
-        if ($menuName === 'Itens/Peças') $menuName = 'Produtos/Acessórios';
+        // Dynamic Niche Translation
+        $menuName = str_replace('Veículos', niche('entities'), $menuName);
+        $menuName = str_replace('veículo', strtolower(niche('entity')), $menuName);
+        $menuName = str_replace('Veículo', niche('entity'), $menuName);
+
+        if ($menuName === 'Itens/Peças') {
+        $menuName = niche('inventory_items');
         }
         @endphp
         <div>{{ $menuName }}</div>
