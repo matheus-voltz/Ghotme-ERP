@@ -67,7 +67,18 @@ $configData = Helper::appClasses();
         @isset($menu->icon)
         <i class="{{ $menu->icon }}"></i>
         @endisset
-        <div>{{ isset($menu->name) ? __($menu->name) : '' }}</div>
+        @php
+        $menuName = isset($menu->name) ? __($menu->name) : '';
+        $userNiche = auth()->user()->niche ?? 'workshop';
+
+        if ($userNiche === 'tech_assistance') {
+        if ($menuName === 'Clientes & Veículos') $menuName = 'Clientes & Dispositivos';
+        if ($menuName === 'Veículos') $menuName = 'Dispositivos';
+        if ($menuName === 'Histórico do veículo') $menuName = 'Histórico do Dispositivo';
+        if ($menuName === 'Itens/Peças') $menuName = 'Peças/Componentes';
+        }
+        @endphp
+        <div>{{ $menuName }}</div>
         @isset($menu->badge)
         <div class="badge bg-{{ $menu->badge[0] }} rounded-pill ms-auto">{{ $menu->badge[1] }}</div>
         @endisset

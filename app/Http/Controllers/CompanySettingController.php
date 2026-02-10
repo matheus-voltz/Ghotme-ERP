@@ -11,7 +11,8 @@ class CompanySettingController extends Controller
     public function index()
     {
         $settings = CompanySetting::first() ?? new CompanySetting();
-        return view('content.settings.company-data.index', compact('settings'));
+        $userNiche = auth()->user()->niche ?? 'workshop';
+        return view('content.settings.company-data.index', compact('settings', 'userNiche'));
     }
 
     public function update(Request $request)
@@ -33,6 +34,7 @@ class CompanySettingController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:2',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'niche' => 'nullable|string|in:workshop,tech_assistance',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -47,6 +49,13 @@ class CompanySettingController extends Controller
         $settings->fill($validated);
         $settings->save();
 
-        return response()->json(['success' => true, 'message' => 'Dados da empresa atualizados com sucesso!']);
+        // Update User Niche
+        if ($request->has('niche')) {
+            $user = auth()->user();
+            $user->niche = $request->niche;
+            $user->save();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Dados da empresa e nicho atualizados com sucesso!']);
     }
 }

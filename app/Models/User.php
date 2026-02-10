@@ -49,7 +49,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'billing_address',
         'city',
         'state',
+        'billing_address',
+        'city',
+        'state',
         'zip_code',
+        'niche',
     ];
 
     public function billingHistory()

@@ -45,6 +45,14 @@
               <label class="form-label">WhatsApp/Celular</label>
               <input type="text" name="mobile" class="form-control" value="{{ $settings->mobile }}" placeholder="(00) 00000-0000" />
             </div>
+            <div class="col-md-12 mb-4">
+              <label class="form-label">Tipo de Negócio (Nicho)</label>
+              <select name="niche" class="form-select">
+                <option value="workshop" {{ $userNiche == 'workshop' ? 'selected' : '' }}>Oficina Mecânica (Veículos)</option>
+                <option value="tech_assistance" {{ $userNiche == 'tech_assistance' ? 'selected' : '' }}>Assistência Técnica (Eletrônicos/Dispositivos)</option>
+              </select>
+              <small class="text-muted">Isso adapta os termos do menu (ex: 'Veículos' muda para 'Dispositivos').</small>
+            </div>
           </div>
 
           <hr class="my-4">
@@ -85,9 +93,9 @@
             </div>
             <div class="col-md-6 text-center">
               @if($settings->logo_path)
-                <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="Logo" class="img-fluid rounded border p-2" style="max-height: 100px;">
+              <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="Logo" class="img-fluid rounded border p-2" style="max-height: 100px;">
               @else
-                <div class="p-4 border rounded bg-light text-muted">Sem Logotipo</div>
+              <div class="p-4 border rounded bg-light text-muted">Sem Logotipo</div>
               @endif
             </div>
           </div>
@@ -106,31 +114,33 @@
 @endsection
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('formCompanyData');
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(form);
-        
-        fetch("{{ route('settings.company-data.update') }}", {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      fetch("{{ route('settings.company-data.update') }}", {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sucesso!',
-                    text: data.message,
-                    customClass: { confirmButton: 'btn btn-success' }
-                }).then(() => location.reload());
-            }
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso!',
+              text: data.message,
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            }).then(() => location.reload());
+          }
         });
     });
-});
+  });
 </script>
 @endsection
