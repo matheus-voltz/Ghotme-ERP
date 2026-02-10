@@ -30,6 +30,43 @@ $itemIcon = 'ti tabler-device-mobile';
         </div>
     </div>
 
+    <!-- Stats Review -->
+    <div class="row mb-4 g-3">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-success"><i class="ti tabler-check"></i></span>
+                    </div>
+                    <h5 class="mb-0">0</h5>
+                    <small class="text-muted">Serviços Hoje</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-info"><i class="ti tabler-clock"></i></span>
+                    </div>
+                    <h5 class="mb-0">0h</h5>
+                    <small class="text-muted">Tempo Médio</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="avatar mx-auto mb-2">
+                        <span class="avatar-initial rounded-circle bg-label-warning"><i class="ti tabler-star"></i></span>
+                    </div>
+                    <h5 class="mb-0">5.0</h5>
+                    <small class="text-muted">Avaliação</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @forelse($orders as $order)
     <div class="card mb-4 border-0 shadow-sm" style="border-radius: 1rem; overflow: hidden;">
         <div class="card-body p-4">
