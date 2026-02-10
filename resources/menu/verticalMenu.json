@@ -13,6 +13,12 @@
       "slug": "calendar"
     },
     {
+      "url": "/kanban",
+      "name": "Kanban",
+      "icon": "menu-icon icon-base ti tabler-layout-kanban",
+      "slug": "kanban"
+    },
+    {
       "name": "Ordens de Serviço",
       "icon": "menu-icon icon-base ti tabler-file",
       "slug": "ordens",

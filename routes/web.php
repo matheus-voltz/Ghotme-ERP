@@ -282,6 +282,12 @@ Route::middleware([
     Route::get('/support/chat-whatsapp', [SupportController::class, 'chatWhatsapp'])->name('support.whatsapp');
     Route::get('/support/chat', [SupportController::class, 'chat'])->name('support.chat');
     Route::get('/calendar', [App\Http\Controllers\CalendarController::class, 'index'])->name('calendar');
+    Route::get('/kanban', [App\Http\Controllers\KanbanController::class, 'index'])->name('kanban');
+    Route::get('/kanban/data', [App\Http\Controllers\KanbanController::class, 'fetch'])->name('kanban.fetch');
+    Route::post('/kanban/add-board', [App\Http\Controllers\KanbanController::class, 'addBoard'])->name('kanban.add-board');
+    Route::post('/kanban/add-item', [App\Http\Controllers\KanbanController::class, 'addItem'])->name('kanban.add-item');
+    Route::post('/kanban/move-item', [App\Http\Controllers\KanbanController::class, 'moveItem'])->name('kanban.move-item');
+    
     Route::get('/calendar/events', [App\Http\Controllers\CalendarController::class, 'fetchEvents'])->name('calendar.fetch');
     Route::post('/calendar/events', [App\Http\Controllers\CalendarController::class, 'store'])->name('calendar.store');
     Route::put('/calendar/events/{id}', [App\Http\Controllers\CalendarController::class, 'update'])->name('calendar.update');
