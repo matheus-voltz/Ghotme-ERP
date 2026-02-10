@@ -14,9 +14,14 @@ class SupportChat extends Component
     public $message = '';
     public $search = '';
     public $activeTab = 'team'; // team, support, clients
+    public $userStatus;
+    public $lastMessageId;
 
     public function mount()
     {
+        $this->userStatus = Auth::user()->status ?? 'active';
+        $this->lastMessageId = ChatMessage::max('id');
+        
         // Ao iniciar, tenta selecionar o primeiro colega de equipe
         $firstContact = User::where('id', '!=', Auth::id())
             ->where('company_id', Auth::user()->company_id)
@@ -31,6 +36,28 @@ class SupportChat extends Component
     {
         $this->activeTab = $tab;
         $this->activeUserId = null; // Limpa a seleção ao trocar de aba
+    }
+
+    public function changeStatus($status)
+    {
+        $this->userStatus = $status;
+        Auth::user()->update(['status' => $status]);
+    }
+
+    public function checkNewMessages()
+    {
+        $latestMessage = ChatMessage::where('receiver_id', Auth::id())
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($latestMessage && $latestMessage->id > $this->lastMessageId) {
+            $this->lastMessageId = $latestMessage->id;
+            $senderName = $latestMessage->sender->name;
+            $this->dispatch('new-chat-message', [
+                'sender' => $senderName,
+                'message' => substr($latestMessage->message, 0, 50) . (strlen($latestMessage->message) > 50 ? '...' : '')
+            ]);
+        }
     }
 
     public function selectUser($userId)

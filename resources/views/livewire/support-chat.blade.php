@@ -1,10 +1,10 @@
-<div class="app-chat card overflow-hidden">
+<div class="app-chat card overflow-hidden" wire:poll.2000ms="checkNewMessages">
   <div class="row g-0">
     <!-- Sidebar Left -->
     <div class="col app-chat-sidebar-left app-sidebar overflow-hidden" id="app-chat-sidebar-left">
       <div
         class="chat-sidebar-left-user sidebar-header d-flex flex-column justify-content-center align-items-center flex-wrap px-6 pt-12">
-        <div class="avatar avatar-xl avatar-online chat-sidebar-avatar">
+        <div class="avatar avatar-xl avatar-{{ $userStatus == 'active' ? 'online' : ($userStatus == 'away' ? 'away' : ($userStatus == 'busy' ? 'busy' : 'offline')) }} chat-sidebar-avatar">
           <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle" />
         </div>
         <h5 class="mt-4 mb-0">{{ auth()->user()->name }}</h5>
@@ -18,8 +18,23 @@
           <div class="d-grid gap-2 pt-2 text-heading ms-2">
             <div class="form-check form-check-success">
               <input name="chat-user-status" class="form-check-input" type="radio" value="active" id="user-active"
-                checked />
+                wire:click="changeStatus('active')" {{ $userStatus == 'active' ? 'checked' : '' }} />
               <label class="form-check-label" for="user-active">Online</label>
+            </div>
+            <div class="form-check form-check-warning">
+              <input name="chat-user-status" class="form-check-input" type="radio" value="away" id="user-away" 
+                wire:click="changeStatus('away')" {{ $userStatus == 'away' ? 'checked' : '' }} />
+              <label class="form-check-label" for="user-away">Ausente</label>
+            </div>
+            <div class="form-check form-check-danger">
+              <input name="chat-user-status" class="form-check-input" type="radio" value="busy" id="user-busy" 
+                wire:click="changeStatus('busy')" {{ $userStatus == 'busy' ? 'checked' : '' }} />
+              <label class="form-check-label" for="user-busy">Não Perturbe</label>
+            </div>
+            <div class="form-check form-check-secondary">
+              <input name="chat-user-status" class="form-check-input" type="radio" value="offline" id="user-offline" 
+                wire:click="changeStatus('offline')" {{ $userStatus == 'offline' ? 'checked' : '' }} />
+              <label class="form-check-label" for="user-offline">Offline</label>
             </div>
           </div>
         </div>
@@ -31,7 +46,7 @@
     <div class="col app-chat-contacts app-sidebar flex-grow-0 overflow-hidden border-end" id="app-chat-contacts">
       <div class="sidebar-header h-px-75 px-5 border-bottom d-flex align-items-center">
         <div class="d-flex align-items-center me-6 me-lg-0">
-          <div class="flex-shrink-0 avatar avatar-online me-4" data-bs-toggle="sidebar" data-overlay="app-overlay-ex"
+          <div class="flex-shrink-0 avatar avatar-{{ $userStatus == 'active' ? 'online' : ($userStatus == 'away' ? 'away' : ($userStatus == 'busy' ? 'busy' : 'offline')) }} me-4" data-bs-toggle="sidebar" data-overlay="app-overlay-ex"
             data-target="#app-chat-sidebar-left">
             <img class="user-avatar rounded-circle cursor-pointer" src="{{ asset('assets/img/avatars/1.png') }}"
               alt="Avatar" />
@@ -76,7 +91,7 @@
           @foreach($contacts as $contact)
           <li class="chat-contact-list-item {{ $activeUserId == $contact->id ? 'active' : '' }} mb-1" wire:click="selectUser({{ $contact->id }})" style="cursor: pointer;">
             <a class="d-flex align-items-center">
-              <div class="flex-shrink-0 avatar avatar-online">
+              <div class="flex-shrink-0 avatar avatar-{{ $contact->status == 'active' ? 'online' : ($contact->status == 'away' ? 'away' : ($contact->status == 'busy' ? 'busy' : 'offline')) }}">
                 <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($contact->name, 0, 2) }}</span>
               </div>
               <div class="chat-contact-info flex-grow-1 ms-4">
@@ -118,12 +133,12 @@
             <div class="d-flex overflow-hidden align-items-center">
               <i class="icon-base ti tabler-menu-2 icon-lg cursor-pointer d-lg-none d-block me-4"
                 data-bs-toggle="sidebar" data-overlay data-target="#app-chat-contacts"></i>
-              <div class="flex-shrink-0 avatar avatar-online">
+              <div class="flex-shrink-0 avatar avatar-{{ $activeUser->status == 'active' ? 'online' : ($activeUser->status == 'away' ? 'away' : ($activeUser->status == 'busy' ? 'busy' : 'offline')) }}">
                  <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($activeUser->name, 0, 2) }}</span>
               </div>
               <div class="chat-contact-info flex-grow-1 ms-4">
                 <h6 class="m-0 fw-normal">{{ $activeUser->name }}</h6>
-                <small class="user-status text-body">Online</small>
+                <small class="user-status text-body">{{ ucfirst($activeUser->status == 'active' ? 'online' : ($activeUser->status == 'away' ? 'ausente' : ($activeUser->status == 'busy' ? 'não perturbe' : 'offline'))) }}</small>
               </div>
             </div>
           </div>
