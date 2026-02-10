@@ -76,6 +76,11 @@ $configData = Helper::appClasses();
         if ($menuName === 'Veículos') $menuName = 'Dispositivos';
         if ($menuName === 'Histórico do veículo') $menuName = 'Histórico do Dispositivo';
         if ($menuName === 'Itens/Peças') $menuName = 'Peças/Componentes';
+        } elseif ($userNiche === 'pet_shop') {
+        if ($menuName === 'Clientes & Veículos') $menuName = 'Clientes & Pets';
+        if ($menuName === 'Veículos') $menuName = 'Pets';
+        if ($menuName === 'Histórico do veículo') $menuName = 'Prontuário Veterinário';
+        if ($menuName === 'Itens/Peças') $menuName = 'Produtos/Acessórios';
         }
         @endphp
         <div>{{ $menuName }}</div>

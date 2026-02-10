@@ -50,8 +50,9 @@
               <select name="niche" class="form-select">
                 <option value="workshop" {{ $userNiche == 'workshop' ? 'selected' : '' }}>Oficina Mecânica (Veículos)</option>
                 <option value="tech_assistance" {{ $userNiche == 'tech_assistance' ? 'selected' : '' }}>Assistência Técnica (Eletrônicos/Dispositivos)</option>
+                <option value="pet_shop" {{ $userNiche == 'pet_shop' ? 'selected' : '' }}>Pet Shop / Veerinária (Pets/Banho e Tosa)</option>
               </select>
-              <small class="text-muted">Isso adapta os termos do menu (ex: 'Veículos' muda para 'Dispositivos').</small>
+              <small class="text-muted">Isso adapta os termos do menu (ex: 'Veículos' muda para 'Pets').</small>
             </div>
           </div>
 
