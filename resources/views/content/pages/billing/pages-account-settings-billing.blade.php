@@ -16,59 +16,73 @@
 @section('page-script')
 @vite(['resources/assets/js/pages-pricing.js', 'resources/assets/js/modal-edit-cc.js'])
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     const $form = $('#formAccountSettings');
     const $btnSave = $('#btnSaveProfile');
 
     // Masks logic
     $('.zip-code-mask').on('input', function() {
-        let v = this.value.replace(/\D/g, '');
-        if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
-        this.value = v;
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5, 8);
+      this.value = v;
     });
 
     $('.phone-mask').on('input', function() {
-        let v = this.value.replace(/\D/g, '');
-        if (v.length > 10) v = v.slice(0, 2) + ' ' + v.slice(2, 7) + '-' + v.slice(7, 11);
-        else if (v.length > 6) v = v.slice(0, 2) + ' ' + v.slice(2, 6) + '-' + v.slice(6, 10);
-        else if (v.length > 2) v = v.slice(0, 2) + ' ' + v.slice(2);
-        this.value = v;
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 10) v = v.slice(0, 2) + ' ' + v.slice(2, 7) + '-' + v.slice(7, 11);
+      else if (v.length > 6) v = v.slice(0, 2) + ' ' + v.slice(2, 6) + '-' + v.slice(6, 10);
+      else if (v.length > 2) v = v.slice(0, 2) + ' ' + v.slice(2);
+      this.value = v;
     });
 
     $('.cpf-cnpj-mask').on('input', function() {
-        let v = this.value.replace(/\D/g, '');
-        if (v.length > 11) { // CNPJ
-            v = v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '/' + v.slice(8, 12) + '-' + v.slice(12, 14);
-        } else if (v.length > 0) { // CPF
-            v = v.slice(0, 3) + '.' + v.slice(3, 6) + '.' + v.slice(6, 9) + '-' + v.slice(9, 11);
-        }
-        this.value = v;
+      let v = this.value.replace(/\D/g, '');
+      if (v.length > 11) { // CNPJ
+        v = v.slice(0, 2) + '.' + v.slice(2, 5) + '.' + v.slice(5, 8) + '/' + v.slice(8, 12) + '-' + v.slice(12, 14);
+      } else if (v.length > 0) { // CPF
+        v = v.slice(0, 3) + '.' + v.slice(3, 6) + '.' + v.slice(6, 9) + '-' + v.slice(9, 11);
+      }
+      this.value = v;
     });
 
     // SAVE PROFILE
     $btnSave.on('click', function(e) {
-        e.preventDefault();
-        const originalText = $btnSave.html();
-        $btnSave.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+      e.preventDefault();
+      const originalText = $btnSave.html();
+      $btnSave.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
 
-        $.ajax({
-            url: "{{ route('settings.update-profile') }}",
-            method: 'POST',
-            data: $form.serialize(),
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            success: function(data) {
-                $btnSave.html(originalText).prop('disabled', false);
-                if (data.success) {
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Erro!', text: data.message });
-                }
-            },
-            error: function() {
-                $btnSave.html(originalText).prop('disabled', false);
-                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Erro ao salvar perfil.' });
-            }
-        });
+      $.ajax({
+        url: "{{ route('settings.update-profile') }}",
+        method: 'POST',
+        data: $form.serialize(),
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+          $btnSave.html(originalText).prop('disabled', false);
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Sucesso!',
+              text: data.message
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro!',
+              text: data.message
+            });
+          }
+        },
+        error: function() {
+          $btnSave.html(originalText).prop('disabled', false);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Erro ao salvar perfil.'
+          });
+        }
+      });
     });
 
     // GENERATE PAYMENT
@@ -78,137 +92,181 @@ document.addEventListener('DOMContentLoaded', function() {
     const $resultContent = $('#payment-result-content');
 
     $('.btn-generate-payment').on('click', function(e) {
-        e.preventDefault();
-        const $btn = $(this);
-        const method = $btn.data('method');
-        const originalText = $btn.html();
-        
-        // Only force plan selection if no future plan is selected yet
-        const currentPlan = "{{ $user->plan }}";
-        const selectedPlan = "{{ $user->selected_plan }}";
-        
-        if (currentPlan === 'free' && (!selectedPlan || selectedPlan === 'free')) {
-            pendingMethod = method;
-            Swal.fire({
-                icon: 'info',
-                title: 'Selecione um Plano',
-                text: 'Você precisa primeiro escolher qual plano deseja assinar para gerar a cobrança.',
-                confirmButtonText: 'Ver Planos',
-                customClass: { confirmButton: 'btn btn-primary' },
-                buttonsStyling: false
-            }).then(() => {
-                $('#pricingModal').modal('show');
-            });
-            return;
-        }
-        
-        // Client-side validation for CPF/CNPJ
-        const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
-        if (!cpfCnpjValue) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Dados Incompletos',
-                text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" abaixo antes de prosseguir.',
-                confirmButtonText: 'Ir para o campo',
-                customClass: { confirmButton: 'btn btn-primary' },
-                buttonsStyling: false
-            }).then(() => {
-                $('input[name="cpf_cnpj"]').focus();
-                $('input[name="cpf_cnpj"]')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-            return;
-        }
-        
-        $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+      e.preventDefault();
+      const $btn = $(this);
+      const method = $btn.data('method');
+      const originalText = $btn.html();
 
-        $.ajax({
-            url: "{{ route('settings.generate-payment') }}",
-            method: 'POST',
-            data: JSON.stringify({ method: method }),
-            contentType: 'application/json',
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            success: function(data) {
-                $btn.html(originalText).prop('disabled', false);
-                if (data.success) {
-                    $infoDefault.addClass('d-none');
-                    $resultContainer.removeClass('d-none');
-                    let html = '';
-                    if (method === 'pix') {
-                        html = `<h6 class="mb-4 text-success">Pagamento via PIX</h6><img src="data:image/png;base64,${data.pix_qr}" class="img-fluid mb-4 shadow-sm rounded" style="max-width: 200px"><div class="mb-4"><small class="text-muted d-block mb-2">Copia e Cola:</small><div class="input-group"><input type="text" class="form-control form-control-sm" value="${data.pix_code}" id="pix-code" readonly><button class="btn btn-primary btn-sm" onclick="copyPix()">Copiar</button></div></div><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
-                    } else if (method === 'boleto') {
-                        html = `<h6 class="mb-4 text-info">Boleto Gerado</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-barcode fs-1 text-primary mb-3 d-block"></i><p class="mb-0">Valor: <strong>R$ ${data.amount}</strong></p></div><a href="${data.bank_slip_url}" target="_blank" class="btn btn-primary w-100 mb-3">Imprimir Boleto</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
-                    } else {
-                        html = `<h6 class="mb-4 text-primary">Cartão de Crédito</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-credit-card fs-1 text-primary mb-3 d-block"></i><p>Conclua o pagamento no ambiente seguro do Asaas.</p></div><a href="${data.invoice_url || data.redirect_url}" target="_blank" class="btn btn-primary w-100 mb-3">Pagar Agora</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
-                    }
-                    $resultContent.html(html);
-                    Swal.fire({ icon: 'success', title: 'Cobrança Gerada!', timer: 2000, showConfirmButton: false });
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Erro!', text: data.message });
-                }
-            },
-            error: function() {
-                $btn.html(originalText).prop('disabled', false);
-                Swal.fire({ icon: 'error', title: 'Erro!', text: 'Erro ao gerar pagamento.' });
-            }
+      // Only force plan selection if no future plan is selected yet
+      const currentPlan = "{{ $user->plan }}";
+      const selectedPlan = "{{ $user->selected_plan }}";
+
+      if (currentPlan === 'free' && (!selectedPlan || selectedPlan === 'free')) {
+        pendingMethod = method;
+        Swal.fire({
+          icon: 'info',
+          title: 'Selecione um Plano',
+          text: 'Você precisa primeiro escolher qual plano deseja assinar para gerar a cobrança.',
+          confirmButtonText: 'Ver Planos',
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          },
+          buttonsStyling: false
+        }).then(() => {
+          $('#pricingModal').modal('show');
         });
+        return;
+      }
+
+      // Client-side validation for CPF/CNPJ
+      const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
+      if (!cpfCnpjValue) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Dados Incompletos',
+          text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" abaixo antes de prosseguir.',
+          confirmButtonText: 'Ir para o campo',
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          },
+          buttonsStyling: false
+        }).then(() => {
+          $('input[name="cpf_cnpj"]').focus();
+          $('input[name="cpf_cnpj"]')[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        });
+        return;
+      }
+
+      $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+
+      $.ajax({
+        url: "{{ route('settings.generate-payment') }}",
+        method: 'POST',
+        data: JSON.stringify({
+          method: method
+        }),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+          $btn.html(originalText).prop('disabled', false);
+          if (data.success) {
+            $infoDefault.addClass('d-none');
+            $resultContainer.removeClass('d-none');
+            let html = '';
+            if (method === 'pix') {
+              html = `<h6 class="mb-4 text-success">Pagamento via PIX</h6><img src="data:image/png;base64,${data.pix_qr}" class="img-fluid mb-4 shadow-sm rounded" style="max-width: 200px"><div class="mb-4"><small class="text-muted d-block mb-2">Copia e Cola:</small><div class="input-group"><input type="text" class="form-control form-control-sm" value="${data.pix_code}" id="pix-code" readonly><button class="btn btn-primary btn-sm" onclick="copyPix()">Copiar</button></div></div><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+            } else if (method === 'boleto') {
+              html = `<h6 class="mb-4 text-info">Boleto Gerado</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-barcode fs-1 text-primary mb-3 d-block"></i><p class="mb-0">Valor: <strong>R$ ${data.amount}</strong></p></div><a href="${data.bank_slip_url}" target="_blank" class="btn btn-primary w-100 mb-3">Imprimir Boleto</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+            } else {
+              html = `<h6 class="mb-4 text-primary">Cartão de Crédito</h6><div class="p-4 bg-white rounded mb-4 shadow-sm"><i class="icon-base ti tabler-credit-card fs-1 text-primary mb-3 d-block"></i><p>Conclua o pagamento no ambiente seguro do Asaas.</p></div><a href="${data.invoice_url || data.redirect_url}" target="_blank" class="btn btn-primary w-100 mb-3">Pagar Agora</a><button class="btn btn-link btn-sm text-muted" onclick="showPaymentInfo()"><i class="icon-base ti tabler-arrow-left"></i> Alterar método</button>`;
+            }
+            $resultContent.html(html);
+            Swal.fire({
+              icon: 'success',
+              title: 'Cobrança Gerada!',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro!',
+              text: data.message
+            });
+          }
+        },
+        error: function() {
+          $btn.html(originalText).prop('disabled', false);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Erro ao gerar pagamento.'
+          });
+        }
+      });
     });
 
     // SELECT PLAN (UPGRADE)
     $('.btn-upgrade-plan').on('click', function() {
-        const $btn = $(this);
-        const plan = $btn.data('plan');
-        const type = $('.price-duration-toggler').is(':checked') ? 'yearly' : 'monthly';
-        const originalText = $btn.html();
+      const $btn = $(this);
+      const plan = $btn.data('plan');
+      const type = $('.price-duration-toggler').is(':checked') ? 'yearly' : 'monthly';
+      const originalText = $btn.html();
 
-        // Client-side validation for CPF/CNPJ
-        const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
-        if (!cpfCnpjValue) {
-            $('#pricingModal').modal('hide');
-            Swal.fire({
-                icon: 'warning',
-                title: 'Dados Incompletos',
-                text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" antes de escolher um plano.',
-                confirmButtonText: 'Preencher agora',
-                customClass: { confirmButton: 'btn btn-primary' },
-                buttonsStyling: false
-            }).then(() => {
-                $('input[name="cpf_cnpj"]').focus();
-                $('input[name="cpf_cnpj"]')[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-            return;
-        }
-
-        $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
-
-        $.ajax({
-            url: "{{ route('settings.select-plan') }}",
-            method: 'POST',
-            data: JSON.stringify({ plan: plan, type: type, method: pendingMethod }),
-            contentType: 'application/json',
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-            success: function(data) {
-                if (data.success) {
-                    location.reload(); // Just reload to show the "Selected" message
-                } else {
-                    $btn.html(originalText).prop('disabled', false);
-                    Swal.fire({ icon: 'error', title: 'Erro', text: data.message });
-                }
-            }
+      // Client-side validation for CPF/CNPJ
+      const cpfCnpjValue = $('input[name="cpf_cnpj"]').val().trim();
+      if (!cpfCnpjValue) {
+        $('#pricingModal').modal('hide');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Dados Incompletos',
+          text: 'Por favor, preencha seu CPF ou CNPJ na seção "Dados de Cobrança" antes de escolher um plano.',
+          confirmButtonText: 'Preencher agora',
+          customClass: {
+            confirmButton: 'btn btn-primary'
+          },
+          buttonsStyling: false
+        }).then(() => {
+          $('input[name="cpf_cnpj"]').focus();
+          $('input[name="cpf_cnpj"]')[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
         });
-    });
-});
+        return;
+      }
 
-function showPaymentInfo() {
+      $btn.html('<span class="spinner-border spinner-border-sm" role="status"></span>').prop('disabled', true);
+
+      $.ajax({
+        url: "{{ route('settings.select-plan') }}",
+        method: 'POST',
+        data: JSON.stringify({
+          plan: plan,
+          type: type,
+          method: pendingMethod
+        }),
+        contentType: 'application/json',
+        headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+          if (data.success) {
+            location.reload(); // Just reload to show the "Selected" message
+          } else {
+            $btn.html(originalText).prop('disabled', false);
+            Swal.fire({
+              icon: 'error',
+              title: 'Erro',
+              text: data.message
+            });
+          }
+        }
+      });
+    });
+  });
+
+  function showPaymentInfo() {
     $('#payment-result-container').addClass('d-none');
     $('#payment-info-default').removeClass('d-none');
-}
+  }
 
-function copyPix() {
+  function copyPix() {
     const copyText = document.getElementById("pix-code");
     copyText.select();
     navigator.clipboard.writeText(copyText.value);
-    Swal.fire({ icon: 'success', title: 'Copiado!', timer: 1000, showConfirmButton: false });
-}
+    Swal.fire({
+      icon: 'success',
+      title: 'Copiado!',
+      timer: 1000,
+      showConfirmButton: false
+    });
+  }
 </script>
 @endsection
 
@@ -242,14 +300,14 @@ function copyPix() {
             <div>
               <h6 class="mb-1"><span class="me-1">R$ {{ $planDetails['price'] }} Por {{ $planDetails['period'] }}</span> <span class="badge bg-label-primary rounded-pill">Plano {{ $planDetails['name'] }}</span></h6>
               @if($user->plan === 'free' && $user->cpf_cnpj && !$selectedPlanDetails)
-                <p class="text-primary fw-bold mt-2 animate__animated animate__pulse animate__infinite">
-                  <i class="icon-base ti tabler-arrow-narrow-right"></i> Selecione um plano para continuar
-                </p>
+              <p class="text-primary fw-bold mt-2 animate__animated animate__pulse animate__infinite">
+                <i class="icon-base ti tabler-arrow-narrow-right"></i> Selecione um plano para continuar
+              </p>
               @endif
               @if($user->plan === 'free' && $selectedPlanDetails)
-                <p class="text-success fw-bold mt-2">
-                  <i class="icon-base ti tabler-check"></i> Plano Selecionado: R$ {{ $selectedPlanDetails['amount'] }} {{ $selectedPlanDetails['type'] }}
-                </p>
+              <p class="text-success fw-bold mt-2">
+                <i class="icon-base ti tabler-check"></i> Plano Selecionado: R$ {{ $selectedPlanDetails['amount'] }} {{ $selectedPlanDetails['type'] }}
+              </p>
               @endif
             </div>
           </div>
@@ -265,17 +323,17 @@ function copyPix() {
             @endif
 
             @if($user->plan === 'free')
-              <div class="plan-statistics">
-                <div class="d-flex justify-content-between mb-1">
-                  <h6 class="mb-0">Dias de Uso</h6>
-                  <h6 class="mb-0">{{ (int)$daysUsed }} de 30 Dias</h6>
-                </div>
-                <div class="progress mb-1" style="height: 8px;">
-                  @php $percent = min(100, max(0, ((int)$daysUsed / 30) * 100)); @endphp
-                  <div class="progress-bar {{ $trialExpired ? 'bg-danger' : '' }}" role="progressbar" style="width: {{ $percent }}%"></div>
-                </div>
-                <small>{{ (int)max(0, $trialDaysLeft) }} dias restantes de teste grátis</small>
+            <div class="plan-statistics">
+              <div class="d-flex justify-content-between mb-1">
+                <h6 class="mb-0">Dias de Uso</h6>
+                <h6 class="mb-0">{{ (int)max(0, $daysUsed) }} de 30 Dias</h6>
               </div>
+              <div class="progress mb-1" style="height: 8px;">
+                @php $percent = min(100, max(0, ((int)$daysUsed / 30) * 100)); @endphp
+                <div class="progress-bar {{ $trialExpired ? 'bg-danger' : '' }}" role="progressbar" style="width: {{ $percent }}%"></div>
+              </div>
+              <small>{{ (int)max(0, $trialDaysLeft) }} dias restantes de teste grátis</small>
+            </div>
             @endif
           </div>
           <div class="col-12 d-flex gap-2 flex-wrap">
@@ -292,65 +350,75 @@ function copyPix() {
           <div class="col-md-6">
             <div class="payment-methods-list">
               @if($user->plan_type === 'monthly')
-                <!-- Pix (Somente Mensal) -->
-                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar bg-label-success me-3 p-2"><i class="icon-base ti tabler-qrcode fs-3"></i></div>
-                    <div><h6 class="mb-0">Pix</h6><small class="text-muted">Aprovação imediata</small></div>
+              <!-- Pix (Somente Mensal) -->
+              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-label-success me-3 p-2"><i class="icon-base ti tabler-qrcode fs-3"></i></div>
+                  <div>
+                    <h6 class="mb-0">Pix</h6><small class="text-muted">Aprovação imediata</small>
                   </div>
-                  <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
                 </div>
-                <!-- Boleto Mensal -->
-                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
-                    <div><h6 class="mb-0">Boleto Mensalidade</h6><small class="text-muted">Vencimento em 3 dias</small></div>
+                <button class="btn btn-xs btn-label-success btn-generate-payment" data-method="pix">Selecionar</button>
+              </div>
+              <!-- Boleto Mensal -->
+              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
+                  <div>
+                    <h6 class="mb-0">Boleto Mensalidade</h6><small class="text-muted">Vencimento em 3 dias</small>
                   </div>
-                  <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
                 </div>
-                <!-- Cartão Recorrente -->
-                <div class="d-flex align-items-center p-3 border rounded justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
-                    <div><h6 class="mb-0">Cartão Recorrente</h6><small class="text-muted">Assinatura mensal</small></div>
+                <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
+              </div>
+              <!-- Cartão Recorrente -->
+              <div class="d-flex align-items-center p-3 border rounded justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
+                  <div>
+                    <h6 class="mb-0">Cartão Recorrente</h6><small class="text-muted">Assinatura mensal</small>
                   </div>
-                  <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
                 </div>
+                <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
+              </div>
               @else
-                <!-- Boleto Único (Anual) -->
-                <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
-                    <div><h6 class="mb-0">Boleto Único Anual</h6><small class="text-muted">Pagamento à vista</small></div>
+              <!-- Boleto Único (Anual) -->
+              <div class="d-flex align-items-center mb-4 p-3 border rounded justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-label-info me-3 p-2"><i class="icon-base ti tabler-barcode fs-3"></i></div>
+                  <div>
+                    <h6 class="mb-0">Boleto Único Anual</h6><small class="text-muted">Pagamento à vista</small>
                   </div>
-                  <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
                 </div>
-                <!-- Cartão Parcelado (Anual) -->
-                <div class="d-flex align-items-center p-3 border rounded justify-content-between">
-                  <div class="d-flex align-items-center">
-                    <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
-                    <div><h6 class="mb-0">Cartão Parcelado</h6><small class="text-muted">Parcele em até 12x</small></div>
+                <button class="btn btn-xs btn-label-info btn-generate-payment" data-method="boleto">Selecionar</button>
+              </div>
+              <!-- Cartão Parcelado (Anual) -->
+              <div class="d-flex align-items-center p-3 border rounded justify-content-between">
+                <div class="d-flex align-items-center">
+                  <div class="avatar bg-label-primary me-3 p-2"><i class="icon-base ti tabler-credit-card fs-3"></i></div>
+                  <div>
+                    <h6 class="mb-0">Cartão Parcelado</h6><small class="text-muted">Parcele em até 12x</small>
                   </div>
-                  <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
                 </div>
+                <button class="btn btn-xs btn-label-primary btn-generate-payment" data-method="credit_card">Selecionar</button>
+              </div>
               @endif
             </div>
           </div>
           <div class="col-md-6 mt-6 mt-md-0">
             <div id="payment-result-container" class="d-none">
-                <div class="card bg-label-secondary border-0 shadow-none">
-                    <div class="card-body text-center" id="payment-result-content">
-                        <!-- Conteúdo dinâmico via JS -->
-                    </div>
+              <div class="card bg-label-secondary border-0 shadow-none">
+                <div class="card-body text-center" id="payment-result-content">
+                  <!-- Conteúdo dinâmico via JS -->
                 </div>
+              </div>
             </div>
             <div id="payment-info-default">
-                <h6 class="mb-6">Pagamento Seguro</h6>
-                <p>Utilizamos o <strong>Asaas</strong> para processar seus pagamentos com segurança. Suas informações de cartão são criptografadas e nunca ficam salvas em nossos servidores.</p>
-                <div class="d-flex align-items-center gap-3">
-                  <img src="https://static.asaas.com/img/brand/asaas-logo.png" alt="Asaas" height="30">
-                  <span class="badge bg-label-primary">Ambiente Seguro</span>
-                </div>
+              <h6 class="mb-6">Pagamento Seguro</h6>
+              <p>Utilizamos o <strong>Asaas</strong> para processar seus pagamentos com segurança. Suas informações de cartão são criptografadas e nunca ficam salvas em nossos servidores.</p>
+              <div class="d-flex align-items-center gap-3">
+                <img src="https://static.asaas.com/img/brand/asaas-logo.png" alt="Asaas" height="30">
+                <span class="badge bg-label-primary">Ambiente Seguro</span>
+              </div>
             </div>
           </div>
         </div>
@@ -455,8 +523,8 @@ function copyPix() {
               <td>R$ {{ number_format($history->amount, 2, ',', '.') }}</td>
               <td>
                 @php
-                  $statusColors = ['paid' => 'success', 'pending' => 'warning', 'expired' => 'secondary', 'failed' => 'danger'];
-                  $statusLabels = ['paid' => 'Pago', 'pending' => 'Pendente', 'expired' => 'Expirado', 'failed' => 'Falhou'];
+                $statusColors = ['paid' => 'success', 'pending' => 'warning', 'expired' => 'secondary', 'failed' => 'danger'];
+                $statusLabels = ['paid' => 'Pago', 'pending' => 'Pendente', 'expired' => 'Expirado', 'failed' => 'Falhou'];
                 @endphp
                 <span class="badge bg-label-{{ $statusColors[$history->status] ?? 'secondary' }}">
                   {{ $statusLabels[$history->status] ?? $history->status }}

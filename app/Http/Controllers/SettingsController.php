@@ -22,12 +22,12 @@ class SettingsController extends Controller
     public function index()
     {
         $user = auth()->user();
-        
+
         // Trial logic based on account creation (integers)
         $trialDuration = 30;
-        $daysUsed = (int)now()->diffInDays($user->created_at);
+        $daysUsed = (int)abs(now()->diffInDays($user->created_at));
         $trialDaysLeft = max(0, $trialDuration - $daysUsed);
-        
+
         $trialExpired = ($user->plan === 'free' && $trialDaysLeft <= 0);
 
         $billingHistory = BillingHistory::where('user_id', $user->id)
@@ -110,7 +110,7 @@ class SettingsController extends Controller
     {
         $user = auth()->user();
         $method = $request->method; // pix, boleto, credit_card
-        
+
         // Verifica se selecionou um plano no modal primeiro
         $planToCharge = $user->selected_plan;
         if (!$planToCharge || $planToCharge === 'free') {
@@ -131,7 +131,7 @@ class SettingsController extends Controller
 
         try {
             $customerId = $this->asaas->getOrCreateCustomer($user);
-            
+
             if ($user->plan_type === 'monthly') {
                 // Cria Assinatura Recorrente
                 $result = $this->asaas->createSubscription($customerId, $method, $amount, $description);
@@ -181,7 +181,6 @@ class SettingsController extends Controller
             }
 
             return response()->json($responseData);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
