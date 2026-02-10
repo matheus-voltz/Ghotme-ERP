@@ -107,6 +107,23 @@
 </script>
 @endsection
 
+@php
+$niche = auth()->user()->niche ?? 'workshop';
+$itemTerm = 'Veículo';
+$itemIcon = 'ti tabler-car';
+$identifierLabel = 'Placa';
+
+if ($niche === 'pet_shop') {
+$itemTerm = 'Pet';
+$itemIcon = 'ti tabler-dog';
+$identifierLabel = 'Raça';
+} elseif ($niche === 'tech_assistance') {
+$itemTerm = 'Dispositivo';
+$itemIcon = 'ti tabler-device-mobile';
+$identifierLabel = 'S/N';
+}
+@endphp
+
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -121,10 +138,10 @@
         <div class="card-body">
             <div class="d-flex align-items-center">
                 <div class="avatar avatar-lg me-3">
-                    <span class="avatar-initial rounded-circle bg-label-primary"><i class="ti tabler-car fs-3"></i></span>
+                    <span class="avatar-initial rounded-circle bg-label-primary"><i class="{{ $itemIcon }} fs-3"></i></span>
                 </div>
                 <div>
-                    <h5 class="mb-1">{{ $order->veiculo->modelo }} <span class="badge bg-label-secondary ms-2">{{ $order->veiculo->placa }}</span></h5>
+                    <h5 class="mb-1">{{ $order->veiculo->modelo ?? $itemTerm . ' não informado' }} <span class="badge bg-label-secondary ms-2">{{ $order->veiculo->placa ?? '' }}</span></h5>
                     <p class="mb-0 text-muted">{{ $order->client->name }}</p>
                 </div>
             </div>
