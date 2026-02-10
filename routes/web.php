@@ -287,6 +287,8 @@ Route::middleware([
     Route::post('/kanban/add-board', [App\Http\Controllers\KanbanController::class, 'addBoard'])->name('kanban.add-board');
     Route::post('/kanban/add-item', [App\Http\Controllers\KanbanController::class, 'addItem'])->name('kanban.add-item');
     Route::post('/kanban/move-item', [App\Http\Controllers\KanbanController::class, 'moveItem'])->name('kanban.move-item');
+    Route::put('/kanban/update-item/{id}', [App\Http\Controllers\KanbanController::class, 'updateItem'])->name('kanban.update-item');
+    Route::delete('/kanban/delete-item/{id}', [App\Http\Controllers\KanbanController::class, 'deleteItem'])->name('kanban.delete-item');
     
     Route::get('/calendar/events', [App\Http\Controllers\CalendarController::class, 'fetchEvents'])->name('calendar.fetch');
     Route::post('/calendar/events', [App\Http\Controllers\CalendarController::class, 'store'])->name('calendar.store');

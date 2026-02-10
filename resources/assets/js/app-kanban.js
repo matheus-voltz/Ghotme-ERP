@@ -18,6 +18,7 @@
 
   // Init kanban Offcanvas
   const kanbanOffcanvas = new bootstrap.Offcanvas(kanbanSidebar);
+  let currentItemId = null; // Store ID for updates/deletion
 
   // Get kanban data
   const kanbanResponse = await fetch('/kanban/data');
@@ -188,7 +189,40 @@
       footer: false
     },
     click: el => {
-      // ... existing click code ...
+      const element = el;
+      currentItemId = element.getAttribute('data-eid');
+      const title = element.getAttribute('data-eid')
+        ? element.querySelector('.kanban-text').textContent
+        : element.textContent;
+      const date = element.getAttribute('data-due-date');
+      const label = element.getAttribute('data-badge-text');
+      const avatars = element.getAttribute('data-assigned');
+
+      // Show kanban offcanvas
+      kanbanOffcanvas.show();
+
+      // Populate sidebar fields
+      kanbanSidebar.querySelector('#title').value = title;
+      if (date && kanbanSidebar.querySelector('#due-date')._flatpickr) {
+          kanbanSidebar.querySelector('#due-date')._flatpickr.setDate(date);
+      } else {
+          kanbanSidebar.querySelector('#due-date').value = date || '';
+      }
+
+      // Using jQuery for select2
+      $('.kanban-update-item-sidebar').find(select2).val(label).trigger('change');
+
+      // Remove and update assigned avatars
+      kanbanSidebar.querySelector('.assigned').innerHTML = '';
+      kanbanSidebar.querySelector('.assigned').insertAdjacentHTML(
+        'afterbegin',
+        `${renderAvatar(avatars, false, 'xs', '1', el.getAttribute('data-members'))}
+        <div class="avatar avatar-xs ms-1">
+            <span class="avatar-initial rounded-circle bg-label-secondary">
+                <i class="icon-base ti tabler-plus icon-xs text-heading"></i>
+            </span>
+        </div>`
+      );
     },
 
     dropEl: (el, target, source, sibling) => {
@@ -282,6 +316,56 @@
   // Kanban Wrapper scrollbar
   if (kanbanWrapper) {
     new PerfectScrollbar(kanbanWrapper);
+  }
+
+  // Sidebar Update Button Logic
+  const updateItemBtn = document.querySelector('.kanban-update-item-sidebar .btn-primary');
+  if (updateItemBtn) {
+      updateItemBtn.addEventListener('click', () => {
+          const title = document.querySelector('#title').value;
+          const dueDate = document.querySelector('#due-date').value;
+          const label = $('#label').val();
+          const badgeColor = $('#label option:selected').data('color')?.replace('bg-label-', '') || 'success';
+
+          fetch('/kanban/update-item/' + currentItemId, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({
+                  title: title,
+                  dueDate: dueDate,
+                  badgeText: label,
+                  badgeColor: badgeColor
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              location.reload(); 
+          })
+          .catch(error => console.error('Error updating item:', error));
+      });
+  }
+
+  // Sidebar Delete Button Logic
+  const deleteItemBtn = document.querySelector('.kanban-update-item-sidebar .btn-label-danger');
+  if (deleteItemBtn) {
+      deleteItemBtn.addEventListener('click', () => {
+          if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+              fetch('/kanban/delete-item/' + currentItemId, {
+                  method: 'DELETE',
+                  headers: {
+                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                  }
+              })
+              .then(response => {
+                  kanban.removeElement(currentItemId);
+                  kanbanOffcanvas.hide();
+              })
+              .catch(error => console.error('Error deleting item:', error));
+          }
+      });
   }
 
   const kanbanContainer = document.querySelector('.kanban-container');

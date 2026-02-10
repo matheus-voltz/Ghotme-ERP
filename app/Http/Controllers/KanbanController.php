@@ -84,4 +84,26 @@ class KanbanController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function updateItem(Request $request, $id)
+    {
+        $item = KanbanItem::findOrFail($id);
+        
+        $item->update([
+            'title' => $request->title,
+            'due_date' => $request->dueDate,
+            'badge_text' => $request->badgeText,
+            'badge_color' => $request->badgeColor,
+        ]);
+
+        return response()->json($item);
+    }
+
+    public function deleteItem($id)
+    {
+        $item = KanbanItem::findOrFail($id);
+        $item->delete();
+
+        return response()->json(['success' => true]);
+    }
 }
