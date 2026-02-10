@@ -1,11 +1,11 @@
 @extends('layouts.layoutMaster')
 
 @php
-$breadcrumbs = [['link' => 'home', 'name' => 'Home'], ['link' => 'javascript:void(0)', 'name' => 'User'], ['name' =>
-'Profile']];
+$breadcrumbs = [['link' => 'home', 'name' => 'Início'], ['link' => 'javascript:void(0)', 'name' => 'Usuário'], ['name' =>
+'Perfil']];
 @endphp
 
-@section('title', 'Profile')
+@section('title', 'Perfil')
 
 
 @section('content')
@@ -14,10 +14,10 @@ $breadcrumbs = [['link' => 'home', 'name' => 'Home'], ['link' => 'javascript:voi
 <div class="nav-align-top">
   <ul class="nav nav-pills flex-column flex-md-row mb-6">
     <li class="nav-item">
-      <a class="nav-link active" href="#"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Account</a>
+      <a class="nav-link active" href="#"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Minha Conta</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Billing & Plans</a>
+      <a class="nav-link" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Faturamento & Planos</a>
     </li>
   </ul>
 </div>

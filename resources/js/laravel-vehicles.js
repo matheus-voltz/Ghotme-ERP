@@ -18,6 +18,37 @@ document.addEventListener('DOMContentLoaded', function (e) {
         });
     }
 
+    // License Plate Lookup
+    const placaInput = document.getElementById('add-vehicle-placa');
+    if (placaInput) {
+        placaInput.addEventListener('blur', function () {
+            const placa = this.value.replace(/[^a-zA-Z0-9]/g, '');
+            if (placa.length >= 7) {
+                // Show loading state
+                const originalPlaceholder = this.placeholder;
+                this.placeholder = 'Buscando...';
+                
+                fetch(`${baseUrl}api/vehicle-lookup/${placa}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        this.placeholder = originalPlaceholder;
+                        if (!data.error && !data.message) {
+                            // Auto-fill fields if data is returned
+                            if (data.marca) document.getElementById('add-vehicle-marca').value = data.marca;
+                            if (data.modelo) document.getElementById('add-vehicle-modelo').value = data.modelo;
+                            if (data.ano) document.getElementById('add-vehicle-ano-fabricacao').value = data.ano;
+                            
+                            // Optional: Toast notification
+                            // Swal.fire({ icon: 'success', title: 'Veículo encontrado!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+                        }
+                    })
+                    .catch(() => {
+                        this.placeholder = originalPlaceholder;
+                    });
+            }
+        });
+    }
+
     if (dt_table) {
         const dt_vehicles = new DataTable(dt_table, {
             processing: true,

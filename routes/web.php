@@ -42,6 +42,8 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
 
+use App\Http\Controllers\VehicleLookupController;
+
 /*
 |--------------------------------------------------------------------------
 | Email Verification
@@ -149,6 +151,7 @@ Route::middleware([
     Route::get('/vehicles-list/{id}/edit', [VehiclesController::class, 'edit'])->name('vehicles-list.edit');
     Route::post('/vehicles-list', [VehiclesController::class, 'store'])->name('vehicles-list.store');
     Route::delete('/vehicles-list/{id}', [VehiclesController::class, 'destroy'])->name('vehicles-list.destroy');
+    Route::get('/api/vehicle-lookup/{placa}', [VehicleLookupController::class, 'lookup'])->name('vehicles.lookup');
 
     // Vehicle History
     Route::get('/vehicle-history', [VehicleHistoryController::class, 'index'])->name('vehicle-history');

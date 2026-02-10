@@ -1,19 +1,19 @@
 <x-action-section>
   <x-slot name="title">
-    {{ __('Browser Sessions') }}
+    {{ __('Sessões do Navegador') }}
   </x-slot>
 
   <x-slot name="description">
-    {{ __('Manage and log out your active sessions on other browsers and devices.') }}
+    {{ __('Gerencie e saia das suas sessões ativas em outros navegadores e dispositivos.') }}
   </x-slot>
 
   <x-slot name="content">
     <x-action-message on="loggedOut">
-      {{ __('Done.') }}
+      {{ __('Concluído.') }}
     </x-action-message>
 
     <p class="card-text">
-      {{ __('If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.') }}
+      {{ __('Se necessário, você pode sair de todas as suas outras sessões de navegador em todos os seus dispositivos. Algumas de suas sessões recentes estão listadas abaixo; no entanto, esta lista pode não ser exaustiva. Se você acha que sua conta foi comprometida, você também deve atualizar sua senha.') }}
     </p>
 
     @if (count($this->sessions) > 0)
@@ -50,9 +50,9 @@
               {{ $session->ip_address }},
 
               @if ($session->is_current_device)
-              <span class="text-success fw-medium">{{ __('This device') }}</span>
+              <span class="text-success fw-medium">{{ __('Este dispositivo') }}</span>
               @else
-              {{ __('Last active') }} {{ $session->last_active }}
+              {{ __('Última atividade') }} {{ $session->last_active }}
               @endif
             </div>
           </div>
@@ -64,22 +64,22 @@
 
     <div class="d-flex mt-6">
       <x-button wire:click="confirmLogout" wire:loading.attr="disabled">
-        {{ __('Log Out Other Browser Sessions') }}
+        {{ __('Sair de Outras Sessões de Navegador') }}
       </x-button>
     </div>
 
     <!-- Log out Other Devices Confirmation Modal -->
     <x-dialog-modal wire:model.live="confirmingLogout">
       <x-slot name="title">
-        {{ __('Log Out Other Browser Sessions') }}
+        {{ __('Sair de Outras Sessões de Navegador') }}
       </x-slot>
 
       <x-slot name="content">
-        {{ __('Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.') }}
+        {{ __('Digite sua senha para confirmar que deseja sair de todas as suas outras sessões de navegador em todos os seus dispositivos.') }}
 
         <div class="mt-3" x-data="{}"
           x-on:confirming-logout-other-browser-sessions.window="setTimeout(() => $refs.password.focus(), 250)">
-          <x-input type="password" placeholder="{{ __('Password') }}" x-ref="password"
+          <x-input type="password" placeholder="{{ __('Senha') }}" x-ref="password"
             class="{{ $errors->has('password') ? 'is-invalid' : '' }}" wire:model="password"
             wire:keydown.enter="logoutOtherBrowserSessions" />
 
@@ -89,11 +89,11 @@
 
       <x-slot name="footer">
         <x-secondary-button wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
-          {{ __('Cancel') }}
+          {{ __('Cancelar') }}
         </x-secondary-button>
 
         <button class="btn btn-danger ms-1" wire:click="logoutOtherBrowserSessions" wire:loading.attr="disabled">
-          {{ __('Log out Other Browser Sessions') }}
+          {{ __('Sair de Outras Sessões de Navegador') }}
         </button>
       </x-slot>
     </x-dialog-modal>

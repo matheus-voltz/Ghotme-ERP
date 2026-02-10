@@ -1,16 +1,16 @@
 <x-form-section submit="updateProfileInformation">
   <x-slot name="title">
-    {{ __('Profile Information') }}
+    {{ __('Informações do Perfil') }}
   </x-slot>
 
   <x-slot name="description">
-    {{ __('Update your account\'s profile information and email address.') }}
+    {{ __('Atualize as informações de perfil e endereço de e-mail da sua conta.') }}
   </x-slot>
 
   <x-slot name="form">
 
     <x-action-message on="saved">
-      {{ __('Saved.') }}
+      {{ __('Salvo.') }}
     </x-action-message>
 
     <!-- Profile Photo -->
@@ -31,12 +31,12 @@
       </div>
 
       <x-secondary-button class="mt-2 me-2" type="button" x-on:click.prevent="$refs.photo.click()">
-        {{ __('Select A New Photo') }}
+        {{ __('Selecionar Nova Foto') }}
       </x-secondary-button>
 
       @if ($this->user->profile_photo_path)
       <button type="button" class="btn btn-danger mt-2" wire:click="deleteProfilePhoto">
-        {{ __('Remove Photo') }}
+        {{ __('Remover Foto') }}
       </button>
       @endif
 
@@ -46,7 +46,7 @@
 
     <!-- Name -->
     <div class="mb-6">
-      <x-label class="form-label" for="name" value="{{ __('Name') }}" />
+      <x-label class="form-label" for="name" value="{{ __('Nome') }}" />
       <x-input id="name" type="text" class="{{ $errors->has('name') ? 'is-invalid' : '' }}" wire:model="state.name"
         autocomplete="name" />
       <x-input-error for="name" />
@@ -54,7 +54,7 @@
 
     <!-- Email -->
     <div class="mb-6">
-      <x-label class="form-label" for="email" value="{{ __('Email') }}" />
+      <x-label class="form-label" for="email" value="{{ __('E-mail') }}" />
       <x-input id="email" type="email" class="{{ $errors->has('email') ? 'is-invalid' : '' }}"
         wire:model="state.email" />
       <x-input-error for="email" />
@@ -64,7 +64,7 @@
   <x-slot name="actions">
     <div class="d-flex align-items-baseline">
       <x-button>
-        {{ __('Save') }}
+        {{ __('Salvar') }}
       </x-button>
     </div>
   </x-slot>
