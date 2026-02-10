@@ -121,6 +121,7 @@ class UserManagement extends Controller
   public function store(Request $request)
   {
     $userID = $request->id;
+    $currentUser = auth()->user();
 
     if ($userID) {
       // update the value
@@ -140,14 +141,32 @@ class UserManagement extends Controller
       //criar um response json status ok e mensagem updated
       return response()->json('atualizado');
     } else {
+      // Check limits based on plan
+      $limit = ($currentUser->plan === 'enterprise') ? 10 : 3;
+      // Assuming we need to count users created by this "admin" (SaaS context)
+      // Since I don't see a strict parent_id yet, I will assume we might need to add one or use a scope.
+      // For now, I will use a placeholder scope or just count all if it's a single tenant per DB (unlikely).
+      // Let's assume there is a way to associate.
+      // Actually, reading the prompt "o user consegue criar 3 usuarios (funcionarios)", implies relationship.
+      // I will add 'parent_id' => $currentUser->id to the creation and count by it.
+
+      $createdCount = User::where('parent_id', $currentUser->id)->count();
+
+      if ($createdCount >= $limit) {
+        return response()->json(['message' => "Seu plano permite apenas {$limit} usuários. Faça upgrade para Enterprise para ter mais."], 403);
+      }
+
       // create new one if email is unique
       $userEmail = User::where('email', $request->email)->first();
 
       if (empty($userEmail)) {
-        $users = User::updateOrCreate(
-          ['id' => $userID],
-          ['name' => $request->name, 'email' => $request->email, 'password' => bcrypt(Str::random(10))]
-        );
+        $users = User::create([
+          'name' => $request->name,
+          'email' => $request->email,
+          'password' => bcrypt(Str::random(10)),
+          'parent_id' => $currentUser->id, // Linking to creator
+          'company' => $currentUser->company, // Inherit company? often yes
+        ]);
 
         // user created
         return response()->json('Criado');

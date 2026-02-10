@@ -281,6 +281,9 @@
         <li class="nav-item">
           <a class="nav-link active" href="{{ route('settings') }}"><i class="icon-base ti tabler-receipt-2 icon-sm me-1_5"></i> Faturamento & Planos</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('team-management') }}"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Gerenciar Equipe</a>
+        </li>
       </ul>
     </div>
     <div class="card mb-6">

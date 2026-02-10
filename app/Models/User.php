@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     protected $fillable = [
         'company_id', // New Field
+        'parent_id',
         'name',
         'email',
         'cpf_cnpj',
@@ -96,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         ];
     }
 
-     public function sendPasswordResetNotification($token)
+    public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordCustom($token));
     }

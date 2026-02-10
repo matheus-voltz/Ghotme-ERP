@@ -257,6 +257,14 @@ Route::middleware([
     Route::delete('/settings/system-errors/clear', [SystemErrorController::class, 'destroyAll'])->name('settings.system-errors.clear');
 
     Route::get('/settings/user-management', [UserManagement::class, 'index'])->name('pages-user-management');
+
+    // Team Management
+    Route::get('/settings/team', [App\Http\Controllers\TeamController::class, 'index'])->name('team-management');
+    Route::get('/settings/team/data', [App\Http\Controllers\TeamController::class, 'dataBase'])->name('team-management.data');
+    Route::post('/settings/team', [App\Http\Controllers\TeamController::class, 'store'])->name('team-management.store');
+    Route::get('/settings/team/{id}/edit', [App\Http\Controllers\TeamController::class, 'edit'])->name('team-management.edit');
+    Route::delete('/settings/team/{id}', [App\Http\Controllers\TeamController::class, 'destroy'])->name('team-management.destroy');
+
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
     Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
     Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');

@@ -27,10 +27,20 @@ class HomePage extends Controller
     ];
 
     // Finance Stats
-    $revenueMonth = FinancialTransaction::where('type', 'in')
+    $financialRevenue = FinancialTransaction::where('type', 'in')
       ->where('status', 'paid')
       ->whereMonth('paid_at', Carbon::now()->month)
+      ->whereYear('paid_at', Carbon::now()->year)
       ->sum('amount');
+
+    $osRevenue = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+      ->whereMonth('updated_at', Carbon::now()->month)
+      ->whereYear('updated_at', Carbon::now()->year)
+      ->with(['items', 'parts'])
+      ->get()
+      ->sum(fn($os) => $os->total);
+
+    $revenueMonth = $financialRevenue + $osRevenue;
 
     $receivablesPending = FinancialTransaction::where('type', 'in')
       ->where('status', 'pending')
@@ -62,11 +72,20 @@ class HomePage extends Controller
       $monthDate = Carbon::now()->subMonths($i);
       $months[] = $monthDate->translatedFormat('M');
 
-      $revenueTrends[] = FinancialTransaction::where('type', 'in')
+      $finRev = FinancialTransaction::where('type', 'in')
         ->where('status', 'paid')
         ->whereMonth('paid_at', $monthDate->month)
         ->whereYear('paid_at', $monthDate->year)
         ->sum('amount');
+
+      $osRev = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+        ->whereMonth('updated_at', $monthDate->month)
+        ->whereYear('updated_at', $monthDate->year)
+        ->with(['items', 'parts'])
+        ->get()
+        ->sum(fn($os) => $os->total);
+
+      $revenueTrends[] = $finRev + $osRev;
 
       $expenseTrends[] = FinancialTransaction::where('type', 'out')
         ->where('status', 'paid')
