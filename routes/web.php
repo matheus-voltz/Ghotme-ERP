@@ -104,6 +104,7 @@ Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
+    App\Http\Middleware\CheckTrialStatus::class,
 ])->group(function () {
 
     // Main Page Route
