@@ -35,6 +35,7 @@ class Tenant extends Model
         'db_usuario',
         'db_senha',
         'nicho',
+        'plano_id',
         'status',
     ];
 
@@ -46,4 +47,12 @@ class Tenant extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the plan associated with the tenant.
+     */
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class, 'plano_id');
+    }
 }

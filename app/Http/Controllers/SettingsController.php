@@ -195,42 +195,50 @@ class SettingsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Update the user's billing profile.
      */
-    public function store(Request $request)
+    public function updateProfile(Request $request)
     {
-        //
-    }
+        $user = auth()->user();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        // Basic validation
+        $validated = $request->validate([
+            'companyName' => 'required|string|max:255',
+            'billingEmail' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'cpf_cnpj' => 'nullable|string|max:20',
+            'mobileNumber' => 'nullable|string|max:20',
+            'country' => 'nullable|string|max:50',
+            'city' => 'nullable|string|max:100',
+            'billingAddress' => 'nullable|string|max:255',
+            'state' => 'nullable|string|max:50',
+            'zipCode' => 'nullable|string|max:20',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        try {
+            $user->update([
+                'company' => $validated['companyName'],
+                'email' => $validated['billingEmail'],
+                'cpf_cnpj' => $validated['cpf_cnpj'],
+                'contact_number' => $validated['mobileNumber'],
+                'country' => $validated['country'],
+                'city' => $validated['city'],
+                'billing_address' => $validated['billingAddress'],
+                'state' => $validated['state'],
+                'zip_code' => $validated['zipCode'],
+            ]);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            // Optional: Update Asaas Customer data if needed
+            // $this->asaas->updateCustomer($user);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            return response()->json([
+                'success' => true,
+                'message' => 'Perfil de cobrança atualizado com sucesso!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao atualizar perfil: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

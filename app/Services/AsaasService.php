@@ -12,7 +12,7 @@ class AsaasService
 
     public function __construct()
     {
-        $this->apiKey = env('ASAAS_API_KEY', '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmQxYmU4NGEwLTQ0NTAtNDYzZS1iN2FkLTYxOTEzMTI0YTE3Zjo6JGFhY2hfYjk3NDcyMjgtZjg3OC00YmU1LTllN2MtNDUzMjAxYjQ2MTli');
+        $this->apiKey = env('ASAAS_API_KEY', '$aact_hmlg_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmQyNjg5MGMwLTBmN2YtNDBiMC04NWEzLWE1MDU1YTY4MjM5Yjo6JGFhY2hfYTg0ODc3MzgtYmE3YS00ZmNjLTliOWUtYzlhZmRiZmNmMjNk');
         $this->baseUrl = env('ASAAS_ENVIRONMENT', 'sandbox') === 'production' 
             ? 'https://www.asaas.com/api/v3' 
             : 'https://sandbox.asaas.com/api/v3';
