@@ -11,7 +11,7 @@ class ApiOrdemServicoController extends Controller
     public function index(Request $request)
     {
         // Simple pagination for API
-        $query = OrdemServico::with(['client', 'vehicle', 'mechanic'])
+        $query = OrdemServico::with(['client', 'veiculo', 'user'])
             ->latest();
 
         if ($request->has('status')) {
@@ -23,7 +23,7 @@ class ApiOrdemServicoController extends Controller
 
     public function show($id)
     {
-        $os = OrdemServico::with(['client', 'vehicle', 'mechanic', 'services', 'products'])
+        $os = OrdemServico::with(['client', 'veiculo', 'user', 'services', 'parts'])
             ->findOrFail($id);
 
         return response()->json($os);
