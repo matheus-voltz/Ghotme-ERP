@@ -12,9 +12,13 @@ if (!function_exists('niche')) {
      */
     function niche($key = null, $default = null)
     {
-        $currentNiche = auth()->id() && !empty(auth()->user()->niche)
-            ? auth()->user()->niche
-            : Config::get('niche.current', 'automotive');
+        $userNiche = auth()->id() && !empty(auth()->user()->niche) ? auth()->user()->niche : null;
+        $defaultNiche = Config::get('niche.current', 'automotive');
+
+        // Check if user's niche exists in config, otherwise fallback to default
+        $currentNiche = $userNiche && Config::has("niche.niches.{$userNiche}")
+            ? $userNiche
+            : $defaultNiche;
 
         // Mapping 'tech_assistance' to 'electronics' if needed, or just ensure config keys match user niche values
         // For now assuming user niche values match config structure keys
