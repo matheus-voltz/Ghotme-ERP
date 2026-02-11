@@ -289,12 +289,12 @@ Route::middleware([
     Route::post('/kanban/move-item', [App\Http\Controllers\KanbanController::class, 'moveItem'])->name('kanban.move-item');
     Route::put('/kanban/update-item/{id}', [App\Http\Controllers\KanbanController::class, 'updateItem'])->name('kanban.update-item');
     Route::delete('/kanban/delete-item/{id}', [App\Http\Controllers\KanbanController::class, 'deleteItem'])->name('kanban.delete-item');
-    
+
     Route::get('/calendar/events', [App\Http\Controllers\CalendarController::class, 'fetchEvents'])->name('calendar.fetch');
     Route::post('/calendar/events', [App\Http\Controllers\CalendarController::class, 'store'])->name('calendar.store');
     Route::put('/calendar/events/{id}', [App\Http\Controllers\CalendarController::class, 'update'])->name('calendar.update');
     Route::delete('/calendar/events/{id}', [App\Http\Controllers\CalendarController::class, 'destroy'])->name('calendar.destroy');
-    
+
     Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
     Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
     Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');
@@ -325,4 +325,4 @@ Route::get('/teste-email', function () {
 // Asaas Webhook
 Route::post('/webhook/asaas', [WebhookController::class, 'asaas']);
 
-Route::resource('inventories', App\Http\Controllers\InventoryController::class);
+// Route::resource('inventories', App\Http\Controllers\InventoryController::class);

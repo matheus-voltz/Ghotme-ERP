@@ -8,6 +8,7 @@ use App\Http\Middleware\LocaleMiddleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
@@ -42,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 // Tenta pegar o ID do erro recém criado (gambiarra leve pois o reportable roda antes)
                 $errorId = \App\Models\SystemError::latest('id')->first()?->id ?? 'N/A';
-                
+
                 return response()->json([
                     'success' => false,
                     'message' => "Erro no banco de dados (Ref: #{$errorId}). Contate o suporte.",

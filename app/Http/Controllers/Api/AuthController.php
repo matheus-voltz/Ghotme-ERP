@@ -11,26 +11,30 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            $token = $user->createToken('auth-token')->plainTextToken;
+        \Illuminate\Support\Facades\Log::info('Login attempt for: ' . $request->email);
 
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            \Illuminate\Support\Facades\Log::warning('Login failed for: ' . $request->email);
             return response()->json([
-                'success' => true,
-                'token' => $token,
-                'user' => $user
-            ]);
+                'success' => false,
+                'message' => 'Credenciais inválidas'
+            ], 401);
         }
 
+        $token = $user->createToken('auth-token')->plainTextToken;
+
         return response()->json([
-            'success' => false,
-            'message' => 'Credenciais inválidas'
-        ], 401);
+            'success' => true,
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
     public function logout(Request $request)
