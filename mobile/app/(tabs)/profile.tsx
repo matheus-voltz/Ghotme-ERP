@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -8,6 +9,7 @@ import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
     const { user, signOut } = useAuth();
+    const { theme, setTheme, colors, activeTheme } = useTheme();
     const router = useRouter();
 
     const handleSignOut = () => {
@@ -21,22 +23,35 @@ export default function ProfileScreen() {
         );
     };
 
+    const handleChangeTheme = () => {
+        Alert.alert(
+            "Escolha o Tema",
+            "Selecione a aparência do aplicativo",
+            [
+                { text: "Claro", onPress: () => setTheme('light') },
+                { text: "Escuro", onPress: () => setTheme('dark') },
+                { text: "Sistema", onPress: () => setTheme('system') },
+                { text: "Cancelar", style: "cancel" }
+            ]
+        );
+    };
+
     const renderSettingItem = (icon: any, title: string, subtitle?: string, onPress?: () => void) => (
         <TouchableOpacity style={styles.settingItem} onPress={onPress}>
-            <View style={[styles.iconContainer, { backgroundColor: '#F3F4F6' }]}>
-                <Ionicons name={icon} size={22} color="#7367F0" />
+            <View style={[styles.iconContainer, { backgroundColor: colors.iconBg }]}>
+                <Ionicons name={icon} size={22} color={colors.primary} />
             </View>
             <View style={styles.settingTextContainer}>
-                <Text style={styles.settingTitle}>{title}</Text>
-                {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+                <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
+                {subtitle && <Text style={[styles.settingSubtitle, { color: colors.subText }]}>{subtitle}</Text>}
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#ABABAB" />
+            <Ionicons name="chevron-forward" size={20} color={colors.subText} />
         </TouchableOpacity>
     );
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#7367F0" />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle={activeTheme === 'dark' ? "light-content" : "light-content"} backgroundColor="#7367F0" />
 
             <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
                 {/* Header Section */}
@@ -79,32 +94,32 @@ export default function ProfileScreen() {
 
                 {/* Settings Section */}
                 <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionHeader}>Conta</Text>
-                    <View style={styles.sectionCard}>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Conta</Text>
+                    <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
                         {renderSettingItem("person-outline", "Dados Pessoais", "Alterar nome, email", () => Alert.alert('Em breve', 'Edição de perfil será implementada.'))}
-                        <View style={styles.separator} />
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("lock-closed-outline", "Segurança", "Alterar senha, biometria", () => Alert.alert('Em breve', 'Segurança será implementada.'))}
                     </View>
 
-                    <Text style={styles.sectionHeader}>Preferências</Text>
-                    <View style={styles.sectionCard}>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Preferências</Text>
+                    <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
                         {renderSettingItem("notifications-outline", "Notificações", "Gerenciar alertas")}
-                        <View style={styles.separator} />
-                        {renderSettingItem("moon-outline", "Tema", "Claro / Escuro")}
-                        <View style={styles.separator} />
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
+                        {renderSettingItem("moon-outline", "Tema", getCurrentThemeLabel(theme), handleChangeTheme)}
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("language-outline", "Idioma", "Português (Brasil)")}
                     </View>
 
-                    <Text style={styles.sectionHeader}>Suporte</Text>
-                    <View style={styles.sectionCard}>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Suporte</Text>
+                    <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
                         {renderSettingItem("help-circle-outline", "Ajuda", "Perguntas frequentes")}
-                        <View style={styles.separator} />
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("chatbox-ellipses-outline", "Chat da Equipe", "Falar com o time", () => router.push('/chat/contacts'))}
-                        <View style={styles.separator} />
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("mail-outline", "Fale Conosco", "Enviar mensagem")}
                     </View>
 
-                    <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
+                    <TouchableOpacity style={[styles.logoutButton, { backgroundColor: activeTheme === 'dark' ? '#2f2b3a' : '#ffebee' }]} onPress={handleSignOut}>
                         <Ionicons name="log-out-outline" size={20} color="#EA5455" style={{ marginRight: 8 }} />
                         <Text style={styles.logoutText}>Sair da Conta</Text>
                     </TouchableOpacity>
@@ -116,10 +131,15 @@ export default function ProfileScreen() {
     );
 }
 
+function getCurrentThemeLabel(theme: string) {
+    if (theme === 'light') return 'Claro';
+    if (theme === 'dark') return 'Escuro';
+    return 'Sistema';
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
     },
     header: {
         paddingTop: 60,
@@ -212,16 +232,13 @@ const styles = StyleSheet.create({
     sectionHeader: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#333',
         marginBottom: 12,
         marginTop: 12,
         marginLeft: 4,
     },
     sectionCard: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 8, // Padding around items
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
@@ -247,23 +264,19 @@ const styles = StyleSheet.create({
     settingTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
     },
     settingSubtitle: {
         fontSize: 12,
-        color: '#888',
         marginTop: 2,
     },
     separator: {
         height: 1,
-        backgroundColor: '#f0f0f0',
         marginLeft: 68, // Align with text start
     },
     logoutButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#ffebee',
         borderRadius: 16,
         paddingVertical: 16,
         marginTop: 30,
