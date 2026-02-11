@@ -4,9 +4,11 @@ import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
     const { user, signOut } = useAuth();
+    const router = useRouter();
 
     const handleSignOut = () => {
         Alert.alert(
@@ -96,6 +98,8 @@ export default function ProfileScreen() {
                     <Text style={styles.sectionHeader}>Suporte</Text>
                     <View style={styles.sectionCard}>
                         {renderSettingItem("help-circle-outline", "Ajuda", "Perguntas frequentes")}
+                        <View style={styles.separator} />
+                        {renderSettingItem("chatbox-ellipses-outline", "Chat da Equipe", "Falar com o time", () => router.push('/chat/contacts'))}
                         <View style={styles.separator} />
                         {renderSettingItem("mail-outline", "Fale Conosco", "Enviar mensagem")}
                     </View>
