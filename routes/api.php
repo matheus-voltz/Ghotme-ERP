@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ApiOrdemServicoController;
+use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ClientVehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 

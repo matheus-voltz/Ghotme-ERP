@@ -15,7 +15,9 @@ class ClientVehicleController extends Controller
 {
     public function getClients()
     {
-        $clients = Clients::where('company_id', Auth::user()->company_id)
+        $companyId = Auth::user()->company_id ?? Auth::id(); // Fallback to user ID if company_id is null
+
+        $clients = Clients::where('company_id', $companyId)
             ->select('id', 'name', 'company_name')
             ->orderBy('name')
             ->get();
