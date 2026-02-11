@@ -369,7 +369,7 @@
     "isEntry": true
   },
   "resources/assets/js/app-calendar.js": {
-    "file": "assets/app-calendar-CqI7f3xY.js",
+    "file": "assets/app-calendar-BGNY-9ru.js",
     "name": "app-calendar",
     "src": "resources/assets/js/app-calendar.js",
     "isEntry": true
@@ -483,7 +483,7 @@
     "isEntry": true
   },
   "resources/assets/js/app-kanban.js": {
-    "file": "assets/app-kanban-BP-d0yTk.js",
+    "file": "assets/app-kanban-DI0toTAE.js",
     "name": "app-kanban",
     "src": "resources/assets/js/app-kanban.js",
     "isEntry": true
@@ -4073,7 +4073,7 @@
     "isEntry": true
   },
   "resources/js/laravel-vehicles.js": {
-    "file": "assets/laravel-vehicles-BJjIuQ53.js",
+    "file": "assets/laravel-vehicles-DkcEJ9kn.js",
     "name": "laravel-vehicles",
     "src": "resources/js/laravel-vehicles.js",
     "isEntry": true

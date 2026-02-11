@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // You might need to install this or use a custom implementation
@@ -85,6 +85,30 @@ export default function CreateOrderScreen() {
         }
     };
 
+    const [showClientModal, setShowClientModal] = useState(false);
+    const [clientSearch, setClientSearch] = useState('');
+    const [filteredClients, setFilteredClients] = useState<any[]>([]);
+
+    useEffect(() => {
+        setFilteredClients(
+            clients.filter(c =>
+                (c.name && c.name.toLowerCase().includes(clientSearch.toLowerCase())) ||
+                (c.company_name && c.company_name.toLowerCase().includes(clientSearch.toLowerCase()))
+            )
+        );
+    }, [clientSearch, clients]);
+
+    const handleSelectClient = (client: any) => {
+        setClientId(client.id);
+        setShowClientModal(false);
+        setClientSearch('');
+    };
+
+    const getSelectedClientName = () => {
+        const client = clients.find(c => c.id === clientId);
+        return client ? (client.name || client.company_name) : 'Selecione o Cliente';
+    };
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -107,30 +131,22 @@ export default function CreateOrderScreen() {
                         <Text style={[styles.sectionTitle, { color: colors.primary }]}>Informações Básicas</Text>
                     </View>
 
-                    {/* Cliente */}
+                    {/* Cliente (Searchable) */}
                     <View style={styles.inputGroup}>
                         <View style={styles.labelRow}>
                             <Ionicons name="person-outline" size={16} color={colors.subText} />
                             <Text style={[styles.label, { color: colors.subText }]}>Cliente *</Text>
                         </View>
-                        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background }]}>
-                            <Picker
-                                selectedValue={clientId}
-                                onValueChange={(itemValue) => setClientId(itemValue)}
-                                style={{ color: colors.text }} // Style prompt text color if possible
-                                dropdownIconColor={colors.text}
-                            >
-                                <Picker.Item label="Selecione o Cliente" value="" color={colors.subText} />
-                                {clients.map((client) => (
-                                    <Picker.Item
-                                        key={client.id}
-                                        label={client.name || client.company_name}
-                                        value={client.id}
-                                        color={colors.text}
-                                    />
-                                ))}
-                            </Picker>
-                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, paddingHorizontal: 15 }]}
+                            onPress={() => setShowClientModal(true)}
+                        >
+                            <Text style={{ fontSize: 16, color: clientId ? colors.text : colors.subText }}>
+                                {getSelectedClientName()}
+                            </Text>
+                            <Ionicons name="chevron-down" size={20} color={colors.subText} style={{ position: 'absolute', right: 15 }} />
+                        </TouchableOpacity>
                     </View>
 
                     {/* Veículo */}
@@ -257,6 +273,50 @@ export default function CreateOrderScreen() {
                 </TouchableOpacity>
 
             </ScrollView>
+
+            {/* Client Search Modal */}
+            {showClientModal && (
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20, zIndex: 100 }]}>
+                    <View style={{ backgroundColor: colors.card, borderRadius: 16, height: '80%', padding: 20 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Selecionar Cliente</Text>
+                            <TouchableOpacity onPress={() => setShowClientModal(false)}>
+                                <Ionicons name="close" size={24} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.background, borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, borderWidth: 1, borderColor: colors.border }}>
+                            <Ionicons name="search" size={20} color={colors.subText} />
+                            <TextInput
+                                style={{ flex: 1, padding: 12, fontSize: 16, color: colors.text }}
+                                placeholder="Buscar cliente..."
+                                placeholderTextColor={colors.subText}
+                                value={clientSearch}
+                                onChangeText={setClientSearch}
+                                autoFocus
+                            />
+                        </View>
+
+                        <FlatList
+                            data={filteredClients}
+                            keyExtractor={item => item.id.toString()}
+                            showsVerticalScrollIndicator={false}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: colors.border }}
+                                    onPress={() => handleSelectClient(item)}
+                                >
+                                    <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{item.name || item.company_name}</Text>
+                                    <Text style={{ fontSize: 14, color: colors.subText }}>ID: {item.id}</Text>
+                                </TouchableOpacity>
+                            )}
+                            ListEmptyComponent={
+                                <Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum cliente encontrado.</Text>
+                            }
+                        />
+                    </View>
+                </View>
+            )}
         </KeyboardAvoidingView>
     );
 }
