@@ -29,9 +29,22 @@ export default function ActionsScreen() {
                     {actions.map((item) => (
                         <TouchableOpacity
                             key={item.id}
-                            style={styles.card}
-                            activeOpacity={0.9}
-                            onPress={() => alert(`Ação: ${item.title}`)}
+                            style={[
+                                styles.card,
+                                {
+                                    width: '47%',
+                                    backgroundColor: '#fff',
+                                    marginBottom: 20
+                                }
+                            ]}
+                            activeOpacity={0.8}
+                            onPress={() => {
+                                if (item.id === 'new-os') {
+                                    router.push('/os/create');
+                                } else {
+                                    alert(`Ação: ${item.title} (Em breve)`);
+                                }
+                            }}
                         >
                             <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
                                 <Ionicons name={item.icon as any} size={28} color={item.color} />

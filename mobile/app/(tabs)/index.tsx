@@ -183,7 +183,8 @@ export default function DashboardScreen() {
       {/* Floating Action Button (Optional - for creating new order) */}
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => Alert.alert('Novo', 'Funcionalidade de Nova OS em breve!')}
+        onPress={() => router.push('/os/create')}
+        activeOpacity={0.8}
       >
         <Ionicons name="add" size={30} color="#fff" />
       </TouchableOpacity>

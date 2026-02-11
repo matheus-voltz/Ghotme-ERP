@@ -28,10 +28,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ordens-servico', [ApiOrdemServicoController::class, 'index']);
     Route::get('/ordens-servico/{id}', [ApiOrdemServicoController::class, 'show']);
 
-    // Chat API
-    Route::get('/chat/contacts', [\App\Http\Controllers\Api\ChatController::class, 'contacts']);
-    Route::get('/chat/messages/{userId}', [\App\Http\Controllers\Api\ChatController::class, 'messages']);
-    Route::post('/chat/messages', [\App\Http\Controllers\Api\ChatController::class, 'send']);
+    // Chat Routes
+    Route::get('/chat/contacts', [ChatController::class, 'contacts']);
+    Route::get('/chat/messages/{userId}', [ChatController::class, 'messages']);
+    Route::post('/chat/messages', [ChatController::class, 'send']);
+
+    // OS & Client/Vehicle Routes
+    Route::get('/clients', [ClientVehicleController::class, 'getClients']);
+    Route::get('/clients/{clientId}/vehicles', [ClientVehicleController::class, 'getVehicles']);
+    Route::post('/os', [ClientVehicleController::class, 'store']);
 
     // Add more API routes here as needed (Vehicles, Clients, etc.)
 });
