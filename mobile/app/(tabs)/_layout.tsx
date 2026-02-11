@@ -66,20 +66,35 @@ export default function TabLayout() {
         }}
       />
 
-      {/* 
-         You can enable this if you want a central "Add" button later
-         It would be a placeholder screen that opens a modal
-      */}
-      {/* 
       <Tabs.Screen
-        name="add"
+        name="actions"
         options={{
+          title: 'Novo',
           tabBarIcon: ({ focused }) => (
-             <Ionicons name="add-circle" size={58} color="#7367F0" style={{ marginTop: -30 }} />
+            <View style={{
+              top: -20, // Float above nicely
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#7367F0',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.5,
+              shadowRadius: 10,
+              elevation: 10,
+            }}>
+              <View style={{
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                backgroundColor: '#7367F0',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+                <Ionicons name="add" size={32} color="#fff" />
+              </View>
+            </View>
           ),
         }}
-      /> 
-      */}
+      />
 
       <Tabs.Screen
         name="profile"
