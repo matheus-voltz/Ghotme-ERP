@@ -116,7 +116,7 @@ $pageConfigs = [
       </div>
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">Tudo que você precisa
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
         para gerir seu negócio
@@ -180,7 +180,7 @@ $pageConfigs = [
           </div>
           <h4 class="mb-1">
             <span class="position-relative fw-extrabold z-1">Depoimentos
-              <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+              <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
                 class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
             </span>
           </h4>
@@ -327,73 +327,45 @@ $pageConfigs = [
   </section>
   <!-- Real customers reviews: End -->
 
-  <!-- Our great team: Start -->
-  <section id="landingTeam" class="section-py landing-team">
+  <!-- Payment Platforms: Start -->
+  <section id="landingPaymentPlatforms" class="section-py landing-payment-platforms">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Nosso Time</span>
+        <span class="badge bg-label-primary">Pagamentos Integrados</span>
       </div>
       <h4 class="text-center mb-1">
-        <span class="position-relative fw-extrabold z-1">Trabalhando
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+        <span class="position-relative fw-extrabold z-1">Plataformas
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
-        para o seu sucesso
+        de pagamento
       </h4>
-      <p class="text-center mb-md-11 pb-0 pb-xl-12">Conheça as mentes por trás da inovação no Ghotme.</p>
-      <div class="row gy-12 mt-2">
-        <div class="col-lg-3 col-sm-6">
-          <div class="card mt-3 mt-lg-0 shadow-none">
-            <div class="bg-label-primary border border-bottom-0 border-label-primary position-relative team-image-box">
-              <img src="{{ asset('assets/img/front-pages/landing-page/team-member-1.png') }}"
-                class="position-absolute card-img-position bottom-0 start-50" alt="human image" />
-            </div>
-            <div class="card-body border border-top-0 border-label-primary text-center">
-              <h5 class="card-title mb-0">Sophie Gilbert</h5>
-              <p class="text-body-secondary mb-0">Gerente de Sucesso</p>
-            </div>
+      <p class="text-center mb-md-11 pb-0 pb-xl-12">O site integra com Pagar.me, Asaas, PagSeguro e Stripe.</p>
+      <div class="row gy-12 mt-2 justify-content-center align-items-center">
+        <div class="col-lg-3 col-sm-6 text-center">
+          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
+            <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
           </div>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="card mt-3 mt-lg-0 shadow-none">
-            <div class="bg-label-info border border-bottom-0 border-label-info position-relative team-image-box">
-              <img src="{{ asset('assets/img/front-pages/landing-page/team-member-2.png') }}"
-                class="position-absolute card-img-position bottom-0 start-50" alt="human image" />
-            </div>
-            <div class="card-body border border-top-0 border-label-info text-center">
-              <h5 class="card-title mb-0">Paul Miles</h5>
-              <p class="text-body-secondary mb-0">Designer de Experiência</p>
-            </div>
+        <div class="col-lg-3 col-sm-6 text-center">
+          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
+            <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
           </div>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="card mt-3 mt-lg-0 shadow-none">
-            <div class="bg-label-danger border border-bottom-0 border-label-danger position-relative team-image-box">
-              <img src="{{ asset('assets/img/front-pages/landing-page/team-member-3.png') }}"
-                class="position-absolute card-img-position bottom-0 start-50" alt="human image" />
-            </div>
-            <div class="card-body border border-top-0 border-label-danger text-center">
-              <h5 class="card-title mb-0">Nannie Ford</h5>
-              <p class="text-body-secondary mb-0">Líder de Desenvolvimento</p>
-            </div>
+        <div class="col-lg-3 col-sm-6 text-center">
+          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
+            <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
           </div>
         </div>
-        <div class="col-lg-3 col-sm-6">
-          <div class="card mt-3 mt-lg-0 shadow-none">
-            <div class="bg-label-success border border-bottom-0 border-label-success position-relative team-image-box">
-              <img src="{{ asset('assets/img/front-pages/landing-page/team-member-4.png') }}"
-                class="position-absolute card-img-position bottom-0 start-50" alt="human image" />
-            </div>
-            <div class="card-body border border-top-0 border-label-success text-center">
-              <h5 class="card-title mb-0">Chris Watkins</h5>
-              <p class="text-body-secondary mb-0">Especialista em Negócios</p>
-            </div>
+        <div class="col-lg-3 col-sm-6 text-center">
+          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
+            <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
           </div>
         </div>
       </div>
     </div>
   </section>
-  <!-- Our great team: End -->
+  <!-- Payment Platforms: End -->
 
   <!-- Pricing plans: Start -->
   <section id="landingPricing" class="section-py bg-body landing-pricing">
@@ -403,7 +375,7 @@ $pageConfigs = [
       </div>
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">Planos de preços sob medida
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
         feitos para você
@@ -682,7 +654,7 @@ $pageConfigs = [
       <h4 class="text-center mb-1">
         Dúvidas
         <span class="position-relative fw-extrabold z-1">Comuns
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
       </h4>
@@ -775,7 +747,7 @@ $pageConfigs = [
       </div>
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">Vamos Crescer
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="notebook carregando"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
         Juntos
