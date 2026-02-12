@@ -784,62 +784,91 @@ $pageConfigs = [
 <!-- Pricing plans: End -->
 
 <!-- Fun facts: Start -->
-<section id="landingFunFacts" class="section-py landing-fun-facts">
+<section id="landingDiferenciais" class="section-py landing-diferenciais">
   <div class="container">
+    <style>
+      .diferencial-card {
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        position: relative;
+        z-index: 1;
+        background: var(--bs-body-bg);
+        /* Ensure opacity */
+      }
+
+      .diferencial-card:hover {
+        transform: translateY(-8px);
+        border-color: transparent !important;
+      }
+
+      .diferencial-card .icon-box {
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        /* Bounce effect */
+        display: inline-block;
+      }
+
+      .diferencial-card:hover .icon-box {
+        transform: scale(1.15) rotate(3deg);
+      }
+
+      /* Individual Colors */
+      .hover-effect-primary:hover {
+        box-shadow: 0 15px 30px rgba(var(--bs-primary-rgb), 0.25);
+      }
+
+      .hover-effect-success:hover {
+        box-shadow: 0 15px 30px rgba(var(--bs-success-rgb), 0.25);
+      }
+
+      .hover-effect-info:hover {
+        box-shadow: 0 15px 30px rgba(var(--bs-info-rgb), 0.25);
+      }
+
+      .hover-effect-warning:hover {
+        box-shadow: 0 15px 30px rgba(var(--bs-warning-rgb), 0.25);
+      }
+    </style>
     <div class="row gy-6">
       <div class="col-sm-6 col-lg-3">
-        <div class="card border border-primary shadow-none">
+        <div class="card border border-primary shadow-none h-100 diferencial-card hover-effect-primary">
           <div class="card-body text-center">
-            <div class="mb-4 text-primary">
-              <i class="ti tabler-tool icon-xl"></i>
+            <div class="mb-4 text-primary icon-box">
+              <i class="ti tabler-headset icon-xl"></i>
             </div>
-            <h3 class="mb-0">150k+</h3>
-            <p class="fw-medium mb-0">
-              Pedidos<br />
-              Processados
-            </p>
+            <h5 class="mb-2">Suporte Humanizado</h5>
+            <p class="text-muted mb-0">Atendimento rápido e direto com especialistas. Nada de robôs.</p>
           </div>
         </div>
       </div>
       <div class="col-sm-6 col-lg-3">
-        <div class="card border border-success shadow-none">
+        <div class="card border border-success shadow-none h-100 diferencial-card hover-effect-success">
           <div class="card-body text-center">
-            <div class="mb-4 text-success">
-              <i class="ti tabler-users icon-xl"></i>
+            <div class="mb-4 text-success icon-box">
+              <i class="ti tabler-lock-open icon-xl"></i>
             </div>
-            <h3 class="mb-0">2.5k+</h3>
-            <p class="fw-medium mb-0">
-              Empresas<br />
-              Parceiras
-            </p>
+            <h5 class="mb-2">Sem Fidelidade</h5>
+            <p class="text-muted mb-0">Total liberdade para cancelar quando quiser, sem multas ou burocracia.</p>
           </div>
         </div>
       </div>
       <div class="col-sm-6 col-lg-3">
-        <div class="card border border-info shadow-none">
+        <div class="card border border-info shadow-none h-100 diferencial-card hover-effect-info">
           <div class="card-body text-center">
-            <div class="mb-4 text-info">
-              <i class="ti tabler-thumb-up icon-xl"></i>
+            <div class="mb-4 text-info icon-box">
+              <i class="ti tabler-refresh icon-xl"></i>
             </div>
-            <h3 class="mb-0">99%</h3>
-            <p class="fw-medium mb-0">
-              Satisfação dos<br />
-              Clientes
-            </p>
+            <h5 class="mb-2">Sempre Atualizado</h5>
+            <p class="text-muted mb-0">Novas funcionalidades e melhorias constantes sem custo adicional.</p>
           </div>
         </div>
       </div>
       <div class="col-sm-6 col-lg-3">
-        <div class="card border border-warning shadow-none">
+        <div class="card border border-warning shadow-none h-100 diferencial-card hover-effect-warning">
           <div class="card-body text-center">
-            <div class="mb-4 text-warning">
-              <i class="ti tabler-shield-check icon-xl"></i>
+            <div class="mb-4 text-warning icon-box">
+              <i class="ti tabler-shield-lock icon-xl"></i>
             </div>
-            <h3 class="mb-0">100%</h3>
-            <p class="fw-medium mb-0">
-              Segurança nos<br />
-              Seus Dados
-            </p>
+            <h5 class="mb-2">Dados Seguros</h5>
+            <p class="text-muted mb-0">Segurança de nível bancário e backups diários automáticos.</p>
           </div>
         </div>
       </div>
