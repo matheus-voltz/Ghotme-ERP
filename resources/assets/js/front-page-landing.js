@@ -74,6 +74,28 @@
     });
   }
 
+  // Swiper Business Highlights (New Carousel)
+  const swiperBusinessHighlights = document.getElementById('swiper-business-highlights');
+  if (swiperBusinessHighlights) {
+    new Swiper(swiperBusinessHighlights, {
+      slidesPerView: 1,
+      spaceBetween: 30,
+      grabCursor: true,
+      loop: true,
+      centeredSlides: true,
+      observer: true,
+      observeParents: true,
+      autoplay: {
+        delay: 5000,
+        disableOnInteraction: false
+      },
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+      }
+    });
+  }
+
   // Pricing Plans Logic (Same as Settings)
   const priceDurationToggler = document.querySelector('.price-duration-toggler');
   const priceMonthlyList = [].slice.call(document.querySelectorAll('.price-monthly'));
