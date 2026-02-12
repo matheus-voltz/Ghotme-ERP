@@ -170,162 +170,95 @@ $pageConfigs = [
   </section>
   <!-- Useful features: End -->
 
-  <!-- Real customers reviews: Start -->
-  <section id="landingReviews" class="section-py bg-body landing-reviews pb-0">
+  <!-- Why Choose Ghotme: Start -->
+  <section id="landingWhyChoose" class="section-py bg-body landing-reviews pb-0">
     <div class="container">
-      <div class="row align-items-center gx-0 gy-4 g-lg-5 mb-5 pb-md-5">
-        <div class="col-md-6 col-lg-5 col-xl-3">
-          <div class="mb-4">
-            <span class="badge bg-label-primary">O que nossos clientes dizem</span>
-          </div>
-          <h4 class="mb-1">
-            <span class="position-relative fw-extrabold z-1">Depoimentos
-              <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
-                class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
-            </span>
-          </h4>
-          <p class="mb-5 mb-md-12">
-            Veja como o Ghotme transformou<br class="d-none d-xl-block" />
-            a gestão de empresas pelo Brasil.
-          </p>
-          <div class="landing-reviews-btns">
-            <button id="reviews-previous-btn" class="btn btn-icon btn-label-primary reviews-btn me-3" type="button">
-              <i class="ti tabler-chevron-left icon-md scaleX-n1-rtl"></i>
-            </button>
-            <button id="reviews-next-btn" class="btn btn-icon btn-label-primary reviews-btn" type="button">
-              <i class="ti tabler-chevron-right icon-md scaleX-n1-rtl"></i>
-            </button>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-7 col-xl-9">
-          <div class="swiper-reviews-carousel overflow-hidden">
-            <div class="swiper" id="swiper-reviews">
-              <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                  <div class="card h-100">
-                    <div class="card-body text-body d-flex flex-column justify-content-between h-100">
-                      <div class="mb-4">
-                        <img src="{{ asset('assets/img/front-pages/branding/logo-1.png') }}" alt="client logo"
-                          class="client-logo img-fluid" />
-                      </div>
-                      <p>“O Ghotme organizou completamente meu financeiro. Antes eu perdia muito tempo em planilhas, agora é tudo automático.”</p>
-                      <div class="text-warning mb-4">
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <div class="avatar me-3 avatar-sm">
-                          <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle" />
-                        </div>
-                        <div>
-                          <h6 class="mb-0">Ricardo Silva</h6>
-                          <p class="small text-body-secondary mb-0">CEO da Silva Soluções</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card h-100">
-                    <div class="card-body text-body d-flex flex-column justify-content-between h-100">
-                      <div class="mb-4">
-                        <img src="{{ asset('assets/img/front-pages/branding/logo-2.png') }}" alt="client logo"
-                          class="client-logo img-fluid" />
-                      </div>
-                      <p>“Sistema prático e eficiente. O controle de estoque integrado com as vendas evitou muitos prejuízos na minha loja.”</p>
-                      <div class="text-warning mb-4">
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <div class="avatar me-3 avatar-sm">
-                          <img src="{{ asset('assets/img/avatars/2.png') }}" alt="Avatar" class="rounded-circle" />
-                        </div>
-                        <div>
-                          <h6 class="mb-0">Eugênia Oliveira</h6>
-                          <p class="small text-body-secondary mb-0">Gerente da TechInova</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="card h-100">
-                    <div class="card-body text-body d-flex flex-column justify-content-between h-100">
-                      <div class="mb-4">
-                        <img src="{{ asset('assets/img/front-pages/branding/logo-3.png') }}" alt="client logo"
-                          class="client-logo img-fluid" />
-                      </div>
-                      <p>A interface é muito intuitiva. Minha equipe de vendas aprendeu a usar em menos de um dia. O suporte também é excelente!</p>
-                      <div class="text-warning mb-4">
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                        <i class="ti tabler-star-filled"></i>
-                      </div>
-                      <div class="d-flex align-items-center">
-                        <div class="avatar me-3 avatar-sm">
-                          <img src="{{ asset('assets/img/avatars/3.png') }}" alt="Avatar" class="rounded-circle" />
-                        </div>
-                        <div>
-                          <h6 class="mb-0">Marcos Frota</h6>
-                          <p class="small text-body-secondary mb-0">Diretor Comercial</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+      <div class="mb-4 text-center">
+        <span class="badge bg-label-primary">A Transformação</span>
+      </div>
+      <h4 class="text-center mb-1">
+        <span class="position-relative fw-extrabold z-1">Por que escolher
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="icone de destaque da secao"
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
+        </span>
+        o Ghotme?
+      </h4>
+      <p class="text-center mb-12">
+        Veja a diferença que um sistema de gestão integrado faz no seu dia a dia.
+      </p>
+
+      <div class="row g-4 justify-content-center align-items-center">
+        <!-- Before Ghotme -->
+        <div class="col-lg-5">
+          <div class="card border-0 shadow-none bg-label-secondary h-100 opacity-75 grayscale-content">
+            <div class="card-body text-center p-5">
+              <div class="mb-4">
+                <div class="avatar avatar-xl mx-auto">
+                  <span class="avatar-initial rounded bg-label-danger">
+                    <i class="ti tabler-x icon-xl"></i>
+                  </span>
                 </div>
               </div>
-              <div class="swiper-button-next"></div>
-              <div class="swiper-button-prev"></div>
+              <h4 class="mb-3 text-danger">Sem o Ghotme</h4>
+              <ul class="list-unstyled text-start d-inline-block mx-auto">
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-file-spreadsheet text-danger me-2"></i> Planilhas espalhadas e confusas
+                </li>
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-clock-off text-danger me-2"></i> Perda de tempo com tarefas manuais
+                </li>
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-chart-arrows-vertical text-danger me-2"></i> Falta de controle financeiro
+                </li>
+                <li class="d-flex align-items-center">
+                  <i class="ti tabler-mood-sad text-danger me-2"></i> Estresse e insegurança nas decisões
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- VS Badge -->
+        <div class="col-lg-1 d-none d-lg-flex justify-content-center">
+          <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-lg" style="width: 60px; height: 60px; z-index: 1;">
+            <span class="fw-bold">VS</span>
+          </div>
+        </div>
+
+        <!-- After Ghotme -->
+        <div class="col-lg-5">
+          <div class="card border-primary shadow-lg h-100 hover-shadow-xl transition-all scale-up-center">
+            <div class="card-body text-center p-5">
+              <div class="mb-4">
+                <div class="avatar avatar-xl mx-auto">
+                  <span class="avatar-initial rounded bg-label-primary">
+                    <i class="ti tabler-check icon-xl"></i>
+                  </span>
+                </div>
+              </div>
+              <h4 class="mb-3 text-primary">Com o Ghotme</h4>
+              <ul class="list-unstyled text-start d-inline-block mx-auto">
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-layout-dashboard text-success me-2"></i> Tudo organizado em um só lugar
+                </li>
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-rocket text-success me-2"></i> Automação que poupa horas do seu dia
+                </li>
+                <li class="mb-3 d-flex align-items-center">
+                  <i class="ti tabler-chart-line text-success me-2"></i> Visão clara de lucros e despesas
+                </li>
+                <li class="d-flex align-items-center">
+                  <i class="ti tabler-mood-smile text-success me-2"></i> Tranquilidade para focar em crescer
+                </li>
+              </ul><Br>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <hr class="m-0 mt-6 mt-md-12" />
-    <div class="container">
-      <div class="swiper-logo-carousel pt-8">
-        <div class="swiper" id="swiper-clients-logos">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <img src="{{ asset('assets/img/front-pages/branding/logo_1-' . $configData['theme'] . '.png') }}"
-                alt="client logo" class="client-logo" data-app-light-img="front-pages/branding/logo_1-light.png"
-                data-app-dark-img="front-pages/branding/logo_1-dark.png" />
-            </div>
-            <div class="swiper-slide">
-              <img src="{{ asset('assets/img/front-pages/branding/logo_2-' . $configData['theme'] . '.png') }}"
-                alt="client logo" class="client-logo" data-app-light-img="front-pages/branding/logo_2-light.png"
-                data-app-dark-img="front-pages/branding/logo_2-dark.png" />
-            </div>
-            <div class="swiper-slide">
-              <img src="{{ asset('assets/img/front-pages/branding/logo_3-' . $configData['theme'] . '.png') }}"
-                alt="client logo" class="client-logo" data-app-light-img="front-pages/branding/logo_3-light.png"
-                data-app-dark-img="front-pages/branding/logo_3-dark.png" />
-            </div>
-            <div class="swiper-slide">
-              <img src="{{ asset('assets/img/front-pages/branding/logo_4-' . $configData['theme'] . '.png') }}"
-                alt="client logo" class="client-logo" data-app-light-img="front-pages/branding/logo_4-light.png"
-                data-app-dark-img="front-pages/branding/logo_4-dark.png" />
-            </div>
-            <div class="swiper-slide">
-              <img src="{{ asset('assets/img/front-pages/branding/logo_5-' . $configData['theme'] . '.png') }}"
-                alt="client logo" class="client-logo" data-app-light-img="front-pages/branding/logo_5-light.png"
-                data-app-dark-img="front-pages/branding/logo_5-dark.png" />
-            </div>
-          </div>
-        </div>
-      </div>
+
     </div>
   </section>
-  <!-- Real customers reviews: End -->
+  <!-- Why Choose Ghotme: End -->
 
   <!-- Payment Platforms: Start -->
   <section id="landingPaymentPlatforms" class="section-py landing-payment-platforms">
@@ -342,24 +275,74 @@ $pageConfigs = [
       </h4>
       <p class="text-center mb-md-11 pb-0 pb-xl-12">O site integra com Pagar.me, Asaas, PagSeguro e Stripe.</p>
       <div class="row gy-12 mt-2 justify-content-center align-items-center">
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
-            <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
+        <style>
+          @keyframes floating {
+            0% {
+              transform: translateY(0px);
+            }
+
+            50% {
+              transform: translateY(-10px);
+            }
+
+            100% {
+              transform: translateY(0px);
+            }
+          }
+
+          .partner-logo-container {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            filter: grayscale(100%);
+            opacity: 0.6;
+          }
+
+          .partner-logo-container:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
+          }
+
+          .floating-animation {
+            animation: floating 3s ease-in-out infinite;
+          }
+
+          .delay-1 {
+            animation-delay: 0s;
+          }
+
+          .delay-2 {
+            animation-delay: 0.5s;
+          }
+
+          .delay-3 {
+            animation-delay: 1s;
+          }
+
+          .delay-4 {
+            animation-delay: 1.5s;
+          }
+        </style>
+        <div class="row gy-12 mt-2 justify-content-center align-items-center">
+          <div class="col-lg-3 col-sm-6 text-center">
+            <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
+              <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px;" />
+            </div>
           </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
-            <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
+          <div class="col-lg-3 col-sm-6 text-center">
+            <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-2">
+              <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px;" />
+            </div>
           </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
-            <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
+          <div class="col-lg-3 col-sm-6 text-center">
+            <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-3">
+              <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px;" />
+            </div>
           </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent hover-shadow-lg transition-all" style="transition: all 0.3s ease;">
-            <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px; filter: grayscale(1); opacity: 0.7; transition: all 0.3s ease;" onmouseover="this.style.filter='grayscale(0)'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.7'" />
+          <div class="col-lg-3 col-sm-6 text-center">
+            <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-4">
+              <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" />
+            </div>
           </div>
         </div>
       </div>
@@ -727,7 +710,7 @@ $pageConfigs = [
       <div class="row align-items-center gy-12">
         <div class="col-lg-6 text-start text-sm-center text-lg-start">
           <h3 class="cta-title text-primary fw-bold mb-1">Pronto para transformar sua empresa?</h3>
-          <h5 class="text-body mb-8">Comece agora seu teste grátis de 7 dias e sinta a diferença.</h5>
+          <h5 class="text-body mb-8">Comece agora seu teste grátis de 30 dias e sinta a diferença.</h5>
           <a href="{{ url('/register') }}" class="btn btn-lg btn-primary">Quero Começar</a>
         </div>
         <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
@@ -768,12 +751,12 @@ $pageConfigs = [
                         class="ti tabler-mail icon-lg"></i></div>
                     <div>
                       <p class="mb-0">E-mail</p>
-                      <h6 class="mb-0"><a href="mailto:contato@ghotme.com.br" class="text-heading">contato@ghotme.com.br</a>
+                      <h6 class="mb-0"><a href="mailto:suporte@ghotme.com.br" class="text-heading">suporte@ghotme.com.br</a>
                       </h6>
                     </div>
                   </div>
                 </div>
-                <div class="col-md-6 col-lg-12 col-xl-6">
+                <!-- <div class="col-md-6 col-lg-12 col-xl-6">
                   <div class="d-flex align-items-center">
                     <div class="badge bg-label-success rounded p-1_5 me-3"><i
                         class="ti tabler-phone-call icon-lg"></i></div>
@@ -782,7 +765,7 @@ $pageConfigs = [
                       <h6 class="mb-0"><a href="tel:+551199999999" class="text-heading">(11) 99999-9999</a></h6>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -801,13 +784,27 @@ $pageConfigs = [
                     <input type="text" class="form-control" id="contact-form-fullname" placeholder="Seu nome" />
                   </div>
                   <div class="col-md-6">
-                    <label class="form-label" for="contact-form-email">E-mail Corporativo</label>
+                    <label class="form-label" for="contact-form-email">E-mail</label>
                     <input type="text" id="contact-form-email" class="form-control" placeholder="seu@email.com" />
                   </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="contact-form-phone">WhatsApp / Telefone</label>
+                    <input type="text" id="contact-form-phone" class="form-control" placeholder="(00) 00000-0000" />
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="contact-form-subject">Assunto</label>
+                    <select id="contact-form-subject" class="form-select">
+                      <option selected disabled value="">Selecione...</option>
+                      <option value="sales">Comercial / Vendas</option>
+                      <option value="support">Suporte Técnico</option>
+                      <option value="partnership">Parcerias</option>
+                      <option value="other">Outros</option>
+                    </select>
+                  </div>
                   <div class="col-12">
-                    <label class="form-label" for="contact-form-message">Como podemos ajudar?</label>
-                    <textarea id="contact-form-message" class="form-control" rows="7"
-                      placeholder="Descreva sua dúvida ou necessidade"></textarea>
+                    <label class="form-label" for="contact-form-message">Mensagem</label>
+                    <textarea id="contact-form-message" class="form-control" rows="5"
+                      placeholder="Olá, gostaria de saber mais sobre o plano Enterprise..."></textarea>
                   </div>
                   <div class="col-12">
                     <button type="submit" class="btn btn-primary">Enviar Mensagem</button>
