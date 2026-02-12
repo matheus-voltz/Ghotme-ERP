@@ -25,13 +25,15 @@ class CreateNewUser implements CreatesNewUsers
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
+            'company_name' => ['required', 'string', 'max:255'],
+            'contact_number' => ['required', 'string', 'max:20'],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
         return DB::transaction(function () use ($input) {
             // 1. Cria a Empresa
             $company = Company::create([
-                'name' => 'Oficina de ' . $input['name'],
+                'name' => $input['company_name'],
             ]);
 
             // 2. Cria o Usuário vinculado a essa empresa
@@ -39,6 +41,7 @@ class CreateNewUser implements CreatesNewUsers
                 'company_id' => $company->id,
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'contact_number' => $input['contact_number'],
                 'password' => Hash::make($input['password']),
                 'trial_ends_at' => now()->addDays(30),
             ]);

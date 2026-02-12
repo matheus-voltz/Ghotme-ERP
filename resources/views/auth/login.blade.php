@@ -13,6 +13,93 @@ $customizerHidden = 'customizer-hide';
 @endsection
 
 @section('content')
+<style>
+  /* Custom Login Page Styles */
+  .authentication-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Left Side Animation */
+  .auth-cover-bg .auth-illustration {
+    animation: slideInLeft 1s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Right Side Form Animation */
+  .authentication-bg {
+    background-color: var(--bs-card-bg);
+  }
+
+  .w-px-400 {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Input Fields Polish */
+  .form-control:focus,
+  .input-group:focus-within .form-control,
+  .input-group:focus-within .input-group-text {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
+  }
+
+  /* Button Polish */
+  .btn-primary {
+    background: linear-gradient(45deg, var(--bs-primary), #696cff);
+    /* Adjust gradient based on theme */
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(var(--bs-primary-rgb), 0.4);
+  }
+
+  /* Logo Animation */
+  .app-brand-logo {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-6px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+</style>
+
 <div class="authentication-wrapper authentication-cover">
   <!-- Logo -->
   <a href="{{ url('/') }}" class="app-brand auth-cover-brand">
@@ -38,8 +125,8 @@ $customizerHidden = 'customizer-hide';
     <!-- Login -->
     <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6">
       <div class="w-px-400 mx-auto mt-12 pt-5">
-        <h4 class="mb-1">Bem vindo ao {{ config('variables.templateName') }}! 👋</h4>
-        <p class="mb-6">Por favor, faça login na sua conta e comece a aventura</p>
+        <h4 class="mb-1">Bem-vindo ao {{ config('variables.templateName') }}! 👋</h4>
+        <p class="mb-6">Acesse sua conta e gerencie seu negócio com facilidade.</p>
 
         @if (session('status'))
         <div class="alert alert-success mb-1 rounded-0" role="alert">
@@ -51,9 +138,9 @@ $customizerHidden = 'customizer-hide';
         <form id="formAuthentication" class="mb-6" action="{{ route('login') }}" method="POST">
           @csrf
           <div class="mb-6">
-            <label for="login-email" class="form-label">Email</label>
+            <label for="login-email" class="form-label">E-mail</label>
             <input type="text" class="form-control @error('email') is-invalid @enderror" id="login-email" name="email"
-              placeholder="john@example.com" autofocus value="{{ old('email') }}" />
+              placeholder="seu@email.com" autofocus value="{{ old('email') }}" />
             @error('email')
             <span class="invalid-feedback" role="alert">
               <span class="fw-medium">{{ $message }}</span>
@@ -61,7 +148,7 @@ $customizerHidden = 'customizer-hide';
             @enderror
           </div>
           <div class="mb-6 form-password-toggle">
-            <label class="form-label" for="login-password">Password</label>
+            <label class="form-label" for="login-password">Senha</label>
             <div class="input-group input-group-merge @error('password') is-invalid @enderror">
               <input type="password" id="login-password" class="form-control @error('password') is-invalid @enderror"
                 name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
@@ -79,7 +166,7 @@ $customizerHidden = 'customizer-hide';
               <div class="form-check mb-0 ms-2">
                 <input class="form-check-input" type="checkbox" id="remember-me" name="remember"
                   {{ old('remember') ? 'checked' : '' }} />
-                <label class="form-check-label" for="remember-me"> Lembre-se </label>
+                <label class="form-check-label" for="remember-me"> Manter conectado </label>
               </div>
               @if (Route::has('password.request'))
               <a href="{{ route('password.request') }}">
@@ -88,39 +175,17 @@ $customizerHidden = 'customizer-hide';
               @endif
             </div>
           </div>
-          <button class="btn btn-primary d-grid w-100" type="submit">Log in</button>
+          <button class="btn btn-primary d-grid w-100 shadow-primary" type="submit">Entrar</button>
         </form>
 
         <p class="text-center">
-          <span>Novo na plataforma</span>
+          <span>Ainda não tem conta?</span>
           @if (Route::has('register'))
           <a href="{{ route('register') }}">
-            <span>Criar uma conta</span>
+            <span>Cadastre-se grátis</span>
           </a>
           @endif
         </p>
-
-        <div class="divider my-6">
-          <div class="divider-text">or</div>
-        </div>
-
-        <div class="d-flex justify-content-center">
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-facebook me-1_5">
-            <i class="icon-base ti tabler-brand-facebook-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-twitter me-1_5">
-            <i class="icon-base ti tabler-brand-twitter-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-github me-1_5">
-            <i class="icon-base ti tabler-brand-github-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
-            <i class="icon-base ti tabler-brand-google-filled icon-20px"></i>
-          </a>
-        </div>
       </div>
     </div>
     <!-- /Login -->

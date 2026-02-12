@@ -13,6 +13,87 @@ $customizerHidden = 'customizer-hide';
 @endsection
 
 @section('content')
+<style>
+  /* Reuse Custom Styles from Login */
+  .authentication-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .auth-cover-bg .auth-illustration {
+    animation: slideInLeft 1s ease-out;
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .authentication-bg {
+    background-color: var(--bs-card-bg);
+  }
+
+  .w-px-400 {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-control:focus,
+  .input-group:focus-within .form-control,
+  .input-group:focus-within .input-group-text {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
+  }
+
+  .btn-primary {
+    background: linear-gradient(45deg, var(--bs-primary), #696cff);
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(var(--bs-primary-rgb), 0.4);
+  }
+
+  .app-brand-logo {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-6px);
+    }
+
+    100% {
+      transform: translateY(0px);
+    }
+  }
+</style>
+
 <div class="authentication-wrapper authentication-cover">
   <!-- Logo -->
   <a href="{{ url('/') }}" class="app-brand auth-cover-brand">
@@ -38,25 +119,48 @@ $customizerHidden = 'customizer-hide';
     <!-- Register -->
     <div class="d-flex col-12 col-xl-4 align-items-center authentication-bg p-sm-12 p-6">
       <div class="w-px-400 mx-auto mt-12 pt-5">
-        <h4 class="mb-1">A aventura começa aqui 🚀</h4>
-        <p class="mb-6">Torne o gerenciamento do seu app fácil e divertido!</p>
+        <h4 class="mb-1">Comece sua jornada 🚀</h4>
+        <p class="mb-6">Crie sua conta em segundos e transforme sua gestão.</p>
 
         <form id="formAuthentication" class="mb-6" action="{{ route('register') }}" method="POST">
           @csrf
           <div class="mb-6">
-            <label for="username" class="form-label">Username</label>
+            <label for="username" class="form-label">Nome Completo</label>
             <input type="text" class="form-control @error('name') is-invalid @enderror" id="username" name="name"
-              placeholder="johndoe" autofocus value="{{ old('name') }}" />
+              placeholder="Seu nome" autofocus value="{{ old('name') }}" />
             @error('name')
             <span class="invalid-feedback" role="alert">
               <span class="fw-medium">{{ $message }}</span>
             </span>
             @enderror
           </div>
+
           <div class="mb-6">
-            <label for="email" class="form-label">Email</label>
+            <label for="company_name" class="form-label">Nome da Empresa</label>
+            <input type="text" class="form-control @error('company_name') is-invalid @enderror" id="company_name" name="company_name"
+              placeholder="Ex: Oficina Mecânica Silva" value="{{ old('company_name') }}" />
+            @error('company_name')
+            <span class="invalid-feedback" role="alert">
+              <span class="fw-medium">{{ $message }}</span>
+            </span>
+            @enderror
+          </div>
+
+          <div class="mb-6">
+            <label for="contact_number" class="form-label">WhatsApp / Celular</label>
+            <input type="text" class="form-control @error('contact_number') is-invalid @enderror" id="contact_number" name="contact_number"
+              placeholder="(00) 00000-0000" value="{{ old('contact_number') }}" />
+            @error('contact_number')
+            <span class="invalid-feedback" role="alert">
+              <span class="fw-medium">{{ $message }}</span>
+            </span>
+            @enderror
+          </div>
+
+          <div class="mb-6">
+            <label for="email" class="form-label">E-mail</label>
             <input type="text" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
-              placeholder="john@example.com" value="{{ old('email') }}" />
+              placeholder="seu@email.com" value="{{ old('email') }}" />
             @error('email')
             <span class="invalid-feedback" role="alert">
               <span class="fw-medium">{{ $message }}</span>
@@ -92,9 +196,9 @@ $customizerHidden = 'customizer-hide';
               <input class="form-check-input @error('terms') is-invalid @enderror" type="checkbox" id="terms"
                 name="terms" />
               <label class="form-check-label" for="terms">
-                Eu concordo com 
-                <a href="{{ route('policy.show') }}" target="_blank">Politica de privacidade</a> &
-                <a href="{{ route('terms.show') }}" target="_blank">termos</a>
+                Eu concordo com a
+                <a href="{{ route('policy.show') }}" target="_blank">Política de Privacidade</a> e os
+                <a href="{{ route('terms.show') }}" target="_blank">Termos de Uso</a>.
               </label>
             </div>
             @error('terms')
@@ -104,39 +208,17 @@ $customizerHidden = 'customizer-hide';
             @enderror
           </div>
           @endif
-          <button type="submit" class="btn btn-primary d-grid w-100">Cadastrar</button>
+          <button type="submit" class="btn btn-primary d-grid w-100 shadow-primary">Cadastrar</button>
         </form>
 
         <p class="text-center">
-          <span>Ja tem uma conta?</span>
+          <span>Já tem uma conta?</span>
           @if (Route::has('login'))
           <a href="{{ route('login') }}">
-            <span>Log in</span>
+            <span>Faça Login</span>
           </a>
           @endif
         </p>
-
-        <div class="divider my-6">
-          <div class="divider-text">ou</div>
-        </div>
-
-        <div class="d-flex justify-content-center">
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-facebook me-1_5">
-            <i class="icon-base ti tabler-brand-facebook-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-twitter me-1_5">
-            <i class="icon-base ti tabler-brand-twitter-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-github me-1_5">
-            <i class="icon-base ti tabler-brand-github-filled icon-20px"></i>
-          </a>
-
-          <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
-            <i class="icon-base ti tabler-brand-google-filled icon-20px"></i>
-          </a>
-        </div>
       </div>
     </div>
     <!-- /Register -->
