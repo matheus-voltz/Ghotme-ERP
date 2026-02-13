@@ -95,9 +95,9 @@ export default function ChecklistVisual() {
       formData.append('ordem_servico_id', osId as string);
 
       damages.forEach((damage, index) => {
-        formData.append(`damages[${index}][part]`, damage.part);
+        formData.append(`parts[${index}]`, damage.part);
         // @ts-ignore
-        formData.append(`damages[${index}][photo_file]`, {
+        formData.append(`photos[${index}]`, {
           uri: damage.photo,
           name: `damage_${index}.jpg`,
           type: 'image/jpeg',

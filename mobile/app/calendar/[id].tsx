@@ -10,8 +10,8 @@ export default function EventDetailsScreen() {
     const { colors } = useTheme();
     const { id, title, start, description, color } = useLocalSearchParams();
 
-    const formattedTime = (start as string)?.split(' ')[1]?.substring(0, 5) || '08:00';
-    const formattedDate = (start as string)?.split(' ')[0]?.split('-').reverse().join('/') || '--/--/----';
+    const formattedTime = (start as string)?.split(/[ T]/)[1]?.substring(0, 5) || '08:00';
+    const formattedDate = (start as string)?.split(/[ T]/)[0]?.split('-').reverse().join('/') || '--/--/----';
 
     const handleDelete = () => {
         Alert.alert(
@@ -19,9 +19,9 @@ export default function EventDetailsScreen() {
             "Tem certeza que deseja remover este compromisso?",
             [
                 { text: "Cancelar", style: "cancel" },
-                { 
-                    text: "Sim, Excluir", 
-                    style: "destructive", 
+                {
+                    text: "Sim, Excluir",
+                    style: "destructive",
                     onPress: async () => {
                         try {
                             // api.delete(`/calendar/events/${id}`);
@@ -30,7 +30,7 @@ export default function EventDetailsScreen() {
                         } catch (e) {
                             Alert.alert("Erro", "Falha ao excluir.");
                         }
-                    } 
+                    }
                 }
             ]
         );

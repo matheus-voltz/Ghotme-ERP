@@ -34,22 +34,23 @@ export default function CalendarScreen() {
       // Usaremos a rota que você já tem no Laravel para calendário
       const response = await api.get('/calendar/events');
       const data = response.data;
-      
+
       // Processar datas marcadas no calendário
       const marked: any = {};
       data.forEach((event: any) => {
-        const date = event.start.split(' ')[0]; // Pega YYYY-MM-DD
-        marked[date] = { 
-            marked: true, 
-            dotColor: '#7367F0', 
-            selected: date === selectedDate,
-            selectedColor: date === selectedDate ? '#7367F0' : undefined 
+        // Suporta tanto "YYYY-MM-DD HH:mm:ss" quanto "YYYY-MM-DDTHH:mm:ss"
+        const date = event.start.split(/[ T]/)[0];
+        marked[date] = {
+          marked: true,
+          dotColor: '#7367F0',
+          selected: date === selectedDate,
+          selectedColor: date === selectedDate ? '#7367F0' : undefined
         };
       });
-      
+
       // Garante que a data selecionada tenha destaque
       marked[selectedDate] = { ...marked[selectedDate], selected: true, selectedColor: '#7367F0' };
-      
+
       setMarkedDates(marked);
       setEvents(data);
     } catch (error) {
@@ -105,24 +106,24 @@ export default function CalendarScreen() {
           <ScrollView showsVerticalScrollIndicator={false}>
             {dayEvents.length > 0 ? (
               dayEvents.map((event, index) => (
-                <TouchableOpacity 
-                  key={index} 
+                <TouchableOpacity
+                  key={index}
                   style={styles.eventCard}
                   onPress={() => router.push({
                     pathname: "/calendar/[id]",
-                    params: { 
-                        id: event.id,
-                        title: event.title,
-                        start: event.start,
-                        description: event.extendedProps?.description,
-                        color: event.color
+                    params: {
+                      id: event.id,
+                      title: event.title,
+                      start: event.start,
+                      description: event.extendedProps?.description,
+                      color: event.color
                     }
                   })}
                 >
                   <View style={[styles.eventBorder, { backgroundColor: event.color || '#7367F0' }]} />
                   <View style={styles.eventInfo}>
                     <Text style={styles.eventTime}>
-                        <Ionicons name="time-outline" size={14} /> {event.start.split(' ')[1]?.substring(0, 5) || 'O dia todo'}
+                      <Ionicons name="time-outline" size={14} /> {event.start.split(/[ T]/)[1]?.substring(0, 5) || 'O dia todo'}
                     </Text>
                     <Text style={styles.eventTitle}>{event.title}</Text>
                     <Text style={styles.eventDesc} numberOfLines={1}>{event.extendedProps?.description || 'Sem observações'}</Text>
@@ -140,8 +141,8 @@ export default function CalendarScreen() {
         )}
       </View>
 
-      <TouchableOpacity 
-        style={styles.fab} 
+      <TouchableOpacity
+        style={styles.fab}
         onPress={() => router.push({ pathname: '/calendar/create', params: { date: selectedDate } })}
       >
         <Ionicons name="add" size={30} color="#fff" />

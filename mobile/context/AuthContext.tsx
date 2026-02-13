@@ -47,7 +47,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await SecureStore.setItemAsync('userData', JSON.stringify(user));
 
             setUser(user);
-            router.replace('/(tabs)');
         } catch (error) {
             throw error;
         }
@@ -55,9 +54,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function signOut() {
         try {
-            setUser(null);
             await SecureStore.deleteItemAsync('userToken');
             await SecureStore.deleteItemAsync('userData');
+            delete api.defaults.headers.common['Authorization'];
+            setUser(null);
         } catch (error) {
             console.error('Error during signOut:', error);
         }

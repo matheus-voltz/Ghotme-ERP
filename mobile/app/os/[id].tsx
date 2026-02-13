@@ -9,7 +9,7 @@ import {
     Alert,
     StatusBar
 } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../services/api';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -33,10 +33,10 @@ const getStatusColor = (status: string) => {
 
 export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
-    const router = useRouter();
     const [os, setOs] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [timers, setTimers] = useState<{ [key: number]: number }>({});
 
     const fetchOSDetails = async () => {
         try {
@@ -54,6 +54,63 @@ export default function OSDetailScreen() {
     useEffect(() => {
         fetchOSDetails();
     }, [id]);
+
+    // Live timer update effect
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (os && os.items) {
+                const newTimers: { [key: number]: number } = {};
+                os.items.forEach((item: any) => {
+                    let elapsed = item.duration_seconds || 0;
+                    if (item.status === 'in_progress' && item.started_at) {
+                        const start = new Date(item.started_at).getTime();
+                        const now = new Date().getTime();
+                        elapsed += Math.floor((now - start) / 1000);
+                    }
+                    newTimers[item.id] = elapsed;
+                });
+                setTimers(newTimers);
+            }
+        }, 1000);
+        return () => clearInterval(interval);
+    }, [os]);
+
+    const formatTime = (seconds: number) => {
+        if (!seconds) return "00:00:00";
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    };
+
+    const toggleItemTimer = async (itemId: number) => {
+        try {
+            const response = await api.post(`/ordens-servico/items/${itemId}/toggle-timer`);
+            if (response.data.success) {
+                // Update local state
+                const updatedItems = os.items.map((it: any) =>
+                    it.id === itemId ? response.data.item : it
+                );
+                setOs({ ...os, items: updatedItems });
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Não foi possível alterar o timer.');
+        }
+    };
+
+    const completeItem = async (itemId: number) => {
+        try {
+            const response = await api.post(`/ordens-servico/items/${itemId}/complete`);
+            if (response.data.success) {
+                const updatedItems = os.items.map((it: any) =>
+                    it.id === itemId ? response.data.item : it
+                );
+                setOs({ ...os, items: updatedItems });
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Não foi possível concluir o serviço.');
+        }
+    };
 
     const handleUpdateStatus = async (newStatus: string) => {
         try {
@@ -132,7 +189,7 @@ export default function OSDetailScreen() {
 
                 {/* Action Buttons for Mechanic */}
                 <View style={styles.actionContainer}>
-                    <Text style={styles.actionTitle}>Gerenciar Trabalho</Text>
+                    <Text style={styles.actionTitle}>Ações Rápidas</Text>
                     <View style={styles.buttonRow}>
                         {os.status === 'pending' && (
                             <TouchableOpacity
@@ -141,7 +198,7 @@ export default function OSDetailScreen() {
                                 disabled={updating}
                             >
                                 <Ionicons name="play" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Iniciar Serviço</Text>
+                                <Text style={styles.buttonText}>Iniciar OS</Text>
                             </TouchableOpacity>
                         )}
 
@@ -152,7 +209,7 @@ export default function OSDetailScreen() {
                                 disabled={updating}
                             >
                                 <Ionicons name="checkmark-done" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Finalizar Serviço</Text>
+                                <Text style={styles.buttonText}>Finalizar OS</Text>
                             </TouchableOpacity>
                         )}
 
@@ -161,33 +218,76 @@ export default function OSDetailScreen() {
                             onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
                         >
                             <Ionicons name="list" size={18} color="#fff" />
-                            <Text style={styles.buttonText}>Checklist / Fotos</Text>
+                            <Text style={styles.buttonText}>Vistoria</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
-                {/* Items / Services */}
+                {/* Services Timer Section */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="build" size={20} color="#7367F0" />
-                        <Text style={styles.sectionTitle}>Serviços & Peças</Text>
+                        <Ionicons name="time" size={20} color="#7367F0" />
+                        <Text style={styles.sectionTitle}>Cronômetro de Serviços</Text>
                     </View>
+
                     {os.items?.map((item: any) => (
-                        <View key={`item-${item.id}`} style={styles.itemRow}>
-                            <Text style={styles.itemName}>{item.name}</Text>
-                            <Text style={styles.itemQty}>x{item.quantity}</Text>
+                        <View key={`item-${item.id}`} style={styles.timerItemRow}>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.itemName}>{item.name}</Text>
+                                <View style={styles.timerBadge}>
+                                    <Text style={styles.timerValue}>{formatTime(timers[item.id])}</Text>
+                                </View>
+                            </View>
+
+                            <View style={styles.timerActions}>
+                                {item.status !== 'completed' && (
+                                    <TouchableOpacity
+                                        onPress={() => toggleItemTimer(item.id)}
+                                        style={[styles.smallIconBtn, { backgroundColor: item.status === 'in_progress' ? '#FF9F43' : '#00CFE8' }]}
+                                    >
+                                        <Ionicons name={item.status === 'in_progress' ? "pause" : "play"} size={16} color="#fff" />
+                                    </TouchableOpacity>
+                                )}
+
+                                {item.status !== 'completed' && (
+                                    <TouchableOpacity
+                                        onPress={() => completeItem(item.id)}
+                                        style={[styles.smallIconBtn, { backgroundColor: '#28C76F' }]}
+                                    >
+                                        <Ionicons name="checkmark" size={16} color="#fff" />
+                                    </TouchableOpacity>
+                                )}
+
+                                {item.status === 'completed' && (
+                                    <View style={styles.completedBadge}>
+                                        <Ionicons name="checkmark-circle" size={16} color="#28C76F" />
+                                        <Text style={{ color: '#28C76F', fontSize: 12, fontWeight: 'bold', marginLeft: 4 }}>Pronto</Text>
+                                    </View>
+                                )}
+                            </View>
                         </View>
                     ))}
-                    {os.parts?.map((part: any) => (
-                        <View key={`part-${part.id}`} style={styles.itemRow}>
-                            <Text style={styles.itemName}>{part.name}</Text>
-                            <Text style={styles.itemQty}>x{part.quantity}</Text>
-                        </View>
-                    ))}
-                    {(!os.items?.length && !os.parts?.length) && (
-                        <Text style={styles.subInfoText}>Nenhum item adicionado.</Text>
+
+                    {(!os.items || os.items.length === 0) && (
+                        <Text style={styles.subInfoText}>Nenhum serviço para cronometrar.</Text>
                     )}
                 </View>
+
+                {/* Parts Section */}
+                {os.parts?.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Ionicons name="build" size={20} color="#7367F0" />
+                            <Text style={styles.sectionTitle}>Peças Utilizadas</Text>
+                        </View>
+                        {os.parts.map((part: any) => (
+                            <View key={`part-${part.id}`} style={styles.itemRow}>
+                                <Text style={styles.itemName}>{part.name}</Text>
+                                <Text style={styles.itemQty}>x{part.quantity}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
 
                 <View style={{ height: 40 }} />
             </ScrollView>
@@ -338,13 +438,55 @@ const styles = StyleSheet.create({
     },
     itemName: {
         fontSize: 14,
+        fontWeight: '500',
         color: '#333',
         flex: 1,
+        marginBottom: 4,
     },
     itemQty: {
         fontSize: 14,
         fontWeight: 'bold',
         color: '#7367F0',
         marginLeft: 10,
+    },
+    timerItemRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f8f9fa',
+    },
+    timerBadge: {
+        backgroundColor: '#7367F015',
+        alignSelf: 'flex-start',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
+    },
+    timerValue: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#7367F0',
+        fontFamily: 'monospace',
+    },
+    timerActions: {
+        flexDirection: 'row',
+        gap: 8,
+        alignItems: 'center',
+    },
+    smallIconBtn: {
+        width: 32,
+        height: 32,
+        borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    completedBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#28C76F10',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
     }
 });

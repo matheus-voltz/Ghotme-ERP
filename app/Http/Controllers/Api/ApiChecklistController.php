@@ -17,9 +17,8 @@ class ApiChecklistController extends Controller
     {
         $request->validate([
             'ordem_servico_id' => 'required|exists:ordem_servicos,id',
-            'damages' => 'required|array',
-            'damages.*.part' => 'required|string',
-            'damages.*.photo' => 'required|string', // Base64 or will be handled via files
+            'parts' => 'required|array',
+            'photos' => 'required|array',
         ]);
 
         $os = OrdemServico::findOrFail($request->ordem_servico_id);
@@ -37,19 +36,21 @@ class ApiChecklistController extends Controller
                 'token' => Str::random(32),
             ]);
 
-            foreach ($request->damages as $index => $damage) {
+            foreach ($request->parts as $index => $partName) {
                 $photoPath = null;
 
-                // If it's a file in the multipart request
-                if ($request->hasFile("damages.$index.photo_file")) {
-                    $photoPath = $request->file("damages.$index.photo_file")->store('checklists', 'public');
+                if ($request->hasFile("photos.$index")) {
+                    $photoPath = $request->file("photos.$index")->store('checklists', 'public');
                 }
 
                 VehicleInspectionDamagePoint::create([
                     'vehicle_inspection_id' => $inspection->id,
-                    'part_name' => $damage['part'],
+                    'part_name' => $partName,
                     'type' => 'risk',
+                    'notes' => 'Registrado via Mobile',
                     'photo_path' => $photoPath,
+                    'x_coordinate' => 0,
+                    'y_coordinate' => 0
                 ]);
             }
 

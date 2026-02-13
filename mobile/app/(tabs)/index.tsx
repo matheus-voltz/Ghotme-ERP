@@ -14,7 +14,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+import { useRouter, router } from 'expo-router';
 
 // Helper for status translations
 const statusTranslations: { [key: string]: string } = {
@@ -44,7 +44,6 @@ const numberFormat = (value: any) => {
 
 export default function DashboardScreen() {
   const { user } = useAuth();
-  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);

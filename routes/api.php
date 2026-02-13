@@ -44,6 +44,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ordens-servico', [ApiOrdemServicoController::class, 'index']);
     Route::get('/ordens-servico/{id}', [ApiOrdemServicoController::class, 'show']);
     Route::patch('/ordens-servico/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
+    Route::post('/ordens-servico/items/{id}/toggle-timer', [\App\Http\Controllers\Api\ApiOrdemServicoItemController::class, 'toggleTimer']);
+    Route::post('/ordens-servico/items/{id}/complete', [\App\Http\Controllers\Api\ApiOrdemServicoItemController::class, 'completeItem']);
     Route::post('/checklist/visual', [\App\Http\Controllers\Api\ApiChecklistController::class, 'storeVisual']);
 
     // Orçamentos API

@@ -10,12 +10,10 @@ import * as Haptics from 'expo-haptics';
 export default function TabLayout() {
   const { user, loading } = useAuth();
 
+  // Redirecionamento removido - controlado pelo RootLayoutNav
+
   if (loading) {
     return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
-  }
-
-  if (!user) {
-    return <Redirect href="/" />;
   }
 
   const handleTabPress = () => {
@@ -68,7 +66,7 @@ export default function TabLayout() {
 
       {/* BOTAO VISTORIA (CUSTOM) */}
       <Tabs.Screen
-        name="checklist_view" // Nome que não conflita com pastas
+        name="checklist_view"
         options={{
           title: 'Vistoria',
           tabBarIcon: ({ focused }) => (
@@ -86,7 +84,7 @@ export default function TabLayout() {
           tabPress: (e) => {
             e.preventDefault();
             handleTabPress();
-            router.push('/screens/ChecklistVisual');
+            router.push('/(tabs)/checklist_view');
           },
         })}
       />
