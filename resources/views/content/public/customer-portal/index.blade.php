@@ -166,7 +166,7 @@ $customizerHidden = 'customizer-hide';
                 <div class="stat-icon bg-label-primary">
                     <i class="ti tabler-car"></i>
                 </div>
-                <h4 class="mb-0 fw-bold">{{ $orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning'])->count() }}</h4>
+                <h4 class="mb-0 fw-bold">{{ $orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'finalized', 'completed'])->count() }}</h4>
                 <small class="text-muted">Em Serviço</small>
             </div>
         </div>
@@ -184,7 +184,7 @@ $customizerHidden = 'customizer-hide';
                 <div class="stat-icon bg-label-success">
                     <i class="ti tabler-history"></i>
                 </div>
-                <h4 class="mb-0 fw-bold">{{ $orders->where('status', 'completed')->count() }}</h4>
+                <h4 class="mb-0 fw-bold">{{ $orders->whereIn('status', ['completed', 'finalized'])->count() }}</h4>
                 <small class="text-muted">Finalizados</small>
             </div>
         </div>
@@ -212,7 +212,7 @@ $customizerHidden = 'customizer-hide';
                                     @php
                                     // Verificar se há OS em andamento para este veículo
                                     $currentOS = $orders->where('veiculo_id', $vehicle->id)
-                                    ->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'awaiting_approval'])
+                                    ->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'awaiting_approval', 'finalized', 'completed'])
                                     ->first();
 
                                     $statusClass = 'bg-label-success';
@@ -221,7 +221,7 @@ $customizerHidden = 'customizer-hide';
                                     if ($currentOS) {
                                     $statusClass = 'bg-label-warning';
                                     $statusText = 'Na Oficina';
-                                    if ($currentOS->status == 'completed') {
+                                    if (in_array($currentOS->status, ['completed', 'finalized'])) {
                                     $statusClass = 'bg-label-info';
                                     $statusText = 'Pronto';
                                     }
@@ -248,7 +248,7 @@ $customizerHidden = 'customizer-hide';
                 <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status na Oficina</h4>
             </div>
 
-            @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed', 'awaiting_approval']) as $order)
+            @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed', 'finalized', 'awaiting_approval']) as $order)
             <div class="vehicle-card p-4 mb-4 shadow-sm border-0">
                 <div class="row align-items-center">
                     <div class="col-md-7">
@@ -275,7 +275,8 @@ $customizerHidden = 'customizer-hide';
                         case 'in_progress': $statusClass = 'bg-label-info'; $statusText = 'Em Manutenção'; break;
                         case 'testing': $statusClass = 'bg-label-primary'; $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusClass = 'bg-label-info'; $statusText = 'Higienização'; break;
-                        case 'completed': $statusClass = 'bg-label-success'; $statusText = 'Pronto para Retirada'; break;
+                        case 'completed':
+                        case 'finalized': $statusClass = 'bg-label-success'; $statusText = 'Pronto para Retirada'; break;
                         case 'paid': $statusClass = 'bg-label-success'; $statusText = 'Pago / Finalizado'; break;
                         }
                         @endphp
@@ -296,6 +297,7 @@ $customizerHidden = 'customizer-hide';
                     'testing' => 75,
                     'cleaning' => 90,
                     'completed' => 100,
+                    'finalized' => 100,
                     'paid' => 100
                     ];
                     $perc = $statusMap[$order->status] ?? 0;

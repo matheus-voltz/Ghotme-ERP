@@ -29,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Dashboard
     Route::get('/dashboard/stats', [ApiOrdemServicoController::class, 'getDashboardStats']);
+    Route::get('/watch/dashboard', [ApiOrdemServicoController::class, 'getWatchDashboard']);
 
     // Clientes & Veículos
     Route::post('/clients-list', [ClientVehicleController::class, 'storeClient']);
@@ -37,6 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/clients/{id}/vehicles', [ClientVehicleController::class, 'getClientVehicles']);
 
     // Ordem de Serviço
+    Route::get('/os', [ApiOrdemServicoController::class, 'index']);
     Route::post('/os', [ApiOrdemServicoController::class, 'store']);
     Route::get('/os/{id}', [ApiOrdemServicoController::class, 'show']);
     Route::patch('/os/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);

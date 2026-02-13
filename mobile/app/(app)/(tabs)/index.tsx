@@ -116,29 +116,38 @@ export default function DashboardScreen() {
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]} 
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="hourglass-outline" size={20} color="#FF9F43" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.pending || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="play-outline" size={20} color="#00CFE8" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.running || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.finalized_today || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Alerts Section */}
@@ -171,29 +180,38 @@ export default function DashboardScreen() {
       <View style={styles.adminStatsContainer}>
         {/* Mechanic Summary Cards */}
         <View style={styles.statusGrid}>
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Minhas Ordens' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="play-outline" size={20} color="#00CFE8" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.runningOS || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Minhas Prontas' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.completedToday || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Prontas Hoje</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
+          <TouchableOpacity 
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Orçamentos' } })}
+          >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="document-text-outline" size={20} color="#FF9F43" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.pendingBudgets || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Orçamentos</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={{ marginTop: 10 }}>

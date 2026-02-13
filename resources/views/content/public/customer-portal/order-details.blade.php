@@ -162,7 +162,8 @@ $customizerHidden = 'customizer-hide';
                         case 'in_progress': $statusText = 'Em Manutenção'; break;
                         case 'testing': $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusText = 'Higienização'; break;
-                        case 'completed': $statusText = 'Pronto para Retirada'; break;
+                        case 'completed':
+                        case 'finalized': $statusText = 'Pronto para Retirada'; break;
                         case 'paid': $statusText = 'Pago / Finalizado'; break;
                         }
                         @endphp
@@ -181,8 +182,23 @@ $customizerHidden = 'customizer-hide';
 
                     <div class="timeline-container">
                         @php
-                        $steps = ['pending', 'awaiting_approval', 'in_progress', 'testing', 'cleaning', 'completed', 'paid'];
-                        $currentStep = array_search($order->status, $steps);
+                        $steps = ['pending', 'awaiting_approval', 'in_progress', 'testing', 'cleaning', 'completed', 'finalized', 'paid'];
+                        // Map finalized to completed for backward compatibility in timeline if needed, or just include it.
+                        // Since 'finalized' means ready, and 'completed' also meant ready, we can just treat them similarly.
+                        // However, array_search will return the index.
+                        // If status is 'finalized', it should activate checks for completed.
+
+                        $statusMap = [
+                        'pending' => 0,
+                        'awaiting_approval' => 1,
+                        'in_progress' => 2,
+                        'testing' => 3,
+                        'cleaning' => 4,
+                        'completed' => 5,
+                        'finalized' => 5, // Same level as completed
+                        'paid' => 6
+                        ];
+                        $currentStep = $statusMap[$order->status] ?? 0;
                         @endphp
 
                         <div class="timeline-point @if($currentStep >= 0) completed @endif">
