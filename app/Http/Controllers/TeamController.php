@@ -57,7 +57,7 @@ class TeamController extends Controller
 
             // Query users belonging strictly to the current user's company
             $currentUser = Auth::user();
-            
+
             \Illuminate\Support\Facades\Log::info('TeamList Debug:', [
                 'User ID' => $currentUser->id,
                 'User Company' => $currentUser->company_id,
@@ -245,13 +245,39 @@ class TeamController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        $user = User::where('id', $id)->where('parent_id', Auth::id())->first();
+        $currentUser = Auth::user();
+
+        // Find user belonging to current user or company
+        $user = User::where('id', $id)
+            ->where(function ($q) use ($currentUser) {
+                $q->where('parent_id', $currentUser->id);
+                if ($currentUser->company_id) {
+                    $q->orWhere('company_id', $currentUser->company_id);
+                }
+            })
+            ->first();
+
         if ($user) {
-            $user->delete();
-            return response()->json(['message' => 'User deleted']);
+            // Cannot delete yourself
+            if ($user->id === $currentUser->id) {
+                return response()->json(['message' => 'Nao pode deletar a si mesmo.'], 403);
+            }
+
+            // Save reason if provided
+            $reason = $request->input('reason');
+            if ($reason) {
+                $user->deleted_reason = $reason;
+                $user->save();
+            }
+
+            $user->delete(); // Soft delete
+
+            \Illuminate\Support\Facades\Log::info('User soft deleted', ['id' => $id, 'reason' => $reason]);
+
+            return response()->json(['message' => 'Usuário removido com sucesso.']);
         }
-        return response()->json(['message' => 'User not found'], 404);
+        return response()->json(['message' => 'User not found or permission denied'], 404);
     }
 }

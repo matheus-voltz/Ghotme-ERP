@@ -14,17 +14,16 @@ use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmailCustom;
 use App\Traits\BelongsToCompany; // Import Trait
+use Illuminate\Database\Eloquent\SoftDeletes; // Import SoftDeletes
 
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
     use HasApiTokens;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    // use BelongsToCompany; // Temporarily disabled to fix Error 500
+    use SoftDeletes; // Use SoftDeletes
 
     /**
      * The attributes that are mass assignable.
@@ -32,7 +31,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_id', // New Field
+        'company_id',
         'parent_id',
         'name',
         'email',
@@ -57,6 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'telegram_chat_id',
         'telegram_username',
         'status',
+        'deleted_reason', // Add deleted_reason
     ];
 
     public function billingHistory()

@@ -40,12 +40,26 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 },
-                columns: [
-                    { data: 'fake_id', name: 'id' },
-                    { data: 'name', name: 'name' },
-                    { data: 'email', name: 'email' },
-                    { data: 'role', name: 'role' },
-                    { data: 'email_verified_at', name: 'email_verified_at' },
+                columns: [{
+                        data: 'fake_id',
+                        name: 'id'
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'role',
+                        name: 'role'
+                    },
+                    {
+                        data: 'email_verified_at',
+                        name: 'email_verified_at'
+                    },
                     {
                         data: null,
                         orderable: false,
@@ -95,38 +109,58 @@
         $(document).on('click', '.delete-record', function() {
             var user_id = $(this).data('id');
             Swal.fire({
-                title: 'Tem certeza?',
-                text: "Você não poderá reverter isso!",
-                icon: 'warning',
+                title: 'Você tem certeza?',
+                text: "Por favor, informe o motivo da exclusão:",
+                input: 'text',
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    placeholder: 'Ex: Saiu da empresa, Duplicado...'
+                },
                 showCancelButton: true,
-                confirmButtonText: 'Sim, deletar!',
+                confirmButtonText: 'Sim, excluir!',
+                cancelButtonText: 'Cancelar',
+                showLoaderOnConfirm: true,
                 customClass: {
-                    confirmButton: 'btn btn-primary me-3',
+                    confirmButton: 'btn btn-danger me-3',
                     cancelButton: 'btn btn-label-secondary'
                 },
-                buttonsStyling: false
-            }).then(function(result) {
-                if (result.value) {
+                buttonsStyling: false,
+                preConfirm: (reason) => {
+                    if (!reason) {
+                        Swal.showValidationMessage('O motivo é obrigatório');
+                    }
+                    return reason;
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $.ajax({
                         type: 'DELETE',
                         url: "{{ url('settings/team') }}/" + user_id,
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        data: {
+                            reason: result.value,
+                            _token: $('meta[name="csrf-token"]').attr('content')
                         },
-                        success: function() {
-                            if(table) table.ajax.reload();
+                        success: function(response) {
+                            if (table) table.ajax.reload();
                             Swal.fire({
                                 icon: 'success',
-                                title: 'Deletado!',
-                                text: 'Funcionário removido.',
-                                customClass: { confirmButton: 'btn btn-success' }
+                                title: 'Excluído!',
+                                text: response.message || 'Funcionário removido com sucesso.',
+                                customClass: {
+                                    confirmButton: 'btn btn-success'
+                                }
                             });
                         },
-                        error: function() {
+                        error: function(xhr) {
+                            var msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Erro ao deletar';
                             Swal.fire({
-                                title: 'Erro',
-                                text: 'Erro ao deletar',
-                                icon: 'error'
+                                title: 'Erro!',
+                                text: msg,
+                                icon: 'error',
+                                customClass: {
+                                    confirmButton: 'btn btn-primary'
+                                }
                             });
                         }
                     });
@@ -144,9 +178,9 @@
                 type: "POST",
                 success: function(data) {
                     $('#offcanvasAddUser').offcanvas('hide');
-                    if(table) table.ajax.reload();
+                    if (table) table.ajax.reload();
                     else window.location.reload();
-                    
+
                     $('#addNewUserForm')[0].reset();
                     $('#user_id').val('');
                     Swal.fire({
@@ -199,7 +233,7 @@
     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Membros da Equipe</h5>
         <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser">
-                        <i class="ti tabler-plus me-0 me-sm-1"></i>
+            <i class="ti tabler-plus me-0 me-sm-1"></i>
             <span class="d-none d-sm-inline-block">Adicionar Usuário</span>
         </button>
     </div>
