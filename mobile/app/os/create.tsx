@@ -14,6 +14,7 @@ export default function CreateOrderScreen() {
     const { colors } = useTheme();
 
     const [loading, setLoading] = useState(false);
+    const [vehiclesLoading, setVehiclesLoading] = useState(false); // Novo estado
     const [clients, setClients] = useState<any[]>([]);
     const [vehicles, setVehicles] = useState<any[]>([]);
 
@@ -48,6 +49,7 @@ export default function CreateOrderScreen() {
     };
 
     const fetchVehicles = async (cid: string) => {
+        setVehiclesLoading(true);
         try {
             console.log("Buscando veículos para cliente ID:", cid);
             const response = await api.get(`/clients/${cid}/vehicles`);
@@ -55,13 +57,18 @@ export default function CreateOrderScreen() {
 
             if (Array.isArray(response.data)) {
                 setVehicles(response.data);
+                // Se só houver um veículo, já seleciona ele automaticamente
+                if (response.data.length === 1) {
+                    setVehicleId(response.data[0].id.toString());
+                }
             } else {
-                console.warn("A resposta não é um array:", response.data);
                 setVehicles([]);
             }
         } catch (error) {
             console.error("Erro ao buscar veículos:", error);
             setVehicles([]);
+        } finally {
+            setVehiclesLoading(false);
         }
     };
 
@@ -171,18 +178,22 @@ export default function CreateOrderScreen() {
                             <Ionicons name="car-sport-outline" size={16} color={colors.subText} />
                             <Text style={[styles.label, { color: colors.subText }]}>Veículo *</Text>
                         </View>
-                        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, opacity: clientId ? 1 : 0.6 }]}>
+                        <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, opacity: (clientId && !vehiclesLoading) ? 1 : 0.6 }]}>
                             <Picker
-                                selectedValue={vehicleId.toString()}
+                                selectedValue={vehicleId ? vehicleId.toString() : ''}
                                 onValueChange={(itemValue) => setVehicleId(itemValue)}
-                                enabled={clientId !== ''}
+                                enabled={clientId !== '' && !vehiclesLoading}
                                 dropdownIconColor={colors.text}
                             >
-                                <Picker.Item label={clientId ? "Selecione o Veículo" : "Selecione o Cliente Primeiro"} value="" color={colors.subText} />
+                                <Picker.Item 
+                                    label={vehiclesLoading ? "Carregando veículos..." : (clientId ? "Selecione o Veículo" : "Selecione o Cliente Primeiro")} 
+                                    value="" 
+                                    color={colors.subText} 
+                                />
                                 {vehicles.map((v) => (
                                     <Picker.Item
                                         key={v.id.toString()}
-                                        label={`${v.marca} ${v.modelo} - ${v.placa}`}
+                                        label={`${v.marca || ''} ${v.modelo} - ${v.placa}`}
                                         value={v.id.toString()}
                                         color={colors.text}
                                     />

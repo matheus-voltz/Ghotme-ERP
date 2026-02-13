@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions, ActivityIndicator } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Path, G, Rect, Circle } from 'react-native-svg';
+import Svg, { Path, G, Rect } from 'react-native-svg';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import api from '../../services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -18,7 +19,8 @@ export default function ChecklistVisual() {
   const [cameraVisible, setCameraVisible] = useState(false);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
   const [damages, setDamages] = useState<any[]>([]);
-  const [cameraRef, setCameraRef] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const cameraRef = React.useRef<any>(null);
 
   useEffect(() => {
     if (!permission?.granted) {
@@ -52,10 +54,20 @@ export default function ChecklistVisual() {
   };
 
   const takePicture = async () => {
-    if (cameraRef) {
-      const photo = await cameraRef.takePictureAsync({ quality: 0.5 });
-      setCameraVisible(false);
-      addDamage(photo.uri);
+    if (cameraRef.current && !isProcessing) {
+      try {
+        setIsProcessing(true);
+        const photo = await cameraRef.current.takePictureAsync({ quality: 0.5 });
+        if (photo) {
+          addDamage(photo.uri);
+          setCameraVisible(false);
+        }
+      } catch (error) {
+        console.error("Erro ao tirar foto:", error);
+        Alert.alert("Erro", "Não foi possível capturar a foto.");
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -71,16 +83,70 @@ export default function ChecklistVisual() {
 
   const hasDamage = (part: string) => damages.some(d => d.part === part);
 
+  const handleSaveChecklist = async () => {
+    if (damages.length === 0) {
+      Alert.alert("Aviso", "Registre pelo menos uma avaria antes de salvar.");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const formData = new FormData();
+      formData.append('ordem_servico_id', osId as string);
+
+      damages.forEach((damage, index) => {
+        formData.append(`damages[${index}][part]`, damage.part);
+        // @ts-ignore
+        formData.append(`damages[${index}][photo_file]`, {
+          uri: damage.photo,
+          name: `damage_${index}.jpg`,
+          type: 'image/jpeg',
+        });
+      });
+
+      const response = await api.post('/checklist/visual', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        Alert.alert("Sucesso", "Vistoria enviada com sucesso!");
+        router.back();
+      }
+    } catch (error) {
+      console.error("Erro ao salvar vistoria:", error);
+      Alert.alert("Erro", "Não foi possível enviar a vistoria para o servidor.");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (cameraVisible) {
     return (
       <View style={{ flex: 1, backgroundColor: '#000' }}>
-        <CameraView style={{ flex: 1 }} ref={(ref) => setCameraRef(ref)}>
+        <CameraView
+          style={{ flex: 1 }}
+          ref={cameraRef}
+          onMountError={(error) => Alert.alert("Erro de Câmera", error.message)}
+        >
           <View style={styles.cameraControls}>
-            <TouchableOpacity onPress={() => setCameraVisible(false)} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={() => !isProcessing && setCameraVisible(false)}
+              style={styles.closeButton}
+              disabled={isProcessing}
+            >
               <Ionicons name="close-circle" size={40} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
-              <View style={styles.captureInner} />
+
+            <TouchableOpacity
+              onPress={takePicture}
+              style={[styles.captureButton, isProcessing && { opacity: 0.5 }]}
+              disabled={isProcessing}
+            >
+              <View style={styles.captureInner}>
+                {isProcessing && <ActivityIndicator color="#7367F0" />}
+              </View>
             </TouchableOpacity>
           </View>
         </CameraView>
@@ -95,29 +161,29 @@ export default function ChecklistVisual() {
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 15 }}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.text }]}>Checklist de Entrada</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Vistoria Visual</Text>
         </View>
         <Text style={[styles.subtitle, { color: colors.subText }]}>OS: #{osId || 'N/A'}</Text>
-        <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do veículo com avarias</Text>
+        <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do veículo para registrar avarias</Text>
       </View>
 
       <View style={styles.carWrapper}>
-        <Svg height="500" width="300" viewBox="0 0 300 600">
-          {/* CHASSI PRINCIPAL */}
-          <Path
-            d="M50,120 C50,80 100,50 150,50 C200,50 250,80 250,120 L250,480 C250,520 200,550 150,550 C100,550 50,520 50,480 Z"
-            fill="#f8f9fa" stroke="#333" strokeWidth="2"
-          />
+        <Svg width="300" height="600" viewBox="0 0 300 600">
+          {/* FRENTE */}
+          <G onPress={() => handlePartPress('Frente')}>
+            <Path d="M100,20 C120,10 180,10 200,20 L220,100 L80,100 Z"
+              fill={hasDamage('Frente') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+          </G>
 
-          {/* CAPÔ */}
+          {/* CAPO */}
           <G onPress={() => handlePartPress('Capô')}>
-            <Path d="M60,150 L240,150 L250,120 C250,90 200,60 150,60 C100,60 50,90 50,120 L60,150"
-              fill={hasDamage('Capô') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            <Path d="M80,100 L220,100 L230,180 L70,180 Z"
+              fill={hasDamage('Capô') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PARA-BRISA */}
           <G onPress={() => handlePartPress('Para-brisa')}>
-            <Path d="M65,155 L235,155 L225,220 L75,220 Z"
+            <Path d="M75,185 L225,185 L235,220 L65,220 Z"
               fill={hasDamage('Para-brisa') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
           </G>
 
@@ -180,29 +246,37 @@ export default function ChecklistVisual() {
       </View>
 
       <View style={styles.listContainer}>
-        <Text style={styles.sectionTitle}>Fotos e Avarias ({damages.length})</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>Fotos e Avarias ({damages.length})</Text>
         {damages.length === 0 && (
-          <View style={styles.emptyState}>
+          <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="camera-outline" size={40} color="#ccc" />
             <Text style={{ color: '#999' }}>Nenhuma avaria registrada</Text>
           </View>
         )}
         {damages.map((item) => (
-          <View key={item.id} style={styles.damageCard}>
+          <View key={item.id} style={[styles.damageCard, { backgroundColor: colors.card }]}>
             <Image source={{ uri: item.photo }} style={styles.thumb} />
             <View style={styles.damageInfo}>
-              <Text style={styles.damagePart}>{item.part}</Text>
+              <Text style={[styles.damagePart, { color: colors.text }]}>{item.part}</Text>
               <Text style={styles.damageDate}>Registrado às {item.date}</Text>
             </View>
-            <TouchableOpacity onPress={() => setDamages(damages.filter(d => d.id !== item.id))}>
+            <TouchableOpacity onPress={() => !isProcessing && setDamages(damages.filter(d => d.id !== item.id))} disabled={isProcessing}>
               <Ionicons name="trash" size={22} color="#EA5455" />
             </TouchableOpacity>
           </View>
         ))}
 
         {damages.length > 0 && (
-          <TouchableOpacity style={styles.saveButton} onPress={() => Alert.alert("Sucesso", "Vistoria salva localmente!")}>
-            <Text style={styles.saveButtonText}>Finalizar Vistoria</Text>
+          <TouchableOpacity
+            style={[styles.saveButton, isProcessing && { opacity: 0.7 }]}
+            onPress={handleSaveChecklist}
+            disabled={isProcessing}
+          >
+            {isProcessing ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.saveButtonText}>Finalizar e Sincronizar</Text>
+            )}
           </TouchableOpacity>
         )}
       </View>
@@ -211,22 +285,22 @@ export default function ChecklistVisual() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f8f9fa' },
-  header: { padding: 24, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#eee' },
-  title: { fontSize: 22, fontWeight: 'bold', color: '#333' },
-  subtitle: { fontSize: 14, color: '#666', marginTop: 4 },
-  carWrapper: { alignItems: 'center', backgroundColor: '#fff', paddingVertical: 20 },
+  container: { flex: 1 },
+  header: { padding: 24, paddingBottom: 20, borderBottomWidth: 1 },
+  title: { fontSize: 22, fontWeight: 'bold' },
+  subtitle: { fontSize: 13, marginTop: 2 },
+  carWrapper: { alignItems: 'center', paddingVertical: 20 },
   cameraControls: { flex: 1, justifyContent: 'center', alignItems: 'flex-end', flexDirection: 'row', paddingBottom: 50 },
   captureButton: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#fff', padding: 5 },
-  captureInner: { flex: 1, borderRadius: 40, backgroundColor: '#fff', borderWidth: 2, borderColor: '#7367F0' },
-  closeButton: { position: 'absolute', top: 60, right: 30 },
+  captureInner: { flex: 1, borderRadius: 40, backgroundColor: '#fff', borderWidth: 2, borderColor: '#7367F0', justifyContent: 'center', alignItems: 'center' },
+  closeButton: { position: 'absolute', top: 60, right: 30, zIndex: 10 },
   listContainer: { padding: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15, color: '#333' },
-  emptyState: { alignItems: 'center', padding: 40, backgroundColor: '#fff', borderRadius: 15, borderStyle: 'dashed', borderWidth: 1, borderColor: '#ccc' },
-  damageCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 12, borderRadius: 12, marginBottom: 12, elevation: 2 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
+  emptyState: { alignItems: 'center', padding: 40, borderRadius: 15, borderStyle: 'dashed', borderWidth: 1 },
+  damageCard: { flexDirection: 'row', alignItems: 'center', padding: 12, borderRadius: 12, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
   thumb: { width: 60, height: 60, borderRadius: 8 },
   damageInfo: { flex: 1, marginLeft: 15 },
-  damagePart: { fontSize: 16, fontWeight: 'bold', color: '#333' },
+  damagePart: { fontSize: 16, fontWeight: 'bold' },
   damageDate: { fontSize: 12, color: '#999', marginTop: 2 },
   saveButton: { backgroundColor: '#28C76F', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10, marginBottom: 40 },
   saveButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }

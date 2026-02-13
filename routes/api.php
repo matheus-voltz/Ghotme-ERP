@@ -43,10 +43,16 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ordem de Serviço API
     Route::get('/ordens-servico', [ApiOrdemServicoController::class, 'index']);
     Route::get('/ordens-servico/{id}', [ApiOrdemServicoController::class, 'show']);
+    Route::patch('/ordens-servico/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
+    Route::post('/checklist/visual', [\App\Http\Controllers\Api\ApiChecklistController::class, 'storeVisual']);
 
     // Orçamentos API
     Route::get('/budgets', [\App\Http\Controllers\Api\ApiBudgetController::class, 'index']);
     Route::get('/budgets/{id}', [\App\Http\Controllers\Api\ApiBudgetController::class, 'show']);
+
+    // Estoque API
+    Route::get('/inventory/items-list', [\App\Http\Controllers\Api\ApiInventoryController::class, 'index']);
+    Route::post('/inventory/items', [\App\Http\Controllers\Api\ApiInventoryController::class, 'store']);
 
     // Chat Routes
     Route::get('/chat/contacts', [ChatController::class, 'contacts']);

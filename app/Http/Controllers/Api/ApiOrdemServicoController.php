@@ -23,9 +23,25 @@ class ApiOrdemServicoController extends Controller
 
     public function show($id)
     {
-        $os = OrdemServico::with(['client', 'veiculo', 'user', 'services', 'parts'])
+        $os = OrdemServico::with(['client', 'veiculo', 'user', 'items', 'parts'])
             ->findOrFail($id);
 
         return response()->json($os);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,running,finalized,canceled'
+        ]);
+
+        $os = OrdemServico::findOrFail($id);
+        $os->status = $request->status;
+        $os->save();
+
+        return response()->json([
+            'message' => 'Status atualizado com sucesso',
+            'os' => $os
+        ]);
     }
 }

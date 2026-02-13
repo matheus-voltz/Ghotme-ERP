@@ -66,12 +66,11 @@ export default function TabLayout() {
         listeners={{ tabPress: handleTabPress }}
       />
 
-      {/* VISTORIA COMO BOTÃO DE DESTAQUE */}
+      {/* BOTAO VISTORIA (CUSTOM) */}
       <Tabs.Screen
-        name="checklist"
+        name="checklist_view" // Nome que não conflita com pastas
         options={{
           title: 'Vistoria',
-          href: null,
           tabBarIcon: ({ focused }) => (
             <View style={styles.middleButtonWrapper}>
               <LinearGradient
@@ -87,9 +86,7 @@ export default function TabLayout() {
           tabPress: (e) => {
             e.preventDefault();
             handleTabPress();
-            console.log("Clicou em Vistoria");
-            Alert.alert("Debug", "Botão Vistoria Clicado!");
-            router.push('/os/checklist');
+            router.push('/screens/ChecklistVisual');
           },
         })}
       />

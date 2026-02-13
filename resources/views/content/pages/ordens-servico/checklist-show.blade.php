@@ -173,8 +173,53 @@
         <div class="card-header">
           <h5 class="mb-0">{{ niche('visual_inspection_title') }}</h5>
         </div>
-        <div class="card-body text-center">
-          <p>Existem {{ $inspection->damagePoints->count() }} avarias registradas nesta vistoria.</p>
+        <div class="card-body">
+          <div class="row">
+            @foreach($inspection->damagePoints as $point)
+            <div class="col-md-3 col-6 mb-3">
+              <div class="border rounded p-2 text-center h-100">
+                @if($point->photo_path)
+                <img src="{{ asset('storage/' . $point->photo_path) }}"
+                  class="img-fluid rounded mb-2 shadow-sm cursor-pointer"
+                  style="height: 120px; width: 100%; object-fit: cover;"
+                  data-bs-toggle="modal"
+                  data-bs-target="#damageModal{{ $point->id }}">
+                @else
+                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2" style="height: 120px;">
+                  <i class="ti tabler-camera-off text-muted"></i>
+                </div>
+                @endif
+                <p class="mb-0 fw-bold small text-uppercase">{{ $point->part_name ?: __('Desconhecido') }}</p>
+                @if($point->notes)
+                <p class="mb-0 xsmall text-muted">{{ $point->notes }}</p>
+                @endif
+
+                @if($point->photo_path)
+                <!-- Modal for Large Damage Photo -->
+                <div class="modal fade" id="damageModal{{ $point->id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title">{{ $point->part_name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="{{ asset('storage/' . $point->photo_path) }}" class="img-fluid rounded w-100 shadow">
+                        @if($point->notes)
+                        <div class="mt-3 p-3 bg-light rounded text-start">
+                          <strong>{{ __('Notas') }}:</strong><br>
+                          {{ $point->notes }}
+                        </div>
+                        @endif
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @endif
+              </div>
+            </div>
+            @endforeach
+          </div>
         </div>
       </div>
       @endif

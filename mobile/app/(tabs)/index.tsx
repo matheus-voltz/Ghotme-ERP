@@ -213,7 +213,7 @@ export default function DashboardScreen() {
       key={item.id}
       style={styles.card}
       activeOpacity={0.9}
-      onPress={() => Alert.alert('Detalhes', `Ordem #${item.id} - ${item.client_name}`)}
+      onPress={() => router.push(`/os/${item.id}`)}
     >
       <View style={styles.cardHeader}>
         <View style={styles.idBadge}>

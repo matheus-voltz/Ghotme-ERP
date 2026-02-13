@@ -8,10 +8,12 @@ class VehicleInspectionDamagePoint extends Model
 {
     protected $fillable = [
         'vehicle_inspection_id',
+        'part_name',
         'x_coordinate',
         'y_coordinate',
         'type',
-        'notes'
+        'notes',
+        'photo_path'
     ];
 
     public function inspection()
