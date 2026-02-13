@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, StatusBar, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import api from '@/services/api';
+import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 
-export default function ChatContactsScreen() {
+export default function ContactsScreen() {
+    const router = useRouter();
+    const { user } = useAuth();
+    const { colors } = useTheme();
     const [contacts, setContacts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const router = useRouter();
 
     useEffect(() => {
         fetchContacts();
@@ -18,58 +22,65 @@ export default function ChatContactsScreen() {
             const response = await api.get('/chat/contacts');
             setContacts(response.data);
         } catch (error) {
-            console.error("Error fetching contacts:", error);
+            console.error(error);
         } finally {
             setLoading(false);
         }
     };
 
     const renderItem = ({ item }: { item: any }) => (
-        <TouchableOpacity
-            style={styles.contactItem}
-            onPress={() => router.push({ pathname: "/chat/messages", params: { userId: item.id, userName: item.name } })}
+        <TouchableOpacity 
+            style={[styles.contactCard, { backgroundColor: colors.card }]}
+            onPress={() => router.push({
+                pathname: '/chat/messages',
+                params: { 
+                    userId: item.id, 
+                    name: item.name, 
+                    photo: item.profile_photo_url 
+                }
+            })}
         >
             <View style={styles.avatarContainer}>
                 {item.profile_photo_url ? (
                     <Image source={{ uri: item.profile_photo_url }} style={styles.avatar} />
                 ) : (
-                    <View style={styles.avatarPlaceholder}>
-                        <Text style={styles.avatarText}>{item.name.charAt(0).toUpperCase()}</Text>
+                    <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
+                        <Text style={[styles.avatarText, { color: colors.primary }]}>
+                            {item.name.charAt(0).toUpperCase()}
+                        </Text>
                     </View>
                 )}
-                <View style={[styles.statusIndicator, { backgroundColor: item.status === 'active' ? '#28C76F' : '#ccc' }]} />
+                {item.is_online && <View style={styles.onlineBadge} />}
             </View>
-            <View style={styles.contactInfo}>
-                <Text style={styles.contactName}>{item.name}</Text>
-                <Text style={styles.contactEmail}>{item.email}</Text>
+            <View style={styles.info}>
+                <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.role, { color: colors.subText }]}>{item.role || 'Colaborador'}</Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="#ccc" />
+            <Ionicons name="chatbubble-ellipses-outline" size={24} color={colors.primary} />
         </TouchableOpacity>
     );
 
     return (
-        <View style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#333" />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.header, { backgroundColor: colors.card }]}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                    <Ionicons name="chevron-back" size={28} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Conversas</Text>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>Equipe</Text>
+                <View style={{ width: 40 }} />
             </View>
 
             {loading ? (
-                <View style={styles.centered}>
-                    <ActivityIndicator size="large" color="#7367F0" />
-                </View>
+                <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 50 }} />
             ) : (
                 <FlatList
                     data={contacts}
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
-                    contentContainerStyle={styles.listContent}
+                    contentContainerStyle={styles.list}
                     ListEmptyComponent={
-                        <View style={styles.centered}>
-                            <Text style={styles.emptyText}>Nenhum contato disponível.</Text>
+                        <View style={styles.empty}>
+                            <Text style={{ color: colors.subText }}>Nenhum contato encontrado.</Text>
                         </View>
                     }
                 />
@@ -79,88 +90,19 @@ export default function ChatContactsScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingTop: 50,
-        paddingBottom: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    backButton: {
-        marginRight: 16,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    listContent: {
-        padding: 16,
-    },
-    contactItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-    },
-    avatarContainer: {
-        position: 'relative',
-        marginRight: 16,
-    },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-    },
-    avatarPlaceholder: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: '#7367F0',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    avatarText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    statusIndicator: {
-        position: 'absolute',
-        bottom: 2,
-        right: 2,
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: '#fff',
-    },
-    contactInfo: {
-        flex: 1,
-    },
-    contactName: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#333',
-    },
-    contactEmail: {
-        fontSize: 14,
-        color: '#888',
-    },
-    emptyText: {
-        color: '#888',
-        fontSize: 16,
-    },
+    container: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 15, elevation: 2 },
+    backBtn: { width: 40 },
+    headerTitle: { fontSize: 20, fontWeight: 'bold' },
+    list: { padding: 20 },
+    contactCard: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 16, marginBottom: 12, elevation: 2 },
+    avatarContainer: { position: 'relative' },
+    avatar: { width: 50, height: 50, borderRadius: 25 },
+    avatarPlaceholder: { width: 50, height: 50, borderRadius: 25, justifyContent: 'center', alignItems: 'center' },
+    avatarText: { fontSize: 20, fontWeight: 'bold' },
+    onlineBadge: { position: 'absolute', bottom: 0, right: 0, width: 14, height: 14, borderRadius: 7, backgroundColor: '#28C76F', borderWidth: 2, borderColor: '#fff' },
+    info: { flex: 1, marginLeft: 15 },
+    name: { fontSize: 16, fontWeight: 'bold' },
+    role: { fontSize: 12 },
+    empty: { alignItems: 'center', marginTop: 50 }
 });

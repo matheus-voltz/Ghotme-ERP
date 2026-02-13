@@ -15,6 +15,8 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -24,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 export default function LoginScreen() {
-    const { signIn, verify2FA, user } = useAuth();
+    const { signIn, verify2FA } = useAuth();
     const router = useRouter();
     
     const [email, setEmail] = useState('');
@@ -35,6 +37,7 @@ export default function LoginScreen() {
     const [success, setSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    // Animações
     const formOpacity = useSharedValue(0);
     const formTranslateY = useSharedValue(50);
     const logoScale = useSharedValue(0.5);
@@ -44,7 +47,53 @@ export default function LoginScreen() {
         formOpacity.value = withDelay(300, withTiming(1, { duration: 800 }));
         formTranslateY.value = withDelay(300, withSpring(0));
         logoScale.value = withSpring(1, { damping: 12 });
+        
+        // Tenta biometria automática após carregar
+        setTimeout(autoBiometrics, 1000);
     }, []);
+
+    const autoBiometrics = async () => {
+        const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
+        if (useBiometrics === 'true') {
+            checkBiometrics();
+        }
+    };
+
+    const checkBiometrics = async () => {
+        try {
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+            if (!hasHardware) {
+                Alert.alert("Erro", "Este dispositivo não suporta biometria.");
+                return;
+            }
+            if (!isEnrolled) {
+                Alert.alert("Biometria", "Nenhuma digital ou rosto cadastrado no sistema do celular.");
+                return;
+            }
+
+            const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
+            const token = await SecureStore.getItemAsync('userToken');
+            
+            if (useBiometrics === 'true' && token) {
+                const result = await LocalAuthentication.authenticateAsync({
+                    promptMessage: 'Entrar com Biometria',
+                    fallbackLabel: 'Usar Senha',
+                    disableDeviceFallback: false
+                });
+
+                if (result.success) {
+                    triggerSuccess();
+                }
+            } else if (useBiometrics !== 'true') {
+                Alert.alert("Aviso", "Ative a biometria na tela de Segurança dentro do seu perfil primeiro.");
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Erro", "Falha ao processar biometria.");
+        }
+    };
 
     const animatedFormStyle = useAnimatedStyle(() => ({
         opacity: formOpacity.value,
@@ -177,6 +226,14 @@ export default function LoginScreen() {
 
                                     <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
                                         {loading ? <ActivityIndicator color="#7367F0" /> : <Text style={styles.loginButtonText}>ENTRAR AGORA</Text>}
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity 
+                                        style={{marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}} 
+                                        onPress={checkBiometrics}
+                                    >
+                                        <Ionicons name="finger-print-outline" size={20} color="#fff" style={{marginRight: 8}} />
+                                        <Text style={{color: '#fff', fontSize: 14, fontWeight: '600'}}>Usar Biometria</Text>
                                     </TouchableOpacity>
                                 </>
                             ) : (

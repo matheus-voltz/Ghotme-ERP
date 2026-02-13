@@ -1,28 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Switch, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as LocalAuthentication from 'expo-local-authentication';
+import * as SecureStore from 'expo-secure-store';
 
 export default function SecurityScreen() {
     const { user } = useAuth();
     const { colors, activeTheme } = useTheme();
     const router = useRouter();
-    const [loading, setLoading] = useState(false);
+    
+    const [biometricEnabled, setBiometricEnabled] = useState(false);
+    const [isBiometricAvailable, setIsBiometricAvailable] = useState(false);
+    const [authType, setAuthType] = useState<string>('');
+
+    useEffect(() => {
+        checkBiometricSupport();
+        loadBiometricPreference();
+    }, []);
+
+    const checkBiometricSupport = async () => {
+        try {
+            const compatible = await LocalAuthentication.hasHardwareAsync();
+            const enrolled = await LocalAuthentication.isEnrolledAsync();
+            const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+            
+            setIsBiometricAvailable(compatible && enrolled);
+            
+            if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+                setAuthType('FaceID');
+            } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+                setAuthType('TouchID / Digital');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const loadBiometricPreference = async () => {
+        const value = await SecureStore.getItemAsync('useBiometrics');
+        setBiometricEnabled(value === 'true');
+    };
+
+    const toggleBiometrics = async (value: boolean) => {
+        if (value) {
+            try {
+                const result = await LocalAuthentication.authenticateAsync({
+                    promptMessage: 'Confirme sua identidade para ativar',
+                    fallbackLabel: 'Usar Senha',
+                    disableDeviceFallback: false,
+                });
+
+                if (result.success) {
+                    await SecureStore.setItemAsync('useBiometrics', 'true');
+                    setBiometricEnabled(true);
+                    Alert.alert("Sucesso", "Biometria ativada!");
+                } else {
+                    setBiometricEnabled(false);
+                    if (result.error !== 'user_cancel') {
+                        Alert.alert("Erro na Autenticação", `Motivo: ${result.error}`);
+                    }
+                }
+            } catch (error: any) {
+                Alert.alert("Erro de Sistema", error.message || "Falha ao acessar biometria");
+                setBiometricEnabled(false);
+            }
+        } else {
+            await SecureStore.deleteItemAsync('useBiometrics');
+            setBiometricEnabled(false);
+        }
+    };
 
     const twoFactorEnabled = !!user?.two_factor_enabled;
 
     const handleToggle2FA = () => {
-        Alert.alert(
-            "Autenticação de Dois Fatores",
-            "Para sua maior segurança, a configuração inicial do 2FA (QR Code e códigos de recuperação) deve ser realizada através do nosso painel Web no computador.",
-            [
-                { text: "Entendi", style: "default" },
-                { text: "Ir para o Web", onPress: () => Alert.alert("Link", "Acesse: https://Ghotme-ERP.com/user/profile") }
-            ]
-        );
+        Alert.alert("Aviso", "A configuração inicial do 2FA deve ser realizada através do painel Web.");
     };
 
     const renderSecurityItem = (icon: any, title: string, subtitle: string, rightElement?: any, onPress?: () => void) => (
@@ -60,11 +115,8 @@ export default function SecurityScreen() {
                 {renderSecurityItem(
                     "shield-checkmark-outline",
                     "Autenticação 2FA",
-                    twoFactorEnabled ? "Ativado - Código de segurança ativo" : "Desativado - Aumente sua segurança",
+                    twoFactorEnabled ? "Código de segurança ativo" : "Aumente sua segurança",
                     <View style={styles.badgeContainer}>
-                        <Text style={[styles.badgeText, { color: twoFactorEnabled ? '#28C76F' : '#EA5455' }]}>
-                            {twoFactorEnabled ? "ATIVO" : "INATIVO"}
-                        </Text>
                         <Switch
                             value={twoFactorEnabled}
                             onValueChange={handleToggle2FA}
@@ -74,24 +126,29 @@ export default function SecurityScreen() {
                 )}
 
                 {renderSecurityItem(
+                    "finger-print-outline",
+                    `Biometria (${authType || 'Detectando...'})`,
+                    isBiometricAvailable ? `Acessar o app usando ${authType}` : "Hardware não disponível ou não configurado",
+                    <Switch 
+                        value={biometricEnabled} 
+                        onValueChange={toggleBiometrics}
+                        disabled={!isBiometricAvailable}
+                        trackColor={{ false: '#767577', true: '#28C76F' }}
+                    />
+                )}
+
+                {renderSecurityItem(
                     "lock-closed-outline",
                     "Alterar Senha",
                     "Troque sua senha periodicamente",
                     <Ionicons name="chevron-forward" size={20} color={colors.subText} />,
-                    () => Alert.alert("Aviso", "Por questões de segurança, a alteração de senha deve ser feita via painel Web ou pela opção 'Esqueci minha senha' no login.")
-                )}
-
-                {renderSecurityItem(
-                    "finger-print-outline",
-                    "Biometria",
-                    "Acessar o app usando digital/face",
-                    <Switch value={false} disabled />, // Mocked for now
+                    () => Alert.alert("Aviso", "A alteração de senha deve ser feita via painel Web.")
                 )}
 
                 <View style={[styles.infoCard, { backgroundColor: activeTheme === 'dark' ? 'rgba(115,103,240,0.1)' : '#F0EFFF' }]}>
                     <Ionicons name="information-circle-outline" size={24} color="#7367F0" />
                     <Text style={[styles.infoText, { color: colors.text }]}>
-                        A autenticação de dois fatores adiciona uma camada extra de segurança. Você precisará de um aplicativo como o Google Authenticator para entrar.
+                        Status: {isBiometricAvailable ? 'Disponível' : 'Indisponível'}. Se o FaceID não aparecer, verifique se o Ghotme tem permissão nos Ajustes do iPhone.
                     </Text>
                 </View>
             </ScrollView>
@@ -125,7 +182,6 @@ const styles = StyleSheet.create({
     itemTitle: { fontSize: 16, fontWeight: '600', marginBottom: 2 },
     itemSubtitle: { fontSize: 12 },
     badgeContainer: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    badgeText: { fontSize: 10, fontWeight: 'bold' },
     infoCard: { flexDirection: 'row', padding: 20, borderRadius: 16, marginTop: 20, gap: 12, alignItems: 'flex-start' },
     infoText: { flex: 1, fontSize: 13, lineHeight: 20, opacity: 0.8 }
 });

@@ -4,9 +4,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
+import { useTheme } from '../../../context/ThemeContext';
+
 export default function ActionsScreen() {
+    const { colors } = useTheme();
     const actions = [
-        { id: 'new-os', title: 'Nova OS', icon: 'document-text-outline', color: '#7367F0', desc: 'Abrir ordem de serviço' },
+        { id: 'new', title: 'Nova OS', icon: 'document-text-outline', color: '#7367F0', desc: 'Abrir ordem de serviço' },
         { id: 'new-client', title: 'Novo Cliente', icon: 'person-add-outline', color: '#28C76F', desc: 'Cadastrar cliente' },
         { id: 'new-vehicle', title: 'Novo Veículo', icon: 'car-sport-outline', color: '#00CFE8', desc: 'Cadastrar veículo' },
         { id: 'scan', title: 'Ler QR Code', icon: 'scan-outline', color: '#4B4B4B', desc: 'Buscar por etiqueta' },
@@ -15,13 +18,15 @@ export default function ActionsScreen() {
     ];
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <LinearGradient
                 colors={['#7367F0', '#CE9FFC']}
                 style={styles.header}
             >
-                <Text style={styles.headerTitle}>Ações Rápidas</Text>
-                <Text style={styles.headerSubtitle}>O que você deseja fazer hoje?</Text>
+                <View>
+                    <Text style={styles.headerTitle}>Ações Rápidas</Text>
+                    <Text style={styles.headerSubtitle}>O que você deseja fazer hoje?</Text>
+                </View>
             </LinearGradient>
 
             <ScrollView contentContainerStyle={styles.gridContainer} showsVerticalScrollIndicator={false}>
@@ -33,13 +38,13 @@ export default function ActionsScreen() {
                                 styles.card,
                                 {
                                     width: '47%',
-                                    backgroundColor: '#fff',
+                                    backgroundColor: colors.card,
                                     marginBottom: 20
                                 }
                             ]}
                             activeOpacity={0.8}
                             onPress={() => {
-                                if (item.id === 'new-os') {
+                                if (item.id === 'new') {
                                     router.push('/os/create');
                                 } else if (item.id === 'new-client') {
                                     router.push('/clients/create');
@@ -57,8 +62,8 @@ export default function ActionsScreen() {
                             <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
                                 <Ionicons name={item.icon as any} size={28} color={item.color} />
                             </View>
-                            <Text style={styles.cardTitle}>{item.title}</Text>
-                            <Text style={styles.cardDesc}>{item.desc}</Text>
+                            <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
+                            <Text style={[styles.cardDesc, { color: colors.subText }]}>{item.desc}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>

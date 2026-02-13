@@ -564,6 +564,11 @@ $pageConfigs = [
             <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" />
           </div>
         </div>
+        <div class="col-lg-3 col-sm-6 text-center">
+          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
+            <img src="{{ asset('assets/img/front-pages/partners/bitcoin_logo_full.svg') }}" alt="Bitcoin Logo" class="img-fluid" style="max-height: 70px;" />
+          </div>
+        </div>
       </div>
     </div>
   </div>

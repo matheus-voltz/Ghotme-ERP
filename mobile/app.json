@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "O Ghotme ERP precisa do FaceID para autenticação rápida e segura."
+      }
     },
     "android": {
       "adaptiveIcon": {

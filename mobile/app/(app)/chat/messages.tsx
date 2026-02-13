@@ -1,222 +1,132 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import api from '@/services/api';
-import { useAuth } from '@/context/AuthContext';
+import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 
-export default function ChatMessagesScreen() {
-    const { userId, userName } = useLocalSearchParams();
-    const { user } = useAuth();
-    const [messages, setMessages] = useState<any[]>([]);
-    const [newMessage, setNewMessage] = useState('');
-    const [loading, setLoading] = useState(true);
-    const flatListRef = useRef<FlatList>(null);
+export default function ChatScreen() {
     const router = useRouter();
+    const { userId, name, photo } = useLocalSearchParams();
+    const { user } = useAuth();
+    const { colors } = useTheme();
+    
+    const [messages, setMessages] = useState<any[]>([]);
+    const [text, setText] = useState('');
+    const flatListRef = useRef<FlatList>(null);
 
     useEffect(() => {
         fetchMessages();
-        const interval = setInterval(fetchMessages, 3000); // Simple polling every 3s
+        const interval = setInterval(fetchMessages, 5000); // Polling simples
         return () => clearInterval(interval);
-    }, [userId]);
+    }, []);
 
     const fetchMessages = async () => {
         try {
             const response = await api.get(`/chat/messages/${userId}`);
             setMessages(response.data);
-            setLoading(false);
         } catch (error) {
-            console.error("Error fetching messages:", error);
+            console.log(error);
         }
     };
 
     const sendMessage = async () => {
-        if (!newMessage.trim()) return;
+        if (!text.trim()) return;
+        
+        const tempMsg = {
+            id: Date.now(),
+            sender_id: user.id,
+            message: text,
+            created_at: new Date().toISOString()
+        };
 
+        setMessages(prev => [...prev, tempMsg]);
+        setText('');
+        
         try {
-            await api.post('/chat/messages', {
-                receiver_id: userId,
-                message: newMessage
-            });
-            setNewMessage('');
-            fetchMessages(); // Refresh immediately
+            await api.post('/chat/messages', { receiver_id: userId, message: tempMsg.message });
+            fetchMessages(); // Sincroniza ID real
         } catch (error) {
-            console.error("Error sending message:", error);
+            console.error("Erro ao enviar", error);
         }
     };
 
     const renderMessage = ({ item }: { item: any }) => {
-        const isMe = item.sender_id === user?.id;
+        const isMe = item.sender_id === user.id;
         return (
             <View style={[
-                styles.messageBubble,
-                isMe ? styles.myMessage : styles.otherMessage
+                styles.bubble, 
+                isMe ? styles.bubbleMe : styles.bubbleOther,
+                { backgroundColor: isMe ? colors.primary : colors.card }
             ]}>
-                <Text style={[styles.messageText, isMe ? styles.myMessageText : styles.otherMessageText]}>
-                    {item.message}
-                </Text>
-                <Text style={[styles.timestamp, isMe ? styles.myTimestamp : styles.otherTimestamp]}>
-                    {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <Text style={[styles.msgText, { color: isMe ? '#fff' : colors.text }]}>{item.message}</Text>
+                <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.7)' : colors.subText }]}>
+                    {new Date(item.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                 </Text>
             </View>
         );
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#333" />
+        <KeyboardAvoidingView 
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={[styles.container, { backgroundColor: colors.background }]}
+        >
+            <View style={[styles.header, { backgroundColor: colors.card }]}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                    <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
-                <View style={styles.headerInfo}>
-                    <Text style={styles.headerTitle}>{userName}</Text>
-                    <Text style={styles.headerStatus}>Online</Text>
-                </View>
+                {photo ? (
+                    <Image source={{ uri: photo as string }} style={styles.avatar} />
+                ) : (
+                    <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
+                        <Text style={styles.avatarText}>{(name as string)?.charAt(0)}</Text>
+                    </View>
+                )}
+                <Text style={[styles.headerName, { color: colors.text }]}>{name}</Text>
             </View>
 
-            {loading ? (
-                <View style={styles.centered}>
-                    <ActivityIndicator size="large" color="#7367F0" />
-                </View>
-            ) : (
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={renderMessage}
-                    contentContainerStyle={styles.messagesList}
-                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-                />
-            )}
+            <FlatList
+                ref={flatListRef}
+                data={messages}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={renderMessage}
+                contentContainerStyle={styles.list}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+            />
 
-            <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-                style={styles.keyboardView}
-            >
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        value={newMessage}
-                        onChangeText={setNewMessage}
-                        placeholder="Digite sua mensagem..."
-                        placeholderTextColor="#999"
-                        multiline
-                    />
-                    <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-                        <Ionicons name="send" size={20} color="#fff" />
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+            <View style={[styles.inputContainer, { backgroundColor: colors.card }]}>
+                <TextInput
+                    style={[styles.input, { color: colors.text, backgroundColor: colors.background }]}
+                    value={text}
+                    onChangeText={setText}
+                    placeholder="Digite sua mensagem..."
+                    placeholderTextColor={colors.subText}
+                />
+                <TouchableOpacity onPress={sendMessage} style={[styles.sendBtn, { backgroundColor: colors.primary }]}>
+                    <Ionicons name="send" size={20} color="#fff" />
+                </TouchableOpacity>
+            </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
-        backgroundColor: '#fff',
-    },
-    backButton: {
-        marginRight: 16,
-    },
-    headerInfo: {
-        flex: 1,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    headerStatus: {
-        fontSize: 12,
-        color: '#28C76F',
-    },
-    centered: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    messagesList: {
-        padding: 16,
-        paddingBottom: 20,
-    },
-    messageBubble: {
-        maxWidth: '80%',
-        padding: 12,
-        borderRadius: 20,
-        marginBottom: 8,
-    },
-    myMessage: {
-        alignSelf: 'flex-end',
-        backgroundColor: '#7367F0',
-        borderBottomRightRadius: 4,
-    },
-    otherMessage: {
-        alignSelf: 'flex-start',
-        backgroundColor: '#f0f0f0',
-        borderBottomLeftRadius: 4,
-    },
-    messageText: {
-        fontSize: 16,
-    },
-    myMessageText: {
-        color: '#fff',
-    },
-    otherMessageText: {
-        color: '#333',
-    },
-    timestamp: {
-        fontSize: 10,
-        marginTop: 4,
-        alignSelf: 'flex-end',
-    },
-    myTimestamp: {
-        color: 'rgba(255,255,255,0.7)',
-    },
-    otherTimestamp: {
-        color: '#999',
-    },
-    keyboardView: {
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        backgroundColor: '#fff',
-    },
-    input: {
-        flex: 1,
-        backgroundColor: '#f8f9fa',
-        borderRadius: 20,
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        maxHeight: 100,
-        marginRight: 12,
-        color: '#333',
-    },
-    sendButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#7367F0',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#7367F0',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 4,
-    },
+    container: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 15, paddingHorizontal: 15, elevation: 4 },
+    backBtn: { marginRight: 10 },
+    avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
+    avatarPlaceholder: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
+    avatarText: { color: '#fff', fontWeight: 'bold', fontSize: 18 },
+    headerName: { fontSize: 18, fontWeight: 'bold' },
+    list: { padding: 15, paddingBottom: 20 },
+    bubble: { maxWidth: '80%', padding: 12, borderRadius: 16, marginBottom: 10 },
+    bubbleMe: { alignSelf: 'flex-end', borderBottomRightRadius: 2 },
+    bubbleOther: { alignSelf: 'flex-start', borderBottomLeftRadius: 2 },
+    msgText: { fontSize: 16 },
+    timeText: { fontSize: 10, alignSelf: 'flex-end', marginTop: 4 },
+    inputContainer: { flexDirection: 'row', padding: 10, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#eee' },
+    input: { flex: 1, height: 45, borderRadius: 22, paddingHorizontal: 15, marginRight: 10 },
+    sendBtn: { width: 45, height: 45, borderRadius: 22.5, justifyContent: 'center', alignItems: 'center' }
 });

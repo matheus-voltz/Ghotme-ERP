@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -45,6 +46,7 @@ const numberFormat = (value: any) => {
 
 export default function DashboardScreen() {
   const { user } = useAuth();
+  const { colors, activeTheme } = useTheme();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -82,9 +84,9 @@ export default function DashboardScreen() {
           style={styles.horizontalScroll}
         >
           {/* Revenue Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#7367F0' }]}>
-            <Text style={styles.statLabel}>Receita Mensal</Text>
-            <Text style={styles.statValue}>R$ {numberFormat(data.monthlyRevenue)}</Text>
+          <View style={[styles.statCard, { borderLeftColor: '#7367F0', backgroundColor: colors.card }]}>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>Receita Mensal</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>R$ {numberFormat(data.monthlyRevenue)}</Text>
             <View style={styles.growthContainer}>
               <Ionicons
                 name={data.revenueGrowth >= 0 ? "trending-up" : "trending-down"}
@@ -98,62 +100,62 @@ export default function DashboardScreen() {
           </View>
 
           {/* Profitability Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#28C76F' }]}>
-            <Text style={styles.statLabel}>Lucratividade</Text>
-            <Text style={styles.statValue}>{data.monthlyProfitability || 0}%</Text>
-            <Text style={styles.statSubLabel}>Margem média do mês</Text>
+          <View style={[styles.statCard, { borderLeftColor: '#28C76F', backgroundColor: colors.card }]}>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>Lucratividade</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>{data.monthlyProfitability || 0}%</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Margem média do mês</Text>
           </View>
 
           {/* Clients Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#FF9F43' }]}>
-            <Text style={styles.statLabel}>Novos Clientes</Text>
-            <Text style={styles.statValue}>{data.totalClients || 0}</Text>
-            <Text style={styles.statSubLabel}>Base ativa na oficina</Text>
+          <View style={[styles.statCard, { borderLeftColor: '#FF9F43', backgroundColor: colors.card }]}>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>Novos Clientes</Text>
+            <Text style={[styles.statValue, { color: colors.text }]}>{data.totalClients || 0}</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Base ativa na oficina</Text>
           </View>
         </ScrollView>
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="hourglass-outline" size={20} color="#FF9F43" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats?.pending || 0}</Text>
-            <Text style={styles.statusLabelText}>Pendentes</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.pending || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
           </View>
 
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="play-outline" size={20} color="#00CFE8" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats?.running || 0}</Text>
-            <Text style={styles.statusLabelText}>Em Execução</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.running || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
           </View>
 
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats?.finalized_today || 0}</Text>
-            <Text style={styles.statusLabelText}>Finalizadas Hoje</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.finalized_today || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
           </View>
         </View>
 
         {/* Alerts Section */}
         {(data.lowStockCount > 0 || data.pendingBudgetsCount > 0) && (
           <View style={styles.alertsContainer}>
-            <Text style={styles.sectionTitle}>Alertas Críticos</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Alertas Críticos</Text>
             <View style={styles.alertRow}>
               {data.lowStockCount > 0 && (
                 <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#EA545515' }]} onPress={() => router.push('/inventory')}>
                   <Ionicons name="warning" size={20} color="#EA5455" />
-                  <Text style={styles.alertText}>{data.lowStockCount} itens com baixo estoque</Text>
+                  <Text style={[styles.alertText, { color: colors.text }]}>{data.lowStockCount} itens com baixo estoque</Text>
                 </TouchableOpacity>
               )}
               {data.pendingBudgetsCount > 0 && (
                 <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]} onPress={() => Alert.alert('Orçamentos', 'Existem orçamentos aguardando aprovação.')}>
                   <Ionicons name="document-text" size={20} color="#FF9F43" />
-                  <Text style={styles.alertText}>{data.pendingBudgetsCount} orçamentos pendentes</Text>
+                  <Text style={[styles.alertText, { color: colors.text }]}>{data.pendingBudgetsCount} orçamentos pendentes</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -169,38 +171,38 @@ export default function DashboardScreen() {
       <View style={styles.adminStatsContainer}>
         {/* Mechanic Summary Cards */}
         <View style={styles.statusGrid}>
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="play-outline" size={20} color="#00CFE8" />
             </View>
-            <Text style={styles.statusCountText}>{data.stats?.runningOS || 0}</Text>
-            <Text style={styles.statusLabelText}>Em Execução</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.runningOS || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
           </View>
 
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
-            <Text style={styles.statusCountText}>{data.stats?.completedToday || 0}</Text>
-            <Text style={styles.statusLabelText}>Prontas Hoje</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.completedToday || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Prontas Hoje</Text>
           </View>
 
-          <View style={styles.statusBox}>
+          <View style={[styles.statusBox, { backgroundColor: colors.card }]}>
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="document-text-outline" size={20} color="#FF9F43" />
             </View>
-            <Text style={styles.statusCountText}>{data.stats?.pendingBudgets || 0}</Text>
-            <Text style={styles.statusLabelText}>Orçamentos</Text>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.pendingBudgets || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Orçamentos</Text>
           </View>
         </View>
 
         <View style={{ marginTop: 10 }}>
-          <Text style={styles.sectionTitle}>Minhas Atividades</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Minhas Atividades</Text>
           {data?.recentOS?.map((item: any) => renderOSCard(item))}
           {(!data?.recentOS || data.recentOS.length === 0) && (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="clipboard-outline" size={40} color="#ccc" />
-              <Text style={styles.emptyText}>Sem ordens atribuídas</Text>
+            <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <Ionicons name="clipboard-outline" size={40} color={colors.subText} />
+              <Text style={[styles.emptyText, { color: colors.subText }]}>Sem ordens atribuídas</Text>
             </View>
           )}
         </View>
@@ -211,7 +213,7 @@ export default function DashboardScreen() {
   const renderOSCard = (item: any) => (
     <TouchableOpacity
       key={item.id}
-      style={styles.card}
+      style={[styles.card, { backgroundColor: colors.card }]}
       activeOpacity={0.9}
       onPress={() => router.push(`/os/${item.id}`)}
     >
@@ -228,20 +230,20 @@ export default function DashboardScreen() {
 
       <View style={styles.cardBody}>
         <View style={styles.infoRow}>
-          <Ionicons name="person-outline" size={16} color="#666" style={{ marginRight: 6 }} />
-          <Text style={styles.clientName} numberOfLines={1}>{item.client_name}</Text>
+          <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
+          <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>{item.client_name}</Text>
         </View>
         <View style={styles.infoRow}>
-          <Ionicons name="car-sport-outline" size={16} color="#666" style={{ marginRight: 6 }} />
-          <Text style={styles.vehicleInfo}>{item.vehicle} - {item.plate}</Text>
+          <Ionicons name="car-sport-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
+          <Text style={[styles.vehicleInfo, { color: colors.subText }]}>{item.vehicle} - {item.plate}</Text>
         </View>
-        <View style={styles.divider} />
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
         <View style={styles.cardFooter}>
           <View style={styles.dateContainer}>
-            <Ionicons name="calendar-outline" size={14} color="#999" />
-            <Text style={styles.dateText}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
+            <Ionicons name="calendar-outline" size={14} color={colors.subText} />
+            <Text style={[styles.dateText, { color: colors.subText }]}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
           </View>
-          <Text style={{ fontSize: 13, fontWeight: '700', color: '#7367F0' }}>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary }}>
             R$ {numberFormat(item.total)}
           </Text>
         </View>
@@ -250,8 +252,8 @@ export default function DashboardScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#7367F0" />
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={activeTheme === 'dark' ? "light-content" : "light-content"} backgroundColor="#7367F0" />
 
       {/* Header with Gradient */}
       <LinearGradient
@@ -270,9 +272,9 @@ export default function DashboardScreen() {
           <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
             <View style={styles.avatarPlaceholder}>
               {user?.profile_photo_url ? (
-                <Image 
-                  source={{ uri: user.profile_photo_url }} 
-                  style={{ width: 45, height: 45, borderRadius: 22.5 }} 
+                <Image
+                  source={{ uri: user.profile_photo_url }}
+                  style={{ width: 45, height: 45, borderRadius: 22.5 }}
                 />
               ) : (
                 <Text style={styles.avatarText}>
@@ -302,7 +304,7 @@ export default function DashboardScreen() {
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#7367F0" />
-            <Text style={{ marginTop: 10, color: '#666' }}>Carregando...</Text>
+            <Text style={{ marginTop: 10, color: colors.subText }}>Carregando...</Text>
           </View>
         ) : (
           <View>
@@ -310,7 +312,7 @@ export default function DashboardScreen() {
               <>
                 {renderAdminHeader()}
                 <View style={{ marginTop: 10 }}>
-                  <Text style={styles.sectionTitle}>Atividades Recentes</Text>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Atividades Recentes</Text>
                   {data?.recentOS?.map((item: any) => renderOSCard(item))}
                 </View>
               </>

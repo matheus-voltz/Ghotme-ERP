@@ -12,6 +12,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const statusTranslations: { [key: string]: string } = {
@@ -33,6 +34,7 @@ const getStatusColor = (status: string) => {
 
 export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
+    const { colors } = useTheme();
     const [os, setOs] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -128,13 +130,13 @@ export default function OSDetailScreen() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#7367F0" />
+                <ActivityIndicator size="large" color={colors.primary} />
             </View>
         );
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar barStyle="light-content" />
 
             {/* Header */}
@@ -156,40 +158,40 @@ export default function OSDetailScreen() {
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Client Info */}
-                <View style={styles.section}>
+                <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="person" size={20} color="#7367F0" />
-                        <Text style={styles.sectionTitle}>Cliente</Text>
+                        <Ionicons name="person" size={20} color={colors.primary} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Cliente</Text>
                     </View>
-                    <Text style={styles.infoText}>{os.client?.name || os.client?.company_name}</Text>
-                    <Text style={styles.subInfoText}>{os.client?.phone || 'Sem telefone'}</Text>
+                    <Text style={[styles.infoText, { color: colors.text }]}>{os.client?.name || os.client?.company_name}</Text>
+                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{os.client?.phone || 'Sem telefone'}</Text>
                 </View>
 
                 {/* Vehicle Info */}
-                <View style={styles.section}>
+                <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="car" size={20} color="#7367F0" />
-                        <Text style={styles.sectionTitle}>Veículo</Text>
+                        <Ionicons name="car" size={20} color={colors.primary} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Veículo</Text>
                     </View>
-                    <Text style={styles.infoText}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
-                    <View style={styles.plateBadge}>
-                        <Text style={styles.plateText}>{os.veiculo?.placa}</Text>
+                    <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
+                    <View style={[styles.plateBadge, { borderColor: colors.border, backgroundColor: colors.background }]}>
+                        <Text style={[styles.plateText, { color: colors.text }]}>{os.veiculo?.placa}</Text>
                     </View>
-                    <Text style={styles.subInfoText}>Cor: {os.veiculo?.cor} | KM: {os.km_entry}</Text>
+                    <Text style={[styles.subInfoText, { color: colors.subText }]}>Cor: {os.veiculo?.cor} | KM: {os.km_entry}</Text>
                 </View>
 
                 {/* Description / Problem */}
-                <View style={styles.section}>
+                <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="alert-circle" size={20} color="#7367F0" />
-                        <Text style={styles.sectionTitle}>Relato do Problema</Text>
+                        <Ionicons name="alert-circle" size={20} color={colors.primary} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Relato do Problema</Text>
                     </View>
-                    <Text style={styles.descriptionText}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
+                    <Text style={[styles.descriptionText, { color: colors.subText }]}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
                 </View>
 
                 {/* Action Buttons for Mechanic */}
                 <View style={styles.actionContainer}>
-                    <Text style={styles.actionTitle}>Ações Rápidas</Text>
+                    <Text style={[styles.actionTitle, { color: colors.text }]}>Ações Rápidas</Text>
                     <View style={styles.buttonRow}>
                         {os.status === 'pending' && (
                             <TouchableOpacity
@@ -217,23 +219,31 @@ export default function OSDetailScreen() {
                             style={[styles.actionButton, { backgroundColor: '#7367F0' }]}
                             onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
                         >
-                            <Ionicons name="list" size={18} color="#fff" />
-                            <Text style={styles.buttonText}>Vistoria</Text>
+                            <Ionicons name="camera" size={18} color="#fff" />
+                            <Text style={styles.buttonText}>Fotos</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={[styles.actionButton, { backgroundColor: '#FF9F43' }]}
+                            onPress={() => router.push({ pathname: '/os/technical_checklist', params: { osId: os.id } })}
+                        >
+                            <Ionicons name="clipboard" size={18} color="#fff" />
+                            <Text style={styles.buttonText}>Checklist</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* Services Timer Section */}
-                <View style={styles.section}>
+                <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="time" size={20} color="#7367F0" />
-                        <Text style={styles.sectionTitle}>Cronômetro de Serviços</Text>
+                        <Ionicons name="time" size={20} color={colors.primary} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Cronômetro de Serviços</Text>
                     </View>
 
                     {os.items?.map((item: any) => (
-                        <View key={`item-${item.id}`} style={styles.timerItemRow}>
+                        <View key={`item-${item.id}`} style={[styles.timerItemRow, { borderBottomColor: colors.border }]}>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
                                 <View style={styles.timerBadge}>
                                     <Text style={styles.timerValue}>{formatTime(timers[item.id])}</Text>
                                 </View>
@@ -269,21 +279,21 @@ export default function OSDetailScreen() {
                     ))}
 
                     {(!os.items || os.items.length === 0) && (
-                        <Text style={styles.subInfoText}>Nenhum serviço para cronometrar.</Text>
+                        <Text style={[styles.subInfoText, { color: colors.subText }]}>Nenhum serviço para cronometrar.</Text>
                     )}
                 </View>
 
                 {/* Parts Section */}
                 {os.parts?.length > 0 && (
-                    <View style={styles.section}>
+                    <View style={[styles.section, { backgroundColor: colors.card }]}>
                         <View style={styles.sectionHeader}>
-                            <Ionicons name="build" size={20} color="#7367F0" />
-                            <Text style={styles.sectionTitle}>Peças Utilizadas</Text>
+                            <Ionicons name="build" size={20} color={colors.primary} />
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Peças Utilizadas</Text>
                         </View>
                         {os.parts.map((part: any) => (
-                            <View key={`part-${part.id}`} style={styles.itemRow}>
-                                <Text style={styles.itemName}>{part.name}</Text>
-                                <Text style={styles.itemQty}>x{part.quantity}</Text>
+                            <View key={`part-${part.id}`} style={[styles.itemRow, { borderBottomColor: colors.border }]}>
+                                <Text style={[styles.itemName, { color: colors.text }]}>{part.name}</Text>
+                                <Text style={[styles.itemQty, { color: colors.primary }]}>x{part.quantity}</Text>
                             </View>
                         ))}
                     </View>

@@ -1,19 +1,21 @@
 import { Tabs, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
 export default function TabLayout() {
   const { user, loading } = useAuth();
+  const { colors } = useTheme();
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
   if (loading || !user) {
-    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
+    return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
 
   return (
@@ -21,19 +23,20 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: true,
-        tabBarActiveTintColor: '#7367F0',
-        tabBarInactiveTintColor: '#B0B0B0',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.subText,
         tabBarStyle: {
           position: 'absolute',
           bottom: 20,
           left: 15,
           right: 20,
           elevation: 10,
-          backgroundColor: '#ffffff',
+          backgroundColor: colors.tabBar,
           borderRadius: 20,
           height: 75,
           paddingBottom: 12,
           paddingTop: 8,
+          borderTopWidth: 0, // Remove default border
           ...styles.shadow,
         },
       }}>
