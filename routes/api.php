@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
 
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {

@@ -6,18 +6,18 @@ import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Componente CustomInput movido para fora para evitar perda de foco
+// Componente CustomInput fora para evitar perda de foco
 const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardType = 'default', flex = 1, colors }: any) => (
     <View style={[styles.inputGroup, { flex }]}>
         <Text style={[styles.label, { color: colors.subText }]}>{label}</Text>
-        <View style={[styles.inputWrapper, { borderColor: colors.border, backgroundColor: '#F9FAFB' }]}>
-            <Ionicons name={icon} size={18} color="#7367F0" style={styles.inputIcon} />
+        <View style={[styles.inputWrapper, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <Ionicons name={icon} size={18} color={colors.primary} style={styles.inputIcon} />
             <TextInput
                 style={[styles.input, { color: colors.text }]}
                 value={value}
                 onChangeText={onChangeText}
                 placeholder={placeholder}
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.subText}
                 keyboardType={keyboardType}
             />
         </View>
@@ -55,30 +55,30 @@ export default function CreateClientScreen() {
     };
 
     return (
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
-            <View style={styles.header}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: colors.background }}>
+            <View style={[styles.header, { backgroundColor: colors.card }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Ionicons name="chevron-back" size={28} color="#333" />
+                    <Ionicons name="chevron-back" size={28} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Novo Cliente</Text>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>Novo Cliente</Text>
                 <View style={{ width: 40 }} />
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 
-                <View style={styles.segmentedContainer}>
-                    <TouchableOpacity style={[styles.segment, type === 'PF' && styles.segmentActive]} onPress={() => setType('PF')}>
-                        <Text style={[styles.segmentText, type === 'PF' && styles.segmentTextActive]}>Pessoa Física</Text>
+                <View style={[styles.segmentedContainer, { backgroundColor: colors.border }]}>
+                    <TouchableOpacity style={[styles.segment, type === 'PF' && { backgroundColor: colors.card }]} onPress={() => setType('PF')}>
+                        <Text style={[styles.segmentText, type === 'PF' && { color: colors.primary }]}>Pessoa Física</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.segment, type === 'PJ' && styles.segmentActive]} onPress={() => setType('PJ')}>
-                        <Text style={[styles.segmentText, type === 'PJ' && styles.segmentTextActive]}>Pessoa Jurídica</Text>
+                    <TouchableOpacity style={[styles.segment, type === 'PJ' && { backgroundColor: colors.card }]} onPress={() => setType('PJ')}>
+                        <Text style={[styles.segmentText, type === 'PJ' && { color: colors.primary }]}>Pessoa Jurídica</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.card}>
-                    <View style={styles.cardHeader}>
-                        <Ionicons name="id-card-outline" size={20} color="#7367F0" />
-                        <Text style={styles.cardTitle}>Identificação</Text>
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
+                    <View style={[styles.cardHeader, { borderBottomColor: colors.border }]}>
+                        <Ionicons name="id-card-outline" size={20} color={colors.primary} />
+                        <Text style={[styles.cardTitle, { color: colors.text }]}>Identificação</Text>
                     </View>
                     {type === 'PF' ? (
                         <>
@@ -96,10 +96,10 @@ export default function CreateClientScreen() {
                     )}
                 </View>
 
-                <View style={styles.card}>
-                    <View style={styles.cardHeader}>
-                        <Ionicons name="call-outline" size={20} color="#7367F0" />
-                        <Text style={styles.cardTitle}>Contato</Text>
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
+                    <View style={[styles.cardHeader, { borderBottomColor: colors.border }]}>
+                        <Ionicons name="call-outline" size={20} color={colors.primary} />
+                        <Text style={[styles.cardTitle, { color: colors.text }]}>Contato</Text>
                     </View>
                     <CustomInput colors={colors} label="E-mail Principal *" icon="mail-outline" value={form.email} onChangeText={(v:any) => updateForm('email', v)} placeholder="exemplo@email.com" keyboardType="email-address" />
                     <View style={styles.row}>
@@ -108,10 +108,10 @@ export default function CreateClientScreen() {
                     </View>
                 </View>
 
-                <View style={styles.card}>
-                    <View style={styles.cardHeader}>
-                        <Ionicons name="map-outline" size={20} color="#7367F0" />
-                        <Text style={styles.cardTitle}>Endereço</Text>
+                <View style={[styles.card, { backgroundColor: colors.card }]}>
+                    <View style={[styles.cardHeader, { borderBottomColor: colors.border }]}>
+                        <Ionicons name="map-outline" size={20} color={colors.primary} />
+                        <Text style={[styles.cardTitle, { color: colors.text }]}>Endereço</Text>
                     </View>
                     <View style={styles.row}>
                         <CustomInput colors={colors} label="CEP" icon="pin-outline" value={form.cep} onChangeText={(v:any) => updateForm('cep', v)} placeholder="00000-000" keyboardType="numeric" flex={0.4} />
@@ -126,7 +126,7 @@ export default function CreateClientScreen() {
 
             </ScrollView>
 
-            <View style={styles.footer}>
+            <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit} disabled={loading}>
                     <LinearGradient colors={['#7367F0', '#CE9FFC']} start={{x:0, y:0}} end={{x:1, y:0}} style={styles.submitBtn}>
                         {loading ? <ActivityIndicator color="#fff" /> : (
@@ -143,25 +143,23 @@ export default function CreateClientScreen() {
 }
 
 const styles = StyleSheet.create({
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 15, backgroundColor: '#fff' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 15 },
     backBtn: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1F2937' },
+    headerTitle: { fontSize: 20, fontWeight: 'bold' },
     scrollContent: { padding: 16, paddingBottom: 40 },
-    segmentedContainer: { flexDirection: 'row', backgroundColor: '#E5E7EB', borderRadius: 12, padding: 4, marginBottom: 20 },
+    segmentedContainer: { flexDirection: 'row', borderRadius: 12, padding: 4, marginBottom: 20 },
     segment: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-    segmentActive: { backgroundColor: '#fff', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4 },
-    segmentText: { fontSize: 14, fontWeight: '600', color: '#6B7280' },
-    segmentTextActive: { color: '#7367F0' },
-    card: { backgroundColor: '#fff', borderRadius: 16, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
-    cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, borderBottomWidth: 1, borderBottomColor: '#F3F4F6', paddingBottom: 10 },
-    cardTitle: { fontSize: 15, fontWeight: 'bold', color: '#374151', marginLeft: 8 },
+    segmentText: { fontSize: 14, fontWeight: '600' },
+    card: { borderRadius: 16, padding: 16, marginBottom: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
+    cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15, borderBottomWidth: 1, paddingBottom: 10 },
+    cardTitle: { fontSize: 15, fontWeight: 'bold', marginLeft: 8 },
     inputGroup: { marginBottom: 15 },
     label: { fontSize: 12, fontWeight: '700', marginBottom: 6, marginLeft: 4, textTransform: 'uppercase' },
     inputWrapper: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, height: 52 },
     inputIcon: { paddingHorizontal: 12 },
     input: { flex: 1, fontSize: 15, paddingRight: 12 },
     row: { flexDirection: 'row', gap: 12 },
-    footer: { padding: 20, paddingBottom: Platform.OS === 'ios' ? 40 : 20, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: '#E5E7EB' },
+    footer: { padding: 20, paddingBottom: Platform.OS === 'ios' ? 40 : 20, borderTopWidth: 1 },
     submitBtn: { height: 56, borderRadius: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
     submitBtnText: { color: '#fff', fontSize: 17, fontWeight: 'bold' }
 });
