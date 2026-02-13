@@ -78,6 +78,8 @@ class ChatController extends Controller
         // Load relationships for response if needed
         $message->load('sender:id,name,profile_photo_path');
 
+        broadcast(new \App\Events\MessageReceived($message))->toOthers();
+
         return response()->json($message, 201);
     }
 }

@@ -1,30 +1,26 @@
 import { Tabs, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
-import { Redirect } from 'expo-router';
-import { useEffect } from 'react';
-import { View, Platform, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
 export default function TabLayout() {
   const { user, loading } = useAuth();
 
-  // Redirecionamento removido - controlado pelo RootLayoutNav
-
-  if (loading) {
-    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
-  }
-
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
+
+  if (loading || !user) {
+    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
+  }
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: true, // Voltei o label para ajudar na distinção
+        tabBarShowLabel: true,
         tabBarActiveTintColor: '#7367F0',
         tabBarInactiveTintColor: '#B0B0B0',
         tabBarStyle: {
@@ -64,11 +60,11 @@ export default function TabLayout() {
         listeners={{ tabPress: handleTabPress }}
       />
 
-      {/* BOTAO VISTORIA (CUSTOM) */}
       <Tabs.Screen
         name="checklist_view"
         options={{
           title: 'Vistoria',
+          href: null,
           tabBarIcon: ({ focused }) => (
             <View style={styles.middleButtonWrapper}>
               <LinearGradient
@@ -84,7 +80,7 @@ export default function TabLayout() {
           tabPress: (e) => {
             e.preventDefault();
             handleTabPress();
-            router.push('/(tabs)/checklist_view');
+            router.push('/os/checklist');
           },
         })}
       />

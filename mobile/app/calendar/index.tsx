@@ -115,8 +115,8 @@ export default function CalendarScreen() {
                       id: event.id,
                       title: event.title,
                       start: event.start,
-                      description: event.extendedProps?.description,
-                      color: event.color
+                      description: event.extendedProps?.description || '',
+                      color: event.color || ''
                     }
                   })}
                 >

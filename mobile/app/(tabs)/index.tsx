@@ -14,6 +14,7 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useRouter, router } from 'expo-router';
 
 // Helper for status translations
@@ -268,9 +269,16 @@ export default function DashboardScreen() {
           </View>
           <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
             <View style={styles.avatarPlaceholder}>
-              <Text style={styles.avatarText}>
-                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-              </Text>
+              {user?.profile_photo_url ? (
+                <Image 
+                  source={{ uri: user.profile_photo_url }} 
+                  style={{ width: 45, height: 45, borderRadius: 22.5 }} 
+                />
+              ) : (
+                <Text style={styles.avatarText}>
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </Text>
+              )}
             </View>
           </TouchableOpacity>
         </View>

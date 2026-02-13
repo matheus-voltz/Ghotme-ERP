@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import api from '../services/api';
-import { router } from 'expo-router';
 
 type AuthContextType = {
     user: any;
@@ -9,6 +8,7 @@ type AuthContextType = {
     signIn: (data: any) => Promise<any>;
     signOut: () => Promise<void>;
     verify2FA: (email: string, code: string) => Promise<void>;
+    updateUser: (newData: any) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -27,23 +27,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const userData = await SecureStore.getItemAsync('userData');
 
             if (userToken && userData) {
-                setUser(JSON.parse(userData));
+                const parsedUser = JSON.parse(userData);
+                setUser(parsedUser);
                 api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
             }
         } catch (error) {
-            console.log('Error loading data', error);
+            console.log('Error loading auth data', error);
         } finally {
             setLoading(false);
         }
     }
 
     async function saveAuthData(user: any, token: string) {
-        // Formatar URL da foto se vier relativa
-        if (user.profile_photo_path && !user.profile_photo_url) {
-            user.profile_photo_url = `${api.defaults.baseURL?.replace('/api', '')}/storage/${user.profile_photo_path}`;
-        } else if (!user.profile_photo_url) {
-            // Fallback para UI Avatars se não tiver foto
-            user.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&color=7F9CF5&background=EBF4FF`;
+        const baseUrl = api.defaults.baseURL?.replace('/api', '');
+        if (user.profile_photo_path) {
+            user.profile_photo_url = `${baseUrl}/storage/${user.profile_photo_path}`;
+        }
+        if (!user.profile_photo_url) {
+            user.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&color=7367F0&background=F3F2FF`;
         }
 
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -52,21 +53,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(user);
     }
 
+    async function updateUser(newData: any) {
+        try {
+            const updatedUser = { ...user, ...newData };
+            const baseUrl = api.defaults.baseURL?.replace('/api', '');
+            if (newData.profile_photo_path) {
+                updatedUser.profile_photo_url = `${baseUrl}/storage/${newData.profile_photo_path}`;
+            }
+            await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+        } catch (error) {
+            console.error("Error updating user:", error);
+        }
+    }
+
     async function signIn({ email, password }: any) {
         try {
             const response = await api.post('/login', { email, password });
-            
-            // Caso necessite de 2FA
-            if (response.data.two_factor) {
-                return response.data;
-            }
-
+            if (response.data.two_factor) return response.data;
             const { user, token } = response.data;
             await saveAuthData(user, token);
             return { success: true };
-        } catch (error) {
-            throw error;
-        }
+        } catch (error) { throw error; }
     }
 
     async function verify2FA(email: string, code: string) {
@@ -74,9 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const response = await api.post('/login/two-factor', { email, code });
             const { user, token } = response.data;
             await saveAuthData(user, token);
-        } catch (error) {
-            throw error;
-        }
+        } catch (error) { throw error; }
     }
 
     async function signOut() {
@@ -85,20 +91,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await SecureStore.deleteItemAsync('userData');
             delete api.defaults.headers.common['Authorization'];
             setUser(null);
-        } catch (error) {
-            console.error('Error during signOut:', error);
-        }
+        } catch (error) { console.error('Error during signOut:', error); }
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, signIn, signOut, verify2FA }}>
+        <AuthContext.Provider value={{ user, loading, signIn, signOut, verify2FA, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) throw new Error('useAuth must be used within an AuthProvider');
-    return context;
-};
+export const useAuth = () => useContext(AuthContext);

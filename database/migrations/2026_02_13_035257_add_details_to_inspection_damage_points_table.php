@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('vehicle_inspection_damage_points', function (Blueprint $table) {
-            $table->string('photo_path')->nullable()->after('notes');
+            if (!Schema::hasColumn('vehicle_inspection_damage_points', 'photo_path')) {
+                $table->string('photo_path')->nullable()->after('notes');
+            }
             // Tornar coordenadas opcionais
             $table->decimal('x_coordinate', 5, 2)->nullable()->change();
             $table->decimal('y_coordinate', 5, 2)->nullable()->change();

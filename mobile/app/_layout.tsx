@@ -11,7 +11,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import { View, ActivityIndicator } from 'react-native';
 
-// Impede que a tela de splash suma automaticamente antes das fontes carregarem
 SplashScreen.preventAutoHideAsync();
 
 function RootLayoutNav() {
@@ -19,51 +18,18 @@ function RootLayoutNav() {
   const segments = useSegments();
   const router = useRouter();
 
-  // Carregar fontes
   const [fontsLoaded] = useFonts({
     ...Ionicons.font,
   });
 
   useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log(notification);
-    });
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    if (!authLoading && user) {
-      registerForPushNotificationsAsync().then(token => {
-        if (token && token.startsWith('ExponentPushToken')) {
-          api.post('/update-push-token', { token }).catch(err => {
-            if (err.response?.status !== 401) {
-              console.log("Erro ao salvar token no servidor:", err);
-            }
-          });
-        }
-      });
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
     }
-  }, [user, authLoading]);
+  }, [fontsLoaded]);
 
-  useEffect(() => {
-    if (authLoading || !fontsLoaded) return;
-
-    const inAuthGroup = segments[0] === '(tabs)';
-
-    if (!user && inAuthGroup) {
-      router.replace('/');
-    } else if (user && (segments[0] === undefined || segments[0] === 'index' || segments[0] as any === '' || segments.length === 0)) {
-      router.replace('/(tabs)');
-    }
-
-    // Ocultar splash screen apenas no final
-    setTimeout(() => {
-        SplashScreen.hideAsync();
-    }, 500);
-  }, [user, authLoading, segments, fontsLoaded]);
-
-  // Mostrar loading enquanto fontes ou auth inicializam
-  if (!fontsLoaded || authLoading) {
+  // Se estiver carregando, mostramos o Splash/Loading
+  if (authLoading || !fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#7367F0' }}>
         <ActivityIndicator size="large" color="#ffffff" />
@@ -73,9 +39,16 @@ function RootLayoutNav() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      {/* Se não houver usuário, a rota inicial é o Login (index) */}
+      {!user ? (
+        <Stack.Screen name="index" options={{ headerShown: false, animation: 'fade' }} />
+      ) : (
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: 'fade' }} />
+      )}
+      
+      {/* Telas auxiliares */}
       <Stack.Screen name="os/checklist" options={{ presentation: 'modal', title: 'Vistoria Visual', headerShown: true }} />
+      <Stack.Screen name="calendar/create" options={{ presentation: 'modal', title: 'Agendar Serviço', headerShown: true }} />
     </Stack>
   );
 }

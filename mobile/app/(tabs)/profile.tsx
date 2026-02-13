@@ -1,16 +1,57 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import api from '../../services/api';
 
 export default function ProfileScreen() {
-    const { user, signOut } = useAuth();
+    const { user, signOut, updateUser } = useAuth();
     const { theme, setTheme, colors, activeTheme } = useTheme();
     const router = useRouter();
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpdatePhoto = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.5,
+            });
+
+            if (!result.canceled) {
+                setUploading(true);
+                const formData = new FormData();
+                
+                // @ts-ignore
+                formData.append('photo', {
+                    uri: result.assets[0].uri,
+                    name: 'profile.jpg',
+                    type: 'image/jpeg',
+                });
+
+                const response = await api.post('/user/profile-photo', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+
+                if (response.data.success) {
+                    // Atualiza o estado global imediatamente
+                    await updateUser(response.data.user || { profile_photo_url: response.data.profile_photo_url });
+                    Alert.alert("Sucesso", "Foto de perfil atualizada!");
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Erro", "Falha ao enviar a foto.");
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSignOut = () => {
         Alert.alert(
@@ -63,12 +104,20 @@ export default function ProfileScreen() {
                 >
                     <View style={styles.profileHeaderContent}>
                         <View style={styles.avatarContainer}>
-                            <Text style={styles.avatarText}>
-                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                            </Text>
-                            <View style={styles.editBadge}>
-                                <Ionicons name="camera" size={12} color="#fff" />
-                            </View>
+                            {user?.profile_photo_url ? (
+                                <Image
+                                    source={{ uri: user.profile_photo_url }}
+                                    style={{ width: 100, height: 100, borderRadius: 50 }}
+                                    contentFit="cover"
+                                />
+                            ) : (
+                                <Text style={styles.avatarText}>
+                                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                                </Text>
+                            )}
+                            <TouchableOpacity style={styles.editBadge} onPress={handleUpdatePhoto} disabled={uploading}>
+                                {uploading ? <ActivityIndicator size="small" color="#fff" /> : <Ionicons name="camera" size={16} color="#fff" />}
+                            </TouchableOpacity>
                         </View>
                         <Text style={styles.name}>{user?.name || 'Usuário'}</Text>
                         <View style={styles.roleBadge}>

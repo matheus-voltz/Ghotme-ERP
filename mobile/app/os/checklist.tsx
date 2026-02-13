@@ -6,14 +6,18 @@ import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, G, Rect } from 'react-native-svg';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 
 const { width } = Dimensions.get('window');
 
 export default function ChecklistVisual() {
   const router = useRouter();
+  const { user } = useAuth();
   const { osId } = useLocalSearchParams();
   const { colors } = useTheme();
+
+  const logoUrl = user?.company?.logo_url || (user?.company?.logo_path ? `${api.defaults.baseURL?.replace('/api', '')}/storage/${user?.company?.logo_path}` : null);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraVisible, setCameraVisible] = useState(false);
@@ -130,7 +134,7 @@ export default function ChecklistVisual() {
           ref={cameraRef}
           onMountError={(error) => Alert.alert("Erro de Câmera", error.message)}
         />
-        
+
         {/* Controles da Câmera (Agora FORA do CameraView com posicionamento absoluto) */}
         <View style={[StyleSheet.absoluteFill, styles.cameraOverlay]}>
           <View style={styles.cameraControls}>
@@ -160,11 +164,20 @@ export default function ChecklistVisual() {
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border, paddingTop: 60 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
-          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 15 }}>
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={[styles.title, { color: colors.text }]}>Vistoria Visual</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 15 }}>
+              <Ionicons name="arrow-back" size={24} color={colors.text} />
+            </TouchableOpacity>
+            <Text style={[styles.title, { color: colors.text }]}>Vistoria Visual</Text>
+          </View>
+          {logoUrl && (
+            <Image
+              source={{ uri: logoUrl }}
+              style={{ width: 100, height: 40 }}
+              contentFit="contain"
+            />
+          )}
         </View>
         <Text style={[styles.subtitle, { color: colors.subText }]}>OS: #{osId || 'N/A'}</Text>
         <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do veículo para registrar avarias</Text>

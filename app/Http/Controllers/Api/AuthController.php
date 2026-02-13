@@ -77,4 +77,29 @@ class AuthController extends Controller
     {
         return response()->json($request->user());
     }
+
+    public function updateProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|max:10240', // 10MB Max
+        ]);
+
+        $user = $request->user();
+
+        if ($request->hasFile('photo')) {
+            $user->updateProfilePhoto($request->file('photo'));
+            
+            // Força a atualização da URL para retorno imediato
+            $user->refresh();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Foto de perfil atualizada!',
+                'profile_photo_url' => $user->profile_photo_url,
+                'user' => $user
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Nenhuma imagem enviada.'], 400);
+    }
 }

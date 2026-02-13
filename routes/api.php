@@ -25,6 +25,7 @@ Route::post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::post('/user/profile-photo', [AuthController::class, 'updateProfilePhoto']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Agenda / Calendário
