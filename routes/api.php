@@ -26,6 +26,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Perfil e Configurações
+    Route::post('/update-push-token', function(Request $request) {
+        $request->validate(['token' => 'required|string']);
+        $request->user()->update(['expo_push_token' => $request->token]);
+        return response()->json(['message' => 'Token atualizado!']);
+    });
+
     // Ordem de Serviço API
     Route::get('/ordens-servico', [ApiOrdemServicoController::class, 'index']);
     Route::get('/ordens-servico/{id}', [ApiOrdemServicoController::class, 'show']);

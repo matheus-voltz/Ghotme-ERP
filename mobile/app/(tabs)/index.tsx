@@ -17,12 +17,26 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 
+import * as Notifications from 'expo-notifications';
+
 export default function DashboardScreen() {
   const { user } = useAuth();
   const [data, setData] = useState<any[]>([]); // Typed as array
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
+
+  const simularNotificacao = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Ghotme ERP 🚀",
+        body: "Novo orçamento #1059 recebido! Clique para revisar.",
+        data: { screen: 'details', id: 1059 },
+        sound: 'default',
+      },
+      trigger: null, // Dispara imediatamente
+    });
+  };
 
   useEffect(() => {
     fetchOrdens();
@@ -136,6 +150,23 @@ export default function DashboardScreen() {
           <View>
             <Text style={styles.welcomeText}>Olá, {user?.name || 'Bem-vindo'}</Text>
             <Text style={styles.subtitleText}>Aqui estão suas ordens de serviço</Text>
+            
+            <TouchableOpacity 
+                onPress={simularNotificacao}
+                style={{
+                    backgroundColor: 'rgba(255,255,255,0.2)',
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    borderRadius: 20,
+                    marginTop: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    alignSelf: 'flex-start'
+                }}
+            >
+                <Ionicons name="notifications-outline" size={16} color="#fff" />
+                <Text style={{color: '#fff', fontSize: 12, fontWeight: 'bold', marginLeft: 5}}>Simular Orçamento</Text>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.profileButton}>
             {/* Placeholder for user avatar */}

@@ -308,4 +308,33 @@ class Helpers
 }
 CSS;
   }
+
+  public static function sendExpoNotification($to, $title, $body, $data = [])
+  {
+    $url = 'https://exp.host/--/api/v2/push/send';
+    
+    $payload = [
+      'to' => $to,
+      'title' => $title,
+      'body' => $body,
+      'data' => $data,
+      'sound' => 'default',
+      'priority' => 'high'
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+      'Content-Type: application/json',
+      'Accept: application/json',
+      'Accept-Encoding: gzip, deflate'
+    ]);
+
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return json_decode($response, true);
+  }
 }

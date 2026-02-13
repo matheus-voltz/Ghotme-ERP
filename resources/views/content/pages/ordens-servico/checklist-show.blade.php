@@ -174,14 +174,13 @@
           <h5 class="mb-0">{{ niche('visual_inspection_title') }}</h5>
         </div>
         <div class="card-body text-center">
-          <span>{{ $point->notes }}</span>
+          <p>Existem {{ $inspection->damagePoints->count() }} avarias registradas nesta vistoria.</p>
         </div>
       </div>
-      @endforeach
+      @endif
     </div>
   </div>
 </div>
-@endif
 <style>
   .damage-marker {
     position: absolute;

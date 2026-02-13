@@ -116,7 +116,7 @@ Route::middleware([
     Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
     Route::get('/ordens-servico/{id}/edit', [OrdemServicoController::class, 'edit'])->name('ordens-servico.edit');
     Route::put('/ordens-servico/{id}', [OrdemServicoController::class, 'update'])->name('ordens-servico.update');
-    Route::get('/api/clients/{id}/vehicles', [OrdemServicoController::class, 'getVehiclesByClient']);
+    Route::get('/api/get-vehicles/{clientId}', [OrdemServicoController::class, 'getVehiclesByClient']);
 
     Route::get('/ordens-servico/checklist', [VehicleChecklistController::class, 'index'])->name('ordens-servico.checklist');
     Route::get('/ordens-servico/checklist/create', [VehicleChecklistController::class, 'create'])->name('ordens-servico.checklist.create');
@@ -312,6 +312,21 @@ Route::middleware([
     Route::get('/mechanic/os/{uuid}', [App\Http\Controllers\MechanicDashboardController::class, 'show'])->name('mechanic.os.show');
     Route::post('/mechanic/timer/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'toggleTimer'])->name('mechanic.timer.toggle');
     Route::post('/mechanic/complete/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'completeItem'])->name('mechanic.item.complete');
+
+    // TESTE DE NOTIFICAÇÃO PUSH REAL
+    Route::get('/push-test/{token}', function(\Illuminate\Http\Request $request, $token) {
+        $fullToken = "ExponentPushToken[" . $token . "]";
+        $res = \App\Helpers\Helpers::sendExpoNotification(
+            $fullToken, 
+            "Ghotme ERP 🚀", 
+            "Novo orçamento #1059 recebido agora mesmo!"
+        );
+        return response()->json([
+            'status' => 'Enviado',
+            'token_usado' => $fullToken,
+            'resposta_expo' => $res
+        ]);
+    });
 });
 
 

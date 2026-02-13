@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../context/AuthContext';
 import { Redirect } from 'expo-router';
 import { useEffect } from 'react';
-import { View, Platform, StyleSheet } from 'react-native';
+import { View, Platform, StyleSheet, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
@@ -89,6 +89,8 @@ export default function TabLayout() {
             tabPress: (e) => {
                 e.preventDefault();
                 handleTabPress();
+                console.log("Clicou em Vistoria");
+                Alert.alert("Debug", "Botão Vistoria Clicado!");
                 router.push('/screens/ChecklistVisual');
             },
         })}

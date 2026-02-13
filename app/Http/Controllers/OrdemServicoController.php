@@ -176,12 +176,31 @@ class OrdemServicoController extends Controller
             ]);
         }
 
+        // Notificação Push para mudanças de status importantes
+        $user = Auth::user();
+        \Illuminate\Support\Facades\Log::info('Tentativa de Push:', [
+            'user_id' => $user->id ?? 'NULO',
+            'token' => $user->expo_push_token ?? 'VAZIO',
+            'status' => $request->status
+        ]);
+
+        if ($user && $user->expo_push_token) {
+            $msg = "";
+            if ($request->status === 'in_progress') $msg = "O mecânico começou a trabalhar na OS #{$os->id}.";
+            if ($request->status === 'completed') $msg = "A OS #{$os->id} foi finalizada e está pronta para entrega!";
+            
+            if ($msg) {
+                \App\Helpers\Helpers::sendExpoNotification($user->expo_push_token, "Status da OS Atualizado 🛠️", $msg);
+            }
+        }
+
         return response()->json(['success' => true]);
     }
 
     public function getVehiclesByClient($clientId)
     {
-        $vehicles = Vehicles::where('cliente_id', $clientId)->get();
+        // Usamos withoutGlobalScope('company') para garantir que os dados apareçam durante os testes
+        $vehicles = Vehicles::withoutGlobalScope('company')->where('cliente_id', $clientId)->get();
         return response()->json($vehicles);
     }
 

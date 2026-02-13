@@ -31,13 +31,19 @@ export async function registerForPushNotificationsAsync() {
     try {
         const projectId =
             Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-        if (!projectId) {
-            // throw new Error('Project ID not found');
+            
+        // Se não tiver projectId (comum em dev local), tentamos pegar sem ele
+        // O Expo Go geralmente resolve isso automaticamente se você estiver logado na CLI
+        if (projectId) {
+            token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+        } else {
+            token = (await Notifications.getExpoPushTokenAsync()).data;
         }
-        token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+        
         console.log("Expo Push Token:", token);
     } catch (e) {
-        token = `${e}`;
+        token = `Erro ao obter token: ${e}`;
+        console.error(e);
     }
   } else {
     // alert('Must use physical device for Push Notifications');

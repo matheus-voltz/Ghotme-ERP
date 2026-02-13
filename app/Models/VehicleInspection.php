@@ -41,4 +41,9 @@ class VehicleInspection extends Model
     {
         return $this->hasMany(VehicleInspectionItem::class);
     }
+
+    public function damagePoints(): HasMany
+    {
+        return $this->hasMany(VehicleInspectionDamagePoint::class);
+    }
 }

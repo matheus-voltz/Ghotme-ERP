@@ -119,6 +119,17 @@ class BudgetController extends Controller
             }
 
             DB::commit();
+
+            // DISPARAR NOTIFICAÇÃO PUSH REAL
+            $user = Auth::user();
+            if ($user && $user->expo_push_token) {
+                \App\Helpers\Helpers::sendExpoNotification(
+                    $user->expo_push_token,
+                    "Novo Orçamento Gerado! 📄",
+                    "O orçamento para o veículo " . ($budget->veiculo->modelo ?? '') . " foi criado com sucesso."
+                );
+            }
+
             return redirect()->route('budgets.pending')->with('success', 'Orçamento Criado!');
 
         } catch (\Exception $e) {
@@ -174,6 +185,17 @@ class BudgetController extends Controller
             $budget->update(['status' => 'approved']);
 
             DB::commit();
+
+            // Notificar o dono da oficina sobre a aprovação
+            $user = Auth::user();
+            if ($user && $user->expo_push_token) {
+                \App\Helpers\Helpers::sendExpoNotification(
+                    $user->expo_push_token,
+                    "Orçamento Aprovado! ✅",
+                    "A OS #{$os->id} foi gerada e o serviço já pode ser iniciado."
+                );
+            }
+
             return response()->json(['success' => true, 'message' => 'Convertido para OS com sucesso!', 'os_id' => $os->id]);
 
         } catch (\Exception $e) {

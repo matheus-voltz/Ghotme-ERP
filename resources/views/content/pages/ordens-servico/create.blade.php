@@ -27,7 +27,7 @@
                             <select name="client_id" id="client_id" class="select2 form-select" required>
                                 <option value="">Selecione o Cliente</option>
                                 @foreach($clients as $client)
-                                    <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
+                                <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -143,28 +143,40 @@
 </form>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    $('.select2').select2();
+    document.addEventListener('DOMContentLoaded', function() {
+        $('.select2').select2();
 
-    // Busca veículos ao mudar o cliente
-    $('#client_id').on('change', function() {
-        const clientId = $(this).val();
-        const vehicleSelect = $('#veiculo_id');
-        
-        vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
+        // Busca veículos ao mudar o cliente
+        $('#client_id').on('change', function() {
+            const clientId = $(this).val();
+            const vehicleSelect = $('#veiculo_id');
 
-        if (clientId) {
-            fetch(`${baseUrl}api/clients/${clientId}/vehicles`)
-                .then(res => res.json())
-                .then(data => {
-                    let html = '<option value="">Selecione o Veículo</option>';
-                    data.forEach(v => {
-                        html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
+            vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
+
+            if (clientId) {
+                fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Erro na resposta do servidor');
+                        return res.json();
+                    })
+                    .then(data => {
+                        let html = '<option value="">Selecione o Veículo</option>';
+                        if (data.length === 0) {
+                            html = '<option value="">Nenhum veículo encontrado para este cliente</option>';
+                        } else {
+                            data.forEach(v => {
+                                html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
+                            });
+                        }
+                        vehicleSelect.html(html).prop('disabled', false);
+                    })
+                    .catch(err => {
+                        console.error('Erro ao buscar veículos:', err);
+                        vehicleSelect.html('<option value="">Erro ao carregar veículos</option>').prop('disabled', true);
+                        alert('Não foi possível carregar os veículos deste cliente. Verifique o console para mais detalhes.');
                     });
-                    vehicleSelect.html(html).prop('disabled', false);
-                });
-        }
+            }
+        });
     });
-});
 </script>
 @endsection

@@ -194,7 +194,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
             vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
 
             if (clientId) {
-                fetch(`/api/clients/${clientId}/vehicles`)
+                fetch(`{{ url('api/clients') }}/${clientId}/vehicles`)
                     .then(res => res.json())
                     .then(data => {
                         let html = '<option value="">Selecione o Veículo</option>';
