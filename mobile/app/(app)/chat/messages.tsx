@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
+import api from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ChatMessagesScreen() {
     const { userId, userName } = useLocalSearchParams();

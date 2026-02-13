@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../../services/api';
-import { useTheme } from '../../context/ThemeContext';
+import api from '../../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
 
 // Configuração para PT-BR
 LocaleConfig.locales['pt-br'] = {

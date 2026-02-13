@@ -3,8 +3,8 @@ import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert,
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // You might need to install this or use a custom implementation
-import api from '../../services/api';
-import { useTheme } from '../../context/ThemeContext';
+import api from '../../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
 
 // IMPORTANT: Install @react-native-picker/picker if not already installed
 // expo install @react-native-picker/picker

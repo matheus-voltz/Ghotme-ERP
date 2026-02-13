@@ -147,6 +147,17 @@ $customizerHidden = 'customizer-hide';
           </div>
 
           <div class="mb-6">
+            <label for="cnpj" class="form-label">CNPJ da Empresa</label>
+            <input type="text" class="form-control @error('cnpj') is-invalid @enderror" id="cnpj" name="cnpj"
+              placeholder="00.000.000/0000-00" value="{{ old('cnpj') }}" maxlength="18" />
+            @error('cnpj')
+            <span class="invalid-feedback" role="alert">
+              <span class="fw-medium">{{ $message }}</span>
+            </span>
+            @enderror
+          </div>
+
+          <div class="mb-6">
             <label for="contact_number" class="form-label">WhatsApp / Celular</label>
             <input type="text" class="form-control @error('contact_number') is-invalid @enderror" id="contact_number" name="contact_number"
               placeholder="(00) 00000-0000" value="{{ old('contact_number') }}" />

@@ -10,8 +10,8 @@ import {
   RefreshControl,
   ScrollView
 } from 'react-native';
-import api from '../../services/api';
-import { useAuth } from '../../context/AuthContext';
+import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';

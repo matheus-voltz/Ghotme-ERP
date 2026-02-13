@@ -25,30 +25,10 @@ window.Echo = new Echo({
 });
 
 import { Notyf } from 'notyf';
-import 'notyf/notyf.min.css'; // Import Notyf styles
-
-// Create an instance of Notyf
-const notyf = new Notyf({
-    duration: 5000,
-    position: {
-        x: 'right',
-        y: 'top',
-    },
-    types: [
-        {
-            type: 'message',
-            background: '#7367F0',
-            icon: {
-                className: 'ti ti-message-circle-2 text-white',
-                tagName: 'i',
-            }
-        }
-    ]
-});
-
+// Notyf removed in favor of Bootstrap Toasts
 
 // Listen for messages
-// Check if user is logged in (you might need a better way to get the ID, e.g., from a meta tag)
+// Check if user is logged in
 const userIdMeta = document.querySelector('meta[name="user-id"]');
 if (userIdMeta) {
     const userId = userIdMeta.getAttribute('content');
@@ -59,9 +39,48 @@ if (userIdMeta) {
             const senderName = e.message.sender ? e.message.sender.name : 'Alguém';
             const messageText = e.message.message;
 
-            notyf.open({
-                type: 'message',
-                message: `<b>${senderName}</b>: ${messageText}`
-            });
+            // 1. Ensure Toast Container Exists
+            let toastContainer = document.querySelector('.toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                toastContainer.style.zIndex = '1090';
+                document.body.appendChild(toastContainer);
+            }
+
+            // 2. Create Toast HTML
+            const toastId = 'toast-' + Date.now();
+            const toastHtml = `
+            <div id="${toastId}" class="bs-toast toast fade" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <i class="icon-base ti tabler-message-circle-2 icon-xs me-2 text-primary"></i>
+                    <div class="me-auto fw-medium">${senderName}</div>
+                    <small class="text-body-secondary">Agora</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${messageText}
+                </div>
+            </div>
+        `;
+
+            // 3. Append to Container
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = toastHtml.trim();
+            const toastElement = tempDiv.firstChild;
+            toastContainer.appendChild(toastElement);
+
+            // 4. Initialize and Show using global bootstrap object (provided by template)
+            if (window.bootstrap) {
+                const toast = new window.bootstrap.Toast(toastElement);
+                toast.show();
+
+                // Cleanup after hide
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
+            } else {
+                console.error('Bootstrap is not loaded');
+            }
         });
 }

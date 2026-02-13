@@ -12,7 +12,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Animated, {
@@ -27,7 +27,6 @@ export default function LoginScreen() {
     const { signIn, verify2FA, user } = useAuth();
     const router = useRouter();
     
-    // States
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -36,7 +35,6 @@ export default function LoginScreen() {
     const [success, setSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // Animações
     const formOpacity = useSharedValue(0);
     const formTranslateY = useSharedValue(50);
     const logoScale = useSharedValue(0.5);
@@ -71,15 +69,12 @@ export default function LoginScreen() {
             const response = await signIn({ email, password });
 
             if (response?.two_factor) {
-                // Ativar modo 2FA
                 setShow2FA(true);
                 setLoading(false);
-                // Animação sutil para avisar a mudança
                 formTranslateY.value = withSpring(10);
                 return;
             }
 
-            // Sucesso direto (sem 2FA)
             triggerSuccess();
 
         } catch (error: any) {
@@ -111,10 +106,6 @@ export default function LoginScreen() {
         formTranslateY.value = withTiming(-20, { duration: 400 });
         logoTranslateY.value = withSpring(50);
         logoScale.value = withSpring(1.5);
-
-        setTimeout(() => {
-            router.replace('/(tabs)');
-        }, 800);
     }
 
     return (
@@ -130,7 +121,6 @@ export default function LoginScreen() {
                 style={styles.keyboardView}
             >
                 <View style={styles.contentContainer}>
-                    {/* Header Animado */}
                     <Animated.View style={[styles.headerContainer, animatedLogoStyle]}>
                         <View style={styles.logoPlaceholder}>
                             {success ? (
@@ -147,7 +137,6 @@ export default function LoginScreen() {
                         )}
                     </Animated.View>
 
-                    {/* Formulário de Login ou 2FA */}
                     {!success && (
                         <Animated.View style={[styles.formContainer, animatedFormStyle]}>
                             {!show2FA ? (

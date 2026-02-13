@@ -5,9 +5,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, G, Rect } from 'react-native-svg';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useTheme } from '../../context/ThemeContext';
-import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { useTheme } from '../../../context/ThemeContext';
+import { useAuth } from '../../../context/AuthContext';
+import api from '../../../services/api';
 
 const { width } = Dimensions.get('window');
 

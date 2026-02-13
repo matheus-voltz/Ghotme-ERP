@@ -26,23 +26,30 @@ class CreateNewUser implements CreatesNewUsers
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
             'company_name' => ['required', 'string', 'max:255'],
+            'cnpj' => ['required', 'string', 'regex:/^\d{14}$|^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$/', 'unique:companies,document_number'], // Valida formato e unicidade
             'contact_number' => ['required', 'string', 'max:20'],
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['accepted', 'required'] : '',
         ])->validate();
 
         return DB::transaction(function () use ($input) {
+            // Remove pontuação do CNPJ
+            $cnpj = preg_replace('/[^0-9]/', '', $input['cnpj']);
+
             // 1. Cria a Empresa
             $company = Company::create([
                 'name' => $input['company_name'],
+                'document_number' => $cnpj,
             ]);
 
             // 2. Cria o Usuário vinculado a essa empresa
             return User::create([
-                'company_id' => $company->id,
+                'company_id' => $company->id, // Assumindo que você tem essa coluna na migration de users ou vai adicionar
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'contact_number' => $input['contact_number'],
                 'password' => Hash::make($input['password']),
+                'role' => 'admin', // Define como administrador da empresa
+                'permission' => 'all', // Permissão total
                 'trial_ends_at' => now()->addDays(30),
             ]);
         });
