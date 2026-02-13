@@ -26,6 +26,27 @@
 @section('page-script')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Phone Mask
+        var phoneMaskList = document.querySelectorAll('.phone-mask');
+        phoneMaskList.forEach(function(phoneMask) {
+            phoneMask.addEventListener('input', function(event) {
+                var value = event.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.slice(0, 11);
+
+                var formatted = '';
+                if (value.length > 0) {
+                    formatted = '(' + value.slice(0, 2);
+                }
+                if (value.length > 2) {
+                    formatted += ') ' + value.slice(2, 7);
+                }
+                if (value.length > 7) {
+                    formatted += '-' + value.slice(7, 11);
+                }
+                event.target.value = formatted;
+            });
+        });
+
         var dt_user_table = $('.datatables-users');
         var table;
 
