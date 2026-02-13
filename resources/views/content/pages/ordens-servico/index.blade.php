@@ -71,7 +71,12 @@
                                 finalized: 'success',
                                 running: 'info'
                             };
-                            return `<span class="badge bg-label-${colors[data] || 'secondary'}">${data}</span>`;
+                            const statusTranslations = {
+                                pending: 'Pendente',
+                                finalized: 'Finalizado',
+                                running: 'Em Execução'
+                            };
+                            return `<span class="badge bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
                         }
                     },
                     {

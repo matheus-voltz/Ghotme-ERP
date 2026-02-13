@@ -72,12 +72,35 @@ export default function DashboardScreen() {
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'em aberto': return '#FF9F43'; // Orange
-      case 'aprovado': return '#28C76F'; // Green
-      case 'concluído': return '#00CFE8'; // Cyan
-      case 'cancelado': return '#EA5455'; // Red
+      case 'pending':
+      case 'em aberto':
+        return '#FF9F43'; // Orange
+      case 'approved':
+      case 'aprovado':
+        return '#28C76F'; // Green
+      case 'running':
+      case 'in_progress':
+      case 'execução':
+        return '#00CFE8'; // Cyan
+      case 'finalized':
+      case 'concluído':
+      case 'paid':
+        return '#28C76F'; // Green
+      case 'cancelado':
+        return '#EA5455'; // Red
       default: return '#7367F0'; // Purple default
     }
+  };
+
+  const statusTranslations: { [key: string]: string } = {
+    pending: 'Pendente',
+    running: 'Em Execução',
+    finalized: 'Finalizado',
+    approved: 'Aprovado',
+    rejected: 'Reprovado',
+    paid: 'Pago',
+    completed: 'Concluído',
+    in_progress: 'Em Andamento'
   };
 
   const renderItem = ({ item }: { item: any }) => (
@@ -94,7 +117,7 @@ export default function DashboardScreen() {
         </View>
         <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
           <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-            {item.status || 'Pendente'}
+            {statusTranslations[item.status?.toLowerCase()] || item.status || 'Pendente'}
           </Text>
         </View>
       </View>
@@ -150,22 +173,22 @@ export default function DashboardScreen() {
           <View>
             <Text style={styles.welcomeText}>Olá, {user?.name || 'Bem-vindo'}</Text>
             <Text style={styles.subtitleText}>Aqui estão suas ordens de serviço</Text>
-            
-            <TouchableOpacity 
-                onPress={simularNotificacao}
-                style={{
-                    backgroundColor: 'rgba(255,255,255,0.2)',
-                    paddingHorizontal: 12,
-                    paddingVertical: 6,
-                    borderRadius: 20,
-                    marginTop: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    alignSelf: 'flex-start'
-                }}
+
+            <TouchableOpacity
+              onPress={simularNotificacao}
+              style={{
+                backgroundColor: 'rgba(255,255,255,0.2)',
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 20,
+                marginTop: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-start'
+              }}
             >
-                <Ionicons name="notifications-outline" size={16} color="#fff" />
-                <Text style={{color: '#fff', fontSize: 12, fontWeight: 'bold', marginLeft: 5}}>Simular Orçamento</Text>
+              <Ionicons name="notifications-outline" size={16} color="#fff" />
+              <Text style={{ color: '#fff', fontSize: 12, fontWeight: 'bold', marginLeft: 5 }}>Simular Orçamento</Text>
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.profileButton}>

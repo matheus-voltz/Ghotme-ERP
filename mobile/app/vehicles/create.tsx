@@ -6,6 +6,22 @@ import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Componente CustomInput movido para fora para evitar perda de foco
+const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardType = 'default', flex = 1, autoCapitalize = 'none' }: any) => (
+    <View style={[styles.inputGroup, { flex }]}>
+        <Text style={styles.label}>{label}</Text>
+        <View style={styles.inputWrapper}>
+            <Ionicons name={icon} size={18} color="#7367F0" style={styles.inputIcon} />
+            <TextInput
+                style={styles.input}
+                value={value} onChangeText={onChangeText}
+                placeholder={placeholder} placeholderTextColor="#9CA3AF"
+                keyboardType={keyboardType} autoCapitalize={autoCapitalize}
+            />
+        </View>
+    </View>
+);
+
 export default function CreateVehicleScreen() {
     const router = useRouter();
     const { colors } = useTheme();
@@ -14,7 +30,6 @@ export default function CreateVehicleScreen() {
     const [lookupLoading, setLookupLoading] = useState(false);
     const [clients, setClients] = useState<any[]>([]);
     
-    // Form State
     const [clienteId, setClienteId] = useState('');
     const [placa, setPlaca] = useState('');
     const [marca, setMarca] = useState('');
@@ -76,21 +91,6 @@ export default function CreateVehicleScreen() {
         } finally { setLoading(false); }
     };
 
-    const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardType = 'default', flex = 1, autoCapitalize = 'none' }: any) => (
-        <View style={[styles.inputGroup, { flex }]}>
-            <Text style={styles.label}>{label}</Text>
-            <View style={styles.inputWrapper}>
-                <Ionicons name={icon} size={18} color="#7367F0" style={styles.inputIcon} />
-                <TextInput
-                    style={styles.input}
-                    value={value} onChangeText={onChangeText}
-                    placeholder={placeholder} placeholderTextColor="#9CA3AF"
-                    keyboardType={keyboardType} autoCapitalize={autoCapitalize}
-                />
-            </View>
-        </View>
-    );
-
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
             <View style={styles.header}>
@@ -101,18 +101,13 @@ export default function CreateVehicleScreen() {
                 <View style={{ width: 40 }} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                
-                {/* Seção: Proprietário */}
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="person-outline" size={20} color="#7367F0" />
                         <Text style={styles.cardTitle}>Proprietário</Text>
                     </View>
-                    <TouchableOpacity 
-                        style={styles.clientSelector}
-                        onPress={() => setShowClientModal(true)}
-                    >
+                    <TouchableOpacity style={styles.clientSelector} onPress={() => setShowClientModal(true)}>
                         <Text style={[styles.clientSelectorText, { color: clienteId ? '#333' : '#9CA3AF' }]}>
                             {clienteId ? clients.find(c => c.id === clienteId)?.name : 'Selecionar Proprietário'}
                         </Text>
@@ -120,7 +115,6 @@ export default function CreateVehicleScreen() {
                     </TouchableOpacity>
                 </View>
 
-                {/* Seção: Identificação */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="barcode-outline" size={20} color="#7367F0" />
@@ -138,20 +132,14 @@ export default function CreateVehicleScreen() {
                                 />
                             </View>
                         </View>
-                        <TouchableOpacity 
-                            style={styles.lookupButton}
-                            onPress={handleLookupPlaca}
-                            disabled={lookupLoading}
-                        >
+                        <TouchableOpacity style={styles.lookupButton} onPress={handleLookupPlaca} disabled={lookupLoading}>
                             <LinearGradient colors={['#7367F0', '#CE9FFC']} style={styles.lookupGradient}>
                                 {lookupLoading ? <ActivityIndicator color="#fff" /> : <Ionicons name="flash" size={22} color="#fff" />}
                             </LinearGradient>
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.helperText}>Dica: Clique no raio para buscar dados automaticamente.</Text>
                 </View>
 
-                {/* Seção: Dados Técnicos */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="settings-outline" size={20} color="#7367F0" />
@@ -167,7 +155,6 @@ export default function CreateVehicleScreen() {
                     </View>
                 </View>
 
-                {/* Seção: Documentos */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="document-outline" size={20} color="#7367F0" />
@@ -176,7 +163,6 @@ export default function CreateVehicleScreen() {
                     <CustomInput label="Renavam" icon="finger-print-outline" value={renavam} onChangeText={setRenavam} keyboardType="numeric" />
                     <CustomInput label="Chassi" icon="qr-code-outline" value={chassi} onChangeText={setChassi} autoCapitalize="characters" />
                 </View>
-
             </ScrollView>
 
             <View style={styles.footer}>
@@ -192,7 +178,6 @@ export default function CreateVehicleScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Modal Cliente */}
             {showClientModal && (
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 20, zIndex: 100 }]}>
                     <View style={{ backgroundColor: '#fff', borderRadius: 20, height: '80%', padding: 20 }}>

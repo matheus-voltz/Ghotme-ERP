@@ -6,6 +6,24 @@ import api from '../../services/api';
 import { useTheme } from '../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
+// Componente CustomInput movido para fora para evitar perda de foco
+const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardType = 'default', flex = 1, colors }: any) => (
+    <View style={[styles.inputGroup, { flex }]}>
+        <Text style={[styles.label, { color: colors.subText }]}>{label}</Text>
+        <View style={[styles.inputWrapper, { borderColor: colors.border, backgroundColor: '#F9FAFB' }]}>
+            <Ionicons name={icon} size={18} color="#7367F0" style={styles.inputIcon} />
+            <TextInput
+                style={[styles.input, { color: colors.text }]}
+                value={value}
+                onChangeText={onChangeText}
+                placeholder={placeholder}
+                placeholderTextColor="#9CA3AF"
+                keyboardType={keyboardType}
+            />
+        </View>
+    </View>
+);
+
 export default function CreateClientScreen() {
     const router = useRouter();
     const { colors } = useTheme();
@@ -36,23 +54,6 @@ export default function CreateClientScreen() {
         } finally { setLoading(false); }
     };
 
-    const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardType = 'default', flex = 1 }: any) => (
-        <View style={[styles.inputGroup, { flex }]}>
-            <Text style={[styles.label, { color: colors.subText }]}>{label}</Text>
-            <View style={[styles.inputWrapper, { borderColor: colors.border, backgroundColor: '#F9FAFB' }]}>
-                <Ionicons name={icon} size={18} color={colors.primary} style={styles.inputIcon} />
-                <TextInput
-                    style={[styles.input, { color: colors.text }]}
-                    value={value}
-                    onChangeText={onChangeText}
-                    placeholder={placeholder}
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType={keyboardType}
-                />
-            </View>
-        </View>
-    );
-
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
             <View style={styles.header}>
@@ -63,74 +64,63 @@ export default function CreateClientScreen() {
                 <View style={{ width: 40 }} />
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
                 
-                {/* Segmented Control para Tipo */}
                 <View style={styles.segmentedContainer}>
-                    <TouchableOpacity 
-                        style={[styles.segment, type === 'PF' && styles.segmentActive]} 
-                        onPress={() => setType('PF')}
-                    >
+                    <TouchableOpacity style={[styles.segment, type === 'PF' && styles.segmentActive]} onPress={() => setType('PF')}>
                         <Text style={[styles.segmentText, type === 'PF' && styles.segmentTextActive]}>Pessoa Física</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
-                        style={[styles.segment, type === 'PJ' && styles.segmentActive]} 
-                        onPress={() => setType('PJ')}
-                    >
+                    <TouchableOpacity style={[styles.segment, type === 'PJ' && styles.segmentActive]} onPress={() => setType('PJ')}>
                         <Text style={[styles.segmentText, type === 'PJ' && styles.segmentTextActive]}>Pessoa Jurídica</Text>
                     </TouchableOpacity>
                 </View>
 
-                {/* Seção: Identificação */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
-                        <Ionicons name="id-card-outline" size={20} color={colors.primary} />
+                        <Ionicons name="id-card-outline" size={20} color="#7367F0" />
                         <Text style={styles.cardTitle}>Identificação</Text>
                     </View>
-                    
                     {type === 'PF' ? (
                         <>
-                            <CustomInput label="Nome Completo *" icon="person-outline" value={form.name} onChangeText={(v:any) => updateForm('name', v)} placeholder="João Silva" />
+                            <CustomInput colors={colors} label="Nome Completo *" icon="person-outline" value={form.name} onChangeText={(v:any) => updateForm('name', v)} placeholder="João Silva" />
                             <View style={styles.row}>
-                                <CustomInput label="CPF" icon="document-text-outline" value={form.cpf} onChangeText={(v:any) => updateForm('cpf', v)} placeholder="000.000..." keyboardType="numeric" />
-                                <CustomInput label="RG" icon="browsers-outline" value={form.rg} onChangeText={(v:any) => updateForm('rg', v)} placeholder="00.000..." />
+                                <CustomInput colors={colors} label="CPF" icon="document-text-outline" value={form.cpf} onChangeText={(v:any) => updateForm('cpf', v)} placeholder="000.000..." keyboardType="numeric" />
+                                <CustomInput colors={colors} label="RG" icon="browsers-outline" value={form.rg} onChangeText={(v:any) => updateForm('rg', v)} placeholder="00.000..." />
                             </View>
                         </>
                     ) : (
                         <>
-                            <CustomInput label="Razão Social *" icon="business-outline" value={form.company_name} onChangeText={(v:any) => updateForm('company_name', v)} placeholder="Empresa LTDA" />
-                            <CustomInput label="CNPJ" icon="copy-outline" value={form.cnpj} onChangeText={(v:any) => updateForm('cnpj', v)} placeholder="00.000.000/0001-00" keyboardType="numeric" />
+                            <CustomInput colors={colors} label="Razão Social *" icon="business-outline" value={form.company_name} onChangeText={(v:any) => updateForm('company_name', v)} placeholder="Empresa LTDA" />
+                            <CustomInput colors={colors} label="CNPJ" icon="copy-outline" value={form.cnpj} onChangeText={(v:any) => updateForm('cnpj', v)} placeholder="00.000.000/0001-00" keyboardType="numeric" />
                         </>
                     )}
                 </View>
 
-                {/* Seção: Contato */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
-                        <Ionicons name="call-outline" size={20} color={colors.primary} />
+                        <Ionicons name="call-outline" size={20} color="#7367F0" />
                         <Text style={styles.cardTitle}>Contato</Text>
                     </View>
-                    <CustomInput label="E-mail Principal *" icon="mail-outline" value={form.email} onChangeText={(v:any) => updateForm('email', v)} placeholder="exemplo@email.com" keyboardType="email-address" />
+                    <CustomInput colors={colors} label="E-mail Principal *" icon="mail-outline" value={form.email} onChangeText={(v:any) => updateForm('email', v)} placeholder="exemplo@email.com" keyboardType="email-address" />
                     <View style={styles.row}>
-                        <CustomInput label="WhatsApp" icon="logo-whatsapp" value={form.whatsapp} onChangeText={(v:any) => updateForm('whatsapp', v)} placeholder="(11) 9..." keyboardType="phone-pad" />
-                        <CustomInput label="Telefone" icon="call-outline" value={form.phone} onChangeText={(v:any) => updateForm('phone', v)} placeholder="(11) 4..." keyboardType="phone-pad" />
+                        <CustomInput colors={colors} label="WhatsApp" icon="logo-whatsapp" value={form.whatsapp} onChangeText={(v:any) => updateForm('whatsapp', v)} placeholder="(11) 9..." keyboardType="phone-pad" />
+                        <CustomInput colors={colors} label="Telefone" icon="call-outline" value={form.phone} onChangeText={(v:any) => updateForm('phone', v)} placeholder="(11) 4..." keyboardType="phone-pad" />
                     </View>
                 </View>
 
-                {/* Seção: Endereço */}
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
-                        <Ionicons name="map-outline" size={20} color={colors.primary} />
+                        <Ionicons name="map-outline" size={20} color="#7367F0" />
                         <Text style={styles.cardTitle}>Endereço</Text>
                     </View>
                     <View style={styles.row}>
-                        <CustomInput label="CEP" icon="pin-outline" value={form.cep} onChangeText={(v:any) => updateForm('cep', v)} placeholder="00000-000" keyboardType="numeric" flex={0.4} />
-                        <CustomInput label="Cidade" icon="business-outline" value={form.cidade} onChangeText={(v:any) => updateForm('cidade', v)} placeholder="São Paulo" flex={0.6} />
+                        <CustomInput colors={colors} label="CEP" icon="pin-outline" value={form.cep} onChangeText={(v:any) => updateForm('cep', v)} placeholder="00000-000" keyboardType="numeric" flex={0.4} />
+                        <CustomInput colors={colors} label="Cidade" icon="business-outline" value={form.cidade} onChangeText={(v:any) => updateForm('cidade', v)} placeholder="São Paulo" flex={0.6} />
                     </View>
-                    <CustomInput label="Rua / Logradouro" icon="navigate-outline" value={form.rua} onChangeText={(v:any) => updateForm('rua', v)} placeholder="Av. Paulista" />
+                    <CustomInput colors={colors} label="Rua / Logradouro" icon="navigate-outline" value={form.rua} onChangeText={(v:any) => updateForm('rua', v)} placeholder="Av. Paulista" />
                     <View style={styles.row}>
-                        <CustomInput label="Nº" icon="home-outline" value={form.numero} onChangeText={(v:any) => updateForm('numero', v)} placeholder="123" flex={0.3} />
-                        <CustomInput label="Bairro" icon="trail-sign-outline" value={form.bairro} onChangeText={(v:any) => updateForm('bairro', v)} placeholder="Centro" flex={0.7} />
+                        <CustomInput colors={colors} label="Nº" icon="home-outline" value={form.numero} onChangeText={(v:any) => updateForm('numero', v)} placeholder="123" flex={0.3} />
+                        <CustomInput colors={colors} label="Bairro" icon="trail-sign-outline" value={form.bairro} onChangeText={(v:any) => updateForm('bairro', v)} placeholder="Centro" flex={0.7} />
                     </View>
                 </View>
 

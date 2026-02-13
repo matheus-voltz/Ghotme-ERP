@@ -145,5 +145,15 @@
     "uppercase": "O campo :attribute deve estar em maiúsculas.",
     "url": "O formato de URL indicado para o campo :attribute é inválido.",
     "user": "Não existe nenhum usuário com o e-mail indicado.",
-    "uuid": ":Attribute deve ser um UUID válido."
+    "uuid": ":Attribute deve ser um UUID válido.",
+    "pending": "Pendente",
+    "running": "Em Execução",
+    "finalized": "Finalizado",
+    "approved": "Aprovado",
+    "rejected": "Reprovado",
+    "paid": "Pago",
+    "completed": "Concluído",
+    "in_progress": "Em Andamento",
+    "overdue": "Atrasado",
+    "cancelled": "Cancelado"
 }

@@ -45,6 +45,8 @@ export default function ActionsScreen() {
                                     router.push('/clients/create');
                                 } else if (item.id === 'new-vehicle') {
                                     router.push('/vehicles/create');
+                                } else if (item.id === 'calendar') {
+                                    router.push('/calendar');
                                 } else {
                                     alert(`Ação: ${item.title} (Em breve)`);
                                 }

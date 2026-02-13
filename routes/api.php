@@ -26,6 +26,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
+    // Agenda / Calendário
+    Route::get('/calendar/events', [App\Http\Controllers\CalendarController::class, 'fetchEvents']);
+
     // Perfil e Configurações
     Route::post('/update-push-token', function(Request $request) {
         $request->validate(['token' => 'required|string']);

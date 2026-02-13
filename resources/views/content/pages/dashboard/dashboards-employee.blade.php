@@ -111,16 +111,9 @@
                             <td>{{ $budget->created_at->format('d/m/Y') }}</td>
                             <td>R$ {{ number_format($budget->total ?? 0, 2, ',', '.') }}</td>
                             <td>
-                                @switch($budget->status)
-                                @case('approved')
-                                <span class="badge bg-label-success">Aprovado</span>
-                                @break
-                                @case('rejected')
-                                <span class="badge bg-label-danger">Reprovado</span>
-                                @break
-                                @default
-                                <span class="badge bg-label-warning">Pendente</span>
-                                @endswitch
+                                <span class="badge bg-label-{{ $budget->status === 'approved' ? 'success' : ($budget->status === 'rejected' ? 'danger' : 'warning') }}">
+                                    {{ __($budget->status) }}
+                                </span>
                             </td>
                         </tr>
                         @empty
@@ -185,19 +178,9 @@
                                 <td>{{ $os->client->name ?? 'Cliente Removido' }}</td>
                                 <td>{{ $os->veiculo->placa ?? '-' }} - {{ $os->veiculo->modelo ?? '-' }}</td>
                                 <td>
-                                    @switch($os->status)
-                                    @case('in_progress')
-                                    <span class="badge bg-label-info">Em Manutenção</span>
-                                    @break
-                                    @case('completed')
-                                    <span class="badge bg-label-success">Pronto</span>
-                                    @break
-                                    @case('paid')
-                                    <span class="badge bg-label-secondary">Finalizado</span>
-                                    @break
-                                    @default
-                                    <span class="badge bg-label-warning">Pendente</span>
-                                    @endswitch
+                                    <span class="badge bg-label-{{ $os->status === 'finalized' || $os->status === 'paid' ? 'success' : ($os->status === 'running' || $os->status === 'in_progress' ? 'info' : 'warning') }}">
+                                        {{ __($os->status) }}
+                                    </span>
                                 </td>
                                 <td>{{ $os->created_at->format('d/m/Y') }}</td>
                             </tr>

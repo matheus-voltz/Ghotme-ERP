@@ -260,9 +260,11 @@ $configData = Helper::appClasses();
                 $statusConfig = [
                 'pending' => ['color' => 'warning', 'label' => 'Pendente', 'icon' => 'tabler-clock'],
                 'running' => ['color' => 'info', 'label' => 'Execução', 'icon' => 'tabler-tool'],
-                'finalized' => ['color' => 'success', 'label' => 'Finalizada', 'icon' => 'tabler-circle-check']
+                'in_progress' => ['color' => 'info', 'label' => 'Em Andamento', 'icon' => 'tabler-tool'],
+                'finalized' => ['color' => 'success', 'label' => 'Finalizada', 'icon' => 'tabler-circle-check'],
+                'paid' => ['color' => 'success', 'label' => 'Pago', 'icon' => 'tabler-currency-dollar']
                 ];
-                $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => $os->status, 'icon' => 'tabler-help'];
+                $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => __($os->status), 'icon' => 'tabler-help'];
                 @endphp
                 <span class="badge bg-label-{{ $conf['color'] }} rounded-pill px-3">
                   {{ $conf['label'] }}
