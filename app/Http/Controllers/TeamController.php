@@ -198,23 +198,38 @@ class TeamController extends Controller
                     return response()->json(['message' => "Este e-mail já está cadastrado no sistema."], 422);
                 }
 
+                $rawPassword = Str::random(8); // Generate random password
+
                 $newUser = User::create([
                     'name' => trim($request->name),
                     'email' => $email,
-                    'password' => bcrypt('password'), // Default password
+                    'password' => bcrypt($rawPassword),
                     'parent_id' => $currentUser->id,
                     'company_id' => $currentUser->company_id,
                     'company' => $currentUser->company,
-                    'role' => $request->role ?? 'subscriber',
+                    'role' => $request->role ?? 'funcionario',
                     'plan' => 'free',
                     'contact_number' => $request->userContact,
                     'status' => 'active',
                     'email_verified_at' => now(),
                 ]);
 
+                // Send Welcome Email
+                try {
+                    $company = $currentUser->company; // This might be the name string or relationship depending on usage, but let's fetch the model to be safe
+                    $companyModel = \App\Models\Company::find($currentUser->company_id);
+                    \Illuminate\Support\Facades\Mail::to($newUser->email)->send(new \App\Mail\NewEmployeeMail($newUser, $rawPassword, $companyModel));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Error sending welcome email: ' . $e->getMessage());
+                }
+
                 \Illuminate\Support\Facades\Log::info('User created successfully', ['id' => $newUser->id, 'parent' => $currentUser->id]);
 
-                return response()->json(['message' => 'Funcionário criado com sucesso!', 'user' => $newUser]);
+                return response()->json([
+                    'message' => 'Funcionário criado com sucesso!',
+                    'user' => $newUser,
+                    'raw_password' => $rawPassword // Return for WhatsApp sharing
+                ]);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Error creating user in TeamController: ' . $e->getMessage());

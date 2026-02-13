@@ -27,7 +27,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (userToken && userData) {
                 setUser(JSON.parse(userData));
-                api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+                // Define global interceptor for 401
+                api.interceptors.response.use(
+                    (response) => response,
+                    async (error) => {
+                        if (error.response && error.response.status === 401) {
+                            console.log('Session expired (401), signing out...');
+                            await signOut();
+                            router.replace('/');
+                        }
+                        return Promise.reject(error);
+                    }
+                );
             }
         } catch (error) {
             console.log('Error loading data', error);

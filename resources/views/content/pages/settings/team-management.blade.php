@@ -204,11 +204,41 @@
 
                     $('#addNewUserForm')[0].reset();
                     $('#user_id').val('');
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sucesso!',
-                        text: 'Operação realizada com sucesso.'
-                    });
+
+                    if (data.raw_password) {
+                        // Novo usuário criado
+                        const msg = `Olá ${data.user.name}! Bem-vindo à equipe.\n\nSeus dados de acesso ao sistema Ghotme ERP são:\nEmail: ${data.user.email}\nSenha: ${data.raw_password}\n\nAcesse em: ${window.location.origin}/login`;
+                        const whatsappUrl = `https://api.whatsapp.com/send?phone=55${data.user.contact_number.replace(/\D/g, '')}&text=${encodeURIComponent(msg)}`;
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Funcionário Criado!',
+                            text: 'Os dados de acesso foram enviados por e-mail. Deseja enviar também via WhatsApp?',
+                            showCancelButton: true,
+                            confirmButtonText: '<i class="ti tabler-brand-whatsapp me-1"></i> Enviar WhatsApp',
+                            cancelButtonText: 'Agora não',
+                            customClass: {
+                                confirmButton: 'btn btn-success me-3',
+                                cancelButton: 'btn btn-label-secondary'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open(whatsappUrl, '_blank');
+                            }
+                        });
+                    } else {
+                        // Apenas atualização
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: 'Operação realizada com sucesso.',
+                            customClass: {
+                                confirmButton: 'btn btn-primary'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
                 },
                 error: function(data) {
                     var msg = data.responseJSON && data.responseJSON.message ? data.responseJSON.message : 'Erro ao salvar';

@@ -61,16 +61,47 @@
     padding-top: 2rem !important;
   }
 
+  /* Forçar Full Width sempre */
+  .container-fluid,
+  .container-xxl {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+  }
+
   @endif
+
+  /* Fix para ícones que aparecem como interrogação */
+  .ti {
+    display: inline-block !important;
+    width: 1em;
+    height: 1em;
+    mask-size: 100% 100% !important;
+    -webkit-mask-size: 100% 100% !important;
+  }
+
   /* Estilos para impressão */
   @media print {
+    @page {
+      margin: 0.5cm;
+      size: A4 portrait;
+    }
+
+    body {
+      background: white !important;
+      font-size: 12px;
+      /* Fonte levemente maior que antes */
+      -webkit-print-color-adjust: exact;
+    }
 
     .layout-menu,
     .layout-navbar,
     .content-footer,
     .no-print,
     .template-customizer-open-btn,
-    .btn {
+    .btn,
+    .layout-menu-toggle {
       display: none !important;
     }
 
@@ -79,33 +110,63 @@
     .container-xxl {
       padding: 0 !important;
       margin: 0 !important;
+      width: 100% !important;
       max-width: 100% !important;
     }
 
     .card {
-      border: none !important;
+      border: 1px solid #ddd !important;
       box-shadow: none !important;
+      break-inside: avoid;
+      margin-bottom: 15px !important;
     }
 
-    body {
-      background: white !important;
+    /* Forçar largura total nos cards */
+    .col-md-4,
+    .col-xl-3,
+    .col-sm-6 {
+      width: 33% !important;
+      /* Distribui melhor as informações no topo */
+      float: left;
     }
 
-    .card-header .d-flex {
-      display: none !important;
+    /* Grid de Fotos na Impressão */
+    .row.g-4 .col-xl-3 {
+      width: 50% !important;
+      /* 2 fotos por linha na impressão para ficarem grandes */
+      page-break-inside: avoid;
+    }
+
+    .card-img-top {
+      height: 200px !important;
+      /* Fotos grandes na impressão */
+      object-fit: contain !important;
+    }
+
+    /* Tabela */
+    .table th,
+    .table td {
+      padding: 6px 10px !important;
+      font-size: 11px !important;
+    }
+
+    .badge {
+      border: 1px solid #000;
+      color: #000 !important;
+      background: transparent !important;
     }
   }
 </style>
 @endsection
 
 @section('content')
-<div class="container-xxl flex-grow-1 container-p-y">
+<div class="container-fluid flex-grow-1 container-p-y px-lg-5">
 
   @if(!$isPublic && auth()->check())
   <div class="d-flex justify-content-between align-items-center mb-4 no-print">
     <h4 class="mb-0">{{ __('Detalhes do Checklist') }}</h4>
     <a href="{{ route('ordens-servico.checklist') }}" class="btn btn-label-secondary">
-      <i class="ti tabler-arrow-left me-1"></i> {{ __('Voltar') }}
+      <i class="icon-base ti tabler-arrow-left ti-sm me-1"></i> {{ __('Voltar') }}
     </a>
   </div>
   @endif
@@ -131,7 +192,7 @@
       @if(!$isPublic && auth()->check())
       <div class="d-flex gap-2 no-print">
         <button onclick="window.print()" class="btn btn-label-secondary">
-          <i class="ti tabler-printer me-1"></i> {{ __('Imprimir') }}
+          <i class="icon-base ti tabler-printer ti-sm me-1"></i> {{ __('Imprimir') }}
         </button>
 
         @php
@@ -141,10 +202,10 @@
         @endphp
 
         <a href="{{ $whatsappUrl }}" target="_blank" class="btn btn-success">
-          <i class="ti tabler-brand-whatsapp me-1"></i> WhatsApp
+          <i class="icon-base ti tabler-brand-whatsapp ti-sm me-1"></i> WhatsApp
         </a>
         <button type="button" class="btn btn-primary btn-send-email" data-id="{{ $inspection->id }}">
-          <i class="ti tabler-mail me-1"></i> {{ __('E-mail') }}
+          <i class="icon-base ti tabler-mail ti-sm me-1"></i> {{ __('E-mail') }}
         </button>
       </div>
       @endif
@@ -173,7 +234,7 @@
       @if($inspection->damagePoints->isNotEmpty())
       <div class="card mb-5 border-dashed bg-lighter">
         <div class="card-header bg-transparent">
-          <h5 class="mb-0 fw-bold"><i class="ti tabler-camera me-2"></i>{{ niche('visual_inspection_title') }}</h5>
+          <h5 class="mb-0 fw-bold"><i class="icon-base ti tabler-camera ti-md me-2"></i>{{ niche('visual_inspection_title') }}</h5>
         </div>
         <div class="card-body">
           <div class="row g-4">
@@ -188,7 +249,7 @@
                   data-bs-target="#damageModal{{ $point->id }}">
                 @else
                 <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                  <i class="ti tabler-camera-off text-muted fs-1"></i>
+                  <i class="icon-base ti tabler-camera-off text-muted fs-1"></i>
                 </div>
                 @endif
                 <div class="card-body p-3 text-center bg-white">
@@ -197,8 +258,6 @@
                   <p class="mb-0 small text-muted text-truncate">{{ $point->notes }}</p>
                   @endif
                 </div>
-              </div>
-            </div>
 
                 @if($point->photo_path)
                 <!-- Modal for Large Damage Photo -->
@@ -250,9 +309,9 @@
               <td class="px-4 fw-bold text-heading">{{ $item->checklistItem->name }}</td>
               <td class="text-center">
                 @if($item->status === 'ok')
-                <span class="badge bg-label-success px-3"><i class="ti tabler-check me-1"></i> OK</span>
+                <span class="badge bg-label-success px-3"><i class="icon-base ti tabler-check me-1"></i> OK</span>
                 @elseif($item->status === 'not_ok')
-                <span class="badge bg-label-danger px-3"><i class="ti tabler-x me-1"></i> {{ __('RUIM') }}</span>
+                <span class="badge bg-label-danger px-3"><i class="icon-base ti tabler-x me-1"></i> {{ __('RUIM') }}</span>
                 @else
                 <span class="badge bg-label-secondary px-3">N/A</span>
                 @endif
@@ -291,12 +350,12 @@
         </table>
       </div>
     </div>
-    
+
     <div class="card-footer bg-lighter border-top text-center py-4">
-        <p class="mb-0 small text-muted">
-            {{ __('Este documento é parte integrante do histórico do veículo no sistema') }} <strong>{{ config('app.name') }}</strong>.<br>
-            {{ __('Gerado em') }} {{ now()->format('d/m/Y \à\s H:i') }}
-        </p>
+      <p class="mb-0 small text-muted">
+        {{ __('Este documento é parte integrante do histórico do veículo no sistema') }} <strong>{{ config('app.name') }}</strong>.<br>
+        {{ __('Gerado em') }} {{ now()->format('d/m/Y \à\s H:i') }}
+      </p>
     </div>
   </div>
 </div>
