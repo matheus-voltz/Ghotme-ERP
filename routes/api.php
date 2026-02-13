@@ -28,9 +28,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Agenda / Calendário
     Route::get('/calendar/events', [App\Http\Controllers\CalendarController::class, 'fetchEvents']);
+    Route::post('/calendar/events', [App\Http\Controllers\CalendarController::class, 'store']);
+
+    // Dashboard / Stats
+    Route::get('/dashboard/stats', [App\Http\Controllers\Api\DashboardController::class, 'getStats']);
 
     // Perfil e Configurações
-    Route::post('/update-push-token', function(Request $request) {
+    Route::post('/update-push-token', function (Request $request) {
         $request->validate(['token' => 'required|string']);
         $request->user()->update(['expo_push_token' => $request->token]);
         return response()->json(['message' => 'Token atualizado!']);
