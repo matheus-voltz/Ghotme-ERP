@@ -49,10 +49,19 @@ export default function CreateOrderScreen() {
 
     const fetchVehicles = async (cid: string) => {
         try {
+            console.log("Buscando veículos para cliente ID:", cid);
             const response = await api.get(`/clients/${cid}/vehicles`);
-            setVehicles(response.data);
+            console.log("Resposta do servidor (veículos):", response.data);
+
+            if (Array.isArray(response.data)) {
+                setVehicles(response.data);
+            } else {
+                console.warn("A resposta não é um array:", response.data);
+                setVehicles([]);
+            }
         } catch (error) {
-            console.error("Error fetching vehicles:", error);
+            console.error("Erro ao buscar veículos:", error);
+            setVehicles([]);
         }
     };
 
@@ -72,10 +81,17 @@ export default function CreateOrderScreen() {
                 description: description
             };
 
-            await api.post('/os', payload);
+            const response = await api.post('/os', payload);
 
             Alert.alert("Sucesso", "Ordem de Serviço criada com sucesso!", [
-                { text: "OK", onPress: () => router.back() }
+                {
+                    text: "Ir para Checklist",
+                    onPress: () => router.push({
+                        pathname: '/os/checklist',
+                        params: { osId: response.data.id }
+                    })
+                },
+                { text: "Depois", onPress: () => router.back() }
             ]);
         } catch (error: any) {
             console.error("Error creating OS:", error);
@@ -157,17 +173,17 @@ export default function CreateOrderScreen() {
                         </View>
                         <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, opacity: clientId ? 1 : 0.6 }]}>
                             <Picker
-                                selectedValue={vehicleId}
+                                selectedValue={vehicleId.toString()}
                                 onValueChange={(itemValue) => setVehicleId(itemValue)}
-                                enabled={clients.length > 0 && clientId !== ''}
+                                enabled={clientId !== ''}
                                 dropdownIconColor={colors.text}
                             >
                                 <Picker.Item label={clientId ? "Selecione o Veículo" : "Selecione o Cliente Primeiro"} value="" color={colors.subText} />
-                                {vehicles.map((vehicle) => (
+                                {vehicles.map((v) => (
                                     <Picker.Item
-                                        key={vehicle.id}
-                                        label={`${vehicle.modelo} - ${vehicle.placa}`}
-                                        value={vehicle.id}
+                                        key={v.id.toString()}
+                                        label={`${v.marca} ${v.modelo} - ${v.placa}`}
+                                        value={v.id.toString()}
                                         color={colors.text}
                                     />
                                 ))}
@@ -248,7 +264,7 @@ export default function CreateOrderScreen() {
                     </View>
                 </View>
 
-                {/* Section: Serviços e Peças (Placeholder) */}
+                {/* Info Box */}
                 <View style={[styles.infoBox, { backgroundColor: colors.primary + '15' }]}>
                     <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
                     <Text style={[styles.infoText, { color: colors.text }]}>
@@ -256,7 +272,10 @@ export default function CreateOrderScreen() {
                     </Text>
                 </View>
 
-                {/* Submit Button */}
+            </ScrollView>
+
+            {/* Fixed Bottom Action Bar */}
+            <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
                 <TouchableOpacity
                     style={[styles.submitButton, { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 }]}
                     onPress={handleSubmit}
@@ -271,8 +290,7 @@ export default function CreateOrderScreen() {
                         </>
                     )}
                 </TouchableOpacity>
-
-            </ScrollView>
+            </View>
 
             {/* Client Search Modal */}
             {showClientModal && (
@@ -445,19 +463,24 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         lineHeight: 20,
     },
+    footer: {
+        padding: 20,
+        paddingBottom: Platform.OS === 'ios' ? 40 : 20,
+        borderTopWidth: 1,
+        borderTopColor: '#f0f0f0',
+    },
     // Submit Button
     submitButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 18,
-        borderRadius: 16,
+        paddingVertical: 16,
+        borderRadius: 12,
         shadowColor: '#7367F0',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 10,
         elevation: 6,
-        marginBottom: 40,
     },
     submitButtonText: {
         color: '#fff',

@@ -26,8 +26,9 @@ class ClientVehicleController extends Controller
 
     public function getVehicles($clientId)
     {
-        $vehicles = Vehicles::where('client_id', $clientId)
-            ->select('id', 'placa', 'modelo', 'brand')
+        // Corrigido de client_id para cliente_id conforme a migração
+        $vehicles = Vehicles::where('cliente_id', $clientId)
+            ->select('id', 'placa', 'modelo', 'marca')
             ->get();
         return response()->json($vehicles);
     }
@@ -51,7 +52,7 @@ class ClientVehicleController extends Controller
             $os = OrdemServico::create([
                 'company_id' => Auth::user()->company_id,
                 'client_id'  => $request->client_id,
-                'vehicle_id' => $request->veiculo_id, // Note: Model uses vehicle_id, form/view used veiculo_id variable 
+                'veiculo_id' => $request->veiculo_id,
                 'user_id'    => Auth::id(),
                 'status'     => $request->status,
                 'km_entry'   => $request->km_entry ?? 0,

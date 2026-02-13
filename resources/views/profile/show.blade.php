@@ -16,9 +16,11 @@ $breadcrumbs = [['link' => 'home', 'name' => 'Início'], ['link' => 'javascript:
     <li class="nav-item">
       <a class="nav-link active" href="#"><i class="icon-base ti tabler-users icon-sm me-1_5"></i> Minha Conta</a>
     </li>
+    @if (auth()->user()->role === 'admin')
     <li class="nav-item">
       <a class="nav-link" href="{{ route('settings') }}"><i class="icon-base ti tabler-bookmark icon-sm me-1_5"></i> Faturamento & Planos</a>
     </li>
+    @endif
   </ul>
 </div>
 <div class="mb-6">

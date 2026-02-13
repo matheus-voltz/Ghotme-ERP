@@ -195,7 +195,7 @@ use Illuminate\Support\Facades\Route;
                   Luke Skywalker
                   @endif
                 </h6>
-                <small class="text-body-secondary">Admin</small>
+                <small class="text-body-secondary">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Funcionário' }}</small>
               </div>
             </div>
           </a>
@@ -206,29 +206,31 @@ use Illuminate\Support\Facades\Route;
         <li>
           <a class="dropdown-item"
             href="{{ Route::has('profile.show') ? route('profile.show') : 'javascript:void(0);' }}">
-            <i class="icon-base ti tabler-user me-3 icon-md"></i><span class="align-middle">My Profile</span> </a>
+            <i class="icon-base ti tabler-user me-3 icon-md"></i><span class="align-middle">Meu Perfil</span> </a>
         </li>
-        @if (Auth::check() && Laravel\Jetstream\Jetstream::hasApiFeatures())
+        @if (Auth::check() && Auth::user()->role === 'admin' && Laravel\Jetstream\Jetstream::hasApiFeatures())
         <li>
           <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
-            <i class="icon-base ti tabler-settings me-3 icon-md"></i><span class="align-middle">API Tokens</span> </a>
+            <i class="icon-base ti tabler-settings me-3 icon-md"></i><span class="align-middle">Tokens de API</span> </a>
         </li>
         @endif
+        @if (Auth::user()->role === 'admin')
         <li>
           <a class="dropdown-item" href="{{ route('settings') }}">
             <span class="d-flex align-items-center align-middle">
               <i class="flex-shrink-0 icon-base ti tabler-file-dollar me-3 icon-md"></i><span
-                class="flex-grow-1 align-middle">Billing</span>
+                class="flex-grow-1 align-middle">Faturamento</span>
               <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">4</span>
             </span>
           </a>
         </li>
+        @endif
         @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
         <li>
           <div class="dropdown-divider my-1 mx-n2"></div>
         </li>
         <li>
-          <h6 class="dropdown-header">Manage Team</h6>
+          <h6 class="dropdown-header">Gerenciar Equipe</h6>
         </li>
         <li>
           <div class="dropdown-divider my-1"></div>
@@ -236,13 +238,13 @@ use Illuminate\Support\Facades\Route;
         <li>
           <a class="dropdown-item"
             href="{{ Auth::user() ? route('teams.show', Auth::user()->currentTeam->id) : 'javascript:void(0)' }}">
-            <i class="icon-base bx bx-cog icon-md me-3"></i><span>Team Settings</span>
+            <i class="icon-base bx bx-cog icon-md me-3"></i><span>Configurações da Equipe</span>
           </a>
         </li>
         @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
         <li>
           <a class="dropdown-item" href="{{ route('teams.create') }}">
-            <i class="icon-base bx bx-user icon-md me-3"></i><span>Create New Team</span>
+            <i class="icon-base bx bx-user icon-md me-3"></i><span>Criar Nova Equipe</span>
           </a>
         </li>
         @endcan
@@ -251,7 +253,7 @@ use Illuminate\Support\Facades\Route;
           <div class="dropdown-divider my-1"></div>
         </li>
         <li>
-          <h6 class="dropdown-header">Switch Teams</h6>
+          <h6 class="dropdown-header">Trocar de Equipe</h6>
         </li>
         <li>
           <div class="dropdown-divider my-1"></div>
@@ -272,7 +274,7 @@ use Illuminate\Support\Facades\Route;
         <li>
           <a class="dropdown-item" href="{{ route('logout') }}"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="icon-base bx bx-power-off icon-md me-3"></i><span>Logout</span>
+            <i class="icon-base bx bx-power-off icon-md me-3"></i><span>Sair</span>
           </a>
         </li>
         <form method="POST" id="logout-form" action="{{ route('logout') }}">
@@ -283,7 +285,7 @@ use Illuminate\Support\Facades\Route;
           <div class="d-grid px-2 pt-2 pb-1">
             <a class="btn btn-sm btn-danger d-flex"
               href="{{ Route::has('login') ? route('login') : url('auth/login-basic') }}" target="_blank">
-              <small class="align-middle">Login</small>
+              <small class="align-middle">Entrar</small>
               <i class="icon-base ti tabler-login ms-2 icon-14px"></i>
             </a>
           </div>

@@ -29,7 +29,11 @@ class BudgetController extends Controller
     {
         $status = $request->input('status');
         $query = Budget::with(['client', 'veiculo']);
-        
+
+        if (Auth::user()->role !== 'admin') {
+            $query->where('user_id', Auth::id());
+        }
+
         if ($status && in_array($status, ['pending', 'approved', 'rejected'])) {
             $query->where('status', $status);
         }
@@ -67,7 +71,7 @@ class BudgetController extends Controller
         $parts = InventoryItem::where('is_active', true)->get();
         $appSettings = AppSetting::first();
         $validityDays = $appSettings->budget_validity_days ?? 7;
-        
+
         return view('content.pages.budgets.create', compact('clients', 'services', 'parts', 'validityDays'));
     }
 
@@ -131,7 +135,6 @@ class BudgetController extends Controller
             }
 
             return redirect()->route('budgets.pending')->with('success', 'Orçamento Criado!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());
@@ -197,7 +200,6 @@ class BudgetController extends Controller
             }
 
             return response()->json(['success' => true, 'message' => 'Convertido para OS com sucesso!', 'os_id' => $os->id]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
@@ -209,7 +211,7 @@ class BudgetController extends Controller
         $budget = Budget::with(['client', 'veiculo', 'items', 'parts'])->findOrFail($id);
         // Tenta primeiro a coluna 'whatsapp', depois 'phone'
         $phone = $budget->client->whatsapp ?? $budget->client->phone;
-        
+
         if (!$phone) {
             return response()->json(['success' => false, 'message' => 'Cliente sem telefone cadastrado (campos whatsapp e phone vazios).']);
         }
@@ -230,64 +232,57 @@ class BudgetController extends Controller
         return response()->json(['success' => true, 'url' => $url]);
     }
 
-    
 
-        public function quickView($id)
 
-        {
+    public function quickView($id)
 
-            $budget = Budget::with(['client', 'veiculo', 'items.service', 'parts.part'])->findOrFail($id);
+    {
 
-            
+        $budget = Budget::with(['client', 'veiculo', 'items.service', 'parts.part'])->findOrFail($id);
 
-            $html = '<div class="row mb-3">
 
-                        <div class="col-6"><strong>Cliente:</strong><br>'.$budget->client->name.'</div>
 
-                        <div class="col-6 text-end"><strong>Veículo:</strong><br>'.$budget->veiculo->marca.' '.$budget->veiculo->modelo.' ('.$budget->veiculo->placa.')</div>
+        $html = '<div class="row mb-3">
+
+                        <div class="col-6"><strong>Cliente:</strong><br>' . $budget->client->name . '</div>
+
+                        <div class="col-6 text-end"><strong>Veículo:</strong><br>' . $budget->veiculo->marca . ' ' . $budget->veiculo->modelo . ' (' . $budget->veiculo->placa . ')</div>
 
                      </div>';
 
-            
 
-            $html .= '<table class="table table-sm border">
+
+        $html .= '<table class="table table-sm border">
 
                         <thead class="table-light"><tr><th>Item</th><th class="text-center">Qtd</th><th class="text-end">Valor</th></tr></thead>
 
                         <tbody>';
 
-            
 
-            foreach($budget->items as $item) {
 
-                $html .= '<tr><td>'.$item->service->name.'</td><td class="text-center">'.$item->quantity.'</td><td class="text-end">R$ '.number_format($item->price, 2, ',', '.').'</td></tr>';
+        foreach ($budget->items as $item) {
 
-            }
-
-            foreach($budget->parts as $part) {
-
-                $html .= '<tr><td>'.$part->part->name.' (Peça)</td><td class="text-center">'.$part->quantity.'</td><td class="text-end">R$ '.number_format($part->price, 2, ',', '.').'</td></tr>';
-
-            }
-
-            
-
-            $html .= '</tbody><tfoot class="table-light"><tr><th colspan="2" class="text-end">Total:</th><th class="text-end">R$ '.number_format($budget->total, 2, ',', '.').'</th></tr></tfoot></table>';
-
-            
-
-            if($budget->description) {
-
-                $html .= '<div class="mt-3 small text-muted"><strong>Obs:</strong> '.$budget->description.'</div>';
-
-            }
-
-    
-
-            return response($html);
-
+            $html .= '<tr><td>' . $item->service->name . '</td><td class="text-center">' . $item->quantity . '</td><td class="text-end">R$ ' . number_format($item->price, 2, ',', '.') . '</td></tr>';
         }
 
-    }
+        foreach ($budget->parts as $part) {
 
-    
+            $html .= '<tr><td>' . $part->part->name . ' (Peça)</td><td class="text-center">' . $part->quantity . '</td><td class="text-end">R$ ' . number_format($part->price, 2, ',', '.') . '</td></tr>';
+        }
+
+
+
+        $html .= '</tbody><tfoot class="table-light"><tr><th colspan="2" class="text-end">Total:</th><th class="text-end">R$ ' . number_format($budget->total, 2, ',', '.') . '</th></tr></tfoot></table>';
+
+
+
+        if ($budget->description) {
+
+            $html .= '<div class="mt-3 small text-muted"><strong>Obs:</strong> ' . $budget->description . '</div>';
+        }
+
+
+
+        return response($html);
+    }
+}

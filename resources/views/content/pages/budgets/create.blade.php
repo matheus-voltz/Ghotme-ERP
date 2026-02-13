@@ -138,7 +138,7 @@
             vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
 
             if (clientId) {
-                fetch(`{{ url('api/clients') }}/${clientId}/vehicles`)
+                fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
                     .then(res => {
                         if (!res.ok) throw new Error('Erro ao buscar veículos');
                         return res.json();

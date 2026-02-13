@@ -50,6 +50,12 @@
         "projectId": "696283d5-a3ab-4c5b-bfde-f09e66702922"
       }
     },
-    "owner": "nazuki854"
+    "owner": "nazuki854",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/696283d5-a3ab-4c5b-bfde-f09e66702922"
+    }
   }
 }

@@ -1,12 +1,12 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-// CHANGE THIS TO YOUR COMPUTER'S IP IF TESTING ON PHYSICAL DEVICE
-// e.g., 'http://192.168.1.10:8000/api'
-const API_URL = 'http://10.0.0.118:8000/api';
+// URL da API (Local para dev, domínio real para produção)
+const DEV_URL = 'http://10.0.0.118:8000/api';
+const PROD_URL = 'https://ghotme.com.br/api';
 
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: __DEV__ ? DEV_URL : PROD_URL,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

@@ -24,6 +24,10 @@ class OrdemServicoController extends Controller
     {
         $query = OrdemServico::with(['client', 'veiculo']);
 
+        if (Auth::user()->role !== 'admin') {
+            $query->where('user_id', Auth::id());
+        }
+
         $totalData = $query->count();
         $totalFiltered = $totalData;
 
@@ -188,7 +192,7 @@ class OrdemServicoController extends Controller
             $msg = "";
             if ($request->status === 'in_progress') $msg = "O mecânico começou a trabalhar na OS #{$os->id}.";
             if ($request->status === 'completed') $msg = "A OS #{$os->id} foi finalizada e está pronta para entrega!";
-            
+
             if ($msg) {
                 \App\Helpers\Helpers::sendExpoNotification($user->expo_push_token, "Status da OS Atualizado 🛠️", $msg);
             }
@@ -210,7 +214,7 @@ class OrdemServicoController extends Controller
         $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
-        
+
         // Prepare pre-selected vehicles for the dropdown
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
 
@@ -254,7 +258,7 @@ class OrdemServicoController extends Controller
                     $selectedServiceIds[] = $sId;
                 }
             }
-            
+
             // Delete items where service_id is NOT in the selected list
             $os->items()->whereNotIn('service_id', $selectedServiceIds)->delete();
 
@@ -283,14 +287,14 @@ class OrdemServicoController extends Controller
             // Sync Parts (similar logic)
             // Note: Simplification - not handling inventory stock adjustment on edit for now to keep it safe
             $submittedParts = $validated['parts'] ?? [];
-            
+
             $selectedPartIds = [];
             foreach ($submittedParts as $pId => $data) {
                 if (isset($data['selected'])) {
                     $selectedPartIds[] = $pId;
                 }
             }
-            
+
             $os->parts()->whereNotIn('inventory_item_id', $selectedPartIds)->delete();
 
             foreach ($submittedParts as $partId => $data) {
@@ -315,7 +319,6 @@ class OrdemServicoController extends Controller
 
             DB::commit();
             return redirect()->route('ordens-servico')->with('success', 'OS Atualizada com Sucesso!');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', $e->getMessage());

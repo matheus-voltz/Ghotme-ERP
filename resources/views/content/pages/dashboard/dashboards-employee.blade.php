@@ -158,5 +158,58 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
+
+    <div class="row mt-4">
+        <!-- Recent OS Table -->
+        <div class="col-lg-12 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Ordens de Serviço Recentes</h5>
+                    <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-info">Ver todas</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cliente</th>
+                                <th>Veículo</th>
+                                <th>Status</th>
+                                <th>Data</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentOS as $os)
+                            <tr>
+                                <td>#{{ $os->id }}</td>
+                                <td>{{ $os->client->name ?? 'Cliente Removido' }}</td>
+                                <td>{{ $os->veiculo->placa ?? '-' }} - {{ $os->veiculo->modelo ?? '-' }}</td>
+                                <td>
+                                    @switch($os->status)
+                                    @case('in_progress')
+                                    <span class="badge bg-label-info">Em Manutenção</span>
+                                    @break
+                                    @case('completed')
+                                    <span class="badge bg-label-success">Pronto</span>
+                                    @break
+                                    @case('paid')
+                                    <span class="badge bg-label-secondary">Finalizado</span>
+                                    @break
+                                    @default
+                                    <span class="badge bg-label-warning">Pendente</span>
+                                    @endswitch
+                                </td>
+                                <td>{{ $os->created_at->format('d/m/Y') }}</td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4">Nenhuma ordem de serviço recente.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endsection

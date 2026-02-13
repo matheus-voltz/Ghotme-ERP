@@ -4,10 +4,16 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path, G, Rect, Circle } from 'react-native-svg';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTheme } from '../../context/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function ChecklistVisual() {
+  const router = useRouter();
+  const { osId } = useLocalSearchParams();
+  const { colors } = useTheme();
+
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraVisible, setCameraVisible] = useState(false);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
@@ -83,71 +89,77 @@ export default function ChecklistVisual() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Checklist de Entrada</Text>
-        <Text style={styles.subtitle}>Toque nas partes do veículo com avarias</Text>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} showsVerticalScrollIndicator={false}>
+      <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border, paddingTop: 60 }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 15 }}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={[styles.title, { color: colors.text }]}>Checklist de Entrada</Text>
+        </View>
+        <Text style={[styles.subtitle, { color: colors.subText }]}>OS: #{osId || 'N/A'}</Text>
+        <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do veículo com avarias</Text>
       </View>
 
       <View style={styles.carWrapper}>
         <Svg height="500" width="300" viewBox="0 0 300 600">
           {/* CHASSI PRINCIPAL */}
-          <Path 
-            d="M50,120 C50,80 100,50 150,50 C200,50 250,80 250,120 L250,480 C250,520 200,550 150,550 C100,550 50,520 50,480 Z" 
+          <Path
+            d="M50,120 C50,80 100,50 150,50 C200,50 250,80 250,120 L250,480 C250,520 200,550 150,550 C100,550 50,520 50,480 Z"
             fill="#f8f9fa" stroke="#333" strokeWidth="2"
           />
 
           {/* CAPÔ */}
           <G onPress={() => handlePartPress('Capô')}>
-            <Path d="M60,150 L240,150 L250,120 C250,90 200,60 150,60 C100,60 50,90 50,120 L60,150" 
+            <Path d="M60,150 L240,150 L250,120 C250,90 200,60 150,60 C100,60 50,90 50,120 L60,150"
               fill={hasDamage('Capô') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PARA-BRISA */}
           <G onPress={() => handlePartPress('Para-brisa')}>
-            <Path d="M65,155 L235,155 L225,220 L75,220 Z" 
+            <Path d="M65,155 L235,155 L225,220 L75,220 Z"
               fill={hasDamage('Para-brisa') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* TETO */}
           <G onPress={() => handlePartPress('Teto')}>
-            <Rect x="70" y="225" width="160" height="200" 
+            <Rect x="70" y="225" width="160" height="200"
               fill={hasDamage('Teto') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PORTA ESQUERDA DIANTEIRA */}
           <G onPress={() => handlePartPress('Porta Esq. Diant.')}>
-            <Path d="M50,225 L70,225 L70,325 L50,325 Z" 
+            <Path d="M50,225 L70,225 L70,325 L50,325 Z"
               fill={hasDamage('Porta Esq. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PORTA DIREITA DIANTEIRA */}
           <G onPress={() => handlePartPress('Porta Dir. Diant.')}>
-            <Path d="M230,225 L250,225 L250,325 L230,325 Z" 
+            <Path d="M230,225 L250,225 L250,325 L230,325 Z"
               fill={hasDamage('Porta Dir. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PORTA ESQUERDA TRASEIRA */}
           <G onPress={() => handlePartPress('Porta Esq. Tras.')}>
-            <Path d="M50,325 L70,325 L70,425 L50,425 Z" 
+            <Path d="M50,325 L70,325 L70,425 L50,425 Z"
               fill={hasDamage('Porta Esq. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PORTA DIREITA TRASEIRA */}
           <G onPress={() => handlePartPress('Porta Dir. Tras.')}>
-            <Path d="M230,325 L250,325 L250,425 L230,425 Z" 
+            <Path d="M230,325 L250,325 L250,425 L230,425 Z"
               fill={hasDamage('Porta Dir. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* VIDRO TRASEIRO */}
           <G onPress={() => handlePartPress('Vidro Traseiro')}>
-            <Path d="M75,430 L225,430 L235,480 L65,480 Z" 
+            <Path d="M75,430 L225,430 L235,480 L65,480 Z"
               fill={hasDamage('Vidro Traseiro') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
           </G>
 
           {/* PORTA MALAS */}
           <G onPress={() => handlePartPress('Porta Malas')}>
-            <Path d="M60,480 L240,480 L250,510 C250,530 200,545 150,545 C100,545 50,530 50,510 L60,480" 
+            <Path d="M60,480 L240,480 L250,510 C250,530 200,545 150,545 C100,545 50,530 50,510 L60,480"
               fill={hasDamage('Porta Malas') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
           </G>
 
@@ -172,7 +184,7 @@ export default function ChecklistVisual() {
         {damages.length === 0 && (
           <View style={styles.emptyState}>
             <Ionicons name="camera-outline" size={40} color="#ccc" />
-            <Text style={{color: '#999'}}>Nenhuma avaria registrada</Text>
+            <Text style={{ color: '#999' }}>Nenhuma avaria registrada</Text>
           </View>
         )}
         {damages.map((item) => (
@@ -187,7 +199,7 @@ export default function ChecklistVisual() {
             </TouchableOpacity>
           </View>
         ))}
-        
+
         {damages.length > 0 && (
           <TouchableOpacity style={styles.saveButton} onPress={() => Alert.alert("Sucesso", "Vistoria salva localmente!")}>
             <Text style={styles.saveButtonText}>Finalizar Vistoria</Text>

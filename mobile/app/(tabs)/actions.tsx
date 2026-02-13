@@ -41,6 +41,10 @@ export default function ActionsScreen() {
                             onPress={() => {
                                 if (item.id === 'new-os') {
                                     router.push('/os/create');
+                                } else if (item.id === 'new-client') {
+                                    router.push('/clients/create');
+                                } else if (item.id === 'new-vehicle') {
+                                    router.push('/vehicles/create');
                                 } else {
                                     alert(`Ação: ${item.title} (Em breve)`);
                                 }

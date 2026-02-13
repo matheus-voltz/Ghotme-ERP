@@ -18,12 +18,22 @@ class HomePage extends Controller
   {
     $user = \Illuminate\Support\Facades\Auth::user();
     if ($user && $user->role !== 'admin') {
-      // Employee Logic
-      $pendingBudgetsCount = Budget::where('status', 'pending')->count();
-      $runningOSCount = OrdemServico::where('status', 'running')->count();
-      $completedOSToday = OrdemServico::where('status', 'finalized')->whereDate('updated_at', Carbon::today())->count();
+      // Employee Logic - Filter only their own records
+      $pendingBudgetsCount = Budget::where('user_id', $user->id)->where('status', 'pending')->count();
+      $runningOSCount = OrdemServico::where('user_id', $user->id)->where('status', 'running')->count();
+      $completedOSToday = OrdemServico::where('user_id', $user->id)
+        ->where('status', 'finalized')
+        ->whereDate('updated_at', Carbon::today())
+        ->count();
 
       $recentBudgets = Budget::with('client')
+        ->where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+
+      $recentOS = OrdemServico::with(['client', 'veiculo'])
+        ->where('user_id', $user->id)
         ->orderBy('created_at', 'desc')
         ->limit(5)
         ->get();
@@ -33,6 +43,7 @@ class HomePage extends Controller
         'runningOSCount',
         'completedOSToday',
         'recentBudgets',
+        'recentOS',
         'user'
       ));
     }
