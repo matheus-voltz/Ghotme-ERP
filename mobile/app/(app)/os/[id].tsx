@@ -7,7 +7,8 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
-    StatusBar
+    StatusBar,
+    Linking
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -104,6 +105,53 @@ export default function OSDetailScreen() {
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível concluir o serviço.');
+        }
+    };
+
+    const handleFinalizeOS = async () => {
+        Alert.alert(
+            "Finalizar Ordem",
+            "Deseja concluir este serviço e notificar o cliente?",
+            [
+                { text: "Cancelar", style: "cancel" },
+                { 
+                    text: "Sim, Notificar WhatsApp", 
+                    onPress: () => processFinalization(true) 
+                },
+                { 
+                    text: "Apenas Finalizar", 
+                    onPress: () => processFinalization(false) 
+                }
+            ]
+        );
+    };
+
+    const processFinalization = async (notify: boolean) => {
+        try {
+            setUpdating(true);
+            await api.patch(`/os/${id}/status`, { status: 'finalized' });
+            setOs({ ...os, status: 'finalized' });
+
+            if (notify) {
+                const phone = os.client?.whatsapp || os.client?.phone;
+                const message = `Olá ${os.client?.name || 'Cliente'}! 🚗\nSeu veículo ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto na oficina Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
+                
+                if (phone) {
+                    const cleanPhone = phone.replace(/\D/g, '');
+                    const url = `whatsapp://send?phone=55${cleanPhone}&text=${encodeURIComponent(message)}`;
+                    Linking.openURL(url).catch(() => {
+                        Alert.alert("Erro", "Não foi possível abrir o WhatsApp.");
+                    });
+                } else {
+                    Alert.alert("Aviso", "Cliente não possui telefone cadastrado.");
+                }
+            }
+
+            Alert.alert("Sucesso", "Ordem de Serviço finalizada!");
+        } catch (error) {
+            Alert.alert("Erro", "Falha ao finalizar OS.");
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -322,7 +370,23 @@ export default function OSDetailScreen() {
                     </View>
                 )}
 
-                <View style={{ height: 40 }} />
+                {/* BOTÃO FINALIZAR GERAL */}
+                {os.status !== 'finalized' && os.status !== 'canceled' && (
+                    <TouchableOpacity 
+                        style={[styles.finalizeButton, { backgroundColor: '#28C76F' }]}
+                        onPress={handleFinalizeOS}
+                        disabled={updating}
+                    >
+                        {updating ? <ActivityIndicator color="#fff" /> : (
+                            <>
+                                <Ionicons name="checkmark-done-circle" size={24} color="#fff" />
+                                <Text style={styles.finalizeButtonText}>FINALIZAR E ENTREGAR</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+                )}
+
+                <View style={{ height: 100 }} />
             </ScrollView>
         </View>
     );
@@ -560,5 +624,26 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
+    },
+    finalizeButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 18,
+        borderRadius: 16,
+        marginTop: 20,
+        marginHorizontal: 5,
+        shadowColor: '#28C76F',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+    finalizeButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginLeft: 10,
+        letterSpacing: 1,
     }
 });

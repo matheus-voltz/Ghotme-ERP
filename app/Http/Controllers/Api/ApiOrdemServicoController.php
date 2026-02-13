@@ -94,19 +94,106 @@ class ApiOrdemServicoController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:pending,running,finalized,canceled'
-        ]);
+        public function updateStatus(Request $request, $id)
 
-        $os = OrdemServico::findOrFail($id);
-        $os->status = $request->status;
-        $os->save();
+        {
 
-        return response()->json([
-            'message' => 'Status atualizado com sucesso',
-            'os' => $os
-        ]);
+            $request->validate([
+
+                'status' => 'required|in:pending,running,finalized,canceled'
+
+            ]);
+
+    
+
+            $os = OrdemServico::findOrFail($id);
+
+            $os->status = $request->status;
+
+            $os->save();
+
+    
+
+            return response()->json([
+
+                'message' => 'Status atualizado com sucesso',
+
+                'os' => $os
+
+            ]);
+
+        }
+
+    
+
+        public function toggleTimer($itemId)
+
+        {
+
+            $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
+
+            
+
+            if ($item->status === 'in_progress') {
+
+                // Pausar
+
+                $item->status = 'paused';
+
+                $item->duration_seconds += now()->diffInSeconds($item->started_at);
+
+                $item->started_at = null;
+
+            } else {
+
+                // Iniciar/Retomar
+
+                $item->status = 'in_progress';
+
+                $item->started_at = now();
+
+            }
+
+            
+
+            $item->save();
+
+            return response()->json(['success' => true, 'item' => $item]);
+
+        }
+
+    
+
+        public function completeItem($itemId)
+
+        {
+
+            $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
+
+            
+
+            // Se estava rodando, soma o tempo final
+
+            if ($item->status === 'in_progress' && $item->started_at) {
+
+                $item->duration_seconds += now()->diffInSeconds($item->started_at);
+
+            }
+
+            
+
+            $item->status = 'completed';
+
+            $item->started_at = null;
+
+            $item->save();
+
+            
+
+            return response()->json(['success' => true, 'item' => $item]);
+
+        }
+
     }
-}
+
+    

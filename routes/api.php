@@ -39,6 +39,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ordem de Serviço
     Route::post('/os', [ApiOrdemServicoController::class, 'store']);
     Route::get('/os/{id}', [ApiOrdemServicoController::class, 'show']);
+    Route::patch('/os/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
+    Route::post('/os/items/{itemId}/toggle-timer', [ApiOrdemServicoController::class, 'toggleTimer']);
+    Route::post('/os/items/{itemId}/complete', [ApiOrdemServicoController::class, 'completeItem']);
     
     // Checklist
     Route::post('/checklist/visual', [ApiChecklistController::class, 'storeVisual']);
