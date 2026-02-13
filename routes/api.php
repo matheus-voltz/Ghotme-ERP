@@ -44,6 +44,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/ordens-servico', [ApiOrdemServicoController::class, 'index']);
     Route::get('/ordens-servico/{id}', [ApiOrdemServicoController::class, 'show']);
 
+    // Orçamentos API
+    Route::get('/budgets', [\App\Http\Controllers\Api\ApiBudgetController::class, 'index']);
+    Route::get('/budgets/{id}', [\App\Http\Controllers\Api\ApiBudgetController::class, 'show']);
+
     // Chat Routes
     Route::get('/chat/contacts', [ChatController::class, 'contacts']);
     Route::get('/chat/messages/{userId}', [ChatController::class, 'messages']);

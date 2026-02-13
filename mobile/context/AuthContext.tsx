@@ -54,10 +54,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     async function signOut() {
-        setUser(null);
-        await SecureStore.deleteItemAsync('userToken');
-        await SecureStore.deleteItemAsync('userData');
-        router.replace('/');
+        try {
+            setUser(null);
+            await SecureStore.deleteItemAsync('userToken');
+            await SecureStore.deleteItemAsync('userData');
+        } catch (error) {
+            console.error('Error during signOut:', error);
+        }
     }
 
     return (

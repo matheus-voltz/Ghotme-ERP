@@ -47,6 +47,8 @@ export default function ActionsScreen() {
                                     router.push('/vehicles/create');
                                 } else if (item.id === 'calendar') {
                                     router.push('/calendar');
+                                } else if (item.id === 'parts') {
+                                    router.push('/inventory');
                                 } else {
                                     alert(`Ação: ${item.title} (Em breve)`);
                                 }

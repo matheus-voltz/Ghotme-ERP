@@ -109,7 +109,7 @@ export default function CalendarScreen() {
                   key={index} 
                   style={styles.eventCard}
                   onPress={() => router.push({
-                    pathname: `/calendar/${event.id}`,
+                    pathname: "/calendar/[id]",
                     params: { 
                         id: event.id,
                         title: event.title,

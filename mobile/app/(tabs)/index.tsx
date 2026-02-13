@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
-  FlatList,
   ActivityIndicator,
   Alert,
   TouchableOpacity,
@@ -15,82 +14,77 @@ import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 
-import * as Notifications from 'expo-notifications';
+// Helper for status translations
+const statusTranslations: { [key: string]: string } = {
+  'pending': 'Pendente',
+  'running': 'Em Execução',
+  'finalized': 'Finalizada',
+  'canceled': 'Cancelada',
+};
+
+// Helper for status colors (Vuexy Palette)
+const getStatusColor = (status: string) => {
+  switch (status?.toLowerCase()) {
+    case 'pending': return '#FF9F43'; // Warning
+    case 'running': return '#00CFE8'; // Info/Execution
+    case 'finalized': return '#28C76F'; // Success
+    case 'canceled': return '#EA5455'; // Danger
+    default: return '#7367F0'; // Primary
+  }
+};
+
+const numberFormat = (value: any) => {
+  return parseFloat(value || 0).toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
 
 export default function DashboardScreen() {
   const { user } = useAuth();
-  const [data, setData] = useState<any>(null); // Changed type and initial value
+  const router = useRouter();
+  const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const router = useRouter();
 
-  useEffect(() => {
-    fetchDashboardData(); // Changed function name
-  }, []);
-
-  const fetchDashboardData = async () => { // Changed function name
+  const fetchDashboardData = async () => {
     try {
-      const response = await api.get('/dashboard/stats'); // Changed API endpoint
+      const response = await api.get('/dashboard/stats');
       setData(response.data);
-    } catch (error: any) {
-      console.error("Error fetching dashboard data:", error); // Updated log message
-      Alert.alert('Erro', 'Não foi possível carregar os dados do painel.'); // Updated error message
+    } catch (error) {
+      console.error("Dashboard error:", error);
+      Alert.alert('Erro', 'Não foi possível carregar os dados do painel.');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    fetchDashboardData(); // Changed function name
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-      case 'em aberto':
-        return '#FF9F43'; // Orange
-      case 'approved':
-      case 'aprovado':
-        return '#28C76F'; // Green
-      case 'running':
-      case 'in_progress':
-      case 'execução':
-        return '#00CFE8'; // Cyan
-      case 'finalized':
-      case 'concluído':
-      case 'paid':
-        return '#28C76F'; // Green
-      case 'cancelado':
-        return '#EA5455'; // Red
-      default: return '#7367F0'; // Purple default
-    }
-  };
-
-  const statusTranslations: { [key: string]: string } = {
-    pending: 'Pendente',
-    running: 'Em Execução',
-    finalized: 'Finalizado',
-    approved: 'Aprovado',
-    rejected: 'Reprovado',
-    paid: 'Pago',
-    completed: 'Concluído',
-    in_progress: 'Em Andamento'
-  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDashboardData();
+  }, []);
 
   const renderAdminHeader = () => {
     if (!data) return null;
     return (
       <View style={styles.adminStatsContainer}>
-        {/* Financial Cards Scroll */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.horizontalScroll}>
-          <View style={[styles.statCard, { borderLeftColor: '#28C76F' }]}>
+        {/* Horizontal Financial Summary */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalScroll}
+        >
+          {/* Revenue Card */}
+          <View style={[styles.statCard, { borderLeftColor: '#7367F0' }]}>
             <Text style={styles.statLabel}>Receita Mensal</Text>
-            <Text style={styles.statValue}>R$ {numberFormat(data.revenueMonth)}</Text>
+            <Text style={styles.statValue}>R$ {numberFormat(data.monthlyRevenue)}</Text>
             <View style={styles.growthContainer}>
               <Ionicons
                 name={data.revenueGrowth >= 0 ? "trending-up" : "trending-down"}
@@ -98,70 +92,69 @@ export default function DashboardScreen() {
                 color={data.revenueGrowth >= 0 ? "#28C76F" : "#EA5455"}
               />
               <Text style={[styles.growthText, { color: data.revenueGrowth >= 0 ? "#28C76F" : "#EA5455" }]}>
-                {Math.abs(data.revenueGrowth).toFixed(1)}% vs mês ant.
+                {Math.abs(data.revenueGrowth || 0).toFixed(1)}% vs ant.
               </Text>
             </View>
           </View>
 
-          <View style={[styles.statCard, { borderLeftColor: '#00CFE8' }]}>
+          {/* Profitability Card */}
+          <View style={[styles.statCard, { borderLeftColor: '#28C76F' }]}>
             <Text style={styles.statLabel}>Lucratividade</Text>
-            <Text style={styles.statValue}>{numberFormat(data.monthlyProfitability)}%</Text>
-            <Text style={styles.statSubLabel}>Margem Líquida</Text>
+            <Text style={styles.statValue}>{data.monthlyProfitability || 0}%</Text>
+            <Text style={styles.statSubLabel}>Margem média do mês</Text>
           </View>
 
-          <View style={[styles.statCard, { borderLeftColor: '#7367F0' }]}>
-            <Text style={styles.statLabel}>Clientes Totais</Text>
-            <Text style={styles.statValue}>{data.totalClients}</Text>
-            <Text style={styles.statSubLabel}>Base Ativa</Text>
+          {/* Clients Card */}
+          <View style={[styles.statCard, { borderLeftColor: '#FF9F43' }]}>
+            <Text style={styles.statLabel}>Novos Clientes</Text>
+            <Text style={styles.statValue}>{data.totalClients || 0}</Text>
+            <Text style={styles.statSubLabel}>Base ativa na oficina</Text>
           </View>
         </ScrollView>
 
-        {/* OS Status Grid */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Status das OS</Text>
-        </View>
+        {/* Operational Grid */}
         <View style={styles.statusGrid}>
-          <TouchableOpacity style={styles.statusBox} onPress={() => router.push('/os')}>
+          <View style={styles.statusBox}>
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
-              <Ionicons name="time-outline" size={20} color="#FF9F43" />
+              <Ionicons name="hourglass-outline" size={20} color="#FF9F43" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats.pending}</Text>
+            <Text style={styles.statusCountText}>{data.osStats?.pending || 0}</Text>
             <Text style={styles.statusLabelText}>Pendentes</Text>
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity style={styles.statusBox} onPress={() => router.push('/os')}>
+          <View style={styles.statusBox}>
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
-              <Ionicons name="build-outline" size={20} color="#00CFE8" />
+              <Ionicons name="play-outline" size={20} color="#00CFE8" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats.running}</Text>
-            <Text style={styles.statusLabelText}>Execução</Text>
-          </TouchableOpacity>
+            <Text style={styles.statusCountText}>{data.osStats?.running || 0}</Text>
+            <Text style={styles.statusLabelText}>Em Execução</Text>
+          </View>
 
-          <TouchableOpacity style={styles.statusBox} onPress={() => router.push('/os')}>
+          <View style={styles.statusBox}>
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
-              <Ionicons name="checkmark-circle-outline" size={20} color="#28C76F" />
+              <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
-            <Text style={styles.statusCountText}>{data.osStats.finalized_today}</Text>
-            <Text style={styles.statusLabelText}>Prontas Hoje</Text>
-          </TouchableOpacity>
+            <Text style={styles.statusCountText}>{data.osStats?.finalized_today || 0}</Text>
+            <Text style={styles.statusLabelText}>Finalizadas Hoje</Text>
+          </View>
         </View>
 
-        {/* Critical Alerts */}
-        {(data.lowStockItems > 0 || data.pendingBudgets > 0) && (
+        {/* Alerts Section */}
+        {(data.lowStockCount > 0 || data.pendingBudgetsCount > 0) && (
           <View style={styles.alertsContainer}>
-            <Text style={styles.sectionTitle}>Atenção Necessária</Text>
+            <Text style={styles.sectionTitle}>Alertas Críticos</Text>
             <View style={styles.alertRow}>
-              {data.lowStockItems > 0 && (
-                <View style={[styles.alertItem, { backgroundColor: '#EA545515' }]}>
-                  <Ionicons name="cube-outline" size={18} color="#EA5455" />
-                  <Text style={styles.alertText}>{data.lowStockItems} itens com baixo estoque</Text>
-                </View>
+              {data.lowStockCount > 0 && (
+                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#EA545515' }]} onPress={() => router.push('/inventory')}>
+                  <Ionicons name="warning" size={20} color="#EA5455" />
+                  <Text style={styles.alertText}>{data.lowStockCount} itens com baixo estoque</Text>
+                </TouchableOpacity>
               )}
-              {data.pendingBudgets > 0 && (
-                <View style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]}>
-                  <Ionicons name="document-text-outline" size={18} color="#FF9F43" />
-                  <Text style={styles.alertText}>{data.pendingBudgets} orçamentos aguardando</Text>
-                </View>
+              {data.pendingBudgetsCount > 0 && (
+                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]} onPress={() => Alert.alert('Orçamentos', 'Existem orçamentos aguardando aprovação.')}>
+                  <Ionicons name="document-text" size={20} color="#FF9F43" />
+                  <Text style={styles.alertText}>{data.pendingBudgetsCount} orçamentos pendentes</Text>
+                </TouchableOpacity>
               )}
             </View>
           </View>
@@ -170,9 +163,91 @@ export default function DashboardScreen() {
     );
   };
 
-  const numberFormat = (val: any) => {
-    return parseFloat(val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const renderMechanicHeader = () => {
+    if (!data) return null;
+    return (
+      <View style={styles.adminStatsContainer}>
+        {/* Mechanic Summary Cards */}
+        <View style={styles.statusGrid}>
+          <View style={styles.statusBox}>
+            <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
+              <Ionicons name="play-outline" size={20} color="#00CFE8" />
+            </View>
+            <Text style={styles.statusCountText}>{data.stats?.runningOS || 0}</Text>
+            <Text style={styles.statusLabelText}>Em Execução</Text>
+          </View>
+
+          <View style={styles.statusBox}>
+            <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
+              <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
+            </View>
+            <Text style={styles.statusCountText}>{data.stats?.completedToday || 0}</Text>
+            <Text style={styles.statusLabelText}>Prontas Hoje</Text>
+          </View>
+
+          <View style={styles.statusBox}>
+            <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
+              <Ionicons name="document-text-outline" size={20} color="#FF9F43" />
+            </View>
+            <Text style={styles.statusCountText}>{data.stats?.pendingBudgets || 0}</Text>
+            <Text style={styles.statusLabelText}>Orçamentos</Text>
+          </View>
+        </View>
+
+        <View style={{ marginTop: 10 }}>
+          <Text style={styles.sectionTitle}>Minhas Atividades</Text>
+          {data?.recentOS?.map((item: any) => renderOSCard(item))}
+          {(!data?.recentOS || data.recentOS.length === 0) && (
+            <View style={styles.emptyContainer}>
+              <Ionicons name="clipboard-outline" size={40} color="#ccc" />
+              <Text style={styles.emptyText}>Sem ordens atribuídas</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    );
   };
+
+  const renderOSCard = (item: any) => (
+    <TouchableOpacity
+      key={item.id}
+      style={styles.card}
+      activeOpacity={0.9}
+      onPress={() => Alert.alert('Detalhes', `Ordem #${item.id} - ${item.client_name}`)}
+    >
+      <View style={styles.cardHeader}>
+        <View style={styles.idBadge}>
+          <Text style={styles.idText}>#{item.id}</Text>
+        </View>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+          <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+            {statusTranslations[item.status?.toLowerCase()] || item.status}
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.cardBody}>
+        <View style={styles.infoRow}>
+          <Ionicons name="person-outline" size={16} color="#666" style={{ marginRight: 6 }} />
+          <Text style={styles.clientName} numberOfLines={1}>{item.client_name}</Text>
+        </View>
+        <View style={styles.infoRow}>
+          <Ionicons name="car-sport-outline" size={16} color="#666" style={{ marginRight: 6 }} />
+          <Text style={styles.vehicleInfo}>{item.vehicle} - {item.plate}</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.cardFooter}>
+          <View style={styles.dateContainer}>
+            <Ionicons name="calendar-outline" size={14} color="#999" />
+            <Text style={styles.dateText}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
+          </View>
+          <Text style={{ fontSize: 13, fontWeight: '700', color: '#7367F0' }}>
+            R$ {numberFormat(item.total)}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -188,11 +263,11 @@ export default function DashboardScreen() {
         <View style={styles.headerContent}>
           <View>
             <Text style={styles.welcomeText}>Olá, {user?.name || 'Bem-vindo'}</Text>
-            <Text style={styles.subtitleText}>Resumo da sua oficina hoje</Text>
-
+            <Text style={styles.subtitleText}>
+              {user?.role === 'admin' ? 'Resumo da oficina hoje' : 'Seu portal de trabalho'}
+            </Text>
           </View>
           <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
-            {/* Placeholder for user avatar */}
             <View style={styles.avatarPlaceholder}>
               <Text style={styles.avatarText}>
                 {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
@@ -202,9 +277,10 @@ export default function DashboardScreen() {
         </View>
       </LinearGradient>
 
-      {/* Content List */}
+      {/* Content Scroll Area */}
       <ScrollView
         style={styles.listContainer}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -212,13 +288,14 @@ export default function DashboardScreen() {
             onRefresh={onRefresh}
             colors={['#7367F0']}
             tintColor="#7367F0"
+            progressViewOffset={140}
           />
         }
       >
         {loading && !refreshing ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#7367F0" />
-            <Text style={{ marginTop: 10, color: '#666' }}>Carregando painel...</Text>
+            <Text style={{ marginTop: 10, color: '#666' }}>Carregando...</Text>
           </View>
         ) : (
           <View>
@@ -227,59 +304,15 @@ export default function DashboardScreen() {
                 {renderAdminHeader()}
                 <View style={{ marginTop: 10 }}>
                   <Text style={styles.sectionTitle}>Atividades Recentes</Text>
-                  {data?.recentOS?.map((item: any) => (
-                    <TouchableOpacity
-                      key={item.id}
-                      style={styles.card}
-                      activeOpacity={0.9}
-                      onPress={() => Alert.alert('Detalhes', `Ordem #${item.id} - ${item.client_name}`)}
-                    >
-                      <View style={styles.cardHeader}>
-                        <View style={styles.idBadge}>
-                          <Text style={styles.idText}>#{item.id}</Text>
-                        </View>
-                        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
-                          <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                            {statusTranslations[item.status?.toLowerCase()] || item.status}
-                          </Text>
-                        </View>
-                      </View>
-
-                      <View style={styles.cardBody}>
-                        <View style={styles.infoRow}>
-                          <Ionicons name="person-outline" size={16} color="#666" style={{ marginRight: 6 }} />
-                          <Text style={styles.clientName} numberOfLines={1}>{item.client_name}</Text>
-                        </View>
-                        <View style={styles.infoRow}>
-                          <Ionicons name="car-sport-outline" size={16} color="#666" style={{ marginRight: 6 }} />
-                          <Text style={styles.vehicleInfo}>{item.vehicle} - {item.plate}</Text>
-                        </View>
-                        <View style={styles.divider} />
-                        <View style={styles.cardFooter}>
-                          <View style={styles.dateContainer}>
-                            <Ionicons name="calendar-outline" size={14} color="#999" />
-                            <Text style={styles.dateText}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
-                          </View>
-                          <Text style={{ fontSize: 13, fontWeight: '700', color: '#7367F0' }}>
-                            R$ {numberFormat(item.total)}
-                          </Text>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  ))}
+                  {data?.recentOS?.map((item: any) => renderOSCard(item))}
                 </View>
               </>
-            ) : (
-              <View style={{ marginTop: 25 }}>
-                <Text style={styles.sectionTitle}>Minhas Atividades</Text>
-                {/* Employee logic ... maybe list their tasks here */}
-              </View>
-            )}
+            ) : renderMechanicHeader()}
           </View>
         )}
       </ScrollView>
 
-      {/* Floating Action Button (Optional - for creating new order) */}
+      {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => router.push('/os/create')}
@@ -297,11 +330,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
-    paddingTop: 60, // Safe area padding
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 60,
     paddingBottom: 25,
     paddingHorizontal: 24,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+    zIndex: 10,
+    elevation: 5,
   },
   headerContent: {
     flexDirection: 'row',
@@ -340,11 +379,11 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    marginTop: -20, // Overlap the header slightly
-    paddingHorizontal: 20,
   },
-  flatListContent: {
-    paddingBottom: 80, // Space for FAB
+  scrollContent: {
+    paddingTop: 140,
+    paddingHorizontal: 20,
+    paddingBottom: 100,
   },
   loadingContainer: {
     flex: 1,
@@ -352,121 +391,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 50,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    marginBottom: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  idBadge: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  idText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#555',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-  },
-  cardBody: {
-    // Body styles
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  clientName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    flex: 1,
-  },
-  vehicleInfo: {
-    fontSize: 14,
-    color: '#666',
-    flex: 1,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#f0f0f0',
-    marginVertical: 12,
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  dateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#999',
-    marginLeft: 6,
-  },
-  detailsLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailsText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#7367F0',
-    marginRight: 4,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    marginTop: 60,
-  },
-  emptyText: {
-    marginTop: 10,
-    color: '#999',
-    fontSize: 16,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#7367F0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#7367F0',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  // Admin Dashboard Styles
   adminStatsContainer: {
-    marginTop: 25,
-    marginBottom: 20,
+    width: '100%',
   },
   horizontalScroll: {
     marginHorizontal: -20,
@@ -513,12 +439,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 4,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -561,9 +481,10 @@ const styles = StyleSheet.create({
     color: '#666',
     fontWeight: '600',
     marginTop: 2,
+    textAlign: 'center',
   },
   alertsContainer: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   alertRow: {
     gap: 10,
@@ -579,5 +500,112 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginLeft: 10,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    marginBottom: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  idBadge: {
+    backgroundColor: '#7367F015',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
+  idText: {
+    color: '#7367F0',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+  },
+  cardBody: {
+    gap: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  clientName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    flex: 1,
+  },
+  vehicleInfo: {
+    fontSize: 13,
+    color: '#666',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#f1f1f1',
+    marginVertical: 4,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  dateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 12,
+    color: '#999',
+    marginLeft: 6,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 16,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  emptyText: {
+    marginTop: 10,
+    color: '#999',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#7367F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#7367F0',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+    zIndex: 20,
   },
 });

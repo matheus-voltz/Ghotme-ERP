@@ -24,15 +24,34 @@ class DashboardController extends Controller
         $companyId = $user->company_id;
 
         if ($user->role !== 'admin') {
-            // Employee specific stats (already somewhat handled in mobile/app/(tabs)/index.tsx but good to have here)
+            $myRecentOS = OrdemServico::where('user_id', $user->id)
+                ->with(['client', 'veiculo'])
+                ->orderBy('updated_at', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($os) {
+                    return [
+                        'id' => $os->id,
+                        'status' => $os->status,
+                        'client_name' => $os->client->name ?? $os->client->company_name ?? 'N/A',
+                        'vehicle' => $os->veiculo ? "{$os->veiculo->marca} {$os->veiculo->modelo}" : 'N/A',
+                        'plate' => $os->veiculo->placa ?? '',
+                        'total' => $os->total,
+                        'created_at' => $os->created_at->format('Y-m-d H:i:s'),
+                    ];
+                });
+
             return response()->json([
                 'role' => $user->role,
-                'pendingBudgetsCount' => Budget::where('user_id', $user->id)->where('status', 'pending')->count(),
-                'runningOSCount' => OrdemServico::where('user_id', $user->id)->where('status', 'running')->count(),
-                'completedOSToday' => OrdemServico::where('user_id', $user->id)
-                    ->where('status', 'finalized')
-                    ->whereDate('updated_at', $today)
-                    ->count(),
+                'stats' => [
+                    'pendingBudgets' => Budget::where('user_id', $user->id)->where('status', 'pending')->count(),
+                    'runningOS' => OrdemServico::where('user_id', $user->id)->where('status', 'running')->count(),
+                    'completedToday' => OrdemServico::where('user_id', $user->id)
+                        ->where('status', 'finalized')
+                        ->whereDate('updated_at', $today)
+                        ->count(),
+                ],
+                'recentOS' => $myRecentOS,
             ]);
         }
 

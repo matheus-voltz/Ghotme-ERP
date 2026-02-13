@@ -10,19 +10,17 @@ import * as Haptics from 'expo-haptics';
 export default function TabLayout() {
   const { user, loading } = useAuth();
 
-  useEffect(() => {
-    if (!loading && !user) {
-      router.replace('/');
-    }
-  }, [user, loading]);
+  if (loading) {
+    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
+  }
+
+  if (!user) {
+    return <Redirect href="/" />;
+  }
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
-
-  if (loading || !user) {
-    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
-  }
 
   return (
     <Tabs
@@ -45,7 +43,7 @@ export default function TabLayout() {
           ...styles.shadow,
         },
       }}>
-      
+
       <Tabs.Screen
         name="index"
         options={{
@@ -86,13 +84,13 @@ export default function TabLayout() {
           ),
         }}
         listeners={() => ({
-            tabPress: (e) => {
-                e.preventDefault();
-                handleTabPress();
-                console.log("Clicou em Vistoria");
-                Alert.alert("Debug", "Botão Vistoria Clicado!");
-                router.push('/screens/ChecklistVisual');
-            },
+          tabPress: (e) => {
+            e.preventDefault();
+            handleTabPress();
+            console.log("Clicou em Vistoria");
+            Alert.alert("Debug", "Botão Vistoria Clicado!");
+            router.push('/os/checklist');
+          },
         })}
       />
 
