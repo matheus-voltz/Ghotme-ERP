@@ -16,6 +16,27 @@ class HomePage extends Controller
 {
   public function index()
   {
+    $user = \Illuminate\Support\Facades\Auth::user();
+    if ($user && $user->role !== 'admin') {
+      // Employee Logic
+      $pendingBudgetsCount = Budget::where('status', 'pending')->count();
+      $runningOSCount = OrdemServico::where('status', 'running')->count();
+      $completedOSToday = OrdemServico::where('status', 'finalized')->whereDate('updated_at', Carbon::today())->count();
+
+      $recentBudgets = Budget::with('client')
+        ->orderBy('created_at', 'desc')
+        ->limit(5)
+        ->get();
+
+      return view('content.pages.dashboard.dashboards-employee', compact(
+        'pendingBudgetsCount',
+        'runningOSCount',
+        'completedOSToday',
+        'recentBudgets',
+        'user'
+      ));
+    }
+
     $today = Carbon::today();
     $startOfMonth = Carbon::now()->startOfMonth();
 

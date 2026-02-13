@@ -1,0 +1,141 @@
+{
+    "menu": [
+        {
+            "url": "/dashboard",
+            "name": "Home",
+            "icon": "menu-icon icon-base ti tabler-smart-home",
+            "slug": "dashboard"
+        },
+        {
+            "url": "/calendar",
+            "name": "Calendário",
+            "icon": "menu-icon icon-base ti tabler-calendar",
+            "slug": "calendar"
+        },
+        {
+            "url": "/kanban",
+            "name": "Kanban",
+            "icon": "menu-icon icon-base ti tabler-layout-kanban",
+            "slug": "kanban"
+        },
+        {
+            "name": "Ordens de Serviço",
+            "icon": "menu-icon icon-base ti tabler-file",
+            "slug": "ordens",
+            "submenu": [
+                {
+                    "url": "/ordens-servico",
+                    "name": "Todas as OS",
+                    "slug": "ordens-servico"
+                },
+                {
+                    "url": "/ordens-servico/create",
+                    "name": "Criar OS",
+                    "slug": "ordens-servico.create"
+                },
+                {
+                    "url": "/ordens-servico/checklist",
+                    "name": "Checklist de Entrada",
+                    "slug": "ordens-servico.checklist"
+                }
+            ]
+        },
+        {
+            "name": "Orçamentos",
+            "icon": "menu-icon icon-base ti tabler-file-dollar",
+            "slug": "budgets",
+            "submenu": [
+                {
+                    "url": "/budgets/pending",
+                    "name": "Aguardando aprovação",
+                    "slug": "budgets.pending"
+                },
+                {
+                    "url": "/budgets/approved",
+                    "name": "Aprovados",
+                    "slug": "budgets.approved"
+                },
+                {
+                    "url": "/budgets/rejected",
+                    "name": "Reprovados",
+                    "slug": "budgets.rejected"
+                },
+                {
+                    "url": "/budgets/send-whatsapp",
+                    "name": "Enviar por WhatsApp",
+                    "slug": "budgets.send-whatsapp"
+                }
+            ]
+        },
+        {
+            "name": "Clientes & Veículos",
+            "icon": "menu-icon icon-base ti tabler-users",
+            "slug": [
+                "clients",
+                "vehicles",
+                "vehicle-history"
+            ],
+            "submenu": [
+                {
+                    "url": "/clients",
+                    "name": "Clientes",
+                    "slug": "clients"
+                },
+                {
+                    "url": "/vehicles",
+                    "name": "Veículos",
+                    "slug": "vehicles"
+                },
+                {
+                    "url": "/vehicle-history",
+                    "name": "Histórico do veículo",
+                    "slug": "vehicle-history"
+                }
+            ]
+        },
+        {
+            "name": "Estoque",
+            "icon": "menu-icon icon-base ti tabler-box",
+            "slug": "inventory",
+            "submenu": [
+                {
+                    "url": "/inventory/items",
+                    "name": "Itens/Peças",
+                    "slug": "inventory.items"
+                },
+                {
+                    "url": "/inventory/stock-in",
+                    "name": "Entrada de estoque",
+                    "slug": "inventory.stock-in"
+                },
+                {
+                    "url": "/inventory/stock-out",
+                    "name": "Saída de estoque",
+                    "slug": "inventory.stock-out"
+                }
+            ]
+        },
+        {
+            "name": "Suporte",
+            "icon": "menu-icon icon-base ti tabler-help",
+            "slug": "support",
+            "submenu": [
+                {
+                    "url": "/support/chat",
+                    "name": "Chat Suporte",
+                    "slug": "support.chat"
+                },
+                {
+                    "url": "/support/knowledge-base",
+                    "name": "Base de conhecimento",
+                    "slug": "support.knowledge-base"
+                },
+                {
+                    "url": "/support/open-ticket",
+                    "name": "Abrir chamado",
+                    "slug": "support.open-ticket"
+                }
+            ]
+        }
+    ]
+}

@@ -5,6 +5,7 @@ import { Redirect } from 'expo-router';
 import { useEffect } from 'react';
 import { View, Platform, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 
 export default function TabLayout() {
   const { user, loading } = useAuth();
@@ -15,82 +16,93 @@ export default function TabLayout() {
     }
   }, [user, loading]);
 
+  const handleTabPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   if (loading || !user) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8f9fa' }}>
-        {/* Placeholder for loading */}
-      </View>
-    );
+    return <View style={{ flex: 1, backgroundColor: '#f8f9fa' }} />;
   }
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarShowLabel: false,
+        tabBarShowLabel: true, // Voltei o label para ajudar na distinção
+        tabBarActiveTintColor: '#7367F0',
+        tabBarInactiveTintColor: '#B0B0B0',
         tabBarStyle: {
           position: 'absolute',
-          bottom: 25,
-          left: 20,
+          bottom: 20,
+          left: 15,
           right: 20,
-          elevation: 0, // Reset default elevation to use custom shadow
+          elevation: 10,
           backgroundColor: '#ffffff',
-          borderRadius: 30, // Softer corners
-          height: 70, // Taller bar
-          borderTopWidth: 0,
-          ...styles.shadow, // Custom premium shadow
+          borderRadius: 20,
+          height: 75,
+          paddingBottom: 12,
+          paddingTop: 8,
+          ...styles.shadow,
         },
-        tabBarHideOnKeyboard: true,
       }}>
+      
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ focused }) => (
-            <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
-                size={26}
-                color={focused ? "#7367F0" : "#B0B0B0"}
-              />
-              {focused && <View style={styles.activeDot} />}
-            </View>
+          title: 'Início',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "home" : "home-outline"} size={24} color={color} />
           ),
         }}
+        listeners={{ tabPress: handleTabPress }}
       />
 
       <Tabs.Screen
         name="actions"
         options={{
           title: 'Novo',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "add-circle" : "add-circle-outline"} size={24} color={color} />
+          ),
+        }}
+        listeners={{ tabPress: handleTabPress }}
+      />
+
+      {/* VISTORIA COMO BOTÃO DE DESTAQUE */}
+      <Tabs.Screen
+        name="checklist"
+        options={{
+          title: 'Vistoria',
+          href: null,
           tabBarIcon: ({ focused }) => (
             <View style={styles.middleButtonWrapper}>
               <LinearGradient
                 colors={['#7367F0', '#CE9FFC']}
                 style={styles.middleButton}
               >
-                <Ionicons name="add" size={32} color="#fff" />
+                <Ionicons name="car-sport" size={28} color="#fff" />
               </LinearGradient>
             </View>
           ),
         }}
+        listeners={() => ({
+            tabPress: (e) => {
+                e.preventDefault();
+                handleTabPress();
+                router.push('/screens/ChecklistVisual');
+            },
+        })}
       />
 
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Perfil',
-          tabBarIcon: ({ focused }) => (
-            <View style={[styles.iconContainer, focused && styles.iconActive]}>
-              <Ionicons
-                name={focused ? "person" : "person-outline"}
-                size={26}
-                color={focused ? "#7367F0" : "#B0B0B0"}
-              />
-              {focused && <View style={styles.activeDot} />}
-            </View>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? "person" : "person-outline"} size={24} color={color} />
           ),
         }}
+        listeners={{ tabPress: handleTabPress }}
       />
     </Tabs>
   );
@@ -98,49 +110,26 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   shadow: {
-    shadowColor: '#7F5DF0',
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    width: 60,
-  },
-  iconActive: {
-    // transform: [{scale: 1.1}] // Optional subtle zoom
-  },
-  activeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: '#7367F0',
-    marginTop: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
   },
   middleButtonWrapper: {
-    top: -25, // Float effectively
+    top: -25,
     justifyContent: 'center',
     alignItems: 'center',
-    // Shadow for button
     shadowColor: '#7367F0',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   middleButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#f8f9fa', // Seamless blending if background matches, or white
   }
 });
