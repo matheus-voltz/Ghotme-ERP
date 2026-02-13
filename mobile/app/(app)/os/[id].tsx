@@ -129,6 +129,39 @@ export default function OSDetailScreen() {
         );
     }
 
+    const renderTimeline = () => {
+        const steps = ['pending', 'approved', 'running', 'finalized'];
+        const labels = ['Entrada', 'Aprovado', 'Execução', 'Pronto'];
+        const currentIndex = steps.indexOf(os.status === 'canceled' ? 'pending' : os.status);
+
+        return (
+            <View style={styles.timelineContainer}>
+                <View style={styles.timelineLine} />
+                <View style={styles.timelineSteps}>
+                    {steps.map((step, index) => {
+                        const isActive = index <= currentIndex;
+                        const isCurrent = index === currentIndex;
+                        return (
+                            <View key={step} style={styles.stepWrapper}>
+                                <View style={[
+                                    styles.stepDot, 
+                                    isActive && { backgroundColor: '#7367F0', borderColor: '#7367F0' },
+                                    isCurrent && { borderWidth: 4, borderColor: '#CE9FFC' }
+                                ]}>
+                                    {isActive && <Ionicons name="checkmark" size={12} color="#fff" />}
+                                </View>
+                                <Text style={[
+                                    styles.stepLabel, 
+                                    isActive && { color: '#7367F0', fontWeight: 'bold' }
+                                ]}>{labels[index]}</Text>
+                            </View>
+                        );
+                    })}
+                </View>
+            </View>
+        );
+    };
+
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar barStyle="light-content" />
@@ -142,12 +175,8 @@ export default function OSDetailScreen() {
                     <Text style={styles.headerTitle}>Ordem de Serviço #{os.id}</Text>
                     <View style={{ width: 24 }} />
                 </View>
-
-                <View style={styles.statusContainer}>
-                    <View style={[styles.statusBadge, { backgroundColor: getStatusColor(os.status) }]}>
-                        <Text style={styles.statusText}>{statusTranslations[os.status] || os.status}</Text>
-                    </View>
-                </View>
+                {/* Timeline Substitui o Status Badge Simples */}
+                {renderTimeline()}
             </LinearGradient>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -342,6 +371,45 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 12,
         textTransform: 'uppercase',
+    },
+    // Timeline Styles
+    timelineContainer: {
+        marginTop: 20,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+    },
+    timelineLine: {
+        position: 'absolute',
+        top: 12,
+        left: 25,
+        right: 25,
+        height: 2,
+        backgroundColor: 'rgba(255,255,255,0.3)',
+        zIndex: -1,
+    },
+    timelineSteps: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    stepWrapper: {
+        alignItems: 'center',
+        width: 60,
+    },
+    stepDot: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: '#fff',
+        borderWidth: 2,
+        borderColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 6,
+    },
+    stepLabel: {
+        fontSize: 10,
+        color: 'rgba(255,255,255,0.8)',
+        textAlign: 'center',
     },
     content: {
         flex: 1,

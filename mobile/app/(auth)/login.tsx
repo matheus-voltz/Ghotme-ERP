@@ -24,11 +24,12 @@ import Animated, {
     withTiming,
     withDelay
 } from 'react-native-reanimated';
+import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 
 export default function LoginScreen() {
     const { signIn, verify2FA } = useAuth();
     const router = useRouter();
-    
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [twoFactorCode, setTwoFactorCode] = useState('');
@@ -47,7 +48,7 @@ export default function LoginScreen() {
         formOpacity.value = withDelay(300, withTiming(1, { duration: 800 }));
         formTranslateY.value = withDelay(300, withSpring(0));
         logoScale.value = withSpring(1, { damping: 12 });
-        
+
         // Tenta biometria automática após carregar
         setTimeout(autoBiometrics, 1000);
     }, []);
@@ -75,7 +76,7 @@ export default function LoginScreen() {
 
             const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
             const token = await SecureStore.getItemAsync('userToken');
-            
+
             if (useBiometrics === 'true' && token) {
                 const result = await LocalAuthentication.authenticateAsync({
                     promptMessage: 'Entrar com Biometria',
@@ -159,12 +160,12 @@ export default function LoginScreen() {
 
     return (
         <LinearGradient
-            colors={['#7367F0', '#CE9FFC']}
+            colors={['#ffffff', '#f8f9fa']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.container}
         >
-            <StatusBar barStyle="light-content" />
+            <StatusBar barStyle="dark-content" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.keyboardView}
@@ -173,15 +174,30 @@ export default function LoginScreen() {
                     <Animated.View style={[styles.headerContainer, animatedLogoStyle]}>
                         <View style={styles.logoPlaceholder}>
                             {success ? (
-                                <Ionicons name="checkmark-circle" size={70} color="#fff" />
+                                <Ionicons name="checkmark-circle" size={90} color="#7367F0" />
                             ) : (
-                                <Ionicons name={show2FA ? "shield-checkmark" : "cube-outline"} size={60} color="#fff" />
+                                <Svg width="120" height="120" viewBox="0 0 32 24" fill="none">
+                                    <Defs>
+                                        <SvgLinearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                                            <Stop offset="0" stopColor="#7367F0" stopOpacity="1" />
+                                            <Stop offset="1" stopColor="#CE9FFC" stopOpacity="1" />
+                                        </SvgLinearGradient>
+                                    </Defs>
+                                    <Path
+                                        fillRule="evenodd"
+                                        clipRule="evenodd"
+                                        d="M16 0L4 6V18L16 24L28 18V10H22V15L16 18L10 15V9L16 6L22 9V3L16 0Z"
+                                        fill="url(#grad)"
+                                    />
+                                    <Path opacity="0.1" d="M16 0L22 3V9L16 6V0Z" fill="#000" />
+                                    <Path opacity="0.1" d="M16 24L16 18L22 15V10H28V18L16 24Z" fill="#000" />
+                                </Svg>
                             )}
                         </View>
                         <Text style={styles.appName}>Ghotme ERP</Text>
                         {!success && (
                             <Text style={styles.tagline}>
-                                {show2FA ? 'Segurança em Duas Etapas' : 'Sincronizando sua oficina'}
+                                {show2FA ? 'Segurança em Duas Etapas' : 'Gestão inteligente para sua empresa'}
                             </Text>
                         )}
                     </Animated.View>
@@ -225,15 +241,15 @@ export default function LoginScreen() {
                                     </View>
 
                                     <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
-                                        {loading ? <ActivityIndicator color="#7367F0" /> : <Text style={styles.loginButtonText}>ENTRAR AGORA</Text>}
+                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>ENTRAR AGORA</Text>}
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity 
-                                        style={{marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center'}} 
+                                    <TouchableOpacity
+                                        style={{ marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
                                         onPress={checkBiometrics}
                                     >
-                                        <Ionicons name="finger-print-outline" size={20} color="#fff" style={{marginRight: 8}} />
-                                        <Text style={{color: '#fff', fontSize: 14, fontWeight: '600'}}>Usar Biometria</Text>
+                                        <Ionicons name="finger-print-outline" size={20} color="#7367F0" style={{ marginRight: 8 }} />
+                                        <Text style={{ color: '#7367F0', fontSize: 14, fontWeight: '600' }}>Usar Biometria</Text>
                                     </TouchableOpacity>
                                 </>
                             ) : (
@@ -253,20 +269,20 @@ export default function LoginScreen() {
                                                 autoFocus
                                             />
                                         </View>
-                                        <Text style={{color: '#fff', fontSize: 12, textAlign: 'center', marginTop: 10, opacity: 0.8}}>
+                                        <Text style={{ color: '#666', fontSize: 12, textAlign: 'center', marginTop: 10, opacity: 0.8 }}>
                                             Abra seu app de autenticação e digite o código.
                                         </Text>
                                     </View>
 
                                     <TouchableOpacity style={styles.loginButton} onPress={handleVerify2FA} disabled={loading}>
-                                        {loading ? <ActivityIndicator color="#7367F0" /> : <Text style={styles.loginButtonText}>VERIFICAR CÓDIGO</Text>}
+                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>VERIFICAR CÓDIGO</Text>}
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity 
-                                        style={{marginTop: 20, alignItems: 'center'}} 
+                                    <TouchableOpacity
+                                        style={{ marginTop: 20, alignItems: 'center' }}
                                         onPress={() => setShow2FA(false)}
                                     >
-                                        <Text style={{color: '#fff', fontSize: 14, fontWeight: '600'}}>Voltar ao Login</Text>
+                                        <Text style={{ color: '#7367F0', fontSize: 14, fontWeight: '600' }}>Voltar ao Login</Text>
                                     </TouchableOpacity>
                                 </View>
                             )}
@@ -284,36 +300,31 @@ const styles = StyleSheet.create({
     contentContainer: { paddingHorizontal: 30, width: '100%', maxWidth: 500, alignSelf: 'center' },
     headerContainer: { alignItems: 'center', marginBottom: 40 },
     logoPlaceholder: {
-        width: 110, height: 110,
-        backgroundColor: 'rgba(255,255,255,0.25)',
-        borderRadius: 30,
+        width: 120, height: 120,
         justifyContent: 'center', alignItems: 'center',
-        marginBottom: 15,
-        borderWidth: 2, borderColor: 'rgba(255,255,255,0.4)',
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.2, shadowRadius: 15,
+        marginBottom: 10,
     },
-    appName: { fontSize: 34, fontWeight: 'bold', color: '#fff', letterSpacing: 1 },
-    tagline: { fontSize: 16, color: 'rgba(255,255,255,0.9)', marginTop: 5 },
+    appName: { fontSize: 32, fontWeight: 'bold', color: '#333', letterSpacing: 1 },
+    tagline: { fontSize: 16, color: '#666', marginTop: 5, textAlign: 'center' },
     formContainer: { width: '100%' },
     inputWrapper: { marginBottom: 20 },
-    label: { fontSize: 12, fontWeight: 'bold', color: '#fff', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', opacity: 0.9 },
+    label: { fontSize: 12, fontWeight: 'bold', color: '#555', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', opacity: 0.9 },
     inputContainer: {
         flexDirection: 'row', alignItems: 'center',
         backgroundColor: '#fff', borderRadius: 16,
         paddingHorizontal: 18, height: 60,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1, shadowRadius: 10, elevation: 5,
+        borderWidth: 1, borderColor: '#E0E0E0',
+        shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05, shadowRadius: 5, elevation: 2,
     },
     inputIcon: { marginRight: 12 },
-    input: { flex: 1, height: 60, color: '#1F2937', fontSize: 16 },
+    input: { flex: 1, height: 60, color: '#333', fontSize: 16 },
     loginButton: {
-        backgroundColor: '#fff', borderRadius: 16,
+        backgroundColor: '#7367F0', borderRadius: 16,
         height: 60, justifyContent: 'center', alignItems: 'center',
         marginTop: 10,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.2, shadowRadius: 12, elevation: 8,
+        shadowColor: '#7367F0', shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
     },
-    loginButtonText: { color: '#7367F0', fontSize: 16, fontWeight: 'bold', letterSpacing: 1.5 },
+    loginButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', letterSpacing: 1.5 },
 });
