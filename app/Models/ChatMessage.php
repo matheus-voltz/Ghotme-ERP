@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChatMessage extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\BelongsToCompany;
 
     protected $fillable = [
+        'company_id',
         'sender_id',
         'receiver_id',
         'message',

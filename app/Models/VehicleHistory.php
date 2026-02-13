@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\BelongsToCompany;
 
 class VehicleHistory extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
         'veiculo_id',
         'ordem_servico_id',
         'date',

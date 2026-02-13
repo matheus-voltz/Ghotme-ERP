@@ -70,23 +70,44 @@
     {
       "name": "Clientes & Veículos",
       "icon": "menu-icon icon-base ti tabler-users",
-      "slug": ["clients", "vehicles", "vehicle-history"],
+      "slug": [
+        "clients",
+        "vehicles",
+        "vehicle-history"
+      ],
       "submenu": [
-      {
-        "url": "/clients",
-        "name": "Clientes",
-        "slug": "clients"
-      },
-      {
-        "url": "/vehicles",
-        "name": "Veículos",
-        "slug": "vehicles"
-      },
-      {
-        "url": "/vehicle-history",
-        "name": "Histórico do veículo",
-        "slug": "vehicle-history"
-      }
+        {
+          "url": "/clients",
+          "name": "Clientes",
+          "slug": "clients"
+        },
+        {
+          "url": "/vehicles",
+          "name": "Veículos",
+          "slug": "vehicles"
+        },
+        {
+          "url": "/vehicle-history",
+          "name": "Histórico do veículo",
+          "slug": "vehicle-history"
+        }
+      ]
+    },
+    {
+      "name": "Equipe",
+      "icon": "menu-icon icon-base ti tabler-users-group",
+      "slug": "team",
+      "submenu": [
+        {
+          "url": "/team/employees",
+          "name": "Colaboradores",
+          "slug": "team.employees"
+        },
+        {
+          "url": "/team/commissions",
+          "name": "Comissões",
+          "slug": "team.commissions"
+        }
       ]
     },
     {

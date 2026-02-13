@@ -265,6 +265,9 @@ Route::middleware([
     Route::get('/settings/team/{id}/edit', [App\Http\Controllers\TeamController::class, 'edit'])->name('team-management.edit');
     Route::delete('/settings/team/{id}', [App\Http\Controllers\TeamController::class, 'destroy'])->name('team-management.destroy');
 
+    // New Team Route for "Equipe > Colaboradores"
+    Route::get('/team/employees', [App\Http\Controllers\TeamController::class, 'index'])->name('team.employees');
+
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
     Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');
     Route::post('/user-list', [UserManagement::class, 'store'])->name('user-list.store');

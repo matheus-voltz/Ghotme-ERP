@@ -25,162 +25,145 @@
 <!-- Page Scripts -->
 @section('page-script')
 <script>
-    $(function() {
-        var table = $('.datatables-users').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('team-management.data') }}",
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                error: function(xhr, error, code) {
-                    console.log(xhr);
-                    console.log(code);
-                }
-            },
-            columns: [{
-                    data: 'fake_id',
-                    name: 'id'
-                },
-                {
-                    data: 'name',
-                    name: 'name'
-                },
-                {
-                    data: 'email',
-                    name: 'email'
-                },
-                {
-                    data: 'role',
-                    name: 'role'
-                },
-                {
-                    data: 'email_verified_at',
-                    name: 'email_verified_at'
-                },
-                {
-                    data: null,
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, row) {
-                        return `
-              <div class="d-inline-block text-nowrap">
-                <button class="btn btn-sm btn-icon edit-record" data-id="${row.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"><i class="ti tabler-edit"></i></button>
-                <button class="btn btn-sm btn-icon delete-record" data-id="${row.id}"><i class="ti tabler-trash"></i></button>
-              </div>
-            `;
-                    }
-                }
-            ],
-            dom: '<"row mx-1"' +
-                '<"col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4"l>' +
-                '<"col-md-10 d-flex align-items-center justify-content-md-end justify-content-center pe-4"f>' +
-                '>t' +
-                '<"row mx-2"' +
-                '<"col-sm-12 col-md-6"i>' +
-                '<"col-sm-12 col-md-6"p>' +
-                '>',
-            language: {
-                sLengthMenu: 'Show _MENU_',
-                search: 'Pesquisar',
-                searchPlaceholder: 'Pesquisar usu... ',
-                emptyTable: "Nenhum dado disponível na tabela"
-            },
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        var dt_user_table = $('.datatables-users');
+        var table;
 
-        // Add User Button to header
-        setTimeout(() => {
-            $('div.head-label').html('<h5 class="card-title mb-0">Equipe</h5>');
-        }, 100);
-    });
-
-    // Edit Record
-    $(document).on('click', '.edit-record', function() {
-        var user_id = $(this).data('id');
-        $('#offcanvasAddUserLabel').html('Editar Funcionário');
-
-        $.get("{{ url('settings/team') }}/" + user_id + "/edit", function(data) {
-            $('#user_id').val(data.id);
-            $('#add-user-fullname').val(data.name);
-            $('#add-user-email').val(data.email);
-            $('#add-user-contact').val(data.contact_number);
-            $('#user-role').val(data.role || 'subscriber');
-        });
-    });
-
-    // Delete Record
-    $(document).on('click', '.delete-record', function() {
-        var user_id = $(this).data('id');
-        Swal.fire({
-            title: 'Tem certeza?',
-            text: "Você não poderá reverter isso!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sim, deletar!',
-            customClass: {
-                confirmButton: 'btn btn-primary me-3',
-                cancelButton: 'btn btn-label-secondary'
-            },
-            buttonsStyling: false
-        }).then(function(result) {
-            if (result.value) {
-                $.ajax({
-                    type: 'DELETE',
-                    url: "{{ url('settings/team') }}/" + user_id,
+        if (dt_user_table.length) {
+            table = dt_user_table.DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('team-management.data') }}",
+                    type: 'GET',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function() {
-                        $('.datatables-users').DataTable().ajax.reload();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Deletado!',
-                            text: 'Funcionário removido.',
-                            customClass: {
-                                confirmButton: 'btn btn-success'
-                            }
-                        });
-                    },
-                    error: function() {
-                        Swal.fire({
-                            title: 'Erro',
-                            text: 'Erro ao deletar',
-                            icon: 'error'
-                        });
                     }
-                });
-            }
-        });
-    });
+                },
+                columns: [
+                    { data: 'fake_id', name: 'id' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'role', name: 'role' },
+                    { data: 'email_verified_at', name: 'email_verified_at' },
+                    {
+                        data: null,
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, row) {
+                            return `
+                                <div class="d-inline-block text-nowrap">
+                                    <button class="btn btn-sm btn-icon edit-record" data-id="${row.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser"><i class="ti tabler-edit"></i></button>
+                                    <button class="btn btn-sm btn-icon delete-record" data-id="${row.id}"><i class="ti tabler-trash"></i></button>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
+                dom: '<"row mx-1"' +
+                    '<"col-md-2 d-flex align-items-center justify-content-md-start justify-content-center ps-4"l>' +
+                    '<"col-md-10 d-flex align-items-center justify-content-md-end justify-content-center pe-4"f>' +
+                    '>t' +
+                    '<"row mx-2"' +
+                    '<"col-sm-12 col-md-6"i>' +
+                    '<"col-sm-12 col-md-6"p>' +
+                    '>',
+                language: {
+                    sLengthMenu: 'Mostrar _MENU_',
+                    search: 'Pesquisar',
+                    searchPlaceholder: 'Pesquisar...',
+                    emptyTable: "Nenhum dado disponível na tabela"
+                }
+            });
+        }
 
-    // Form Submit
-    $('#addNewUserForm').on('submit', function(e) {
-        e.preventDefault();
-        var formData = $(this).serialize();
-        $.ajax({
-            data: formData,
-            url: "{{ route('team-management.store') }}",
-            type: "POST",
-            success: function(data) {
-                $('#offcanvasAddUser').offcanvas('hide');
-                $('.datatables-users').DataTable().ajax.reload();
-                $('#addNewUserForm')[0].reset();
-                $('#user_id').val(''); // Clear ID for next add
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Sucesso!',
-                    text: 'Operação realizada com sucesso.'
-                });
-            },
-            error: function(data) {
-                var msg = data.responseJSON && data.responseJSON.message ? data.responseJSON.message : 'Erro ao salvar';
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro!',
-                    text: msg
-                });
-            }
+        // Edit Record
+        $(document).on('click', '.edit-record', function() {
+            var user_id = $(this).data('id');
+            $('#offcanvasAddUserLabel').html('Editar Funcionário');
+
+            $.get("{{ url('settings/team') }}/" + user_id + "/edit", function(data) {
+                $('#user_id').val(data.id);
+                $('#add-user-fullname').val(data.name);
+                $('#add-user-email').val(data.email);
+                $('#add-user-contact').val(data.contact_number);
+                $('#user-role').val(data.role || 'subscriber');
+            });
+        });
+
+        // Delete Record
+        $(document).on('click', '.delete-record', function() {
+            var user_id = $(this).data('id');
+            Swal.fire({
+                title: 'Tem certeza?',
+                text: "Você não poderá reverter isso!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, deletar!',
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3',
+                    cancelButton: 'btn btn-label-secondary'
+                },
+                buttonsStyling: false
+            }).then(function(result) {
+                if (result.value) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "{{ url('settings/team') }}/" + user_id,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        success: function() {
+                            if(table) table.ajax.reload();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deletado!',
+                                text: 'Funcionário removido.',
+                                customClass: { confirmButton: 'btn btn-success' }
+                            });
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: 'Erro',
+                                text: 'Erro ao deletar',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        // Form Submit
+        $('#addNewUserForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            $.ajax({
+                data: formData,
+                url: "{{ route('team-management.store') }}",
+                type: "POST",
+                success: function(data) {
+                    $('#offcanvasAddUser').offcanvas('hide');
+                    if(table) table.ajax.reload();
+                    else window.location.reload();
+                    
+                    $('#addNewUserForm')[0].reset();
+                    $('#user_id').val('');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso!',
+                        text: 'Operação realizada com sucesso.'
+                    });
+                },
+                error: function(data) {
+                    var msg = data.responseJSON && data.responseJSON.message ? data.responseJSON.message : 'Erro ao salvar';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro!',
+                        text: msg
+                    });
+                }
+            });
         });
     });
 </script>
@@ -202,7 +185,7 @@
                     </div>
                     <div class="avatar">
                         <span class="avatar-initial rounded bg-label-primary">
-                            <i class="icon-base ti tabler-users icon-26px"></i>
+                            <i class="ti tabler-users icon-26px"></i>
                         </span>
                     </div>
                 </div>
@@ -216,7 +199,8 @@
     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">Membros da Equipe</h5>
         <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddUser">
-            <i class="ti tabler-plus me-0 me-sm-1"></i><span class="d-none d-sm-inline-block">Adicionar Usuário</span>
+                        <i class="ti tabler-plus me-0 me-sm-1"></i>
+            <span class="d-none d-sm-inline-block">Adicionar Usuário</span>
         </button>
     </div>
     <div class="card-datatable table-responsive">

@@ -24,7 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    // use BelongsToCompany; // Commented for debug
+    // use BelongsToCompany; // Temporarily disabled to fix Error 500
 
     /**
      * The attributes that are mass assignable.
