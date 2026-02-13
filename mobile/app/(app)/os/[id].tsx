@@ -42,7 +42,7 @@ export default function OSDetailScreen() {
 
     const fetchOSDetails = async () => {
         try {
-            const response = await api.get(`/ordens-servico/${id}`);
+            const response = await api.get(`/os/${id}`);
             setOs(response.data);
         } catch (error) {
             console.error("Error fetching OS:", error);
@@ -87,13 +87,9 @@ export default function OSDetailScreen() {
 
     const toggleItemTimer = async (itemId: number) => {
         try {
-            const response = await api.post(`/ordens-servico/items/${itemId}/toggle-timer`);
+            const response = await api.post(`/os/items/${itemId}/toggle-timer`);
             if (response.data.success) {
-                // Update local state
-                const updatedItems = os.items.map((it: any) =>
-                    it.id === itemId ? response.data.item : it
-                );
-                setOs({ ...os, items: updatedItems });
+                // ...
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível alterar o timer.');
@@ -102,12 +98,9 @@ export default function OSDetailScreen() {
 
     const completeItem = async (itemId: number) => {
         try {
-            const response = await api.post(`/ordens-servico/items/${itemId}/complete`);
+            const response = await api.post(`/os/items/${itemId}/complete`);
             if (response.data.success) {
-                const updatedItems = os.items.map((it: any) =>
-                    it.id === itemId ? response.data.item : it
-                );
-                setOs({ ...os, items: updatedItems });
+                // ...
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível concluir o serviço.');
@@ -117,7 +110,7 @@ export default function OSDetailScreen() {
     const handleUpdateStatus = async (newStatus: string) => {
         try {
             setUpdating(true);
-            await api.patch(`/ordens-servico/${id}/status`, { status: newStatus });
+            await api.patch(`/os/${id}/status`, { status: newStatus });
             setOs({ ...os, status: newStatus });
             Alert.alert('Sucesso', `Status atualizado para ${statusTranslations[newStatus]}`);
         } catch (error) {
@@ -127,10 +120,11 @@ export default function OSDetailScreen() {
         }
     };
 
-    if (loading) {
+    if (loading || !os) {
         return (
-            <View style={styles.loadingContainer}>
+            <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
                 <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={{ marginTop: 10, color: colors.subText }}>Carregando ordem...</Text>
             </View>
         );
     }
