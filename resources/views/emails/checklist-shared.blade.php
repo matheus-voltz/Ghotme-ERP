@@ -44,6 +44,9 @@
 <body>
     <div class="container">
         <div class="header">
+            @if($inspection->company && $inspection->company->logo_path)
+            <img src="{{ $message->embed(public_path('storage/' . $inspection->company->logo_path)) }}" alt="Logo" style="max-height: 60px; margin-bottom: 20px;">
+            @endif
             <h2>{{ __('Checklist de Entrada') }}</h2>
             <p>{{ __('Olá') }}, <strong>{{ $inspection->veiculo->client->name ?? __('Cliente') }}</strong>!</p>
         </div>

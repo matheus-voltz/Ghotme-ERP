@@ -169,7 +169,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
         <!-- Coluna Direita: Resumo -->
         <div class="col-md-4">
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Ações</h5>
                 </div>
@@ -178,6 +178,41 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                     <a href="{{ route('ordens-servico') }}" class="btn btn-label-secondary w-100">Cancelar</a>
                 </div>
             </div>
+
+            <!-- Card de Vistoria Visual -->
+            @if($order->inspection && $order->inspection->damagePoints->isNotEmpty())
+            <div class="card">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Fotos da Vistoria</h5>
+                    <span class="badge bg-label-primary">{{ $order->inspection->damagePoints->count() }}</span>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="row g-3">
+                        @foreach($order->inspection->damagePoints as $point)
+                        <div class="col-6">
+                            <div class="card shadow-none border border-light h-100">
+                                @if($point->photo_path)
+                                <a href="{{ asset('storage/' . $point->photo_path) }}" target="_blank">
+                                    <img src="{{ asset('storage/' . $point->photo_path) }}" class="card-img-top rounded" alt="{{ $point->part_name }}" style="height: 100px; object-fit: cover;">
+                                </a>
+                                @else
+                                <div class="bg-label-secondary d-flex align-items-center justify-content-center rounded-top" style="height: 100px">
+                                    <i class="ti tabler-camera-off fs-2"></i>
+                                </div>
+                                @endif
+                                <div class="card-body p-2 text-center">
+                                    <small class="fw-bold d-block text-truncate">{{ $point->part_name }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-3">
+                        <a href="{{ route('ordens-servico.checklist.show', $order->inspection->id) }}" class="btn btn-outline-primary btn-sm w-100">Ver Detalhes da Vistoria</a>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
     </div>
 </form>

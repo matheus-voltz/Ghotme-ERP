@@ -83,7 +83,17 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     protected $appends = [
         'profile_photo_url',
+        'two_factor_enabled',
     ];
+
+    protected $attributes = [
+        'role' => 'funcionario',
+    ];
+
+    public function getTwoFactorEnabledAttribute()
+    {
+        return ! is_null($this->two_factor_secret);
+    }
 
     public function ordensServico()
     {

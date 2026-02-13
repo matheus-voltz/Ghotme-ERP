@@ -129,7 +129,10 @@ export default function ChecklistVisual() {
           style={{ flex: 1 }}
           ref={cameraRef}
           onMountError={(error) => Alert.alert("Erro de Câmera", error.message)}
-        >
+        />
+        
+        {/* Controles da Câmera (Agora FORA do CameraView com posicionamento absoluto) */}
+        <View style={[StyleSheet.absoluteFill, styles.cameraOverlay]}>
           <View style={styles.cameraControls}>
             <TouchableOpacity
               onPress={() => !isProcessing && setCameraVisible(false)}
@@ -149,7 +152,7 @@ export default function ChecklistVisual() {
               </View>
             </TouchableOpacity>
           </View>
-        </CameraView>
+        </View>
       </View>
     );
   }
@@ -290,10 +293,11 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: 'bold' },
   subtitle: { fontSize: 13, marginTop: 2 },
   carWrapper: { alignItems: 'center', paddingVertical: 20 },
-  cameraControls: { flex: 1, justifyContent: 'center', alignItems: 'flex-end', flexDirection: 'row', paddingBottom: 50 },
+  cameraOverlay: { backgroundColor: 'transparent', justifyContent: 'flex-end' },
+  cameraControls: { justifyContent: 'center', alignItems: 'flex-end', flexDirection: 'row', paddingBottom: 50 },
   captureButton: { width: 80, height: 80, borderRadius: 40, backgroundColor: '#fff', padding: 5 },
   captureInner: { flex: 1, borderRadius: 40, backgroundColor: '#fff', borderWidth: 2, borderColor: '#7367F0', justifyContent: 'center', alignItems: 'center' },
-  closeButton: { position: 'absolute', top: 60, right: 30, zIndex: 10 },
+  closeButton: { position: 'absolute', bottom: 70, right: 30, zIndex: 10 },
   listContainer: { padding: 20 },
   sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 15 },
   emptyState: { alignItems: 'center', padding: 40, borderRadius: 15, borderStyle: 'dashed', borderWidth: 1 },

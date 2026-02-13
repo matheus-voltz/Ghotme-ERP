@@ -52,12 +52,40 @@
       <x-input-error for="name" />
     </div>
 
+    <!-- CPF/CNPJ -->
+    <div class="mb-6">
+      <x-label class="form-label" for="cpf_cnpj" value="{{ __('CPF / CNPJ') }}" />
+      <x-input id="cpf_cnpj" type="text" class="{{ $errors->has('cpf_cnpj') ? 'is-invalid' : '' }}" wire:model="state.cpf_cnpj" />
+      <x-input-error for="cpf_cnpj" />
+    </div>
+
     <!-- Email -->
     <div class="mb-6">
       <x-label class="form-label" for="email" value="{{ __('E-mail') }}" />
       <x-input id="email" type="email" class="{{ $errors->has('email') ? 'is-invalid' : '' }}"
         wire:model="state.email" />
       <x-input-error for="email" />
+    </div>
+
+    <!-- Contact Number -->
+    <div class="mb-6">
+      <x-label class="form-label" for="contact_number" value="{{ __('Telefone') }}" />
+      <x-input id="contact_number" type="text" class="{{ $errors->has('contact_number') ? 'is-invalid' : '' }}" wire:model="state.contact_number" />
+      <x-input-error for="contact_number" />
+    </div>
+
+    <!-- City -->
+    <div class="mb-6">
+      <x-label class="form-label" for="city" value="{{ __('Cidade') }}" />
+      <x-input id="city" type="text" class="{{ $errors->has('city') ? 'is-invalid' : '' }}" wire:model="state.city" />
+      <x-input-error for="city" />
+    </div>
+
+    <!-- Role -->
+    <div class="mb-6">
+      <x-label class="form-label" for="role" value="{{ __('Cargo') }}" />
+      <x-input id="role" type="text" class="{{ $errors->has('role') ? 'is-invalid' : '' }}" wire:model="state.role" />
+      <x-input-error for="role" />
     </div>
   </x-slot>
 

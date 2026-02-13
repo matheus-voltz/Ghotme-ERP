@@ -71,22 +71,32 @@ export default function ProfileScreen() {
                             </View>
                         </View>
                         <Text style={styles.name}>{user?.name || 'Usuário'}</Text>
-                        <Text style={styles.email}>{user?.email || 'email@exemplo.com'}</Text>
+                        <View style={styles.roleBadge}>
+                            <Text style={styles.roleText}>{user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Mecânico'}</Text>
+                        </View>
+
+                        <View style={styles.contactInfoRow}>
+                            <Ionicons name="mail-outline" size={14} color="rgba(255,255,255,0.9)" />
+                            <Text style={styles.email}>{user?.email || 'email@exemplo.com'}</Text>
+                            <View style={{ width: 15 }} />
+                            <Ionicons name="call-outline" size={14} color="rgba(255,255,255,0.9)" />
+                            <Text style={styles.email}>{user?.contact_number || '(00) 00000-0000'}</Text>
+                        </View>
 
                         <View style={styles.statsContainer}>
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>0</Text>
-                                <Text style={styles.statLabel}>Ordens</Text>
+                                <Text style={styles.statNumber}>12</Text>
+                                <Text style={styles.statLabel}>Hoje</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>0</Text>
+                                <Text style={styles.statNumber}>4</Text>
                                 <Text style={styles.statLabel}>Pendentes</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>0</Text>
-                                <Text style={styles.statLabel}>Concluídas</Text>
+                                <Text style={styles.statNumber}>85%</Text>
+                                <Text style={styles.statLabel}>Eficiência</Text>
                             </View>
                         </View>
                     </View>
@@ -96,9 +106,14 @@ export default function ProfileScreen() {
                 <View style={styles.sectionContainer}>
                     <Text style={[styles.sectionHeader, { color: colors.text }]}>Conta</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
-                        {renderSettingItem("person-outline", "Dados Pessoais", "Alterar nome, email", () => Alert.alert('Em breve', 'Edição de perfil será implementada.'))}
+                        {renderSettingItem("person-outline", "Dados Pessoais", "Alterar nome, telefone, cidade", () => router.push('/profile/details'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("lock-closed-outline", "Segurança", "Alterar senha, biometria", () => Alert.alert('Em breve', 'Segurança será implementada.'))}
+                        {renderSettingItem(
+                            "lock-closed-outline",
+                            "Segurança",
+                            user?.two_factor_enabled ? "2FA Ativado" : "2FA Desativado",
+                            () => router.push('/profile/security')
+                        )}
                     </View>
 
                     <Text style={[styles.sectionHeader, { color: colors.text }]}>Preferências</Text>
@@ -189,12 +204,30 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
-        marginBottom: 4,
+        marginBottom: 8,
+    },
+    roleBadge: {
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 20,
+        marginBottom: 16,
+    },
+    roleText: {
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    contactInfoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 24,
     },
     email: {
-        fontSize: 14,
+        fontSize: 13,
         color: 'rgba(255,255,255,0.8)',
-        marginBottom: 24,
+        marginLeft: 5,
     },
     statsContainer: {
         flexDirection: 'row',

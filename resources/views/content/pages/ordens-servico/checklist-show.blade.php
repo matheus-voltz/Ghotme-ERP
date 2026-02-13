@@ -108,16 +108,26 @@
       <i class="ti tabler-arrow-left me-1"></i> {{ __('Voltar') }}
     </a>
   </div>
-  @else
-  <div class="text-center mb-6">
-    <h3 class="mb-1 fw-bold">{{ __('Checklist de Entrada') }}</h3>
-    <p class="text-muted">{{ __('Documento gerado pela oficina para sua segurança.') }}</p>
-  </div>
   @endif
 
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between flex-wrap gap-3">
-      <h5 class="mb-0">{{ __('Checklist') }} #{{ $inspection->id }}</h5>
+  <!-- Cabeçalho com Logo da Empresa -->
+  <div class="row mb-5 align-items-center">
+    <div class="col-sm-6 text-center text-sm-start">
+      @if($inspection->company && $inspection->company->logo_path)
+      <img src="{{ asset('storage/' . $inspection->company->logo_path) }}" alt="Logo {{ $inspection->company->name }}" style="max-height: 100px; max-width: 300px;" class="mb-3">
+      @else
+      <h2 class="mb-1 fw-bold text-primary">{{ $inspection->company->name ?? config('app.name') }}</h2>
+      @endif
+    </div>
+    <div class="col-sm-6 text-center text-sm-end">
+      <h3 class="mb-1 fw-bold">{{ __('Checklist de Entrada') }}</h3>
+      <p class="text-muted">{{ __('Documento gerado para segurança do cliente e da oficina.') }}</p>
+    </div>
+  </div>
+
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header d-flex justify-content-between flex-wrap gap-3 border-bottom bg-light">
+      <h5 class="mb-0 py-2">{{ __('Protocolo') }} #{{ $inspection->id }}</h5>
       @if(!$isPublic && auth()->check())
       <div class="d-flex gap-2 no-print">
         <button onclick="window.print()" class="btn btn-label-secondary">
@@ -128,10 +138,6 @@
         $url = route('public.checklist.show', $inspection->id) . ($inspection->token ? "?token=" . $inspection->token : "");
         $whatsappMsg = "Olá! Segue o checklist de entrada do seu veículo " . $inspection->veiculo->modelo . " (" . $inspection->veiculo->placa . ").\nVocê pode visualizar os detalhes e fotos aqui: " . $url;
         $whatsappUrl = "https://api.whatsapp.com/send?phone=55" . preg_replace('/\D/', '', $inspection->veiculo->client->whatsapp ?? '') . "&text=" . urlencode($whatsappMsg);
-
-        $emailSubject = "Checklist de Entrada - Veículo " . $inspection->veiculo->placa;
-        $emailBody = "Olá, segue o link do seu checklist: " . $url;
-        $emailUrl = "mailto:" . ($inspection->veiculo->client->email ?? '') . "?subject=" . urlencode($emailSubject) . "&body=" . urlencode($emailBody);
         @endphp
 
         <a href="{{ $whatsappUrl }}" target="_blank" class="btn btn-success">
@@ -143,72 +149,72 @@
       </div>
       @endif
     </div>
-    <div class="card-body">
-      <div class="row mb-4">
-        <div class="col-md-4">
-          <h6>{{ niche('entity') }}</h6>
-          <p><strong>{{ niche('identifier') }}:</strong> {{ $inspection->veiculo->placa }}<br>
-            <strong>{{ niche('model') }}:</strong> {{ $inspection->veiculo->modelo }}<br>
-            <strong>{{ niche('metric') }}:</strong> {{ $inspection->km_current }}
-          </p>
+    <div class="card-body pt-4">
+      <div class="row g-4 mb-5">
+        <div class="col-md-4 border-end">
+          <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ niche('entity') }}</h6>
+          <p class="mb-1"><span class="fw-bold">{{ niche('identifier') }}:</span> {{ $inspection->veiculo->placa }}</p>
+          <p class="mb-1"><span class="fw-bold">{{ niche('model') }}:</span> {{ $inspection->veiculo->modelo }}</p>
+          <p class="mb-1"><span class="fw-bold">{{ niche('metric') }}:</span> {{ number_format($inspection->km_current, 0, ',', '.') }} km</p>
+        </div>
+        <div class="col-md-4 border-end">
+          <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ __('Informações Gerais') }}</h6>
+          <p class="mb-1"><span class="fw-bold">{{ __('Data') }}:</span> {{ $inspection->created_at->format('d/m/Y H:i') }}</p>
+          <p class="mb-1"><span class="fw-bold">{{ __('Responsável') }}:</span> {{ $inspection->user->name }}</p>
+          <p class="mb-1"><span class="fw-bold">{{ niche('fuel') }}:</span> {{ $inspection->fuel_level }}</p>
         </div>
         <div class="col-md-4">
-          <h6>{{ __('Informações') }}</h6>
-          <p><strong>{{ __('Data') }}:</strong> {{ $inspection->created_at->format('d/m/Y H:i') }}<br>
-            <strong>{{ __('Responsável') }}:</strong> {{ $inspection->user->name }}<br>
-            <strong>{{ niche('fuel') }}:</strong> {{ $inspection->fuel_level }}
-          </p>
+          <h6 class="text-muted text-uppercase small fw-bold mb-3">{{ __('Observações do Atendente') }}</h6>
+          <p class="text-muted italic">{{ $inspection->notes ?: __('Nenhuma observação registrada.') }}</p>
         </div>
-        @if($inspection->notes)
-        <div class="col-md-4">
-          <h6>{{ __('Observações Gerais') }}</h6>
-          <p>{{ $inspection->notes }}</p>
-        </div>
-        @endif
       </div>
 
       <!-- Visual Inspection Display -->
       @if($inspection->damagePoints->isNotEmpty())
-      <div class="card mb-4">
-        <div class="card-header">
-          <h5 class="mb-0">{{ niche('visual_inspection_title') }}</h5>
+      <div class="card mb-5 border-dashed bg-lighter">
+        <div class="card-header bg-transparent">
+          <h5 class="mb-0 fw-bold"><i class="ti tabler-camera me-2"></i>{{ niche('visual_inspection_title') }}</h5>
         </div>
         <div class="card-body">
-          <div class="row">
+          <div class="row g-4">
             @foreach($inspection->damagePoints as $point)
-            <div class="col-md-3 col-6 mb-3">
-              <div class="border rounded p-2 text-center h-100">
+            <div class="col-xl-3 col-md-4 col-sm-6">
+              <div class="card h-100 shadow-none border">
                 @if($point->photo_path)
                 <img src="{{ asset('storage/' . $point->photo_path) }}"
-                  class="img-fluid rounded mb-2 shadow-sm cursor-pointer"
-                  style="height: 120px; width: 100%; object-fit: cover;"
+                  class="card-img-top cursor-pointer"
+                  style="height: 180px; object-fit: cover;"
                   data-bs-toggle="modal"
                   data-bs-target="#damageModal{{ $point->id }}">
                 @else
-                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2" style="height: 120px;">
-                  <i class="ti tabler-camera-off text-muted"></i>
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                  <i class="ti tabler-camera-off text-muted fs-1"></i>
                 </div>
                 @endif
-                <p class="mb-0 fw-bold small text-uppercase">{{ $point->part_name ?: __('Desconhecido') }}</p>
-                @if($point->notes)
-                <p class="mb-0 xsmall text-muted">{{ $point->notes }}</p>
-                @endif
+                <div class="card-body p-3 text-center bg-white">
+                  <span class="badge bg-label-danger text-uppercase mb-2">{{ $point->part_name ?: __('Avaria') }}</span>
+                  @if($point->notes && $point->notes != 'Registrado via Mobile')
+                  <p class="mb-0 small text-muted text-truncate">{{ $point->notes }}</p>
+                  @endif
+                </div>
+              </div>
+            </div>
 
                 @if($point->photo_path)
                 <!-- Modal for Large Damage Photo -->
                 <div class="modal fade" id="damageModal{{ $point->id }}" tabindex="-1" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                       <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title">{{ $point->part_name }}</h5>
+                        <h5 class="modal-title fw-bold text-uppercase">{{ $point->part_name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <div class="modal-body">
-                        <img src="{{ asset('storage/' . $point->photo_path) }}" class="img-fluid rounded w-100 shadow">
+                      <div class="modal-body text-center p-4">
+                        <img src="{{ asset('storage/' . $point->photo_path) }}" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
                         @if($point->notes)
-                        <div class="mt-3 p-3 bg-light rounded text-start">
-                          <strong>{{ __('Notas') }}:</strong><br>
-                          {{ $point->notes }}
+                        <div class="mt-4 p-3 bg-light rounded text-start border-start border-danger border-3">
+                          <strong class="text-danger small text-uppercase">{{ __('Notas do Mecânico') }}:</strong><br>
+                          <span class="text-dark">{{ $point->notes }}</span>
                         </div>
                         @endif
                       </div>
@@ -223,110 +229,76 @@
         </div>
       </div>
       @endif
+
+      <div class="divider divider-dashed my-5">
+        <div class="divider-text text-uppercase small fw-bold">{{ __('Itens Verificados') }}</div>
+      </div>
+
+      <div class="table-responsive border rounded mb-4">
+        <table class="table table-hover table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="py-3 px-4">{{ __('Item de Inspeção') }}</th>
+              <th class="text-center py-3">{{ __('Status') }}</th>
+              <th class="py-3">{{ __('Observações / Notas') }}</th>
+              <th class="text-center py-3 px-4">{{ __('Evidência') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($inspection->items as $item)
+            <tr>
+              <td class="px-4 fw-bold text-heading">{{ $item->checklistItem->name }}</td>
+              <td class="text-center">
+                @if($item->status === 'ok')
+                <span class="badge bg-label-success px-3"><i class="ti tabler-check me-1"></i> OK</span>
+                @elseif($item->status === 'not_ok')
+                <span class="badge bg-label-danger px-3"><i class="ti tabler-x me-1"></i> {{ __('RUIM') }}</span>
+                @else
+                <span class="badge bg-label-secondary px-3">N/A</span>
+                @endif
+              </td>
+              <td class="text-muted italic">{{ $item->observations ?? '-' }}</td>
+              <td class="text-center px-4">
+                @if($item->photo_path)
+                <img src="{{ asset('storage/' . $item->photo_path) }}"
+                  alt="{{ __('Evidência') }}"
+                  class="rounded cursor-pointer shadow-sm border"
+                  style="width: 50px; height: 50px; object-fit: cover;"
+                  data-bs-toggle="modal"
+                  data-bs-target="#photoModal{{ $item->id }}">
+
+                <!-- Modal para Foto Grande -->
+                <div class="modal fade" id="photoModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header border-0 pb-0">
+                        <h5 class="modal-title fw-bold">{{ $item->checklistItem->name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body p-4 text-center">
+                        <img src="{{ asset('storage/' . $item->photo_path) }}" class="img-fluid rounded shadow-lg" style="max-height: 80vh;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                @else
+                <span class="text-muted small">-</span>
+                @endif
+              </td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="card-footer bg-lighter border-top text-center py-4">
+        <p class="mb-0 small text-muted">
+            {{ __('Este documento é parte integrante do histórico do veículo no sistema') }} <strong>{{ config('app.name') }}</strong>.<br>
+            {{ __('Gerado em') }} {{ now()->format('d/m/Y \à\s H:i') }}
+        </p>
     </div>
   </div>
-</div>
-<style>
-  .damage-marker {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  .marker-dot {
-    width: 16px;
-    height: 16px;
-    background-color: rgba(234, 84, 85, 0.9);
-    border: 2px solid #fff;
-    border-radius: 50%;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  }
-
-  .marker-tooltip {
-    display: none;
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    white-space: nowrap;
-    font-size: 12px;
-    margin-bottom: 5px;
-    z-index: 20;
-  }
-
-  .damage-marker:hover .marker-tooltip {
-    display: block;
-  }
-</style>
-
-<div class="table-responsive">
-  <table class="table table-striped border-top">
-    <thead>
-      <tr>
-        <th>{{ __('Item') }}</th>
-        <th class="text-center">{{ __('Status') }}</th>
-        <th>{{ __('Observações') }}</th>
-        <th class="text-center">{{ __('Foto') }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach($inspection->items as $item)
-      <tr>
-        <td>{{ $item->checklistItem->name }}</td>
-        <td class="text-center">
-          @if($item->status === 'ok')
-          <span class="badge bg-label-success">OK</span>
-          @elseif($item->status === 'not_ok')
-          <span class="badge bg-label-danger">{{ __('RUIM') }}</span>
-          @else
-          <span class="badge bg-label-secondary">N/A</span>
-          @endif
-        </td>
-        <td>{{ $item->observations ?? '-' }}</td>
-        <td class="text-center">
-          @if($item->photo_path)
-          <img src="{{ asset('storage/' . $item->photo_path) }}"
-            alt="{{ __('Evidência') }}"
-            class="rounded cursor-pointer shadow-sm"
-            style="width: 40px; height: 40px; object-fit: cover;"
-            data-bs-toggle="modal"
-            data-bs-target="#photoModal{{ $item->id }}">
-
-          <!-- Modal para Foto Grande -->
-          <div class="modal fade" id="photoModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
-                  <h5 class="modal-title">{{ $item->checklistItem->name }}</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <img src="{{ asset('storage/' . $item->photo_path) }}" class="img-fluid rounded w-100 shadow">
-                </div>
-              </div>
-            </div>
-          </div>
-          @else
-          <span class="text-muted small">-</span>
-          @endif
-        </td>
-      </tr>
-      @endforeach
-    </tbody>
-  </table>
-</div>
-</div>
-</div>
 </div>
 @endsection
 

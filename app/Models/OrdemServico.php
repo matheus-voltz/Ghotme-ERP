@@ -48,6 +48,11 @@ class OrdemServico extends Model
         return $this->hasOne(VehicleHistory::class, 'ordem_servico_id');
     }
 
+    public function inspection()
+    {
+        return $this->hasOne(VehicleInspection::class, 'ordem_servico_id');
+    }
+
     public function items()
     {
         return $this->hasMany(\App\Models\OrdemServicoItem::class);

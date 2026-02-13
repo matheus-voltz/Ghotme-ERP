@@ -16,11 +16,11 @@
       {{ __('Se necessário, você pode sair de todas as suas outras sessões de navegador em todos os seus dispositivos. Algumas de suas sessões recentes estão listadas abaixo; no entanto, esta lista pode não ser exaustiva. Se você acha que sua conta foi comprometida, você também deve atualizar sua senha.') }}
     </p>
 
-    @if (count($this->sessions) > 0)
+    @if (count($this->sessions) > 0 || auth()->user()->tokens->count() > 0)
     <div class="mt-6">
       <!-- Other Browser Sessions -->
       @foreach ($this->sessions as $session)
-      <div class="d-flex">
+      <div class="d-flex mb-4">
         <div>
           @if ($session->agent->isDesktop())
           <svg fill="none" width="32" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -54,6 +54,33 @@
               @else
               {{ __('Última atividade') }} {{ $session->last_active }}
               @endif
+            </div>
+          </div>
+        </div>
+      </div>
+      @endforeach
+
+      <!-- Mobile Tokens (Sanctum) -->
+      @foreach (auth()->user()->tokens as $token)
+      <div class="d-flex mb-4">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+            fill="none" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+            <path d="M0 0h24v24H0z" stroke="none"></path>
+            <rect x="7" y="4" width="10" height="16" rx="1"></rect>
+            <path d="M11 5h2M12 17v.01"></path>
+          </svg>
+        </div>
+
+        <div class="ms-2">
+          <div>
+            Dispositivo Móvel ({{ $token->name }})
+          </div>
+
+          <div>
+            <div class="small text-body-secondary">
+              {{ __('Ativo desde') }} {{ $token->created_at->diffForHumans() }}
+              <span class="badge bg-label-info ms-2">App Mobile</span>
             </div>
           </div>
         </div>
