@@ -5,60 +5,97 @@ namespace App\Http\Controllers;
 use App\Models\OrdemServico;
 use App\Models\TaxInvoice;
 use App\Models\Company;
+use App\Models\FinancialTransaction;
+use App\Services\OfxParserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AccountingController extends Controller
 {
+    protected $ofxService;
+
+    public function __construct(OfxParserService $ofxService)
+    {
+        $this->ofxService = $ofxService;
+    }
+
     public function index(Request $request)
     {
         $user = Auth::user();
         $companyId = $user->company_id;
-        
-        // Busca a empresa do usuário ou a primeira disponível se for admin sem empresa
         $company = Company::find($companyId) ?? Company::first();
 
         if (!$company) {
-            return redirect()->route('dashboard')->with('error', 'Nenhuma empresa cadastrada no sistema. Cadastre uma empresa primeiro.');
+            return redirect()->route('dashboard')->with('error', 'Nenhuma empresa cadastrada.');
         }
-        
-        // Garante que o ID da empresa usada seja consistente para os filtros
-        $companyId = $company->id;
-        
-        // Filtro de Mês e Ano (Default mês atual)
+
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
-
-        // Vendas Finalizadas (Receitas)
-        $orders = OrdemServico::where('company_id', $companyId)
+        
+        // Receitas e Despesas do Mês
+        $revenue = OrdemServico::where('company_id', $company->id)
             ->whereIn('status', ['completed', 'finalized'])
             ->whereMonth('updated_at', $month)
             ->whereYear('updated_at', $year)
-            ->with(['client', 'items', 'parts'])
+            ->with(['client'])
             ->get();
 
-        // Notas Fiscais Emitidas
-        $invoices = TaxInvoice::where('company_id', $companyId)
+        $expenses = FinancialTransaction::where('company_id', $company->id)
+            ->where('type', 'expense')
+            ->whereMonth('due_date', $month)
+            ->whereYear('due_date', $year)
+            ->get();
+
+        $invoices = TaxInvoice::where('company_id', $company->id)
             ->whereMonth('issued_at', $month)
             ->whereYear('issued_at', $year)
             ->get();
 
-        // Projeção de impostos (Baseado no faturamento total vs alíquota real da empresa)
-        $projectedTax = $orders->sum('total') * ($company->iss_rate / 100);
-
         $totals = [
-            'revenue' => $orders->sum('total'),
-            'invoiced' => $invoices->where('status', 'authorized')->sum('total_amount'),
-            'taxes' => $invoices->where('status', 'authorized')->sum('tax_amount'),
-            'projected_tax' => $projectedTax,
+            'revenue' => $revenue->sum('total'),
+            'expenses' => $expenses->sum('amount'),
+            'net_profit' => $revenue->sum('total') - $expenses->sum('amount'),
+            'audited_count' => $expenses->where('audit_status', 'audited')->count(),
+            'pending_audit' => $expenses->where('audit_status', 'pending')->count(),
         ];
 
-        return view('content.accounting.index', compact('orders', 'invoices', 'totals', 'month', 'year', 'company'));
+        return view('content.accounting.index', compact('revenue', 'expenses', 'invoices', 'totals', 'month', 'year', 'company'));
+    }
+
+    public function importOfx(Request $request)
+    {
+        $request->validate(['ofx_file' => 'required|file']);
+
+        $path = $request->file('ofx_file')->getRealPath();
+        $ofxTransactions = $this->ofxService->parse($path);
+
+        if (empty($ofxTransactions)) {
+            return back()->with('error', 'Erro ao ler o arquivo OFX. Verifique se o formato é válido.');
+        }
+
+        // Armazenar na sessão para conciliação (ou passar para a view)
+        return back()->with('ofx_data', $ofxTransactions);
+    }
+
+    public function auditTransaction(Request $request, $id)
+    {
+        $transaction = FinancialTransaction::findOrFail($id);
+        
+        if ($transaction->company_id !== Auth::user()->company_id && !Auth::user()->is_admin) {
+             return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $transaction->update([
+            'audit_status' => $request->status,
+            'accountant_notes' => $request->notes,
+            'audited_at' => now(),
+        ]);
+
+        return back()->with('success', 'Auditoria realizada com sucesso!');
     }
 
     public function exportXml(Request $request)
     {
-        // Aqui implementaremos a lógica de ZIP com todos os XMLs do mês
-        return back()->with('info', 'Funcionalidade de exportação em lote sendo preparada (Requer integração com API de NFe).');
+        return back()->with('info', 'Lógica de exportação de XML em lote em desenvolvimento.');
     }
 }

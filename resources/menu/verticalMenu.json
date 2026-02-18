@@ -7,6 +7,12 @@
       "slug": "dashboard"
     },
     {
+      "url": "/appointments",
+      "name": "Agendamentos Site",
+      "icon": "menu-icon icon-base ti tabler-calendar-star",
+      "slug": "appointments.index"
+    },
+    {
       "url": "/calendar",
       "name": "Calendário",
       "icon": "menu-icon icon-base ti tabler-calendar",

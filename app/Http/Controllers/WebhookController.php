@@ -35,10 +35,35 @@ class WebhookController extends Controller
 
     private function processPayment($asaasPayment)
     {
-        $customerId = $asaasPayment['customer'];
         $externalReference = $asaasPayment['externalReference'] ?? null;
+        if (!$externalReference) return;
 
-        // Tenta achar o usuário pelo externalReference (User ID) ou pelo e-mail
+        // Caso 1: Pagamento de Ordem de Serviço (Prefixo 'os_')
+        if (str_starts_with($externalReference, 'os_')) {
+            $osId = str_replace('os_', '', $externalReference);
+            $os = \App\Models\OrdemServico::find($osId);
+            
+            if ($os) {
+                // Marca a OS como paga e gera a transação financeira
+                $os->update(['status' => 'paid']); // Ou o status final de pagamento do seu fluxo
+                
+                // Registra no histórico do veículo
+                \App\Models\VehicleHistory::create([
+                    'company_id' => $os->company_id,
+                    'veiculo_id' => $os->veiculo_id,
+                    'date' => now(),
+                    'event_type' => 'pagamento_recebido',
+                    'title' => 'Pagamento PIX Confirmado',
+                    'description' => 'Pagamento de R$ ' . number_format($asaasPayment['value'], 2, ',', '.') . ' recebido automaticamente via Asaas.',
+                    'performer' => 'Sistema (Asaas Webhook)',
+                ]);
+
+                Log::info("OS #{$osId} marked as paid via Webhook.");
+            }
+            return;
+        }
+
+        // Caso 2: Pagamento de Assinatura do Ghotme ERP (User ID direto)
         $user = User::find($externalReference);
         
         if (!$user) {

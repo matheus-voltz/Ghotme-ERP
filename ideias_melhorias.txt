@@ -1,25 +1,38 @@
-# IDEIAS DE MELHORIAS - PROJETO GHOTME
+1. 🤖 Inteligência e IA (O "Uau" do Cliente)
+   * Leitura de Documentos via IA (OCR): O usuário tira foto do documento do carro (CRLV) ou da CNH do cliente, e o
+     sistema preenche tudo sozinho (Nome, CPF, Placa, Chassi). Isso economiza minutos valiosos na recepção.
+   * Diagnóstico por Voz: O mecânico, com as mãos sujas, clica num botão de microfone e dita os problemas. O sistema
+     transcreve o texto direto nas observações da OS.
+   * Previsão de Receita: Baseado nos orçamentos pendentes e na média de aprovação, o dashboard mostra: "Você tem R$
+     15.000,00 em orçamentos na rua com 70% de chance de fechamento nos próximos 5 dias".
 
-## 1. EXPERIÊNCIA DO CLIENTE (PORTAL DO CLIENTE)
-- Aprovação Digital: Link único para o cliente aprovar orçamentos online com registro de IP.
-- Tracker de Status: Visualização em tempo real da etapa atual do veículo (Entrada, Manutenção, Lavagem, Pronto).
-- Histórico Digital: Área para o cliente baixar notas e histórico de serviços.
 
-## 2. EFICIÊNCIA DA OFICINA (MODO MECÂNICO)
-- Cronômetro de Serviços: Botão de Start/Stop para medir o tempo real gasto em cada serviço na OS.
-- Diagnóstico por Voz: Uso de API de voz para ditar problemas e observações.
-- Upload de Fotos: Interface mobile rápida para anexar fotos de peças com defeito diretamente na OS.
+  2. 📱 Experiência e Fidelização (CRM Ativo)
+   * Lembretes de Revisão Automáticos: O sistema detecta que o cliente trocou o óleo há 6 meses e envia um WhatsApp
+     automático: "Olá João, está na hora da nova revisão do seu [Modelo]. Vamos agendar?"
+   * Cartão de Fidelidade Digital: Cada R$ 100,00 em serviços geram pontos que podem ser trocados por descontos ou
+     brindes (ex: uma lavagem grátis).
+   * Página de Status "Onde está meu carro?": Uma URL simplificada onde o cliente vê uma barra de progresso: [Entrada]
+     -> [Peças Chegaram] -> [Em Manutenção] -> [Testes Finais] -> [Pronto].
 
-## 3. AGENDAMENTO E CALENDÁRIO
-- Gestão de Box/Elevador: Calendário visual para organizar qual veículo ocupa cada espaço físico da oficina.
-- Agendamento Online: Landing page para clientes marcarem serviços conforme horários livres.
 
-## 4. AUTOMAÇÃO E INTELIGÊNCIA (CRM)
-- Lembretes Automáticos: Disparo de WhatsApp/E-mail para revisões periódicas (Troca de óleo, correia, etc).
-- Consulta de Placa (API): Preenchimento automático de dados do veículo ao digitar a placa.
-- Tabela FIPE: Exibição do valor de mercado do veículo na ficha do cliente.
+  3. 🏢 Gestão B2B e Frotas (Para Grandes Clientes)
+   * Faturamento de Frotas: Permitir que uma empresa (ex: uma locadora) tenha 10 carros na oficina e o Ghotme gere uma
+     fatura única mensal com todos os serviços agrupados.
+   * Portal do Frotista: Uma área onde o gestor da frota vê o custo por placa, média de gasto anual e quais carros estão
+     parados na sua oficina agora.
 
-## 5. GESTÃO VISUAL E B2B
-- Quadro Kanban: Visualização das Ordens de Serviço em colunas (Trello style).
-- Faturamento de Frotas: Agrupamento de várias OS de uma mesma empresa para cobrança mensal única.
-- Relatórios de Lucratividade: Cálculo automático de margem bruta considerando custo de peças e horas de mão de obra.
+
+  4. 💰 Financeiro Avançado
+   * Split de Comissões Real-time: Assim que a OS é paga, o sistema já separa a parte do mecânico (ex: 10% da mão de
+     obra) e mostra no painel dele quanto ele já ganhou no mês.
+   * Fluxo de Caixa Projetado: Um gráfico que cruza o Contas a Pagar (aluguel, luz, fornecedores) com o Contas a Receber
+     (parcelamentos de cartões, boletos) para prever se faltará dinheiro daqui a 15 dias.
+
+
+  5. 📦 Estoque e Compras
+   * Pedido de Compra Automático: Quando uma peça atinge o "Estoque Mínimo", o sistema gera um PDF de pedido de compra
+     pronto para ser enviado ao fornecedor.
+   * Curva ABC de Peças: Relatório que mostra quais peças trazem mais lucro e quais estão "encalhadas" no estoque
+     ocupando espaço e dinheiro.
+

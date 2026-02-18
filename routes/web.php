@@ -86,6 +86,10 @@ Route::get('/pages/misc-error', [MiscError::class, 'index'])->name('pages-misc-e
 Route::get('/auth/login-basic', [LoginBasic::class, 'index'])->name('auth-login-basic');
 Route::get('/auth/register-basic', [RegisterBasic::class, 'index'])->name('auth-register-basic');
 
+// Public Booking
+Route::get('/agendar/{slug}', [App\Http\Controllers\PublicBookingController::class, 'show'])->name('public.booking.show');
+Route::post('/agendar/{slug}', [App\Http\Controllers\PublicBookingController::class, 'store'])->name('public.booking.store');
+
 // Public Budget Approval
 Route::get('/view-budget/{uuid}', [PublicBudgetController::class, 'show'])->name('public.budget.show');
 Route::get('/view-budget/{uuid}/checkout', [PublicBudgetController::class, 'checkout'])->name('public.budget.checkout');
@@ -106,6 +110,11 @@ Route::middleware([
     'verified',
     App\Http\Middleware\CheckTrialStatus::class,
 ])->group(function () {
+
+    // Appointments Management
+    Route::get('/appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
+    Route::post('/appointments/{id}/confirm', [App\Http\Controllers\AppointmentController::class, 'confirm'])->name('appointments.confirm');
+    Route::post('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
 
     // Main Page Route
     Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
@@ -161,6 +170,10 @@ Route::middleware([
     Route::post('/vehicle-history', [VehicleHistoryController::class, 'store'])->name('vehicle-history.store');
 
     // Inventory
+    Route::get('/inventory/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('inventory.purchase-orders');
+    Route::post('/inventory/purchase-orders/automatic', [App\Http\Controllers\PurchaseOrderController::class, 'generateAutomaticOrders'])->name('inventory.purchase-orders.automatic');
+    Route::post('/inventory/purchase-orders/{id}/receive', [App\Http\Controllers\PurchaseOrderController::class, 'receive'])->name('inventory.purchase-orders.receive');
+    
     Route::get('/inventory/items', [InventoryItemController::class, 'index'])->name('inventory.items');
     Route::get('/inventory/items-list', [InventoryItemController::class, 'dataBase'])->name('inventory.items-list');
     Route::post('/inventory/items', [InventoryItemController::class, 'store'])->name('inventory.items.store');
@@ -218,8 +231,10 @@ Route::middleware([
     Route::get('/finance/reports', [FinancialReportController::class, 'index'])->name('finance.reports');
     Route::get('/finance/reports/chart-data', [FinancialReportController::class, 'getChartData']);
 
-    // Accounting & Fiscal
+    // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
+    Route::post('/accounting/import-ofx', [App\Http\Controllers\AccountingController::class, 'importOfx'])->name('accounting.import-ofx');
+    Route::post('/accounting/audit/{id}', [App\Http\Controllers\AccountingController::class, 'auditTransaction'])->name('accounting.audit');
     Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export');
     Route::get('/fiscal/emit-invoice', [App\Http\Controllers\TaxInvoiceController::class, 'createFromOS'])->name('tax.invoice.create');
     
