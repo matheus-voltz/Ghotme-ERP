@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
-class Vehicles extends Model
+class Vehicles extends Model implements Auditable
 {
-    use BelongsToCompany;
+    use BelongsToCompany, AuditableTrait;
 
     protected $table = 'veiculos';
 

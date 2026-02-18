@@ -11,45 +11,56 @@ use App\Models\InventoryItem;
 use App\Models\Budget;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class HomePage extends Controller
 {
   public function index()
   {
-    $user = \Illuminate\Support\Facades\Auth::user();
-    if ($user && $user->role !== 'admin') {
-      // Employee Logic - Filter only their own records
-      $pendingBudgetsCount = Budget::where('user_id', $user->id)->where('status', 'pending')->count();
-      $runningOSCount = OrdemServico::where('user_id', $user->id)->where('status', 'running')->count();
-      $completedOSToday = OrdemServico::where('user_id', $user->id)
+    $user = Auth::user();
+    $companyId = $user->company_id ?? 0;
+    $cacheKey = "dashboard_stats_{$companyId}_" . ($user->role !== 'admin' ? "user_{$user->id}" : "admin");
+
+    $data = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($user) {
+      if ($user && $user->role !== 'admin') {
+        return $this->getEmployeeData($user);
+      }
+      return $this->getAdminData();
+    });
+
+    $view = ($user && $user->role !== 'admin') ? 'content.pages.dashboard.dashboards-employee' : 'content.pages.dashboard.dashboards-analytics';
+    
+    return view($view, array_merge($data, ['user' => $user]));
+  }
+
+  protected function getEmployeeData($user)
+  {
+    return [
+      'pendingBudgetsCount' => Budget::where('user_id', $user->id)->where('status', 'pending')->count(),
+      'runningOSCount' => OrdemServico::where('user_id', $user->id)->where('status', 'running')->count(),
+      'completedOSToday' => OrdemServico::where('user_id', $user->id)
         ->where('status', 'finalized')
         ->whereDate('updated_at', Carbon::today())
-        ->count();
-
-      $recentBudgets = Budget::with('client')
+        ->count(),
+      'recentBudgets' => Budget::with('client')
         ->where('user_id', $user->id)
         ->orderBy('created_at', 'desc')
         ->limit(5)
-        ->get();
-
-      $recentOS = OrdemServico::with(['client', 'veiculo'])
+        ->get(),
+      'recentOS' => OrdemServico::with(['client', 'veiculo'])
         ->where('user_id', $user->id)
         ->orderBy('created_at', 'desc')
         ->limit(5)
-        ->get();
+        ->get(),
+    ];
+  }
 
-      return view('content.pages.dashboard.dashboards-employee', compact(
-        'pendingBudgetsCount',
-        'runningOSCount',
-        'completedOSToday',
-        'recentBudgets',
-        'recentOS',
-        'user'
-      ));
-    }
-
+  protected function getAdminData()
+  {
     $today = Carbon::today();
     $startOfMonth = Carbon::now()->startOfMonth();
+    $lastMonth = Carbon::now()->subMonth();
 
     // OS Stats
     $osStats = [
@@ -75,8 +86,6 @@ class HomePage extends Controller
 
     $revenueMonth = $financialRevenue + $osRevenue;
 
-    // Revenue Last Month (for comparison)
-    $lastMonth = Carbon::now()->subMonth();
     $financialRevenueLast = FinancialTransaction::where('type', 'in')
       ->where('status', 'paid')
       ->whereMonth('paid_at', $lastMonth->month)
@@ -91,13 +100,7 @@ class HomePage extends Controller
       ->sum(fn($os) => $os->total);
 
     $revenueLastMonth = $financialRevenueLast + $osRevenueLast;
-
-    $revenueGrowth = 0;
-    if ($revenueLastMonth > 0) {
-      $revenueGrowth = (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100;
-    } else if ($revenueMonth > 0) {
-      $revenueGrowth = 100;
-    }
+    $revenueGrowth = $revenueLastMonth > 0 ? (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100 : ($revenueMonth > 0 ? 100 : 0);
 
     $receivablesPending = FinancialTransaction::where('type', 'in')
       ->where('status', 'pending')
@@ -109,113 +112,55 @@ class HomePage extends Controller
       ->whereDate('due_date', '<=', Carbon::now()->addDays(7))
       ->sum('amount');
 
-    // Other Stats
-    $totalClients = Clients::count();
-    $lowStockItems = InventoryItem::whereRaw('quantity <= min_quantity')->count();
-    $pendingBudgets = Budget::where('status', 'pending')->count();
-
-    // Recent OS
-    $recentOS = OrdemServico::with(['client', 'veiculo'])
-      ->orderBy('created_at', 'desc')
-      ->limit(5)
-      ->get();
-
-    // Chart Data: Revenue vs Expenses (Last 6 Months)
+    // Chart Data & Trends
     $months = [];
     $revenueTrends = [];
     $expenseTrends = [];
+    $budgetTrends = [];
 
     for ($i = 5; $i >= 0; $i--) {
       $monthDate = Carbon::now()->subMonths($i);
       $months[] = $monthDate->translatedFormat('M');
 
-      $finRev = FinancialTransaction::where('type', 'in')
-        ->where('status', 'paid')
-        ->whereMonth('paid_at', $monthDate->month)
-        ->whereYear('paid_at', $monthDate->year)
-        ->sum('amount');
-
-      $osRev = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
-        ->whereMonth('updated_at', $monthDate->month)
-        ->whereYear('updated_at', $monthDate->year)
-        ->with(['items', 'parts'])
-        ->get()
-        ->sum(fn($os) => $os->total);
-
+      $finRev = FinancialTransaction::where('type', 'in')->where('status', 'paid')->whereMonth('paid_at', $monthDate->month)->whereYear('paid_at', $monthDate->year)->sum('amount');
+      $osRev = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])->whereMonth('updated_at', $monthDate->month)->whereYear('updated_at', $monthDate->year)->with(['items', 'parts'])->get()->sum(fn($os) => $os->total);
+      
       $revenueTrends[] = $finRev + $osRev;
-
-      $expenseTrends[] = FinancialTransaction::where('type', 'out')
-        ->where('status', 'paid')
-        ->whereMonth('paid_at', $monthDate->month)
-        ->whereYear('paid_at', $monthDate->year)
-        ->sum('amount');
+      $expenseTrends[] = FinancialTransaction::where('type', 'out')->where('status', 'paid')->whereMonth('paid_at', $monthDate->month)->whereYear('paid_at', $monthDate->year)->sum('amount');
+      $budgetTrends[] = Budget::whereMonth('created_at', $monthDate->month)->whereYear('created_at', $monthDate->year)->count();
     }
 
-    // OS Distribution Chart
-    $osDistribution = [
-      'pending' => OrdemServico::where('status', 'pending')->count(),
-      'running' => OrdemServico::where('status', 'running')->count(),
-      'finalized' => OrdemServico::where('status', 'finalized')->count(),
-    ];
-
-    // Budget Conversion Metrics
-    $totalBudgetsMonth = Budget::whereMonth('created_at', Carbon::now()->month)->count();
-    $approvedBudgetsMonth = Budget::where('status', 'approved')
-      ->whereMonth('updated_at', Carbon::now()->month)
-      ->count();
-
-    $conversionRate = $totalBudgetsMonth > 0 ? ($approvedBudgetsMonth / $totalBudgetsMonth) * 100 : 0;
-
-    // Top 5 Services by Revenue
     $topServices = \App\Models\OrdemServicoItem::join('services', 'ordem_servico_items.service_id', '=', 'services.id')
       ->select('services.name as description', DB::raw('SUM(ordem_servico_items.price * ordem_servico_items.quantity) as total_revenue'))
-      ->groupBy('services.name')
-      ->orderBy('total_revenue', 'desc')
-      ->limit(5)
-      ->get();
+      ->groupBy('services.name')->orderBy('total_revenue', 'desc')->limit(5)->get();
 
-    $topServiceLabels = $topServices->pluck('description')->map(fn($item) => str($item)->limit(20))->toArray();
-    $topServiceData = $topServices->pluck('total_revenue')->toArray();
+    $monthlyExpenses = FinancialTransaction::where('type', 'out')->where('status', 'paid')->whereMonth('paid_at', Carbon::now()->month)->whereYear('paid_at', Carbon::now()->year)->sum('amount');
 
-    // Budget Trends (Last 6 Months)
-    $budgetTrends = [];
-    for ($i = 5; $i >= 0; $i--) {
-      $monthDate = Carbon::now()->subMonths($i);
-      $budgetTrends[] = Budget::whereMonth('created_at', $monthDate->month)
-        ->whereYear('created_at', $monthDate->year)
-        ->count();
-    }
-
-    // Monthly Profitability
-    $monthlyExpenses = FinancialTransaction::where('type', 'out')
-      ->where('status', 'paid')
-      ->whereMonth('paid_at', Carbon::now()->month)
-      ->whereYear('paid_at', Carbon::now()->year)
-      ->sum('amount');
-
-    $monthlyProfitability = $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0;
-
-    return view('content.pages.dashboard.dashboards-analytics', compact(
-      'osStats',
-      'revenueMonth',
-      'receivablesPending',
-      'payablesPending',
-      'totalClients',
-      'lowStockItems',
-      'pendingBudgets',
-      'recentOS',
-      'months',
-      'revenueTrends',
-      'expenseTrends',
-      'osDistribution',
-      'conversionRate',
-      'budgetTrends',
-      'totalBudgetsMonth',
-      'approvedBudgetsMonth',
-      'topServiceLabels',
-      'topServiceData',
-      'revenueGrowth',
-      'monthlyProfitability'
-    ));
+    return [
+      'osStats' => $osStats,
+      'revenueMonth' => $revenueMonth,
+      'receivablesPending' => $receivablesPending,
+      'payablesPending' => $payablesPending,
+      'totalClients' => Clients::count(),
+      'lowStockItems' => InventoryItem::whereRaw('quantity <= min_quantity')->count(),
+      'pendingBudgets' => Budget::where('status', 'pending')->count(),
+      'recentOS' => OrdemServico::with(['client', 'veiculo'])->orderBy('created_at', 'desc')->limit(5)->get(),
+      'months' => $months,
+      'revenueTrends' => $revenueTrends,
+      'expenseTrends' => $expenseTrends,
+      'osDistribution' => [
+        'pending' => OrdemServico::where('status', 'pending')->count(),
+        'running' => OrdemServico::where('status', 'running')->count(),
+        'finalized' => OrdemServico::where('status', 'finalized')->count(),
+      ],
+      'conversionRate' => Budget::whereMonth('created_at', Carbon::now()->month)->count() > 0 ? (Budget::where('status', 'approved')->whereMonth('updated_at', Carbon::now()->month)->count() / Budget::whereMonth('created_at', Carbon::now()->month)->count()) * 100 : 0,
+      'budgetTrends' => $budgetTrends,
+      'totalBudgetsMonth' => Budget::whereMonth('created_at', Carbon::now()->month)->count(),
+      'approvedBudgetsMonth' => Budget::where('status', 'approved')->whereMonth('updated_at', Carbon::now()->month)->count(),
+      'topServiceLabels' => $topServices->pluck('description')->map(fn($item) => str($item)->limit(20))->toArray(),
+      'topServiceData' => $topServices->pluck('total_revenue')->toArray(),
+      'revenueGrowth' => $revenueGrowth,
+      'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
+    ];
   }
 }

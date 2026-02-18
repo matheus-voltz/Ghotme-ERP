@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
+use OwenIt\Auditing\Contracts\Auditable;
+use OwenIt\Auditing\Auditable as AuditableTrait;
 
 use Illuminate\Support\Str;
 
-class OrdemServico extends Model
+class OrdemServico extends Model implements Auditable
 {
-    use BelongsToCompany;
+    use BelongsToCompany, AuditableTrait;
 
     protected $fillable = [
         'company_id',
