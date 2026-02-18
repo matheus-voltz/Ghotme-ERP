@@ -12,6 +12,11 @@ class Company extends Model
     protected $fillable = [
         'name',
         'document_number',
+        'ie',
+        'im',
+        'tax_regime',
+        'iss_rate',
+        'is_tax_iss_withheld',
         'email',
         'phone',
         'address',

@@ -72,6 +72,25 @@ class OrdemServico extends Model implements Auditable
         return $servicesTotal + $partsTotal;
     }
 
+    public function getPartsCostTotalAttribute()
+    {
+        return $this->parts->sum(function($p) {
+            // Se a peça não tiver custo, assume 0
+            return ($p->part->cost_price ?? 0) * $p->quantity;
+        });
+    }
+
+    public function getGrossProfitAttribute()
+    {
+        return $this->total - $this->parts_cost_total;
+    }
+
+    public function getProfitMarginAttribute()
+    {
+        if ($this->total <= 0) return 0;
+        return ($this->gross_profit / $this->total) * 100;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

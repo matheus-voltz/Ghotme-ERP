@@ -197,10 +197,27 @@
       ]
     },
     {
+      "name": "Fiscal & Contábil",
+      "icon": "menu-icon icon-base ti tabler-receipt-tax",
+      "slug": "accounting",
+      "submenu": [
+        {
+          "url": "/accounting",
+          "name": "Portal do Contador",
+          "slug": "accounting.index"
+        }
+      ]
+    },
+    {
       "name": "Relatórios",
       "icon": "menu-icon icon-base ti tabler-chart-line",
       "slug": "reports",
       "submenu": [
+        {
+          "url": "/reports/profitability",
+          "name": "Lucratividade Real",
+          "slug": "reports.profitability"
+        },
         {
           "url": "/reports/os-status",
           "name": "OS por status",

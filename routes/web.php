@@ -218,7 +218,13 @@ Route::middleware([
     Route::get('/finance/reports', [FinancialReportController::class, 'index'])->name('finance.reports');
     Route::get('/finance/reports/chart-data', [FinancialReportController::class, 'getChartData']);
 
+    // Accounting & Fiscal
+    Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
+    Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export');
+    Route::get('/fiscal/emit-invoice', [App\Http\Controllers\TaxInvoiceController::class, 'createFromOS'])->name('tax.invoice.create');
+    
     // Reports
+    Route::get('/reports/profitability', [App\Http\Controllers\ProfitabilityReportController::class, 'index'])->name('reports.profitability');
     Route::get('/reports/os-status', [ReportController::class, 'osStatus'])->name('reports.os-status');
     Route::get('/reports/os-status-data', [ReportController::class, 'getOsStatusData']);
     Route::get('/reports/consumed-stock', [ReportController::class, 'consumedStock'])->name('reports.consumed-stock');
