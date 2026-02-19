@@ -18,9 +18,14 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        // Get team members (same company, excluding self)
+        // Get team members (same company) + Support Ghotme (Super Admins/NULL company)
         $contacts = User::where('id', '!=', $user->id)
-            ->where('company_id', $user->company_id)
+            ->where(function ($q) use ($user) {
+                $q->where('company_id', $user->company_id)
+                  ->orWhereNull('company_id')
+                  ->orWhere('role', 'super_admin')
+                  ->orWhere('role', 'admin');
+            })
             ->get()
             ->map(function ($contact) use ($user) {
                 $contact->unread_count = ChatMessage::where('sender_id', $contact->id)

@@ -39,10 +39,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     async function saveAuthData(user: any, token: string) {
-        const baseUrl = api.defaults.baseURL?.replace('/api', '');
-        if (user.profile_photo_path) {
-            user.profile_photo_url = `${baseUrl}/storage/${user.profile_photo_path}`;
-        }
         if (!user.profile_photo_url) {
             user.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&color=7367F0&background=F3F2FF`;
         }
@@ -56,10 +52,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     async function updateUser(newData: any) {
         try {
             const updatedUser = { ...user, ...newData };
-            const baseUrl = api.defaults.baseURL?.replace('/api', '');
-            if (newData.profile_photo_path) {
-                updatedUser.profile_photo_url = `${baseUrl}/storage/${newData.profile_photo_path}`;
-            }
             await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
             setUser(updatedUser);
         } catch (error) {

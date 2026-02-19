@@ -22,6 +22,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Forçar URL dinâmico se acessado via IP/Host diferente (importante para Mobile)
+        if (!app()->runningInConsole() && request()->getHost()) {
+            config(['app.url' => request()->getSchemeAndHttpHost()]);
+        }
+
         if (app()->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }

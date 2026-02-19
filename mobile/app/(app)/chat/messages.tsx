@@ -113,7 +113,9 @@ export default function ChatScreen() {
         if (item.temp_image) {
             attachmentUrl = item.temp_image;
         } else if (item.attachment_path) {
-            attachmentUrl = `${api.defaults.baseURL?.replace('/api', '')}/storage/${item.attachment_path}`;
+            // Get the base URL from the API instance dynamically
+            const baseUrl = api.defaults.baseURL?.split('/api')[0];
+            attachmentUrl = `${baseUrl}/storage/${item.attachment_path}`;
         }
 
         return (

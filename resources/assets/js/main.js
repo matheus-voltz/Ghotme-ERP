@@ -6,6 +6,49 @@
 
 window.isRtl = window.Helpers.isRtl();
 window.isDarkStyle = window.Helpers.isDarkStyle();
+
+/**
+ * Global Toast Helper
+ * @param {string} title Toast title
+ * @param {string} message Toast message
+ * @param {string} type Toast type (success, danger, warning, info)
+ */
+window.showToast = function(title, message, type = 'success') {
+  let toastContainer = document.querySelector('.toast-container');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+    toastContainer.style.zIndex = '9999';
+    document.body.appendChild(toastContainer);
+  }
+
+  const toastId = 'toast-' + Math.random().toString(36).substr(2, 9);
+  const icon = type === 'success' ? 'tabler-circle-check' : (type === 'danger' ? 'tabler-x' : 'tabler-info-circle');
+  const bgClass = 'bg-' + type;
+
+  const toastHtml = `
+    <div id="${toastId}" class="toast bs-toast fade show animate__animated animate__tada ${bgClass}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+      <div class="toast-header">
+        <i class="ti ${icon} me-2"></i>
+        <div class="me-auto fw-medium">${title}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+        ${message}
+      </div>
+    </div>
+  `;
+
+  toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+  const toastElement = document.getElementById(toastId);
+  const toast = new bootstrap.Toast(toastElement);
+  toast.show();
+
+  toastElement.addEventListener('hidden.bs.toast', function () {
+    toastElement.remove();
+  });
+};
+
 let menu,
   animate,
   isHorizontalLayout = false;
