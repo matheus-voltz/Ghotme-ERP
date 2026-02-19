@@ -39,6 +39,7 @@ const defaultLabels: NicheLabels = {
   model: 'Modelo',
   color: 'Cor',
   year: 'Ano',
+  inventory_items: 'Peças',
 };
 
 const NicheContext = createContext<NicheContextData>({} as NicheContextData);

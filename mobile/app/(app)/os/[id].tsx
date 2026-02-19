@@ -374,7 +374,7 @@ export default function OSDetailScreen() {
                     <View style={[styles.section, { backgroundColor: colors.card }]}>
                         <View style={styles.sectionHeader}>
                             <Ionicons name="build" size={20} color={colors.primary} />
-                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Peças Utilizadas</Text>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.inventory_items?.split('/')[0] + ' Utilizados' || 'Peças Utilizadas'}</Text>
                         </View>
                         {os.parts.map((part: any) => (
                             <View key={`part-${part.id}`} style={[styles.itemRow, { borderBottomColor: colors.border }]}>

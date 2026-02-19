@@ -9,15 +9,23 @@ import { useNiche } from '../../../context/NicheContext';
 
 export default function ActionsScreen() {
     const { colors } = useTheme();
-    const { labels } = useNiche();
+    const { labels, niche } = useNiche();
+
+    const getEntityIcon = () => {
+        switch (niche) {
+            case 'pet': return 'paw-outline';
+            case 'electronics': return 'laptop-outline';
+            default: return 'car-sport-outline';
+        }
+    };
 
     const actions = [
         { id: 'new', title: 'Nova OS', icon: 'document-text-outline', color: '#7367F0', desc: 'Abrir ordem de serviço' },
         { id: 'new-client', title: 'Novo Cliente', icon: 'person-add-outline', color: '#28C76F', desc: 'Cadastrar cliente' },
-        { id: 'new-vehicle', title: labels.new_entity, icon: 'car-sport-outline', color: '#00CFE8', desc: `Cadastrar ${labels.entity.toLowerCase()}` },
+        { id: 'new-vehicle', title: labels.new_entity, icon: getEntityIcon(), color: '#00CFE8', desc: `Cadastrar ${labels.entity.toLowerCase()}` },
         { id: 'scan', title: 'Ler QR Code', icon: 'scan-outline', color: '#4B4B4B', desc: 'Buscar por etiqueta' },
         { id: 'calendar', title: 'Agenda', icon: 'calendar-outline', color: '#FF9F43', desc: 'Ver agendamentos' },
-        { id: 'parts', title: 'Peças', icon: 'construct-outline', color: '#EA5455', desc: 'Consultar estoque' },
+        { id: 'parts', title: labels.inventory_items?.split('/')[0] || 'Peças/Produtos', icon: 'cube-outline', color: '#EA5455', desc: 'Consultar estoque' },
     ];
 
     return (
