@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
@@ -34,48 +35,53 @@ export default function ActionsScreen() {
                 colors={['#7367F0', '#CE9FFC']}
                 style={styles.header}
             >
-                <View>
+                <Animated.View entering={FadeInUp.duration(600).springify()}>
                     <Text style={styles.headerTitle}>Ações Rápidas</Text>
                     <Text style={styles.headerSubtitle}>O que você deseja fazer hoje?</Text>
-                </View>
+                </Animated.View>
             </LinearGradient>
 
             <ScrollView contentContainerStyle={styles.gridContainer} showsVerticalScrollIndicator={false}>
                 <View style={styles.grid}>
-                    {actions.map((item) => (
-                        <TouchableOpacity
+                    {actions.map((item, index) => (
+                        <Animated.View
                             key={item.id}
-                            style={[
-                                styles.card,
-                                {
-                                    width: '47%',
-                                    backgroundColor: colors.card,
-                                    marginBottom: 20
-                                }
-                            ]}
-                            activeOpacity={0.8}
-                            onPress={() => {
-                                if (item.id === 'new') {
-                                    router.push('/os/create');
-                                } else if (item.id === 'new-client') {
-                                    router.push('/clients/create');
-                                } else if (item.id === 'new-vehicle') {
-                                    router.push('/vehicles/create');
-                                } else if (item.id === 'calendar') {
-                                    router.push('/calendar');
-                                } else if (item.id === 'parts') {
-                                    router.push('/inventory');
-                                } else {
-                                    alert(`Ação: ${item.title} (Em breve)`);
-                                }
-                            }}
+                            style={{ width: '47%', marginBottom: 20 }}
+                            entering={ZoomIn.delay(index * 100).duration(500).springify()}
                         >
-                            <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
-                                <Ionicons name={item.icon as any} size={28} color={item.color} />
-                            </View>
-                            <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
-                            <Text style={[styles.cardDesc, { color: colors.subText }]}>{item.desc}</Text>
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
+                                    styles.card,
+                                    {
+                                        width: '100%',
+                                        backgroundColor: colors.card,
+                                        borderColor: colors.border
+                                    }
+                                ]}
+                                activeOpacity={0.8}
+                                onPress={() => {
+                                    if (item.id === 'new') {
+                                        router.push('/os/create');
+                                    } else if (item.id === 'new-client') {
+                                        router.push('/clients/create');
+                                    } else if (item.id === 'new-vehicle') {
+                                        router.push('/vehicles/create');
+                                    } else if (item.id === 'calendar') {
+                                        router.push('/calendar');
+                                    } else if (item.id === 'parts') {
+                                        router.push('/inventory');
+                                    } else {
+                                        alert(`Ação: ${item.title} (Em breve)`);
+                                    }
+                                }}
+                            >
+                                <View style={[styles.iconContainer, { backgroundColor: item.color + '20' }]}>
+                                    <Ionicons name={item.icon as any} size={28} color={item.color} />
+                                </View>
+                                <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
+                                <Text style={[styles.cardDesc, { color: colors.subText }]}>{item.desc}</Text>
+                            </TouchableOpacity>
+                        </Animated.View>
                     ))}
                 </View>
             </ScrollView>
@@ -100,11 +106,13 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontWeight: 'bold',
         color: '#fff',
+        textAlign: 'center',
     },
     headerSubtitle: {
         fontSize: 14,
         color: 'rgba(255,255,255,0.9)',
         marginTop: 5,
+        textAlign: 'center',
     },
     gridContainer: {
         padding: 20,
@@ -116,17 +124,17 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     card: {
-        width: '48%', // 2 columns
         backgroundColor: '#fff',
-        borderRadius: 20,
+        borderRadius: 16, // Matched login
         padding: 20,
-        marginBottom: 16,
         alignItems: 'center',
+        borderWidth: 1, // Added
+        borderColor: '#f0f0f0', // Added
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
-        elevation: 3,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05, // Refined
+        shadowRadius: 10,   // Refined
+        elevation: 2,       // Refined
     },
     iconContainer: {
         width: 60,

@@ -37,6 +37,7 @@ function RootLayoutNav() {
 }
 
 import { NicheProvider } from '../context/NicheContext';
+import { ChatProvider } from '../context/ChatContext';
 
 // ... (imports)
 
@@ -46,7 +47,9 @@ export default function Layout() {
       <ThemeProvider>
         <AuthProvider>
           <NicheProvider>
-            <RootLayoutNav />
+            <ChatProvider>
+              <RootLayoutNav />
+            </ChatProvider>
           </NicheProvider>
         </AuthProvider>
       </ThemeProvider>

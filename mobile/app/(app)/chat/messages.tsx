@@ -5,13 +5,15 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
+import { useChat } from '../../../context/ChatContext';
 
 export default function ChatScreen() {
     const router = useRouter();
     const { userId, name, photo } = useLocalSearchParams();
     const { user } = useAuth();
     const { colors } = useTheme();
-    
+    const { refreshUnreadCount } = useChat();
+
     const [messages, setMessages] = useState<any[]>([]);
     const [text, setText] = useState('');
     const flatListRef = useRef<FlatList>(null);
@@ -26,6 +28,7 @@ export default function ChatScreen() {
         try {
             const response = await api.get(`/chat/messages/${userId}`);
             setMessages(response.data);
+            refreshUnreadCount();
         } catch (error) {
             console.log(error);
         }
@@ -33,7 +36,7 @@ export default function ChatScreen() {
 
     const sendMessage = async () => {
         if (!text.trim()) return;
-        
+
         const tempMsg = {
             id: Date.now(),
             sender_id: user.id,
@@ -43,7 +46,7 @@ export default function ChatScreen() {
 
         setMessages(prev => [...prev, tempMsg]);
         setText('');
-        
+
         try {
             await api.post('/chat/messages', { receiver_id: userId, message: tempMsg.message });
             fetchMessages(); // Sincroniza ID real
@@ -56,20 +59,20 @@ export default function ChatScreen() {
         const isMe = item.sender_id === user.id;
         return (
             <View style={[
-                styles.bubble, 
+                styles.bubble,
                 isMe ? styles.bubbleMe : styles.bubbleOther,
                 { backgroundColor: isMe ? colors.primary : colors.card }
             ]}>
                 <Text style={[styles.msgText, { color: isMe ? '#fff' : colors.text }]}>{item.message}</Text>
                 <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.7)' : colors.subText }]}>
-                    {new Date(item.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
             </View>
         );
     };
 
     return (
-        <KeyboardAvoidingView 
+        <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={[styles.container, { backgroundColor: colors.background }]}
         >

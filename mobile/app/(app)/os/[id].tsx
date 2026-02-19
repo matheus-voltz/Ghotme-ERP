@@ -16,6 +16,7 @@ import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
 import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
 const statusTranslations: { [key: string]: string } = {
     'pending': 'Pendente',
@@ -234,17 +235,23 @@ export default function OSDetailScreen() {
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Client Info */}
-                <View style={[styles.section, { backgroundColor: colors.card }]}>
+                <Animated.View
+                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    entering={FadeInDown.delay(100).duration(500).springify()}
+                >
                     <View style={styles.sectionHeader}>
                         <Ionicons name="person" size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Cliente</Text>
                     </View>
                     <Text style={[styles.infoText, { color: colors.text }]}>{os.client?.name || os.client?.company_name}</Text>
                     <Text style={[styles.subInfoText, { color: colors.subText }]}>{os.client?.phone || 'Sem telefone'}</Text>
-                </View>
+                </Animated.View>
 
                 {/* Vehicle Info */}
-                <View style={[styles.section, { backgroundColor: colors.card }]}>
+                <Animated.View
+                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    entering={FadeInDown.delay(200).duration(500).springify()}
+                >
                     <View style={styles.sectionHeader}>
                         <Ionicons name={niche === 'pet' ? "paw" : (niche === 'electronics' ? "laptop" : "car")} size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.entity}</Text>
@@ -264,19 +271,25 @@ export default function OSDetailScreen() {
                         ]}>{os.veiculo?.placa}</Text>
                     </View>
                     <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} | {labels.metric}: {os.km_entry}</Text>
-                </View>
+                </Animated.View>
 
                 {/* Description / Problem */}
-                <View style={[styles.section, { backgroundColor: colors.card }]}>
+                <Animated.View
+                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    entering={FadeInDown.delay(300).duration(500).springify()}
+                >
                     <View style={styles.sectionHeader}>
                         <Ionicons name="alert-circle" size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Relato do Problema</Text>
                     </View>
                     <Text style={[styles.descriptionText, { color: colors.subText }]}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
-                </View>
+                </Animated.View>
 
                 {/* Action Buttons for Mechanic */}
-                <View style={styles.actionContainer}>
+                <Animated.View
+                    style={styles.actionContainer}
+                    entering={FadeInDown.delay(400).duration(500).springify()}
+                >
                     <Text style={[styles.actionTitle, { color: colors.text }]}>Ações Rápidas</Text>
                     <View style={styles.buttonRow}>
                         {os.status === 'pending' && (
@@ -317,10 +330,13 @@ export default function OSDetailScreen() {
                             <Text style={styles.buttonText}>Checklist</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Animated.View>
 
                 {/* Services Timer Section */}
-                <View style={[styles.section, { backgroundColor: colors.card }]}>
+                <Animated.View
+                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    entering={FadeInDown.delay(500).duration(500).springify()}
+                >
                     <View style={styles.sectionHeader}>
                         <Ionicons name="time" size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Cronômetro de Serviços</Text>
@@ -367,11 +383,14 @@ export default function OSDetailScreen() {
                     {(!os.items || os.items.length === 0) && (
                         <Text style={[styles.subInfoText, { color: colors.subText }]}>Nenhum serviço para cronometrar.</Text>
                     )}
-                </View>
+                </Animated.View>
 
                 {/* Parts Section */}
                 {os.parts?.length > 0 && (
-                    <View style={[styles.section, { backgroundColor: colors.card }]}>
+                    <Animated.View
+                        style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                        entering={FadeInDown.delay(600).duration(500).springify()}
+                    >
                         <View style={styles.sectionHeader}>
                             <Ionicons name="build" size={20} color={colors.primary} />
                             <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.inventory_items?.split('/')[0] + ' Utilizados' || 'Peças Utilizadas'}</Text>
@@ -382,23 +401,25 @@ export default function OSDetailScreen() {
                                 <Text style={[styles.itemQty, { color: colors.primary }]}>x{part.quantity}</Text>
                             </View>
                         ))}
-                    </View>
+                    </Animated.View>
                 )}
 
                 {/* BOTÃO FINALIZAR GERAL */}
                 {os.status !== 'finalized' && os.status !== 'canceled' && (
-                    <TouchableOpacity
-                        style={[styles.finalizeButton, { backgroundColor: '#28C76F' }]}
-                        onPress={handleFinalizeOS}
-                        disabled={updating}
-                    >
-                        {updating ? <ActivityIndicator color="#fff" /> : (
-                            <>
-                                <Ionicons name="checkmark-done-circle" size={24} color="#fff" />
-                                <Text style={styles.finalizeButtonText}>FINALIZAR E ENTREGAR</Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
+                    <Animated.View entering={FadeInUp.delay(800).duration(500).springify()}>
+                        <TouchableOpacity
+                            style={[styles.finalizeButton, { backgroundColor: '#28C76F' }]}
+                            onPress={handleFinalizeOS}
+                            disabled={updating}
+                        >
+                            {updating ? <ActivityIndicator color="#fff" /> : (
+                                <>
+                                    <Ionicons name="checkmark-done-circle" size={24} color="#fff" />
+                                    <Text style={styles.finalizeButtonText}>FINALIZAR E ENTREGAR</Text>
+                                </>
+                            )}
+                        </TouchableOpacity>
+                    </Animated.View>
                 )}
 
                 <View style={{ height: 100 }} />
@@ -499,11 +520,13 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         marginBottom: 20,
+        borderWidth: 1, // Added
+        borderColor: '#f0f0f0', // Added
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 3,
+        shadowOpacity: 0.05, // Refined
+        shadowRadius: 10,   // Refined
+        elevation: 2,       // Refined
     },
     sectionHeader: {
         flexDirection: 'row',

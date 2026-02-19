@@ -1,26 +1,27 @@
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'BPO Financeiro & Conciliação OFX')
+@section('title', __('Fiscal & Accounting') . ' & ' . __('Bank Reconciliation'))
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold py-3 mb-0">
-            <span class="text-muted fw-light">Fiscal /</span> BPO Financeiro
+            <span class="text-muted fw-light">{{ __('Fiscal') }} /</span> {{ __('BPO Financeiro') }}
         </h4>
         <div class="d-flex gap-2">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ofxImportModal">
-                <i class="ti tabler-file-import me-1"></i> Importar Extrato (OFX)
+                <i class="ti tabler-file-import me-1"></i> {{ __('Import OFX') }}
             </button>
             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#fiscalConfigModal">
-                <i class="ti tabler-settings me-1"></i> Dados Fiscais
+                <i class="ti tabler-settings me-1"></i> {{ __('Company data') }}
             </button>
             <select class="form-select w-auto" id="monthFilter" onchange="filterData()">
                 @php
+                    $locale = app()->getLocale();
                     $meses = [
-                        '01' => 'Jan', '02' => 'Fev', '03' => 'Mar', '04' => 'Abr',
-                        '05' => 'Mai', '06' => 'Jun', '07' => 'Jul', '08' => 'Ago',
-                        '09' => 'Set', '10' => 'Out', '11' => 'Nov', '12' => 'Dez'
+                        '01' => __('January'), '02' => __('February'), '03' => __('March'), '04' => __('April'),
+                        '05' => __('May'), '06' => __('June'), '07' => __('July'), '08' => __('August'),
+                        '09' => __('September'), '10' => __('October'), '11' => __('November'), '12' => __('December')
                     ];
                 @endphp
                 @foreach($meses as $key => $nome)
@@ -32,33 +33,32 @@
 
     <!-- KPI Cards BPO -->
     <div class="row mb-4">
-        <div class="col-md-3"><div class="card bg-success text-white p-3"><h5>Receitas R$ {{ number_format($totals['revenue'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-danger text-white p-3"><h5>Despesas R$ {{ number_format($totals['expenses'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-primary text-white p-3"><h5>Saldo R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-info text-white p-3"><h5>Auditoria {{ $totals['audited_count'] }}/{{ $expenses->count() }}</h5></div></div>
+        <div class="col-md-3"><div class="card bg-success text-white p-3"><h5>{{ __('Revenue') }} R$ {{ number_format($totals['revenue'], 2, ',', '.') }}</h5></div></div>
+        <div class="col-md-3"><div class="card bg-danger text-white p-3"><h5>{{ __('Expenses') }} R$ {{ number_format($totals['expenses'], 2, ',', '.') }}</h5></div></div>
+        <div class="col-md-3"><div class="card bg-primary text-white p-3"><h5>{{ __('Balance') }} R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5></div></div>
+        <div class="col-md-3"><div class="card bg-info text-white p-3"><h5>{{ __('Audit') }} {{ $totals['audited_count'] }}/{{ $expenses->count() }}</h5></div></div>
     </div>
 
     @if(session('ofx_data'))
-    <!-- ABA DE CONCILIAÇÃO (SÓ APARECE APÓS UPLOAD) -->
+    <!-- ABA DE CONCILIAÇÃO -->
     <div class="card mb-4 border-primary">
         <div class="card-header bg-label-primary d-flex justify-content-between">
-            <h5 class="mb-0">Conciliação de Extrato Bancário ({{ count(session('ofx_data')) }} lançamentos)</h5>
-            <a href="{{ route('accounting.index') }}" class="btn btn-xs btn-outline-danger">Limpar Extrato</a>
+            <h5 class="mb-0">{{ __('Bank Reconciliation') }} ({{ count(session('ofx_data')) }} {{ __('entries') }})</h5>
+            <a href="{{ route('accounting.index') }}" class="btn btn-xs btn-outline-danger">{{ __('Clear Extract') }}</a>
         </div>
         <div class="table-responsive">
             <table class="table table-sm">
                 <thead class="table-light">
                     <tr>
-                        <th>Banco (Extrato)</th>
-                        <th>Valor</th>
-                        <th>Status no ERP (Sugestão)</th>
-                        <th>Ação</th>
+                        <th>{{ __('Bank (Statement)') }}</th>
+                        <th>{{ __('Value') }}</th>
+                        <th>{{ __('ERP Status (Suggestion)') }}</th>
+                        <th>{{ __('Action') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach(session('ofx_data') as $ofx)
                     @php
-                        // Lógica de "Matching" simples (busca por valor exato no mês)
                         $match = $revenue->first(fn($r) => abs($r->total - abs($ofx['amount'])) < 0.01)
                                  ?? $expenses->first(fn($e) => abs($e->amount - abs($ofx['amount'])) < 0.01);
                     @endphp
@@ -72,16 +72,16 @@
                         </td>
                         <td>
                             @if($match)
-                                <span class="badge bg-label-success">Match Encontrado (#{{ $match->id }})</span>
+                                <span class="badge bg-label-success">{{ __('Match Found') }} (#{{ $match->id }})</span>
                             @else
-                                <span class="badge bg-label-secondary">Não vinculado</span>
+                                <span class="badge bg-label-secondary">{{ __('Not Linked') }}</span>
                             @endif
                         </td>
                         <td>
                             @if($match)
-                                <button class="btn btn-xs btn-success">Confirmar Vínculo</button>
+                                <button class="btn btn-xs btn-success">{{ __('Confirm Link') }}</button>
                             @else
-                                <button class="btn btn-xs btn-primary">Lançar no ERP</button>
+                                <button class="btn btn-xs btn-primary">{{ __('Post to ERP') }}</button>
                             @endif
                         </td>
                     </tr>
@@ -94,15 +94,15 @@
 
     <div class="nav-align-top mb-4">
         <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-rev">Receitas & Notas</button></li>
-            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-exp">Despesas & Auditoria</button></li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-rev">{{ __('Revenue & Invoices') }}</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-exp">{{ __('Expenses & Audit') }}</button></li>
         </ul>
         <div class="tab-content p-0">
             <!-- ABA RECEITAS -->
             <div class="tab-pane fade show active" id="tab-rev" role="tabpanel">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th>Data</th><th>OS #</th><th>Cliente</th><th>Valor</th><th>Ação</th></tr></thead>
+                        <thead><tr><th>{{ __('Date') }}</th><th>{{ __('OS #') }}</th><th>{{ __('Customer') }}</th><th>{{ __('Value') }}</th><th>{{ __('Action') }}</th></tr></thead>
                         <tbody>
                             @foreach($revenue as $order)
                             <tr>
@@ -110,7 +110,7 @@
                                 <td>#{{ $order->id }}</td>
                                 <td>{{ $order->client->name }}</td>
                                 <td>R$ {{ number_format($order->total, 2, ',', '.') }}</td>
-                                <td><a href="#" class="btn btn-xs btn-outline-primary">Ver OS</a></td>
+                                <td><a href="#" class="btn btn-xs btn-outline-primary">{{ __('View OS') }}</a></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -121,15 +121,15 @@
             <div class="tab-pane fade" id="tab-exp" role="tabpanel">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Auditoria</th><th>Ação</th></tr></thead>
+                        <thead><tr><th>{{ __('Date') }}</th><th>{{ __('Description') }}</th><th>{{ __('Value') }}</th><th>{{ __('Audit') }}</th><th>{{ __('Action') }}</th></tr></thead>
                         <tbody>
                             @foreach($expenses as $expense)
                             <tr>
                                 <td>{{ date('d/m', strtotime($expense->due_date)) }}</td>
                                 <td>{{ $expense->description }}</td>
                                 <td class="text-danger">R$ {{ number_format($expense->amount, 2, ',', '.') }}</td>
-                                <td><span class="badge bg-label-{{ $expense->audit_status == 'audited' ? 'success' : 'warning' }}">{{ $expense->audit_status }}</span></td>
-                                <td><button class="btn btn-xs btn-outline-secondary" onclick="signalError({{ $expense->id }})">Auditar</button></td>
+                                <td><span class="badge bg-label-{{ $expense->audit_status == 'audited' ? 'success' : 'warning' }}">{{ __($expense->audit_status) }}</span></td>
+                                <td><button class="btn btn-xs btn-outline-secondary" onclick="signalError({{ $expense->id }})">{{ __('Audit') }}</button></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -145,14 +145,14 @@
     <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('accounting.import-ofx') }}" method="POST" enctype="multipart/form-data" class="modal-content">
             @csrf
-            <div class="modal-header"><h5 class="modal-title">Conciliação Bancária (OFX)</h5></div>
+            <div class="modal-header"><h5 class="modal-title">{{ __('Bank Reconciliation') }} (OFX)</h5></div>
             <div class="modal-body">
-                <p>Selecione o arquivo <strong>.ofx</strong> exportado pelo Internet Banking do seu banco.</p>
+                <p>{{ __('Select the .ofx file exported by your bank.') }}</p>
                 <input type="file" name="ofx_file" class="form-control" accept=".ofx" required>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary">Processar Arquivo</button>
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Process File') }}</button>
             </div>
         </form>
     </div>

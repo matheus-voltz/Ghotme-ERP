@@ -84,7 +84,7 @@ export default function CreateInventoryScreen() {
 
                     <CustomInput label={`Nome do ${itemLabel} *`} icon="pricetag-outline" value={form.name} onChangeText={(v: any) => updateForm('name', v)} placeholder="Ex: Filtro de Óleo" />
                     <CustomInput label="SKU / Código" icon="barcode-outline" value={form.sku} onChangeText={(v: any) => updateForm('sku', v)} placeholder="FIL-1234" />
-// ...
+
 
                     <View style={styles.row}>
                         <CustomInput label="Quantidade *" icon="layers-outline" value={form.quantity} onChangeText={(v: any) => updateForm('quantity', v)} placeholder="10" keyboardType="numeric" />
