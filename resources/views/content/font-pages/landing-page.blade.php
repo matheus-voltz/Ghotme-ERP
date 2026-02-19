@@ -21,6 +21,65 @@ $pageConfigs = [
 <!-- Page Styles -->
 @section('page-style')
 @vite(['resources/assets/vendor/scss/pages/front-page-landing.scss'])
+<style>
+  :root {
+    --ghotme-primary: #7367f0;
+    --ghotme-gradient: linear-gradient(135deg, #7367f0 0%, #4831d4 100%);
+  }
+
+  .hero-title {
+    background: var(--ghotme-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+  }
+
+  .niche-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(115, 103, 240, 0.1) !important;
+  }
+
+  .niche-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(115, 103, 240, 0.15);
+    border-color: var(--ghotme-primary) !important;
+  }
+
+  .pricing-card-popular {
+    position: relative;
+    border: 2px solid var(--ghotme-primary) !important;
+    transform: scale(1.05);
+    z-index: 10;
+  }
+
+  .pricing-card-popular::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    background: var(--ghotme-gradient);
+    z-index: -1;
+    border-radius: 0.5rem;
+    opacity: 0.1;
+  }
+
+  .btn-primary {
+    background: var(--ghotme-gradient) !important;
+    border: none !important;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(115, 103, 240, 0.3);
+  }
+
+  .badge-niche {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+  }
+</style>
 @endsection
 
 <!-- Vendor Scripts -->
@@ -79,10 +138,10 @@ $pageConfigs = [
         class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1" />
       <div class="container">
         <div class="hero-text-box text-center position-relative">
-          <h1 class="text-primary hero-title display-6 fw-extrabold">A gestão completa para sua empresa em um só lugar</h1>
+          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">O ERP que fala a língua do seu negócio</h1>
           <h2 class="hero-sub-title h6 mb-6">
-            Controle vendas, serviços, estoque, financeiro e clientes com facilidade.<br class="d-none d-lg-block" />
-            Otimize sua produtividade e escale seu negócio hoje mesmo.
+            O único sistema que se adapta automaticamente se você é uma <strong>Oficina</strong>, <strong>Pet Shop</strong> ou <strong>Assistência Técnica</strong>.<br class="d-none d-lg-block" />
+            Tenha controle total de vendas, estoque e financeiro com a terminologia que você já usa.
           </h2>
           <div class="landing-hero-btn d-inline-block position-relative">
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">Conheça nosso sistema <img
@@ -125,50 +184,93 @@ $pageConfigs = [
       <div class="features-icon-wrapper row gx-0 gy-6 g-sm-12">
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-clipboard-text icon-xl mb-3"></i>
+            <i class="ti tabler-rocket icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Gestão de Vendas e Serviços</h5>
-          <p class="features-icon-description">Emita pedidos de venda, orçamentos e ordens de serviço personalizadas em poucos cliques.</p>
+          <h5 class="mb-2">Agilidade na Operação</h5>
+          <p class="features-icon-description">Abra Ordens de Serviço em segundos e acompanhe o status em tempo real pelo celular.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-box icon-xl mb-3"></i>
+            <i class="ti tabler-shield-check icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Controle de Estoque</h5>
-          <p class="features-icon-description">Acompanhe a entrada e saída de produtos, receba alertas de reposição e gerencie fornecedores.</p>
+          <h5 class="mb-2">Estoque Inteligente</h5>
+          <p class="features-icon-description">Evite prejuízos com alertas de estoque mínimo e pedidos de compra automáticos por fornecedor.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-users icon-xl mb-3"></i>
+            <i class="ti tabler-chart-arrows icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Gestão de Clientes (CRM)</h5>
-          <p class="features-icon-description">Mantenha o histórico completo de seus clientes, preferências e aumente suas vendas recorrentes.</p>
+          <h5 class="mb-2">Lucratividade Real</h5>
+          <p class="features-icon-description">Saiba exatamente quanto ganhou em cada serviço, descontando o custo real das peças e insumos.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-cash icon-xl mb-3"></i>
+            <i class="ti tabler-receipt-tax icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Financeiro Completo</h5>
-          <p class="features-icon-description">Fluxo de caixa, contas a pagar e receber, boletos e conciliação bancária simplificada.</p>
+          <h5 class="mb-2">Fiscal e Contábil sem Medo</h5>
+          <p class="features-icon-description">Emissão de Notas Fiscais (NFe/NFSe) integrada e portal exclusivo para o seu contador.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-calendar-stats icon-xl mb-3"></i>
+            <i class="ti tabler-device-mobile-message icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Agenda e Produtividade</h5>
-          <p class="features-icon-description">Organize a agenda da sua equipe, evite conflitos de horário e garanta a entrega no prazo.</p>
+          <h5 class="mb-2">WhatsApp como Aliado</h5>
+          <p class="features-icon-description">Envie orçamentos para aprovação e avisos de "serviço pronto" automaticamente via WhatsApp.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
-            <i class="ti tabler-chart-pie icon-xl mb-3"></i>
+            <i class="ti tabler-building-bank icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Relatórios Inteligentes</h5>
-          <p class="features-icon-description">Tome decisões baseadas em dados com dashboards de faturamento, lucro e desempenho.</p>
+          <h5 class="mb-2">Conciliação Bancária</h5>
+          <p class="features-icon-description">Importe seu arquivo OFX e deixe o Ghotme bater os saldos bancários com o seu financeiro.</p>
         </div>
       </div>
     </div>
   </section>
   <!-- Useful features: End -->
+
+  <!-- Multi-Niche: Start -->
+  <section id="landingNiches" class="section-py bg-body">
+    <div class="container">
+      <div class="text-center mb-4">
+        <span class="badge bg-label-primary">Feito para você</span>
+      </div>
+      <h4 class="text-center mb-1">
+        Um sistema, <span class="fw-extrabold">múltiplos nichos</span>
+      </h4>
+      <p class="text-center mb-12">O Ghotme adapta termos, ícones e processos automaticamente para o seu negócio.</p>
+      <div class="row g-6">
+        <div class="col-md-4">
+          <div class="card niche-card shadow-sm text-center p-5 h-100">
+            <div class="avatar avatar-xl mx-auto mb-4 bg-label-info rounded-circle">
+                <i class="ti tabler-car fs-1"></i>
+            </div>
+            <h5 class="fw-extrabold mb-3">Oficinas Mecânicas</h5>
+            <p class="text-muted small mb-0">Gestão completa de placas, chassi, quilometragem e histórico preventivo.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card niche-card shadow-sm text-center p-5 h-100">
+            <div class="avatar avatar-xl mx-auto mb-4 bg-label-success rounded-circle">
+                <i class="ti tabler-dog fs-1"></i>
+            </div>
+            <h5 class="fw-extrabold mb-3">Pet Shops e Veterinárias</h5>
+            <p class="text-muted small mb-0">Rótulos automáticos para Raça, Espécie, Porte e controle de Banho/Tosa.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card niche-card shadow-sm text-center p-5 h-100">
+            <div class="avatar avatar-xl mx-auto mb-4 bg-label-warning rounded-circle">
+                <i class="ti tabler-device-mobile fs-1"></i>
+            </div>
+            <h5 class="fw-extrabold mb-3">Assistências Técnicas</h5>
+            <p class="text-muted small mb-0">Controle por Número de Série, Modelo e checklists de entrada de hardware.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Multi-Niche: End -->
 
   <!-- Business Highlights Carousel: Start -->
   <section id="landingBusinessHighlights" class="section-py bg-body landing-reviews pb-0">
@@ -190,7 +292,7 @@ $pageConfigs = [
                 </span>
                 o Ghotme?
               </h4>
-              <p class="text-center mb-5 text-heading">
+              <p class="text-center mb-5 text-body">
                 Veja a diferença que um sistema de gestão integrado faz no seu dia a dia.
               </p>
               <div class="row g-4 justify-content-center align-items-center mb-5">
@@ -274,7 +376,7 @@ $pageConfigs = [
                 </span>
                 o seu Negócio
               </h4>
-              <p class="text-center mb-5">
+              <p class="text-center mb-5 text-body">
                 O sistema flexível que se adapta à sua realidade.
               </p>
               <div class="row gy-6 mb-5">
@@ -344,7 +446,7 @@ $pageConfigs = [
                 </span>
                 facilitam sua vida
               </h4>
-              <p class="text-center mb-5">
+              <p class="text-center mb-5 text-body">
                 Centralize sua operação conectando as ferramentas que você já usa.
               </p>
               <div class="row gy-6 mb-5">
@@ -414,7 +516,7 @@ $pageConfigs = [
                 </span>
                 de Sucesso
               </h4>
-              <p class="text-center mb-5">
+              <p class="text-center mb-5 text-body">
                 Começar a usar o Ghotme é simples, rápido e sem burocracia.
               </p>
               <div class="row gy-4 justify-content-center mb-5">
@@ -423,8 +525,8 @@ $pageConfigs = [
                     <div class="avatar avatar-xl border border-primary border-2 rounded-circle mx-auto mb-3">
                       <span class="avatar-initial rounded-circle bg-primary text-white">1</span>
                     </div>
-                    <h5 class="mb-2">Crie sua Conta</h5>
-                    <p class="text-muted">Escolha o plano ideal e faça seu cadastro em menos de 2 minutos.</p>
+                    <h5 class="mb-2 text-heading">Crie sua Conta</h5>
+                    <p class="text-body">Escolha o plano ideal e faça seu cadastro em menos de 2 minutos.</p>
                     <div class="d-none d-lg-block position-absolute start-100 top-0 translate-middle"
                       style="margin-top: 1.5rem; margin-left: -1rem;">
                       <i class="ti tabler-arrow-right text-muted icon-lg"></i>
@@ -436,8 +538,8 @@ $pageConfigs = [
                     <div class="avatar avatar-xl border border-primary border-2 rounded-circle mx-auto mb-3">
                       <span class="avatar-initial rounded-circle bg-white text-primary">2</span>
                     </div>
-                    <h5 class="mb-2">Configure Fácil</h5>
-                    <p class="text-muted">Cadastre seus dados ou importe clientes e produtos de planilhas.</p>
+                    <h5 class="mb-2 text-heading">Configure Fácil</h5>
+                    <p class="text-body">Cadastre seus dados ou importe clientes e produtos de planilhas.</p>
                     <div class="d-none d-lg-block position-absolute start-100 top-0 translate-middle"
                       style="margin-top: 1.5rem; margin-left: -1rem;">
                       <i class="ti tabler-arrow-right text-muted icon-lg"></i>
@@ -449,8 +551,8 @@ $pageConfigs = [
                     <div class="avatar avatar-xl border border-primary border-2 rounded-circle mx-auto mb-3">
                       <span class="avatar-initial rounded-circle bg-white text-primary">3</span>
                     </div>
-                    <h5 class="mb-2">Gerencie Tudo</h5>
-                    <p class="text-muted">Emita notas, controle estoque e financeiro em uma única tela.</p>
+                    <h5 class="mb-2 text-heading">Gerencie Tudo</h5>
+                    <p class="text-body">Emita notas, controle estoque e financeiro em uma única tela.</p>
                     <div class="d-none d-lg-block position-absolute start-100 top-0 translate-middle"
                       style="margin-top: 1.5rem; margin-left: -1rem;">
                       <i class="ti tabler-arrow-right text-muted icon-lg"></i>
@@ -460,12 +562,10 @@ $pageConfigs = [
                 <div class="col-lg-3 col-md-6">
                   <div class="text-center position-relative">
                     <div class="avatar avatar-xl border border-primary border-2 rounded-circle mx-auto mb-3">
-                      <span class="avatar-initial rounded-circle bg-primary text-white">
-                        <i class="ti tabler-trophy icon-md h-auto"></i>
-                      </span>
+                      <span class="avatar-initial rounded-circle bg-primary text-white">4</span>
                     </div>
-                    <h5 class="mb-2">Veja os Resultados</h5>
-                    <p class="text-muted">Acompanhe relatórios de crescimento e tome decisões inteligentes.</p>
+                    <h5 class="mb-2 text-heading">Veja os Resultados</h5>
+                    <p class="text-body">Acompanhe relatórios de crescimento e tome decisões inteligentes.</p>
                   </div>
                 </div>
               </div>
@@ -493,7 +593,7 @@ $pageConfigs = [
       </span>
       de pagamento
     </h4>
-    <p class="text-center mb-md-11 pb-0 pb-xl-12">O site integra com Pagar.me, Asaas, PagSeguro e Stripe.</p>
+    <p class="text-center mb-md-11 pb-0 pb-xl-12">O site integra com Pagar.me, Asaas, PagSeguro, Stripe e Bitcoin.</p>
     <div class="row gy-12 mt-2 justify-content-center align-items-center">
       <style>
         @keyframes floating {
@@ -654,7 +754,7 @@ $pageConfigs = [
 
       <!-- Padrão -->
       <div class="col-xl-4 col-lg-6">
-        <div class="card border border-primary shadow-xl">
+        <div class="card pricing-card-popular shadow-xl">
           <div class="card-header">
             <div class="text-center position-relative">
               <div class="position-absolute end-0 top-0 mt-n2">
@@ -677,35 +777,42 @@ $pageConfigs = [
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  MEI e Pequenos negócios
+                  <strong>Até 3 usuários</strong> e suporte completo
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Integração via WhatsApp
+                  <strong>Multi-Nicho:</strong> O sistema se adapta ao seu negócio
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Até 3 usuários
+                  <strong>Agendamento Online via Site:</strong> Venda mais!
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Funcionalidades essenciais ERP
+                  <strong>PIX Dinâmico</strong> com baixa automática (Asaas)
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Suporte em horário comercial
+                  <strong>Conciliação Bancária (OFX):</strong> Economize horas
+                </h6>
+              </li>
+              <li>
+                <h6 class="d-flex align-items-center mb-3">
+                  <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
+                      class="ti tabler-check icon-12px"></i></span>
+                  Integração via WhatsApp e Relatórios de Lucro
                 </h6>
               </li>
             </ul>
@@ -742,35 +849,42 @@ $pageConfigs = [
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Empresas estruturadas (PJ)
+                  <strong>Tudo do Plano Padrão +</strong>
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Até 10 usuários
+                  <strong>Até 10 usuários</strong> e suporte prioritário
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Todos os módulos do sistema
+                  <strong>Suprimento Automático:</strong> Robô de reposição
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Prioridade no suporte
+                  <strong>BPO Financeiro</strong> e Portal do Contador
                 </h6>
               </li>
               <li>
                 <h6 class="d-flex align-items-center mb-3">
                   <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
                       class="ti tabler-check icon-12px"></i></span>
-                  Recursos avançados e automações
+                  <strong>Emissão de Notas Fiscais</strong> ilimitada (NFe/NFSe)
+                </h6>
+              </li>
+              <li>
+                <h6 class="d-flex align-items-center mb-3">
+                  <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
+                      class="ti tabler-check icon-12px"></i></span>
+                  Gestão de Frotas e B2B avançado
                 </h6>
               </li>
             </ul>
