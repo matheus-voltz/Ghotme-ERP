@@ -4,53 +4,58 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
-  'resources/assets/vendor/libs/animate-css/animate.scss'
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
+'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
+'resources/assets/vendor/libs/animate-css/animate.scss'
 ])
 <style>
-.timeline {
-    position: relative;
-    padding: 20px 0;
-}
-.timeline-item {
-    position: relative;
-    padding-left: 40px;
-    margin-bottom: 30px;
-    border-left: 2px solid #e9ecef;
-}
-.timeline-item:last-child {
-    border-left: 2px solid transparent;
-}
-.timeline-point {
-    position: absolute;
-    left: -9px;
-    top: 0;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #7367f0;
-    border: 3px solid #fff;
-}
-.timeline-date {
-    font-size: 0.85rem;
-    color: #a1acb8;
-    margin-bottom: 5px;
-}
-.timeline-title {
-    font-weight: 600;
-    margin-bottom: 5px;
-}
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 30px;
+        border-left: 2px solid #e9ecef;
+    }
+
+    .timeline-item:last-child {
+        border-left: 2px solid transparent;
+    }
+
+    .timeline-point {
+        position: absolute;
+        left: -9px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #7367f0;
+        border: 3px solid #fff;
+    }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #a1acb8;
+        margin-bottom: 5px;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
 </style>
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/select2/select2.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.js',
-  'resources/assets/vendor/libs/moment/moment.js'
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
+'resources/assets/vendor/libs/flatpickr/flatpickr.js',
+'resources/assets/vendor/libs/moment/moment.js'
 ])
 @endsection
 
@@ -65,8 +70,12 @@
             <div class="card-body">
                 <div class="row align-items-end">
                     <div class="col-md-8">
-                        <label class="form-label" for="vehicle-search">Buscar {{ niche('entity') }} ({{ niche('identifier') }} ou Chassi)</label>
-                        <select id="vehicle-search" class="select2 form-select"></select>
+                        <label class="form-label" for="vehicle-search">Buscar {{ niche('entity') }} ({{ niche('identifier') }} ou {{ niche('secondary_identifier') }})</label>
+                        <select id="vehicle-search"
+                            class="select2 form-select"
+                            data-placeholder="Digite {{ niche('identifier') }} ou {{ niche('secondary_identifier') }}..."
+                            data-no-results="Nenhum {{ strtolower(niche('entity')) }} encontrado."
+                            data-select-prompt="Selecione um {{ strtolower(niche('entity')) }} para ver o histórico."></select>
                     </div>
                     <div class="col-md-4 mt-md-0 mt-4">
                         <button class="btn btn-primary w-100" id="btn-add-history" disabled data-bs-toggle="modal" data-bs-target="#modalAddHistory">
@@ -98,7 +107,7 @@
                     <ul class="list-unstyled mb-6">
                         <li class="mb-2"><span class="fw-medium me-2">Dono:</span> <span id="info-owner">---</span></li>
                         <li class="mb-2"><span class="fw-medium me-2">{{ niche('metric') }} Atual:</span> <span id="info-km">---</span></li>
-                        <li class="mb-2"><span class="fw-medium me-2">Chassi:</span> <span id="info-chassis" class="text-break">---</span></li>
+                        <li class="mb-2"><span class="fw-medium me-2">{{ niche('secondary_identifier') }}:</span> <span id="info-chassis" class="text-break">---</span></li>
                         <li class="mb-2"><span class="fw-medium me-2">{{ niche('color') }}:</span> <span id="info-color">---</span></li>
                         <li class="mb-2"><span class="fw-medium me-2">{{ niche('year') }}:</span> <span id="info-year">---</span></li>
                     </ul>

@@ -54,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'zip_code',
         'niche',
         'chat_status',
+        'expo_push_token',
         'telegram_chat_id',
         'telegram_username',
         'status',

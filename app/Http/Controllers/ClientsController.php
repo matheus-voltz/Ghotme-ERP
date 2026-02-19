@@ -61,7 +61,7 @@ class ClientsController extends Controller
             $totalFiltered = $query->count();
         }
 
-        if ($limit != -1) {
+        if ($limit > 0) {
             $query->offset($start)->limit($limit);
         }
 

@@ -141,7 +141,7 @@
                     <a href="{{ route('ordens-servico.create') }}" class="btn btn-outline-info d-flex align-items-center justify-content-center p-3">
                         <i class="ti tabler-tool me-2"></i> Nova Ordem de Serviço
                     </a>
-                    <a href="{{ route('clients-list') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center p-3">
+                    <a href="{{ route('clients') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center p-3">
                         <i class="ti tabler-user-plus me-2"></i> Cadastrar Cliente
                     </a>
                     <a href="{{ route('support.open-ticket') }}" class="btn btn-label-warning d-flex align-items-center justify-content-center p-3">

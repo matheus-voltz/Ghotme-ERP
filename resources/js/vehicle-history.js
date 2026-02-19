@@ -23,8 +23,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Select2 with AJAX Search
     if (vehicleSearch.length) {
+        const placeholder = vehicleSearch.data('placeholder') || 'Digite a Placa ou Chassi...';
         vehicleSearch.select2({
-            placeholder: 'Digite a Placa ou Chassi...',
+            placeholder: placeholder,
             allowClear: true,
             ajax: {
                 url: baseUrl + 'vehicle-history/search',
@@ -83,7 +84,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     function renderTimeline(data) {
         if (data.length === 0) {
-            vehicleTimeline.innerHTML = '<p class="text-center text-muted py-10">Nenhum registro encontrado para este veículo.</p>';
+            const noResults = vehicleSearch.data('no-results') || 'Nenhum registro encontrado para este veículo.';
+            vehicleTimeline.innerHTML = `<p class="text-center text-muted py-10">${noResults}</p>`;
             return;
         }
 
@@ -127,7 +129,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
         vehicleInfoCard.classList.add('d-none');
         timelineCard.classList.add('d-none');
         btnAddHistory.disabled = true;
-        vehicleTimeline.innerHTML = '<p class="text-center text-muted py-10">Selecione um veículo para ver o histórico.</p>';
+        const selectPrompt = vehicleSearch.data('select-prompt') || 'Selecione um veículo para ver o histórico.';
+        vehicleTimeline.innerHTML = `<p class="text-center text-muted py-10">${selectPrompt}</p>`;
     }
 
     // Form Submit (AJAX)

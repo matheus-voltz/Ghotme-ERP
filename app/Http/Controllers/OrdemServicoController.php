@@ -41,10 +41,10 @@ class OrdemServicoController extends Controller
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhereHas('client', function ($cq) use ($search) {
-                      $cq->where('name', 'like', "%{$search}%")
-                        ->orWhere('company_name', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('client', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%")
+                            ->orWhere('company_name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -53,10 +53,13 @@ class OrdemServicoController extends Controller
         // Pagination
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
+
+        if ($length > 0) {
+            $query->offset($start)->limit($length);
+        }
+
         $items = $query->orderBy('created_at', 'desc')
-                       ->offset($start)
-                       ->limit($length)
-                       ->get();
+            ->get();
 
         return response()->json([
             'draw' => intval($request->input('draw')),
@@ -81,7 +84,7 @@ class OrdemServicoController extends Controller
 
             if ($request->has('redirect_to_checklist')) {
                 return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])
-                                 ->with('success', 'OS Criada! Realize o checklist agora.');
+                    ->with('success', 'OS Criada! Realize o checklist agora.');
             }
 
             return redirect()->route('ordens-servico')->with('success', 'OS Criada!');
@@ -167,4 +170,3 @@ class OrdemServicoController extends Controller
         }
     }
 }
-

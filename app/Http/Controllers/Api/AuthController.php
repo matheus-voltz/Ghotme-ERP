@@ -50,11 +50,14 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->firstOrFail();
 
         // Valida o código de 6 dígitos usando a lógica nativa do Fortify
-        if (! $user->two_factor_secret || 
-            ! decrypt($user->two_factor_secret) || 
+        if (
+            ! $user->two_factor_secret ||
+            ! decrypt($user->two_factor_secret) ||
             ! app(\Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider::class)->verify(
-                decrypt($user->two_factor_secret), $request->code
-            )) {
+                decrypt($user->two_factor_secret),
+                $request->code
+            )
+        ) {
             return response()->json(['message' => 'Código de autenticação inválido.'], 422);
         }
 
@@ -88,10 +91,10 @@ class AuthController extends Controller
 
         if ($request->hasFile('photo')) {
             $user->updateProfilePhoto($request->file('photo'));
-            
+
             // Força a atualização da URL para retorno imediato
             $user->refresh();
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Foto de perfil atualizada!',
@@ -101,5 +104,21 @@ class AuthController extends Controller
         }
 
         return response()->json(['success' => false, 'message' => 'Nenhuma imagem enviada.'], 400);
+    }
+
+    public function updatePushToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $request->user()->update([
+            'expo_push_token' => $request->token
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Token de notificação atualizado com sucesso.'
+        ]);
     }
 }

@@ -21,13 +21,7 @@ class ChatController extends Controller
         // Get team members (same company, excluding self)
         $contacts = User::where('id', '!=', $user->id)
             ->where('company_id', $user->company_id)
-            ->select('id', 'name', 'email', 'profile_photo_path', 'status')
-            ->get()
-            ->map(function ($contact) {
-                // Append full profile photo URL if needed
-                $contact->profile_photo_url = $contact->profile_photo_url;
-                return $contact;
-            });
+            ->get();
 
         return response()->json($contacts);
     }
