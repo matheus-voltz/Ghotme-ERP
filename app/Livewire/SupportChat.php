@@ -89,6 +89,18 @@ class SupportChat extends Component
             'attachment_path' => $attachmentPath,
         ]);
 
+        // Broadcast Message
+        $message->load('sender:id,name,profile_photo_path');
+        try {
+            broadcast(new \App\Events\MessageReceived($message))->toOthers();
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Broadcasting failed: " . $e->getMessage());
+        }
+
+        // Send Database Notification
+        $receiver = User::find($this->activeUserId);
+        $receiver->notify(new \App\Notifications\ChatMessageNotification($message));
+
         // Send Notification if User has Push Token
         $receiver = User::find($this->activeUserId);
         if ($receiver && $receiver->expo_push_token) {
@@ -124,7 +136,14 @@ class SupportChat extends Component
         $teamContacts = User::where('id', '!=', $user->id)
             ->where('company_id', $user->company_id)
             ->where('name', 'like', '%' . $this->search . '%')
-            ->get();
+            ->get()
+            ->map(function ($contact) use ($user) {
+                $contact->unread_count = ChatMessage::where('sender_id', $contact->id)
+                    ->where('receiver_id', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+                return $contact;
+            });
 
         // 2. Suporte Ghotme (Super Admins)
         $supportContacts = User::where('id', '!=', $user->id)
@@ -133,7 +152,14 @@ class SupportChat extends Component
                     ->orWhere('role', 'super_admin');
             })
             ->where('name', 'like', '%' . $this->search . '%')
-            ->get();
+            ->get()
+            ->map(function ($contact) use ($user) {
+                $contact->unread_count = ChatMessage::where('sender_id', $contact->id)
+                    ->where('receiver_id', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+                return $contact;
+            });
 
         // 3. Clientes (CRM)
         $clientContacts = collect();

@@ -27,6 +27,10 @@
       "_jquery-BQXThELV.js"
     ]
   },
+  "_notyf.es-ZvlfbKa9.js": {
+    "file": "assets/notyf.es-ZvlfbKa9.js",
+    "name": "notyf.es"
+  },
   "node_modules/jstree/dist/themes/default-dark/32px.png": {
     "file": "assets/32px-By6ysAjd.png",
     "src": "node_modules/jstree/dist/themes/default-dark/32px.png"
@@ -765,7 +769,7 @@
     "isEntry": true
   },
   "resources/assets/js/front-page-landing.js": {
-    "file": "assets/front-page-landing-Dq_BStVN.js",
+    "file": "assets/front-page-landing-QL8x2fV8.js",
     "name": "front-page-landing",
     "src": "resources/assets/js/front-page-landing.js",
     "isEntry": true
@@ -3686,10 +3690,13 @@
     "isEntry": true
   },
   "resources/assets/vendor/libs/notyf/notyf.js": {
-    "file": "assets/notyf-DUP0mdC1.js",
+    "file": "assets/notyf-Cb9RJ-eh.js",
     "name": "notyf",
     "src": "resources/assets/vendor/libs/notyf/notyf.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "_notyf.es-ZvlfbKa9.js"
+    ]
   },
   "resources/assets/vendor/libs/notyf/notyf.scss": {
     "file": "assets/notyf-Bb7lQgXD.css",
@@ -4037,10 +4044,17 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-T1DpEqax.js",
+    "file": "assets/app-RoRiYCXw.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-D6-XlEtG.js",
+      "_notyf.es-ZvlfbKa9.js"
+    ],
+    "css": [
+      "assets/app-KOmfmGu7.css"
+    ]
   },
   "resources/js/cep-lookup.js": {
     "file": "assets/cep-lookup-1yiX_NIi.js",
@@ -4091,7 +4105,7 @@
     "isEntry": true
   },
   "resources/js/vehicle-history.js": {
-    "file": "assets/vehicle-history-DNuWW9Z_.js",
+    "file": "assets/vehicle-history-DaqxfBdR.js",
     "name": "vehicle-history",
     "src": "resources/js/vehicle-history.js",
     "isEntry": true

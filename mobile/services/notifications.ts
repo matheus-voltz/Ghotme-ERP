@@ -55,7 +55,8 @@ export async function registerForPushNotificationsAsync() {
 // Configuração de como a notificação deve aparecer quando o app está aberto
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),

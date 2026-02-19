@@ -14,6 +14,7 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 window.Pusher = Pusher;
 
+console.log('Initializing Echo with Reverb...');
 window.Echo = new Echo({
     broadcaster: 'reverb',
     key: import.meta.env.VITE_REVERB_APP_KEY,
@@ -24,63 +25,61 @@ window.Echo = new Echo({
     enabledTransports: ['ws', 'wss'],
 });
 
+window.Echo.connector.pusher.connection.bind('connected', () => {
+    console.log('Echo connected to Reverb!');
+});
+
+window.Echo.connector.pusher.connection.bind('error', (err) => {
+    console.error('Echo connection error:', err);
+});
+
 import { Notyf } from 'notyf';
-// Notyf removed in favor of Bootstrap Toasts
+import 'notyf/notyf.min.css';
+
+const notyf = new Notyf({
+    duration: 5000,
+    position: { x: 'right', y: 'top' },
+    types: [
+        {
+            type: 'message',
+            background: '#7367F0',
+            icon: {
+                className: 'icon-base ti tabler-message-circle-2',
+                tagName: 'i',
+                color: 'white'
+            }
+        }
+    ]
+});
 
 // Listen for messages
 // Check if user is logged in
 const userIdMeta = document.querySelector('meta[name="user-id"]');
 if (userIdMeta) {
     const userId = userIdMeta.getAttribute('content');
+    console.log('Subscribing to private channel: chat.' + userId);
 
     window.Echo.private(`chat.${userId}`)
+        .subscribed(() => {
+            console.log('Successfully subscribed to chat.' + userId);
+        })
         .listen('MessageReceived', (e) => {
-            console.log('Message Received:', e.message);
+            console.log('Event MessageReceived captured!', e);
+            // Se eu sou o remetente, não mostro notificação para mim mesmo
+            if (String(e.message.sender_id) === String(userId)) {
+                console.log('Skipping toast: User is the sender.');
+                return;
+            }
+
+            console.log('Showing toast for message:', e.message.message);
             const senderName = e.message.sender ? e.message.sender.name : 'Alguém';
-            const messageText = e.message.message;
+            const messageText = e.message.message || 'Enviou uma imagem';
 
-            // 1. Ensure Toast Container Exists
-            let toastContainer = document.querySelector('.toast-container');
-            if (!toastContainer) {
-                toastContainer = document.createElement('div');
-                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-                toastContainer.style.zIndex = '1090';
-                document.body.appendChild(toastContainer);
-            }
-
-            // 2. Create Toast HTML
-            const toastId = 'toast-' + Date.now();
-            const toastHtml = `
-            <div id="${toastId}" class="bs-toast toast fade" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="toast-header">
-                    <i class="icon-base ti tabler-message-circle-2 icon-xs me-2 text-primary"></i>
-                    <div class="me-auto fw-medium">${senderName}</div>
-                    <small class="text-body-secondary">Agora</small>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    ${messageText}
-                </div>
-            </div>
-        `;
-
-            // 3. Append to Container
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = toastHtml.trim();
-            const toastElement = tempDiv.firstChild;
-            toastContainer.appendChild(toastElement);
-
-            // 4. Initialize and Show using global bootstrap object (provided by template)
-            if (window.bootstrap) {
-                const toast = new window.bootstrap.Toast(toastElement);
-                toast.show();
-
-                // Cleanup after hide
-                toastElement.addEventListener('hidden.bs.toast', () => {
-                    toastElement.remove();
-                });
-            } else {
-                console.error('Bootstrap is not loaded');
-            }
+            notyf.open({
+                type: 'message',
+                message: `<b>${senderName}</b><br>${messageText}`
+            });
         });
+} else {
+    console.warn('User ID meta tag not found. Real-time chat notifications disabled.');
 }

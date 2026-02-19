@@ -84,6 +84,9 @@
                                 <div class="chat-contact-info flex-grow-1 ms-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="chat-contact-name text-truncate m-0 fw-normal">{{ $contact->name }}</h6>
+                                        @if($contact->unread_count > 0)
+                                        <span class="badge bg-danger badge-dot badge-notifications"></span>
+                                        @endif
                                     </div>
                                     <small class="chat-contact-status text-truncate">{{ $contact->email }}</small>
                                 </div>

@@ -1,6 +1,22 @@
 import { Stack } from 'expo-router';
+import { useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { registerForPushNotificationsAsync } from '../../services/notifications';
+import api from '../../services/api';
 
 export default function AppLayout() {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      registerForPushNotificationsAsync().then(token => {
+        if (token && !token.startsWith('Erro')) {
+          api.post('/user/push-token', { token }).catch(e => console.error("Error updating push token:", e));
+        }
+      });
+    }
+  }, [user]);
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

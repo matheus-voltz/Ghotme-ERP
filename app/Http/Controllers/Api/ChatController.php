@@ -12,7 +12,7 @@ use App\Models\ChatMessage;
 class ChatController extends Controller
 {
     /**
-     * Get list of contacts (team members)
+     * Get list of contacts (team members) with unread counts
      */
     public function contacts()
     {
@@ -21,9 +21,28 @@ class ChatController extends Controller
         // Get team members (same company, excluding self)
         $contacts = User::where('id', '!=', $user->id)
             ->where('company_id', $user->company_id)
-            ->get();
+            ->get()
+            ->map(function ($contact) use ($user) {
+                $contact->unread_count = ChatMessage::where('sender_id', $contact->id)
+                    ->where('receiver_id', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+                return $contact;
+            });
 
         return response()->json($contacts);
+    }
+
+    /**
+     * Get total unread count for the authenticated user
+     */
+    public function unreadCount()
+    {
+        $count = ChatMessage::where('receiver_id', Auth::id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json(['count' => $count]);
     }
 
     /**
@@ -84,7 +103,15 @@ class ChatController extends Controller
         // Load relationships for response if needed
         $message->load('sender:id,name,profile_photo_path');
 
-        broadcast(new \App\Events\MessageReceived($message))->toOthers();
+        try {
+            broadcast(new \App\Events\MessageReceived($message));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning("Broadcasting failed: " . $e->getMessage());
+        }
+
+        // Send Database Notification
+        $receiver = User::find($request->receiver_id);
+        $receiver->notify(new \App\Notifications\ChatMessageNotification($message));
 
         // Send Push Notification
         $receiver = User::find($request->receiver_id);
