@@ -136,6 +136,13 @@
                             @foreach($messages as $msg)
                             <li class="chat-message {{ $msg->sender_id == auth()->id() ? 'chat-message-right' : '' }}" wire:key="msg-{{ $msg->id }}">
                                 <div class="d-flex overflow-hidden">
+                                    @if($msg->sender_id != auth()->id())
+                                    <div class="user-avatar flex-shrink-0 me-4">
+                                        <div class="avatar avatar-sm">
+                                            <img src="{{ $msg->sender->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
+                                        </div>
+                                    </div>
+                                    @endif
                                     <div class="chat-message-wrapper flex-grow-1">
                                         <div class="chat-message-text">
                                             @if($msg->attachment_path)
@@ -151,6 +158,13 @@
                                             <small>{{ $msg->created_at->format('H:i') }}</small>
                                         </div>
                                     </div>
+                                    @if($msg->sender_id == auth()->id())
+                                    <div class="user-avatar flex-shrink-0 ms-4">
+                                        <div class="avatar avatar-sm">
+                                            <img src="{{ auth()->user()->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
                             </li>
                             @endforeach

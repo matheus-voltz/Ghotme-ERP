@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
@@ -125,7 +126,7 @@ export default function ChatScreen() {
                     <Image
                         source={{ uri: attachmentUrl }}
                         style={styles.messageImage}
-                        resizeMode="cover"
+                        contentFit="cover"
                     />
                 )}
                 {!!item.message && (
@@ -149,7 +150,11 @@ export default function ChatScreen() {
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
                 {photo ? (
-                    <Image source={{ uri: photo as string }} style={styles.avatar} />
+                    <Image 
+                        source={{ uri: photo as string }} 
+                        style={styles.avatar} 
+                        contentFit="cover"
+                    />
                 ) : (
                     <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary }]}>
                         <Text style={styles.avatarText}>{(name as string)?.charAt(0)}</Text>
@@ -171,7 +176,11 @@ export default function ChatScreen() {
             <View style={[styles.inputWrapper, { backgroundColor: colors.card, paddingBottom: insets.bottom + 10 }]}>
                 {selectedImage && (
                     <View style={styles.previewContainer}>
-                        <Image source={{ uri: selectedImage }} style={styles.previewImage} />
+                        <Image 
+                            source={{ uri: selectedImage }} 
+                            style={styles.previewImage}
+                            contentFit="cover"
+                        />
                         <TouchableOpacity style={styles.removePreviewBtn} onPress={() => setSelectedImage(null)}>
                             <Ionicons name="close-circle" size={24} color="#fff" />
                         </TouchableOpacity>

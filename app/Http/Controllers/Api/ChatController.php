@@ -27,6 +27,7 @@ class ChatController extends Controller
                     ->where('receiver_id', $user->id)
                     ->where('is_read', false)
                     ->count();
+                
                 return $contact;
             });
 

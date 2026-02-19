@@ -175,7 +175,7 @@ class SupportChat extends Component
         $messages = [];
 
         if ($this->activeUserId) {
-            $messages = ChatMessage::where(function ($q) {
+            $messages = ChatMessage::with('sender')->where(function ($q) {
                 $q->where('sender_id', Auth::id())
                     ->where('receiver_id', $this->activeUserId);
             })

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
@@ -42,7 +43,12 @@ export default function ContactsScreen() {
         >
             <View style={styles.avatarContainer}>
                 {item.profile_photo_url ? (
-                    <Image source={{ uri: item.profile_photo_url }} style={styles.avatar} />
+                    <Image 
+                        source={{ uri: item.profile_photo_url }} 
+                        style={styles.avatar}
+                        contentFit="cover"
+                        transition={200}
+                    />
                 ) : (
                     <View style={[styles.avatarPlaceholder, { backgroundColor: colors.primary + '20' }]}>
                         <Text style={[styles.avatarText, { color: colors.primary }]}>

@@ -97,6 +97,20 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         return ! is_null($this->two_factor_secret);
     }
 
+    /**
+     * Get the URL to the user's profile photo.
+     *
+     * @return string
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo_path) {
+            return asset('storage/' . $this->profile_photo_path);
+        }
+
+        return $this->defaultProfilePhotoUrl();
+    }
+
     public function ordensServico()
     {
         return $this->hasMany(OrdemServico::class);
