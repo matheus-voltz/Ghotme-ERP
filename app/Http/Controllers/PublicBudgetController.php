@@ -19,7 +19,11 @@ class PublicBudgetController extends Controller
             ->where('uuid', $uuid)
             ->firstOrFail();
 
-        return view('content.public.budget-approval', compact('budget'));
+        $paymentMethodsCount = \App\Models\PaymentMethod::where('company_id', $budget->company_id)
+            ->where('is_active', true)
+            ->count();
+
+        return view('content.public.budget-approval', compact('budget', 'paymentMethodsCount'));
     }
 
     public function checkout($uuid)

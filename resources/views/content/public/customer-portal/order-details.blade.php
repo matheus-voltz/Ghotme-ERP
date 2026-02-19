@@ -143,11 +143,11 @@ $customizerHidden = 'customizer-hide';
                     <h1 class="text-white fw-bold mb-3">Protocolo #{{ $order->id }}</h1>
                     <div class="d-flex align-items-center">
                         <div class="p-2 bg-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                            <i class="ti tabler-car-suv text-primary fs-3"></i>
+                            <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $order->company) }} text-primary fs-3"></i>
                         </div>
                         <div>
                             <h4 class="text-white mb-0 fw-600">{{ $order->veiculo->marca }} {{ $order->veiculo->modelo }}</h4>
-                            <span class="text-white opacity-75 fs-6">{{ $order->veiculo->placa }} • Ano {{ $order->veiculo->ano ?? 'N/A' }}</span>
+                            <span class="text-white opacity-75 fs-6">{{ $order->veiculo->placa }} • {{ niche('year', 'Ano', $order->company) }} {{ $order->veiculo->ano_modelo ?? $order->veiculo->ano ?? 'N/A' }}</span>
                         </div>
                     </div>
                 </div>
@@ -159,7 +159,7 @@ $customizerHidden = 'customizer-hide';
                         switch($order->status) {
                         case 'pending': $statusText = 'Aguardando Início'; break;
                         case 'awaiting_approval': $statusText = 'Aguardando Aprovação'; break;
-                        case 'in_progress': $statusText = 'Em Manutenção'; break;
+                        case 'in_progress': $statusText = niche('in_service_label', 'Em Serviço', $order->company); break;
                         case 'testing': $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusText = 'Higienização'; break;
                         case 'completed':
@@ -203,27 +203,27 @@ $customizerHidden = 'customizer-hide';
 
                         <div class="timeline-point @if($currentStep >= 0) completed @endif">
                             <h6 class="fw-bold mb-1">Check-in Realizado</h6>
-                            <p class="text-muted small">O seu veículo deu entrada com sucesso na oficina.</p>
+                            <p class="text-muted small">{{ niche('timeline_checkin_body', 'O check-in foi realizado com sucesso.', $order->company) }}</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep > 1) completed @elseif($currentStep == 1) active @endif">
-                            <h6 class="fw-bold mb-1">Aprovação do Orçamento</h6>
-                            <p class="text-muted small">Aguardando sua autorização para iniciar o serviço.</p>
+                            <h6 class="fw-bold mb-1">Aprovação de Orçamento</h6>
+                            <p class="text-muted small">Aguardando sua autorização para iniciar os serviços.</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep > 2) completed @elseif($currentStep == 2) active @endif">
                             <h6 class="fw-bold mb-1">Execução de Serviços</h6>
-                            <p class="text-muted small">Nossos técnicos estão trabalhando no seu veículo neste momento.</p>
+                            <p class="text-muted small">{{ niche('timeline_execution_body', 'Nossos profissionais estão cuidando de tudo neste momento.', $order->company) }}</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep > 3) completed @elseif($currentStep == 3) active @endif">
-                            <h6 class="fw-bold mb-1">Fase de Testes</h6>
-                            <p class="text-muted small">Realizamos testes rigorosos para garantir sua segurança total.</p>
+                            <h6 class="fw-bold mb-1">Fase de Finalização</h6>
+                            <p class="text-muted small">{{ niche('timeline_finalizing_body', 'Estamos realizando os últimos ajustes.', $order->company) }}</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep >= 5) completed @elseif($currentStep >= 4 && $currentStep < 6) active @endif">
-                            <h6 class="fw-bold mb-1">Finalização e Entrega</h6>
-                            <p class="text-muted small">O veículo está sendo preparado para você vir buscar.</p>
+                            <h6 class="fw-bold mb-1">Pronto para Retirada</h6>
+                            <p class="text-muted small">Tudo pronto! Já pode vir buscar.</p>
                         </div>
                     </div>
                 </div>
@@ -231,7 +231,7 @@ $customizerHidden = 'customizer-hide';
                 <!-- Coluna: Detalhes Técnicos -->
                 <div class="col-lg-7">
                     <div class="p-4 bg-light rounded-4 border-dashed mb-5">
-                        <h5 class="fw-bold mb-4">Relatório do Mecânico</h5>
+                        <h5 class="fw-bold mb-4">Relatório do Profissional</h5>
                         <p class="text-muted mb-0 lh-lg">
                             {{ $order->description ?: 'Nenhuma observação técnica adicional para este serviço.' }}
                         </p>

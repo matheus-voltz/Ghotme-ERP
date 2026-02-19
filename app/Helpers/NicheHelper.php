@@ -6,17 +6,12 @@ if (!function_exists('niche_translate')) {
     /**
      * Traduz uma string baseada no nicho atual e no idioma do sistema.
      */
-    function niche_translate($string)
+    function niche_translate($string, $company = null)
     {
-        // Se a string contiver os termos base, fazemos a substituição baseada no nicho
-        // O str_ireplace ignora maiúsculas/minúsculas
-        
-        $entities = niche('entities');
-        $entity = niche('entity');
-        $inventory = niche('inventory_items');
+        $entities = niche('entities', null, $company);
+        $entity = niche('entity', null, $company);
+        $inventory = niche('inventory_items', null, $company);
 
-        // Mapeamento de termos que devem ser trocados pelo termo do nicho
-        // Buscamos tanto em PT quanto em EN para garantir que a troca ocorra
         $search = [
             'Clientes & Veículos', 'Clientes & Veiculos', 'Customers & Vehicles',
             'Veículos', 'Veiculos', 'Vehicles',
@@ -41,26 +36,36 @@ if (!function_exists('niche_translate')) {
     }
 }
 
+if (!function_exists('get_current_niche')) {
+    /**
+     * Get the current niche name.
+     */
+    function get_current_niche($company = null)
+    {
+        if ($company && !empty($company->niche)) {
+            return $company->niche;
+        }
+
+        if (auth()->check() && !empty(auth()->user()->niche)) {
+            return auth()->user()->niche;
+        }
+
+        return Config::get('niche.current', 'automotive');
+    }
+}
+
 if (!function_exists('niche')) {
     /**
      * Get the current niche configuration.
      *
      * @param string|null $key
      * @param mixed $default
+     * @param object|null $company
      * @return mixed
      */
-    function niche($key = null, $default = null)
+    function niche($key = null, $default = null, $company = null)
     {
-        $userNiche = auth()->id() && !empty(auth()->user()->niche) ? auth()->user()->niche : null;
-        $defaultNiche = Config::get('niche.current', 'automotive');
-
-        // Check if user's niche exists in config, otherwise fallback to default
-        $currentNiche = $userNiche && Config::has("niche.niches.{$userNiche}")
-            ? $userNiche
-            : $defaultNiche;
-
-        // Mapping 'tech_assistance' to 'electronics' if needed, or just ensure config keys match user niche values
-        // For now assuming user niche values match config structure keys
+        $currentNiche = get_current_niche($company);
 
         if (is_null($key)) {
             return $currentNiche;
@@ -70,18 +75,43 @@ if (!function_exists('niche')) {
     }
 }
 
-if (!function_exists('niche_config')) {
+if (!function_exists('niche_icon')) {
     /**
-     * Get a specific configuration key for the current niche.
-     * Use this for non-label configs like icons or components.
+     * Get the current niche icon.
      *
      * @param string $key
      * @param mixed $default
+     * @param object|null $company
      * @return mixed
      */
-    function niche_config($key, $default = null)
+    function niche_icon($key, $default = null, $company = null)
     {
-        $currentNiche = Config::get('niche.current', 'automotive');
+        $currentNiche = get_current_niche($company);
+        $icon = Config::get("niche.niches.{$currentNiche}.icons.{$key}", $default);
+        
+        // Ensure icon has the prefix if it's from the old format
+        if ($icon && !str_starts_with($icon, 'tabler-') && !str_starts_with($icon, 'ti')) {
+            $icon = 'tabler-' . str_replace('ti-', '', $icon);
+        } elseif ($icon && str_starts_with($icon, 'ti-')) {
+             $icon = 'tabler-' . substr($icon, 3);
+        }
+
+        return $icon;
+    }
+}
+
+if (!function_exists('niche_config')) {
+    /**
+     * Get a specific configuration key for the current niche.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @param object|null $company
+     * @return mixed
+     */
+    function niche_config($key, $default = null, $company = null)
+    {
+        $currentNiche = get_current_niche($company);
         return Config::get("niche.niches.{$currentNiche}.{$key}", $default);
     }
 }

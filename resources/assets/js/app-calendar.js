@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function () {
       eventToUpdate = info.event;
       if (eventToUpdate.url) {
         info.jsEvent.preventDefault();
-        window.open(eventToUpdate.url, '_blank');
+        // window.open(eventToUpdate.url, '_blank'); // Removed auto-open to allow editing
       }
       bsAddEventSidebar.show();
       // For update event set offcanvas title text: Update Event

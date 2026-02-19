@@ -38,6 +38,10 @@ return [
                 'year' => 'Ano',
                 'features' => 'Opcionais',
                 'inventory_items' => 'Itens/Peças',
+                'in_service_label' => 'Na Oficina',
+                'timeline_checkin_body' => 'O seu veículo deu entrada com sucesso na oficina.',
+                'timeline_execution_body' => 'Nossos técnicos estão trabalhando no seu veículo neste momento.',
+                'timeline_finalizing_body' => 'Realizamos os últimos ajustes e testes para garantir sua segurança total.',
                 'checklist_categories' => [
                     'Motor' => ['Óleo do Motor', 'Filtro de Ar', 'Correia Dentada', 'Velas', 'Sistema de Arrefecimento'],
                     'Freios' => ['Pastilhas Dianteiras', 'Discos Dianteiros', 'Lona Traseira', 'Fluido de Freio'],
@@ -71,6 +75,10 @@ return [
                 'color' => 'Cor',
                 'year' => 'Ano de Fabricação',
                 'features' => 'Especificações',
+                'in_service_label' => 'Em Manutenção',
+                'timeline_checkin_body' => 'O seu dispositivo deu entrada com sucesso na bancada.',
+                'timeline_execution_body' => 'Nossos técnicos estão trabalhando no seu dispositivo neste momento.',
+                'timeline_finalizing_body' => 'Estamos realizando os testes finais para garantir o pleno funcionamento.',
                 'checklist_categories' => [
                     'Tela / Display' => ['Riscos', 'Trincas', 'Touchscreen', 'Manchas', 'Dead Pixels'],
                     'Carcaça' => ['Amassados', 'Riscos', 'Parafusos Faltando', 'Dobradiças'],
@@ -106,6 +114,10 @@ return [
                 'year' => 'Data de Nascimento',
                 'features' => 'Alergias / Cuidados',
                 'inventory_items' => 'Insumos/Produtos',
+                'in_service_label' => 'Em Atendimento',
+                'timeline_checkin_body' => 'Seu pet já está sob nossos cuidados e pronto para o atendimento.',
+                'timeline_execution_body' => 'Nossos profissionais estão cuidando do seu pet com toda atenção e carinho.',
+                'timeline_finalizing_body' => 'Estamos finalizando os últimos cuidados e observações pós-atendimento.',
                 'checklist_categories' => [
                     'Exame Físico' => ['Mucosas', 'Hidratação', 'Temperatura', 'Batimentos Cardíacos', 'Respiração'],
                     'Pele e Pelagem' => ['Queda de Pelo', 'Feridas', 'Parasitas (Pulgas/Carrapatos)', 'Nódulos', 'Otite'],
@@ -137,6 +149,10 @@ return [
                 'year' => 'Última Visita',
                 'features' => 'Observações Clínicas',
                 'inventory_items' => 'Insumos / Dermocosméticos',
+                'in_service_label' => 'Em Procedimento',
+                'timeline_checkin_body' => 'O check-in foi realizado e já estamos preparando tudo para o procedimento.',
+                'timeline_execution_body' => 'O seu procedimento está sendo realizado por nossos especialistas.',
+                'timeline_finalizing_body' => 'Estamos finalizando com os últimos cuidados e orientações pós-procedimento.',
                 'checklist_categories' => [
                     'Anamnese Facial' => ['Tipo de Pele', 'Manchas / Melasma', 'Acne / Cicatrizes', 'Rugas / Linhas', 'Flacidez'],
                     'Anamnese Corporal' => ['Gordura Localizada', 'Celulite', 'Estrias', 'Flacidez Corporal', 'Retenção Hídrica'],

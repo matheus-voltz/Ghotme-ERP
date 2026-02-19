@@ -132,7 +132,7 @@
             <div class="mb-5">
               <label class="form-label" for="eventURL">URL do Evento</label>
               <input type="url" class="form-control" id="eventURL" name="eventURL"
-                placeholder="https://www.google.com" />
+                placeholder="https://exemplo.com" />
             </div>
             <div class="mb-4 select2-primary">
               <label class="form-label" for="eventGuests">Adicionar Convidados</label>

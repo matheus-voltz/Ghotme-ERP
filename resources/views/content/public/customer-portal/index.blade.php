@@ -153,7 +153,7 @@ $customizerHidden = 'customizer-hide';
     <div class="container text-center py-4">
         <h1 class="text-white fw-bold mb-3 animate-up">Olá, {{ explode(' ', $client->name)[0] }}! 👋</h1>
         <p class="text-white fs-5 opacity-75 animate-up" style="animation-delay: 0.1s">
-            Acompanhe o cuidado com o seu veículo de qualquer lugar.
+            Acompanhe o cuidado com o seu {{ strtolower(niche('entity', 'veículo', $client->company)) }} de qualquer lugar.
         </p>
     </div>
 </div>
@@ -164,7 +164,7 @@ $customizerHidden = 'customizer-hide';
         <div class="col-md-3 col-6 animate-up" style="animation-delay: 0.2s">
             <div class="stat-card shadow-sm">
                 <div class="stat-icon bg-label-primary">
-                    <i class="ti tabler-car"></i>
+                    <i class="ti {{ niche_icon('entity', 'tabler-car', $client->company) }}"></i>
                 </div>
                 <h4 class="mb-0 fw-bold">{{ $orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'finalized', 'completed'])->count() }}</h4>
                 <small class="text-muted">Em Serviço</small>
@@ -195,7 +195,7 @@ $customizerHidden = 'customizer-hide';
         <div class="col-lg-8 animate-up" style="animation-delay: 0.5s">
             <!-- Seção de Veículos -->
             <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
-                <h4 class="mb-0 fw-bold"><i class="ti tabler-car me-2 text-primary"></i>Meus Veículos</h4>
+                <h4 class="mb-0 fw-bold"><i class="ti {{ niche_icon('entity', 'tabler-car', $client->company) }} me-2 text-primary"></i>Meus {{ niche('entities', 'Veículos', $client->company) }}</h4>
             </div>
 
             <div class="row g-4 mb-5">
@@ -204,7 +204,7 @@ $customizerHidden = 'customizer-hide';
                     <div class="vehicle-card p-3 shadow-none border h-100">
                         <div class="d-flex align-items-center">
                             <div class="p-2 bg-label-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
-                                <i class="ti tabler-car-suv fs-3"></i>
+                                <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $client->company) }} fs-3"></i>
                             </div>
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start">
@@ -220,7 +220,7 @@ $customizerHidden = 'customizer-hide';
 
                                     if ($currentOS) {
                                     $statusClass = 'bg-label-warning';
-                                    $statusText = 'Na Oficina';
+                                    $statusText = niche('in_service_label', 'Em Serviço', $client->company);
                                     if (in_array($currentOS->status, ['completed', 'finalized'])) {
                                     $statusClass = 'bg-label-info';
                                     $statusText = 'Pronto';
@@ -239,13 +239,13 @@ $customizerHidden = 'customizer-hide';
                 </div>
                 @empty
                 <div class="col-12 text-center py-4 bg-white rounded-4 border">
-                    <p class="text-muted mb-0 small">Nenhum veículo cadastrado.</p>
+                    <p class="text-muted mb-0 small">Nenhum {{ strtolower(niche('entity', 'veículo', $client->company)) }} cadastrado.</p>
                 </div>
                 @endforelse
             </div>
 
             <div class="d-flex align-items-center justify-content-between mb-4">
-                <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status na Oficina</h4>
+                <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status de Manutenção</h4>
             </div>
 
             @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed', 'finalized', 'awaiting_approval']) as $order)
@@ -254,7 +254,7 @@ $customizerHidden = 'customizer-hide';
                     <div class="col-md-7">
                         <div class="d-flex align-items-center mb-3">
                             <div class="p-3 bg-label-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
-                                <i class="ti tabler-car-suv fs-2"></i>
+                                <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $client->company) }} fs-2"></i>
                             </div>
                             <div>
                                 <h5 class="mb-1 fw-bold">{{ $order->veiculo->marca }} {{ $order->veiculo->modelo }}</h5>
@@ -272,7 +272,7 @@ $customizerHidden = 'customizer-hide';
                         switch($order->status) {
                         case 'pending': $statusClass = 'bg-label-warning'; $statusText = 'Aguardando Início'; break;
                         case 'awaiting_approval': $statusClass = 'bg-label-danger'; $statusText = 'Aguardando Aprovação'; break;
-                        case 'in_progress': $statusClass = 'bg-label-info'; $statusText = 'Em Manutenção'; break;
+                        case 'in_progress': $statusClass = 'bg-label-info'; $statusText = niche('in_service_label', 'Em Serviço', $client->company); break;
                         case 'testing': $statusClass = 'bg-label-primary'; $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusClass = 'bg-label-info'; $statusText = 'Higienização'; break;
                         case 'completed':
@@ -314,7 +314,7 @@ $customizerHidden = 'customizer-hide';
 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                     <div class="avatar-group d-none d-sm-flex">
-                        <small class="text-muted"><i class="ti tabler-user-check me-1"></i>Consultor: {{ explode(' ', $order->user->name ?? 'Equipe Ghotme')[0] }}</small>
+                        <small class="text-muted"><i class="ti tabler-user-check me-1"></i>Responsável: {{ explode(' ', $order->user->name ?? 'Equipe Ghotme')[0] }}</small>
                     </div>
                     <a href="{{ route('customer.portal.order', $order->uuid) }}" class="btn btn-primary px-4 rounded-pill">
                         Detalhes <i class="ti tabler-arrow-right ms-1"></i>
@@ -324,8 +324,8 @@ $customizerHidden = 'customizer-hide';
             @empty
             <div class="text-center py-5 glass-card mb-4 mt-2">
                 <i class="ti tabler-ghost display-3 text-muted opacity-25"></i>
-                <h5 class="mt-3 text-muted">A oficina está tranquila hoje.</h5>
-                <p class="text-muted small">Nenhum serviço em andamento para seus veículos.</p>
+                <h5 class="mt-3 text-muted">A empresa está tranquila hoje.</h5>
+                <p class="text-muted small">Nenhum serviço em andamento para seus {{ strtolower(niche('entities', 'itens', $client->company)) }}.</p>
             </div>
             @endforelse
         </div>
@@ -359,7 +359,7 @@ $customizerHidden = 'customizer-hide';
                 <div class="card-body p-4 position-relative">
                     <i class="ti tabler-help fs-1 text-white opacity-10" style="position: absolute; right: 10px; top: 10px;"></i>
                     <h5 class="text-white mb-3">Precisa de Ajuda?</h5>
-                    <p class="text-white opacity-75 small mb-4">Sua oficina de confiança está sempre à disposição para esclarecer dúvidas.</p>
+                    <p class="text-white opacity-75 small mb-4">Sua empresa de confiança está sempre à disposição para esclarecer dúvidas.</p>
                     <a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}" target="_blank" class="btn btn-primary w-100 rounded-pill">
                         Falar com Atendente
                     </a>
@@ -378,7 +378,7 @@ $customizerHidden = 'customizer-hide';
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#portalFaq">
                             <div class="accordion-body bg-white text-muted small pt-0">
-                                Você pode acompanhar todo o progresso em tempo real através deste portal. As etapas são atualizadas automaticamente conforme nossa equipe trabalha no seu veículo.
+                                Você pode acompanhar todo o progresso em tempo real através deste portal. As etapas são atualizadas automaticamente conforme nossa equipe trabalha no seu {{ strtolower(niche('entity', 'item', $client->company)) }}.
                             </div>
                         </div>
                     </div>

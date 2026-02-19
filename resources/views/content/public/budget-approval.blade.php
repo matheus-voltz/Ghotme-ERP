@@ -211,6 +211,7 @@ $customizerHidden = 'customizer-hide';
                 @if($budget->status == 'pending')
                 <form action="{{ route('public.budget.approve', $budget->uuid) }}" method="POST" id="approvalForm" onsubmit="return handleApproval(event)">
                     @csrf
+                    @if(($paymentMethodsCount ?? 0) > 0)
                     <div class="row g-4 mb-5">
                         <div class="col-12 text-center">
                             <h5 class="fw-bold mb-4">Deseja realizar o pagamento antecipado?</h5>
@@ -230,6 +231,10 @@ $customizerHidden = 'customizer-hide';
                             </label>
                         </div>
                     </div>
+                    @else
+                    <input type="hidden" name="early_payment" value="0" id="early_no">
+                    <input type="checkbox" id="early_yes" class="d-none" disabled> {{-- Placeholder for JS --}}
+                    @endif
 
                     <div class="d-flex flex-column flex-md-row gap-3 justify-content-center mt-5">
                         <button type="button" class="btn btn-outline-danger btn-lg px-5 rounded-pill" data-bs-toggle="modal" data-bs-target="#rejectModal">

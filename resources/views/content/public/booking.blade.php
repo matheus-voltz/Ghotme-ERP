@@ -1,3 +1,8 @@
+@php
+$configData = Helper::appClasses();
+$customizerHidden = 'customizer-hide';
+@endphp
+
 @extends('layouts/commonMaster')
 
 @section('title', 'Agendamento Online - ' . $company->name)
@@ -41,8 +46,8 @@
                 </div>
                 <div class="row mb-3 g-3">
                     <div class="col-md-6">
-                        <label class="form-label fw-semibold">Placa do Veículo</label>
-                        <input type="text" name="vehicle_plate" class="form-control" placeholder="ABC-1234">
+                        <label class="form-label fw-semibold">{{ niche('identifier', 'Identificador', $company) }}</label>
+                        <input type="text" name="vehicle_plate" class="form-control" placeholder="{{ niche('identifier', 'Placa', $company) }}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label fw-semibold">Data e Hora</label>
