@@ -28,16 +28,16 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
         </button>
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="#landingFeatures">Funcionalidades</a>
+            <a class="nav-link fw-medium" href="#landingFeatures">{{ __('Features') }}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="#landingPricing">Planos</a>
+            <a class="nav-link fw-medium" href="#landingPricing">{{ __('Pricing') }}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#landingFAQ">FAQ</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link fw-medium" href="#landingContact">Contato</a>
+            <a class="nav-link fw-medium" href="#landingContact">{{ __('Contact') }}</a>
           </li>
         </ul>
       </div>
@@ -45,6 +45,37 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
       <!-- Menu wrapper: End -->
       <!-- Toolbar: Start -->
       <ul class="navbar-nav flex-row align-items-center ms-auto">
+        
+        <!-- Language -->
+        <li class="nav-item dropdown me-2 me-xl-1">
+          <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+            <i class="icon-base ti tabler-language icon-lg"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item {{ app()->getLocale() === 'pt_BR' ? 'active' : '' }}" href="{{ url('lang/pt_BR') }}">
+                <span class="align-middle">Português (Brasil)</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item {{ app()->getLocale() === 'en' ? 'active' : '' }}" href="{{ url('lang/en') }}">
+                <span class="align-middle">English</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item {{ app()->getLocale() === 'es' ? 'active' : '' }}" href="{{ url('lang/es') }}">
+                <span class="align-middle">Español</span>
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item {{ app()->getLocale() === 'fr' ? 'active' : '' }}" href="{{ url('lang/fr') }}">
+                <span class="align-middle">Français</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <!--/ Language -->
+
         @if ($configData['hasCustomizer'] == true)
         <!-- Style Switcher -->
         <li class="nav-item dropdown-style-switcher dropdown me-2 me-xl-1">
@@ -84,15 +115,15 @@ data-icon="device-desktop-analytics"></i>Sistema</span>
             @auth
               <a href="{{ route('dashboard') }}" class="btn btn-primary"><span
                   class="icon-base ti tabler-layout-dashboard me-md-1"></span><span
-                  class="d-none d-md-block">Acessar Painel</span></a>
+                  class="d-none d-md-block">{{ __('Access Panel') }}</span></a>
             @else
               <a href="{{ route('login') }}" class="btn btn-label-primary me-2"><span
                   class="icon-base ti tabler-login me-md-1"></span><span
-                  class="d-none d-md-block">Entrar</span></a>
+                  class="d-none d-md-block">{{ __('Login') }}</span></a>
               @if (Route::has('register'))
                 <a href="{{ route('register') }}" class="btn btn-primary"><span
                     class="icon-base ti tabler-user-plus me-md-1"></span><span
-                    class="d-none d-md-block">Cadastrar</span></a>
+                    class="d-none d-md-block">{{ __('Register') }}</span></a>
               @endif
             @endauth
           @endif

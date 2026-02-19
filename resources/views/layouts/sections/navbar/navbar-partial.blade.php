@@ -73,8 +73,8 @@ use Illuminate\Support\Facades\Route;
       </a>
       <ul class="dropdown-menu dropdown-menu-end">
         <li>
-          <a class="dropdown-item {{ app()->getLocale() === 'pt' ? 'active' : '' }}" href="{{ url('lang/pt') }}">
-            <span class="align-middle">Português</span>
+          <a class="dropdown-item {{ app()->getLocale() === 'pt_BR' ? 'active' : '' }}" href="{{ url('lang/pt_BR') }}">
+            <span class="align-middle">Português (Brasil)</span>
           </a>
         </li>
         <li>
@@ -85,6 +85,11 @@ use Illuminate\Support\Facades\Route;
         <li>
           <a class="dropdown-item {{ app()->getLocale() === 'es' ? 'active' : '' }}" href="{{ url('lang/es') }}">
             <span class="align-middle">Español</span>
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item {{ app()->getLocale() === 'fr' ? 'active' : '' }}" href="{{ url('lang/fr') }}">
+            <span class="align-middle">Français</span>
           </a>
         </li>
       </ul>

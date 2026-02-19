@@ -708,6 +708,20 @@
               visualCvv.textContent = e.target.value || '***';
             });
 
+            // 4. Name Sync
+            ccNameInput.addEventListener('input', (e) => {
+              visualName.textContent = e.target.value.toUpperCase() || 'NOME NO CARTÃO';
+            });
+
+            // 5. Card Flip on CVV Focus
+            ccCvvInput.addEventListener('focus', () => {
+              visualCard.classList.add('flipped');
+            });
+
+            ccCvvInput.addEventListener('blur', () => {
+              visualCard.classList.remove('flipped');
+            });
+
             // AJAX Payment Logic (Re-implemented)
             $(document).on('click', '.btn-generate-payment', function(e) { // Use delegated event for dynamic buttons
               e.preventDefault();

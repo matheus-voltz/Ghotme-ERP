@@ -16,7 +16,7 @@ class LocaleMiddleware
   public function handle(Request $request, Closure $next): Response
   {
     // Locale is enabled and allowed to be change
-    if (session()->has('locale') && in_array(session()->get('locale'), ['en', 'pt', 'es'])) {
+    if (session()->has('locale') && in_array(session()->get('locale'), ['en', 'pt_BR', 'es', 'fr'])) {
       app()->setLocale(session()->get('locale'));
     }
 
