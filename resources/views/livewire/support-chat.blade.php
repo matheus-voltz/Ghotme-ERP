@@ -1,25 +1,3 @@
-<style>
-  #chat-history-body {
-    height: calc(100vh - 380px); /* Altura fixa para permitir scroll */
-    overflow-y: auto !important;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Estilização da Scrollbar para ficar elegante */
-  #chat-history-body::-webkit-scrollbar {
-    width: 6px;
-  }
-  #chat-history-body::-webkit-scrollbar-thumb {
-    background-color: rgba(115, 103, 240, 0.2);
-    border-radius: 10px;
-  }
-  #chat-history-body::-webkit-scrollbar-track {
-    background: transparent;
-  }
-</style>
-
 <div class="app-chat card overflow-hidden">
   <div class="row g-0">
     <!-- Sidebar Left -->
@@ -111,8 +89,9 @@
           </li>
 
           @foreach($contacts as $contact)
-          <li class="chat-contact-list-item {{ $activeUserId == $contact->id ? 'active' : '' }} mb-1" wire:click="selectUser({{ $contact->id }})" style="cursor: pointer;">
-            <a class="d-flex align-items-center">
+          <li class="chat-contact-list-item {{ $activeUserId == $contact->id ? 'active' : '' }} mb-1" 
+              wire:key="contact-{{ $contact->id }}">
+            <a class="d-flex align-items-center" wire:click.prevent="selectUser({{ $contact->id }})" style="cursor: pointer;">
               <div class="flex-shrink-0 avatar avatar-{{ $contact->chat_status }}">
                 <img src="{{ $contact->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
               </div>
@@ -166,16 +145,16 @@
           </div>
         </div>
 
-        <div class="chat-history-body" id="chat-history-body" wire:poll.3000ms>
+        <div class="chat-history-body" id="chat-history-body" wire:poll.2000ms>
           <ul class="list-unstyled chat-history">
             @foreach($messages as $msg)
-            <li class="chat-message {{ $msg->sender_id == auth()->id() ? 'chat-message-right' : '' }}">
+            <li class="chat-message {{ $msg->sender_id == auth()->id() ? 'chat-message-right' : '' }}" wire:key="msg-{{ $msg->id }}">
               <div class="d-flex overflow-hidden">
                 <div class="chat-message-wrapper flex-grow-1">
                   <div class="chat-message-text">
                     @if($msg->attachment_path)
                     <div class="mb-2 position-relative">
-                      <img src="{{ \Illuminate\Support\Facades\Storage::url($msg->attachment_path) }}" class="img-fluid rounded cursor-pointer" style="max-width: 200px; max-height: 200px; object-fit: cover;" onclick="window.open(this.src, '_blank')" alt="Anexo" />
+                      <img src="{{ asset('storage/' . $msg->attachment_path) }}" class="img-fluid rounded" style="max-width: 200px;" alt="Anexo" />
                     </div>
                     @endif
                     @if($msg->message)
@@ -238,23 +217,20 @@
 </div>
 
 <script>
-  function scrollToBottom() {
-    const chatHistoryBody = document.getElementById('chat-history-body');
-    if (chatHistoryBody) {
-      chatHistoryBody.scrollTop = chatHistoryBody.scrollHeight;
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', scrollToBottom);
-  
-  window.addEventListener('message-sent', event => {
-      setTimeout(scrollToBottom, 50);
-  });
-
-  // Roda o scroll após cada atualização do Livewire (poll)
   document.addEventListener('livewire:initialized', () => {
-      Livewire.hook('morph.updated', ({ el, component }) => {
-          scrollToBottom();
-      });
+    const scrollChat = () => {
+      const el = document.getElementById('chat-history-body');
+      if (el) el.scrollTop = el.scrollHeight;
+    };
+
+    // Rola ao carregar
+    setTimeout(scrollChat, 100);
+
+    // Rola quando o Livewire termina de processar qualquer ação (como enviar mensagem ou poll)
+    Livewire.hook('morph.updated', ({ el, component }) => {
+      if (component.name === 'support-chat') {
+        scrollChat();
+      }
+    });
   });
 </script>

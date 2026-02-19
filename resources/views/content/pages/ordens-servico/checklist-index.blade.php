@@ -24,8 +24,8 @@
         <tr>
           <td>#{{ $inspection->id }}</td>
           <td>
-            <strong>{{ $inspection->veiculo->placa }}</strong><br>
-            <small>{{ $inspection->veiculo->modelo }}</small>
+            <strong>{{ $inspection->veiculo->placa ?? 'N/A' }}</strong><br>
+            <small>{{ $inspection->veiculo->modelo ?? 'Veículo não encontrado' }}</small>
           </td>
           <td>{{ $inspection->user->name }}</td>
           <td>{{ $inspection->created_at->format('d/m/Y H:i') }}</td>

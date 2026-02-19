@@ -61,10 +61,11 @@ class ClientsController extends Controller
             $totalFiltered = $query->count();
         }
 
-        $clients = $query->offset($start)
-            ->limit($limit)
-            ->orderBy($order, $dir)
-            ->get();
+        if ($limit != -1) {
+            $query->offset($start)->limit($limit);
+        }
+
+        $clients = $query->orderBy($order, $dir)->get();
 
         $data = [];
         $ids = $start;
