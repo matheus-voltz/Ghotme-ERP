@@ -22,7 +22,10 @@ import Animated, {
     useAnimatedStyle,
     withSpring,
     withTiming,
-    withDelay
+    withDelay,
+    withRepeat,
+    withSequence,
+    Easing
 } from 'react-native-reanimated';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 
@@ -47,7 +50,20 @@ export default function LoginScreen() {
     useEffect(() => {
         formOpacity.value = withDelay(300, withTiming(1, { duration: 800 }));
         formTranslateY.value = withDelay(300, withSpring(0));
-        logoScale.value = withSpring(1, { damping: 12 });
+
+        // Entrance + Breathing Animation
+        logoScale.value = withSpring(1, { damping: 10 }, (finished) => {
+            if (finished) {
+                logoScale.value = withRepeat(
+                    withSequence(
+                        withTiming(1.03, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
+                        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
+                    ),
+                    -1, // Infinite
+                    true // Reverse
+                );
+            }
+        });
 
         // Tenta biometria automática após carregar
         setTimeout(autoBiometrics, 1000);

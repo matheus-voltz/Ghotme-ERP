@@ -2,19 +2,19 @@
   "menu": [
     {
       "url": "/dashboard",
-      "name": "Home",
+      "name": "Dashboard",
       "icon": "menu-icon icon-base ti tabler-smart-home",
       "slug": "dashboard"
     },
     {
       "url": "/appointments",
-      "name": "Agendamentos Site",
+      "name": "Site Appointments",
       "icon": "menu-icon icon-base ti tabler-calendar-star",
       "slug": "appointments.index"
     },
     {
       "url": "/calendar",
-      "name": "Calendário",
+      "name": "Calendar",
       "icon": "menu-icon icon-base ti tabler-calendar",
       "slug": "calendar"
     },
@@ -25,56 +25,56 @@
       "slug": "kanban"
     },
     {
-      "name": "Ordens de Serviço",
+      "name": "Service Orders",
       "icon": "menu-icon icon-base ti tabler-file",
       "slug": "ordens",
       "submenu": [
         {
           "url": "/ordens-servico",
-          "name": "Todas as OS",
+          "name": "All OS",
           "slug": "ordens-servico"
         },
         {
           "url": "/ordens-servico/create",
-          "name": "Criar OS",
+          "name": "Create OS",
           "slug": "ordens-servico.create"
         },
         {
           "url": "/ordens-servico/checklist",
-          "name": "Checklist de Entrada",
+          "name": "Entry Checklist",
           "slug": "ordens-servico.checklist"
         }
       ]
     },
     {
-      "name": "Orçamentos",
+      "name": "Budgets",
       "icon": "menu-icon icon-base ti tabler-file-dollar",
       "slug": "budgets",
       "submenu": [
         {
           "url": "/budgets/pending",
-          "name": "Aguardando aprovação",
+          "name": "Awaiting approval",
           "slug": "budgets.pending"
         },
         {
           "url": "/budgets/approved",
-          "name": "Aprovados",
+          "name": "Approved",
           "slug": "budgets.approved"
         },
         {
           "url": "/budgets/rejected",
-          "name": "Reprovados",
+          "name": "Rejected",
           "slug": "budgets.rejected"
         },
         {
           "url": "/budgets/send-whatsapp",
-          "name": "Enviar por WhatsApp",
+          "name": "Send via WhatsApp",
           "slug": "budgets.send-whatsapp"
         }
       ]
     },
     {
-      "name": "Clientes & Veículos",
+      "name": "Customers & Vehicles",
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": [
         "clients",
@@ -84,17 +84,17 @@
       "submenu": [
         {
           "url": "/clients",
-          "name": "Clientes",
+          "name": "Customers",
           "slug": "clients"
         },
         {
           "url": "/vehicles",
-          "name": "Veículos",
+          "name": "Vehicles",
           "slug": "vehicles"
         },
         {
           "url": "/vehicle-history",
-          "name": "Histórico do veículo",
+          "name": "Vehicle history",
           "slug": "vehicle-history"
         }
       ]
@@ -215,13 +215,13 @@
       ]
     },
     {
-      "name": "Relatórios",
+      "name": "Reports",
       "icon": "menu-icon icon-base ti tabler-chart-line",
       "slug": "reports",
       "submenu": [
         {
           "url": "/reports/profitability",
-          "name": "Lucratividade Real",
+          "name": "Real Profitability",
           "slug": "reports.profitability"
         },
         {

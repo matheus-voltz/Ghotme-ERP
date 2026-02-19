@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
@@ -27,7 +27,7 @@ export default function ProfileScreen() {
             if (!result.canceled) {
                 setUploading(true);
                 const formData = new FormData();
-                
+
                 // @ts-ignore
                 formData.append('photo', {
                     uri: result.assets[0].uri,
@@ -40,7 +40,6 @@ export default function ProfileScreen() {
                 });
 
                 if (response.data.success) {
-                    // Atualiza o estado global imediatamente
                     await updateUser(response.data.user || { profile_photo_url: response.data.profile_photo_url });
                     Alert.alert("Sucesso", "Foto de perfil atualizada!");
                 }
@@ -87,8 +86,47 @@ export default function ProfileScreen() {
                 {subtitle && <Text style={[styles.settingSubtitle, { color: colors.subText }]}>{subtitle}</Text>}
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.subText} />
-        </TouchableOpacity>
+        </TouchableOpacity >
     );
+
+    const [stats, setStats] = useState<any>(null);
+
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        try {
+            const response = await api.get('/dashboard/stats');
+            setStats(response.data);
+        } catch (error) {
+            console.log("Error fetching profile stats:", error);
+        }
+    };
+
+    const getCompletedToday = () => {
+        if (!stats) return 0;
+        return user?.role === 'admin'
+            ? (stats.osStats?.finalized_today || 0)
+            : (stats.stats?.completedToday || 0);
+    };
+
+    const getPending = () => {
+        if (!stats) return 0;
+        return user?.role === 'admin'
+            ? (stats.osStats?.pending || 0)
+            : (stats.stats?.pendingBudgets || 0);
+    };
+
+    const getEfficiency = () => {
+        if (!stats) return '0%';
+        if (user?.role === 'admin') {
+            return (stats.monthlyProfitability || 0) + '%';
+        }
+        // Para mecânicos, podemos calcular eficiência baseada em ordens finalizadas vs total?
+        // Por enquanto, vamos retornar um placeholder ou remover
+        return '-';
+    };
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -134,18 +172,18 @@ export default function ProfileScreen() {
 
                         <View style={styles.statsContainer}>
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>12</Text>
+                                <Text style={styles.statNumber}>{getCompletedToday()}</Text>
                                 <Text style={styles.statLabel}>Hoje</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>4</Text>
+                                <Text style={styles.statNumber}>{getPending()}</Text>
                                 <Text style={styles.statLabel}>Pendentes</Text>
                             </View>
                             <View style={styles.statDivider} />
                             <View style={styles.statItem}>
-                                <Text style={styles.statNumber}>85%</Text>
-                                <Text style={styles.statLabel}>Eficiência</Text>
+                                <Text style={styles.statNumber}>{getEfficiency()}</Text>
+                                <Text style={styles.statLabel}>{user?.role === 'admin' ? 'Lucratividade' : 'Eficiência'}</Text>
                             </View>
                         </View>
                     </View>

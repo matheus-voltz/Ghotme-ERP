@@ -4,29 +4,38 @@ use Illuminate\Support\Facades\Config;
 
 if (!function_exists('niche_translate')) {
     /**
-     * Traduz uma string baseada no nicho atual.
+     * Traduz uma string baseada no nicho atual e no idioma do sistema.
      */
     function niche_translate($string)
     {
+        // Se a string contiver os termos base, fazemos a substituição baseada no nicho
+        // O str_ireplace ignora maiúsculas/minúsculas
+        
+        $entities = niche('entities');
+        $entity = niche('entity');
+        $inventory = niche('inventory_items');
+
+        // Mapeamento de termos que devem ser trocados pelo termo do nicho
+        // Buscamos tanto em PT quanto em EN para garantir que a troca ocorra
         $search = [
-            'Clientes & Veículos', 'Clientes & Veiculos',
-            'Veículos', 'Veiculos', 'Veículo', 'Veiculo',
-            'veículos', 'veiculos', 'veículo', 'veiculo',
-            'Itens/Peças', 'Peças', 'Pecas',
-            'Histórico do veículo', 'Historico do veiculo',
-            'Dossiê do Veículo', 'Dossie do Veiculo'
+            'Clientes & Veículos', 'Clientes & Veiculos', 'Customers & Vehicles',
+            'Veículos', 'Veiculos', 'Vehicles',
+            'Veículo', 'Veiculo', 'Vehicle',
+            'Itens/Peças', 'Peças', 'Pecas', 'Items/Parts', 'Parts',
+            'Histórico do veículo', 'Vehicle history',
+            'Dossiê do Veículo', 'Vehicle dossier'
         ];
 
         $replace = [
-            'Clientes & ' . niche('entities'), 'Clientes & ' . niche('entities'),
-            niche('entities'), niche('entities'), niche('entity'), niche('entity'),
-            strtolower(niche('entities')), strtolower(niche('entities')), strtolower(niche('entity')), strtolower(niche('entity')),
-            niche('inventory_items'), niche('inventory_items'), niche('inventory_items'),
-            'Histórico do ' . strtolower(niche('entity')), 'Histórico do ' . strtolower(niche('entity')),
-            'Dossiê do ' . niche('entity'), 'Dossiê do ' . niche('entity')
+            __('Clientes') . ' & ' . $entities, __('Clientes') . ' & ' . $entities, __('Customers') . ' & ' . $entities,
+            $entities, $entities, $entities,
+            $entity, $entity, $entity,
+            $inventory, $inventory, $inventory, $inventory, $inventory,
+            __('Histórico do') . ' ' . strtolower($entity), __('Vehicle history'),
+            __('Dossiê do') . ' ' . $entity, __('Vehicle dossier')
         ];
 
-        return str_replace($search, $replace, $string);
+        return str_ireplace($search, $replace, $string);
     }
 }
 
