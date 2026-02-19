@@ -51,8 +51,8 @@ $configData = Helper::appClasses();
       <div class="card-body p-4 position-relative z-1">
         <div class="row align-items-center">
           <div class="col-md-8 col-12">
-            <h4 class="text-white mb-2 fw-bold">Bem-vindo de volta, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h4>
-            <p class="text-white mb-4 opacity-75">Sua oficina tem <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> ordens em execução agora.</p>
+            <h4 class="text-white mb-2 fw-bold">{{ __('Welcome back') }}, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h4>
+            <p class="text-white mb-4 opacity-75">{{ __('Your workshop has') }} <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> {{ __('orders running now.') }}</p>
 
             <div class="row g-3 mt-4">
               <div class="col-sm-6 col-auto">
@@ -64,7 +64,7 @@ $configData = Helper::appClasses();
                   </div>
                   <div class="d-flex flex-column">
                     <h4 class="mb-0 fw-bolder text-dark" style="color: #343a40 !important;">{{ $osStats['pending'] }}</h4>
-                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">Pendentes</span>
+                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">{{ __('Pending') }}</span>
                   </div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ $configData = Helper::appClasses();
                   </div>
                   <div class="d-flex flex-column">
                     <h4 class="mb-0 fw-bolder text-dark" style="color: #343a40 !important;">{{ $osStats['finalized_today'] }}</h4>
-                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">Concluídas Hoje</span>
+                    <span class="small text-uppercase fw-bold ls-1 text-secondary" style="font-size: 0.75rem; color: #6c757d !important;">{{ __('Completed Today') }}</span>
                   </div>
                 </div>
               </div>
@@ -101,7 +101,7 @@ $configData = Helper::appClasses();
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
-                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">Receita Mensal</span>
+                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">{{ __('Monthly Revenue') }}</span>
                 <h3 class="mb-0 fw-bold text-heading">R$ {{ number_format($revenueMonth, 2, ',', '.') }}</h3>
               </div>
               <div class="avatar avatar-md bg-label-success rounded p-1">
@@ -114,7 +114,7 @@ $configData = Helper::appClasses();
                 <i class="ti {{ $revenueGrowth >= 0 ? 'tabler-arrow-up' : 'tabler-arrow-down' }} fs-6 me-1"></i>
                 {{ number_format(abs($revenueGrowth), 1) }}%
               </span>
-              <small class="text-muted ms-1">vs mês passado</small>
+              <small class="text-muted ms-1">vs {{ __('last month') }}</small>
             </div>
             @endisset
           </div>
@@ -127,7 +127,7 @@ $configData = Helper::appClasses();
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
-                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">Taxa de Conversão</span>
+                <span class="text-muted fw-medium d-block mb-1 text-uppercase small ls-1">{{ __('Conversion Rate') }}</span>
                 <h3 class="mb-0 fw-bold text-heading">{{ round($conversionRate) }}%</h3>
               </div>
               <div class="avatar avatar-md bg-label-info rounded p-1">
@@ -137,7 +137,7 @@ $configData = Helper::appClasses();
             <div class="progress" style="height: 8px; border-radius: 4px;">
               <div class="progress-bar bg-info" role="progressbar" style="width:{{ $conversionRate }}%" aria-valuenow="{{ $conversionRate }}" aria-valuemin="0" aria-valuemax="100"></div>
             </div>
-            <small class="text-muted mt-2">Orçamentos aprovados no mês</small>
+            <small class="text-muted mt-2">{{ __('Approved budgets this month') }}</small>
           </div>
         </div>
       </div>
@@ -149,13 +149,13 @@ $configData = Helper::appClasses();
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
         <div>
-          <h5 class="card-title mb-0 fw-bold">Atividade Comercial</h5>
-          <small class="text-muted">Receitas, Despesas e Orçamentos</small>
+          <h5 class="card-title mb-0 fw-bold">{{ __('Business Activity') }}</h5>
+          <small class="text-muted">{{ __('Revenue, Expenses and Budgets') }}</small>
         </div>
         <div class="dropdown">
           <button class="btn p-0" type="button" data-bs-toggle="dropdown"><i class="ti tabler-dots-vertical fs-4 text-muted"></i></button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="javascript:void(0);">Relatórios Detalhados</a></li>
+            <li><a class="dropdown-item" href="javascript:void(0);">{{ __('Detailed Reports') }}</a></li>
           </ul>
         </div>
       </div>
@@ -172,7 +172,7 @@ $configData = Helper::appClasses();
       <div class="col-12">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-header py-3 bg-transparent border-bottom">
-            <h5 class="mb-0 fw-bold">Status das OS</h5>
+            <h5 class="mb-0 fw-bold">{{ __('OS Status') }}</h5>
           </div>
           <div class="card-body d-flex align-items-center justify-content-center p-2">
             <div class="w-100">
@@ -183,15 +183,15 @@ $configData = Helper::appClasses();
             <div class="d-flex justify-content-around text-center">
               <div>
                 <strong class="d-block text-warning h6 mb-0">{{ round(($osDistribution['pending'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">Pendente</span>
+                <span class="text-muted small">{{ __('Pending') }}</span>
               </div>
               <div>
                 <strong class="d-block text-info h6 mb-0">{{ round(($osDistribution['running'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">Execução</span>
+                <span class="text-muted small">{{ __('Running') }}</span>
               </div>
               <div>
                 <strong class="d-block text-success h6 mb-0">{{ round(($osDistribution['finalized'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">Finalizada</span>
+                <span class="text-muted small">{{ __('Finalized') }}</span>
               </div>
             </div>
           </div>
@@ -202,8 +202,8 @@ $configData = Helper::appClasses();
       <div class="col-12">
         <div class="card shadow-sm border-0 h-100">
           <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
-            <h5 class="mb-0 fw-bold">Lucratividade</h5>
-            <span class="badge bg-label-primary">Mês Atual</span>
+            <h5 class="mb-0 fw-bold">{{ __('Profitability') }}</h5>
+            <span class="badge bg-label-primary">{{ __('Current Month') }}</span>
           </div>
           <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
             <div id="profitabilityRadialChart"></div>
@@ -211,7 +211,7 @@ $configData = Helper::appClasses();
               <h2 class="mb-0 {{ $monthlyProfitability >= 0 ? 'text-success' : 'text-danger' }} fw-bolder">
                 {{ $monthlyProfitability >= 0 ? '+' : '' }}{{ number_format($monthlyProfitability, 1, ',', '.') }}%
               </h2>
-              <span class="text-muted fw-medium">Margem Líquida</span>
+              <span class="text-muted fw-medium">{{ __('Net Margin') }}</span>
             </div>
           </div>
         </div>
@@ -223,16 +223,16 @@ $configData = Helper::appClasses();
   <div class="col-xl-6 col-lg-12">
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">Últimas Ordens de Serviço</h5>
-        <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-primary">Ver Todas</a>
+        <h5 class="mb-0 fw-bold">{{ __('Recent Service Orders') }}</h5>
+        <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-primary">{{ __('View All') }}</a>
       </div>
       <div class="table-responsive text-nowrap">
         <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th class="ps-4 py-3 text-muted text-uppercase small fw-bold">OS / Cliente</th>
-              <th class="py-3 text-muted text-uppercase small fw-bold">Status</th>
-              <th class="text-end pe-4 py-3 text-muted text-uppercase small fw-bold">Valor</th>
+              <th class="ps-4 py-3 text-muted text-uppercase small fw-bold">{{ __('OS') }} / {{ __('Customer') }}</th>
+              <th class="py-3 text-muted text-uppercase small fw-bold">{{ __('Status') }}</th>
+              <th class="text-end pe-4 py-3 text-muted text-uppercase small fw-bold">{{ __('Value') }}</th>
             </tr>
           </thead>
           <tbody class="table-border-bottom-0">
@@ -251,18 +251,18 @@ $configData = Helper::appClasses();
                   </div>
                   <div class="d-flex flex-column">
                     <a href="{{ route('ordens-servico.edit', $os->id) }}" class="text-heading fw-bold mb-0">#{{ $os->id }} - {{ str($clientName)->limit(15) }}</a>
-                    <small class="text-muted">{{ $os->veiculo->model ?? 'Veículo não inf.' }}</small>
+                    <small class="text-muted">{{ $os->veiculo->model ?? niche('entity') . ' not inf.' }}</small>
                   </div>
                 </div>
               </td>
               <td>
                 @php
                 $statusConfig = [
-                'pending' => ['color' => 'warning', 'label' => 'Pendente', 'icon' => 'tabler-clock'],
-                'running' => ['color' => 'info', 'label' => 'Execução', 'icon' => 'tabler-tool'],
-                'in_progress' => ['color' => 'info', 'label' => 'Em Andamento', 'icon' => 'tabler-tool'],
-                'finalized' => ['color' => 'success', 'label' => 'Finalizada', 'icon' => 'tabler-circle-check'],
-                'paid' => ['color' => 'success', 'label' => 'Pago', 'icon' => 'tabler-currency-dollar']
+                'pending' => ['color' => 'warning', 'label' => __('Pending'), 'icon' => 'tabler-clock'],
+                'running' => ['color' => 'info', 'label' => __('Running'), 'icon' => 'tabler-tool'],
+                'in_progress' => ['color' => 'info', 'label' => __('In Progress'), 'icon' => 'tabler-tool'],
+                'finalized' => ['color' => 'success', 'label' => __('Finalized'), 'icon' => 'tabler-circle-check'],
+                'paid' => ['color' => 'success', 'label' => __('Paid'), 'icon' => 'tabler-currency-dollar']
                 ];
                 $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => __($os->status), 'icon' => 'tabler-help'];
                 @endphp
@@ -285,7 +285,7 @@ $configData = Helper::appClasses();
   <div class="col-xl-6 col-lg-12">
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">Top 5 Serviços (Receita)</h5>
+        <h5 class="mb-0 fw-bold">{{ __('Top 5 Services (Revenue)') }}</h5>
         <div class="avatar avatar-sm bg-label-success rounded">
           <i class="ti tabler-trending-up fs-4"></i>
         </div>
@@ -301,7 +301,7 @@ $configData = Helper::appClasses();
     <div class="card h-100 shadow-sm border-0 bg-label-secondary bg-opacity-25">
       <div class="card-header bg-transparent border-0 py-3 pb-0">
         <h5 class="mb-0 text-danger fw-bold d-flex align-items-center">
-          <i class="ti tabler-alert-triangle me-2"></i>Atenção Necessária
+          <i class="ti tabler-alert-triangle me-2"></i>{{ __('Attention Required') }}
         </h5>
       </div>
       <div class="card-body">
@@ -313,10 +313,10 @@ $configData = Helper::appClasses();
               </div>
               <div class="d-flex w-100 justify-content-between align-items-center">
                 <div>
-                  <h6 class="mb-1 fw-bold text-danger">Estoque Baixo</h6>
-                  <p class="mb-0 small text-muted">{{ $lowStockItems }} produtos abaixo do mínimo.</p>
+                  <h6 class="mb-1 fw-bold text-danger">{{ __('Low Stock') }}</h6>
+                  <p class="mb-0 small text-muted">{{ $lowStockItems }} {{ __('products below minimum.') }}</p>
                 </div>
-                <a href="{{ route('inventory.items') }}" class="btn btn-danger btn-sm px-3">Repor</a>
+                <a href="{{ route('inventory.items') }}" class="btn btn-danger btn-sm px-3">{{ __('Replenish') }}</a>
               </div>
             </div>
           </div>
@@ -327,10 +327,10 @@ $configData = Helper::appClasses();
               </div>
               <div class="d-flex w-100 justify-content-between align-items-center">
                 <div>
-                  <h6 class="mb-1 fw-bold text-warning">Orçamentos Pendentes</h6>
-                  <p class="mb-0 small text-muted">{{ $pendingBudgets }} aguardando aprovação.</p>
+                  <h6 class="mb-1 fw-bold text-warning">{{ __('Pending Budgets') }}</h6>
+                  <p class="mb-0 small text-muted">{{ $pendingBudgets }} {{ __('awaiting approval.') }}</p>
                 </div>
-                <a href="{{ route('budgets.pending') }}" class="btn btn-warning btn-sm px-3 text-white">Verificar</a>
+                <a href="{{ route('budgets.pending') }}" class="btn btn-warning btn-sm px-3 text-white">{{ __('Verify') }}</a>
               </div>
             </div>
           </div>

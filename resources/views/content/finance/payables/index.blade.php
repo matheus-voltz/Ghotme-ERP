@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Contas a Pagar')
+@section('title', __('Accounts payable'))
 
 @section('vendor-style')
 @vite([
@@ -50,19 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     targets: 5,
                     render: (data) => {
                         const colors = { pending: 'warning', paid: 'success', cancelled: 'danger' };
-                        const labels = { pending: 'Pendente', paid: 'Pago', cancelled: 'Cancelado' };
+                        const labels = {
+                            pending: "{{ __('Pending') }}",
+                            paid: "{{ __('Paid') }}",
+                            cancelled: "{{ __('Cancelled') }}"
+                        };
                         return `<span class="badge bg-label-${colors[data]}">${labels[data]}</span>`;
                     }
                 },
                 {
                     targets: 6,
-                    title: 'Ações',
+                    title: "{{ __('Actions') }}",
                     render: (data, type, full) => {
                         let html = '<div class="d-flex gap-2">';
                         if (full.status === 'pending') {
-                            html += `<button class="btn btn-sm btn-success mark-paid" data-id="${data}"><i class="ti tabler-check"></i></button>`;
+                            html += `<button class="btn btn-sm btn-success mark-paid" data-id="${data}" title="{{ __('Mark as Paid') }}"><i class="ti tabler-check"></i></button>`;
                         }
-                        html += `<button class="btn btn-sm btn-danger delete-record" data-id="${data}"><i class="ti tabler-trash"></i></button></div>`;
+                        html += `<button class="btn btn-sm btn-danger delete-record" data-id="${data}" title="{{ __('Delete') }}"><i class="ti tabler-trash"></i></button></div>`;
                         return html;
                     }
                 }
@@ -111,9 +115,9 @@ document.addEventListener('DOMContentLoaded', function() {
 @section('content')
 <div class="card">
   <div class="card-header border-bottom d-flex justify-content-between">
-    <h5 class="card-title mb-0">Contas a Pagar</h5>
+    <h5 class="card-title mb-0">{{ __('Accounts payable') }}</h5>
     <button class="btn btn-danger" data-bs-toggle="offcanvas" data-bs-target="#offcanvasTransaction">
-        <i class="ti tabler-plus me-1"></i> Novo Pagamento
+        <i class="ti tabler-plus me-1"></i> {{ __('Add') }}
     </button>
   </div>
   <div class="card-datatable table-responsive">
@@ -121,12 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
       <thead>
         <tr>
           <th>#</th>
-          <th>Descrição</th>
-          <th>Fornecedor</th>
-          <th>Valor</th>
-          <th>Vencimento</th>
-          <th>Status</th>
-          <th>Ações</th>
+          <th>{{ __('Description') }}</th>
+          <th>{{ __('Supplier') }}</th>
+          <th>{{ __('Value') }}</th>
+          <th>{{ __('Due Date') }}</th>
+          <th>{{ __('Status') }}</th>
+          <th>{{ __('Actions') }}</th>
         </tr>
       </thead>
     </table>
@@ -134,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasTransaction">
     <div class="offcanvas-header border-bottom">
-      <h5>Novo Lançamento de Despesa</h5>
+      <h5>{{ __('New Transaction') }}</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body mx-0 p-6 h-100">
@@ -142,36 +146,36 @@ document.addEventListener('DOMContentLoaded', function() {
         @csrf
         <input type="hidden" name="type" value="out">
         <div class="mb-4">
-          <label class="form-label">Descrição</label>
+          <label class="form-label">{{ __('Description') }}</label>
           <input type="text" name="description" class="form-control" placeholder="Ex: Aluguel, Compra de peças" required />
         </div>
         <div class="mb-4">
-          <label class="form-label">Valor (R$)</label>
+          <label class="form-label">{{ __('Value') }} (R$)</label>
           <input type="number" step="0.01" name="amount" class="form-control" required />
         </div>
         <div class="mb-4">
-          <label class="form-label">Data de Vencimento</label>
+          <label class="form-label">{{ __('Due Date') }}</label>
           <input type="text" name="due_date" class="form-control flatpickr" required />
         </div>
         <div class="mb-4">
-          <label class="form-label">Fornecedor</label>
+          <label class="form-label">{{ __('Supplier') }}</label>
           <select name="supplier_id" class="select2 form-select">
-            <option value="">Selecione...</option>
+            <option value="">{{ __('Select') }}...</option>
             @foreach($suppliers as $supplier)
               <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
             @endforeach
           </select>
         </div>
         <div class="mb-4">
-          <label class="form-label">Forma de Pagamento</label>
+          <label class="form-label">{{ __('Payment Method') }}</label>
           <select name="payment_method_id" class="select2 form-select">
-            <option value="">Selecione...</option>
+            <option value="">{{ __('Select') }}...</option>
             @foreach($paymentMethods as $method)
               <option value="{{ $method->id }}">{{ $method->name }}</option>
             @endforeach
           </select>
         </div>
-        <button type="submit" class="btn btn-danger w-100">Salvar Despesa</button>
+        <button type="submit" class="btn btn-danger w-100">{{ __('Save') }}</button>
       </form>
     </div>
   </div>

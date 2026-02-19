@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useChat } from '../../../context/ChatContext';
+import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ChatScreen() {
     const router = useRouter();
@@ -13,9 +15,12 @@ export default function ChatScreen() {
     const { user } = useAuth();
     const { colors } = useTheme();
     const { refreshUnreadCount } = useChat();
+    const insets = useSafeAreaInsets();
 
     const [messages, setMessages] = useState<any[]>([]);
     const [text, setText] = useState('');
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [sending, setSending] = useState(false);
     const flatListRef = useRef<FlatList>(null);
 
     useEffect(() => {
@@ -34,36 +39,98 @@ export default function ChatScreen() {
         }
     };
 
+    const pickImage = async () => {
+        try {
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 0.7,
+            });
+
+            if (!result.canceled) {
+                setSelectedImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert('Erro', 'Não foi possível selecionar a imagem.');
+        }
+    };
+
     const sendMessage = async () => {
-        if (!text.trim()) return;
+        if ((!text.trim() && !selectedImage) || sending) return;
+
+        setSending(true);
 
         const tempMsg = {
             id: Date.now(),
             sender_id: user.id,
             message: text,
+            attachment_path: selectedImage ? 'temp' : null, // Marker for UI
+            temp_image: selectedImage,
             created_at: new Date().toISOString()
         };
 
         setMessages(prev => [...prev, tempMsg]);
         setText('');
+        setSelectedImage(null);
 
         try {
-            await api.post('/chat/messages', { receiver_id: userId, message: tempMsg.message });
-            fetchMessages(); // Sincroniza ID real
+            const formData = new FormData();
+            formData.append('receiver_id', userId as string);
+            formData.append('message', text); // Send empty string if just image
+
+            if (selectedImage) {
+                const filename = selectedImage.split('/').pop() || 'image.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+                // @ts-ignore
+                formData.append('image', { uri: selectedImage, name: filename, type });
+            }
+
+            // We need to remove the 'Content-Type' header so axios/browser can set the boundary
+            // This is a bit tricky with configured instance. 
+            // In RN usually passing form data works.
+            await api.post('/chat/messages', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+            fetchMessages(); // Sincroniza ID real e imagem real
         } catch (error) {
             console.error("Erro ao enviar", error);
+            Alert.alert('Erro', 'Falha ao enviar mensagem.');
+        } finally {
+            setSending(false);
         }
     };
 
     const renderMessage = ({ item }: { item: any }) => {
         const isMe = item.sender_id === user.id;
+
+        // Resolve attachment URL
+        let attachmentUrl = null;
+        if (item.temp_image) {
+            attachmentUrl = item.temp_image;
+        } else if (item.attachment_path) {
+            attachmentUrl = `${api.defaults.baseURL?.replace('/api', '')}/storage/${item.attachment_path}`;
+        }
+
         return (
             <View style={[
                 styles.bubble,
                 isMe ? styles.bubbleMe : styles.bubbleOther,
                 { backgroundColor: isMe ? colors.primary : colors.card }
             ]}>
-                <Text style={[styles.msgText, { color: isMe ? '#fff' : colors.text }]}>{item.message}</Text>
+                {attachmentUrl && (
+                    <Image
+                        source={{ uri: attachmentUrl }}
+                        style={styles.messageImage}
+                        resizeMode="cover"
+                    />
+                )}
+                {!!item.message && (
+                    <Text style={[styles.msgText, { color: isMe ? '#fff' : colors.text }]}>{item.message}</Text>
+                )}
                 <Text style={[styles.timeText, { color: isMe ? 'rgba(255,255,255,0.7)' : colors.subText }]}>
                     {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Text>
@@ -73,10 +140,11 @@ export default function ChatScreen() {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
             style={[styles.container, { backgroundColor: colors.background }]}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
         >
-            <View style={[styles.header, { backgroundColor: colors.card }]}>
+            <View style={[styles.header, { backgroundColor: colors.card, paddingTop: insets.top + 10 }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
@@ -96,20 +164,50 @@ export default function ChatScreen() {
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderMessage}
                 contentContainerStyle={styles.list}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
             />
 
-            <View style={[styles.inputContainer, { backgroundColor: colors.card }]}>
-                <TextInput
-                    style={[styles.input, { color: colors.text, backgroundColor: colors.background }]}
-                    value={text}
-                    onChangeText={setText}
-                    placeholder="Digite sua mensagem..."
-                    placeholderTextColor={colors.subText}
-                />
-                <TouchableOpacity onPress={sendMessage} style={[styles.sendBtn, { backgroundColor: colors.primary }]}>
-                    <Ionicons name="send" size={20} color="#fff" />
-                </TouchableOpacity>
+            <View style={[styles.inputWrapper, { backgroundColor: colors.card, paddingBottom: insets.bottom + 10 }]}>
+                {selectedImage && (
+                    <View style={styles.previewContainer}>
+                        <Image source={{ uri: selectedImage }} style={styles.previewImage} />
+                        <TouchableOpacity style={styles.removePreviewBtn} onPress={() => setSelectedImage(null)}>
+                            <Ionicons name="close-circle" size={24} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+                )}
+
+                <View style={styles.inputRow}>
+                    <TouchableOpacity style={styles.iconBtn} onPress={pickImage}>
+                        <Ionicons name="images-outline" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.iconBtn} onPress={() => { /* Abre teclado emoji nativo? O input ja suporta. */ }}>
+                        <Ionicons name="happy-outline" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+
+                    <TextInput
+                        style={[styles.input, { color: colors.text, backgroundColor: colors.background }]}
+                        value={text}
+                        onChangeText={setText}
+                        placeholder="Digite sua mensagem..."
+                        placeholderTextColor={colors.subText}
+                        multiline
+                    />
+
+                    <TouchableOpacity
+                        onPress={sendMessage}
+                        style={[styles.sendBtn, { backgroundColor: colors.primary, opacity: (!text.trim() && !selectedImage) ? 0.5 : 1 }]}
+                        disabled={!text.trim() && !selectedImage}
+                    >
+                        {sending ? (
+                            <ActivityIndicator size="small" color="#fff" />
+                        ) : (
+                            <Ionicons name="send" size={20} color="#fff" />
+                        )}
+                    </TouchableOpacity>
+                </View>
             </View>
         </KeyboardAvoidingView>
     );
@@ -117,7 +215,7 @@ export default function ChatScreen() {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    header: { flexDirection: 'row', alignItems: 'center', paddingTop: 50, paddingBottom: 15, paddingHorizontal: 15, elevation: 4 },
+    header: { flexDirection: 'row', alignItems: 'center', paddingBottom: 15, paddingHorizontal: 15, elevation: 4 },
     backBtn: { marginRight: 10 },
     avatar: { width: 40, height: 40, borderRadius: 20, marginRight: 10 },
     avatarPlaceholder: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 10 },
@@ -129,7 +227,15 @@ const styles = StyleSheet.create({
     bubbleOther: { alignSelf: 'flex-start', borderBottomLeftRadius: 2 },
     msgText: { fontSize: 16 },
     timeText: { fontSize: 10, alignSelf: 'flex-end', marginTop: 4 },
-    inputContainer: { flexDirection: 'row', padding: 10, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#eee' },
-    input: { flex: 1, height: 45, borderRadius: 22, paddingHorizontal: 15, marginRight: 10 },
-    sendBtn: { width: 45, height: 45, borderRadius: 22.5, justifyContent: 'center', alignItems: 'center' }
+    messageImage: { width: 200, height: 150, borderRadius: 10, marginBottom: 5 },
+
+    inputWrapper: { borderTopWidth: 1, borderTopColor: '#eee' },
+    inputRow: { flexDirection: 'row', padding: 10, alignItems: 'center' },
+    input: { flex: 1, minHeight: 45, maxHeight: 100, borderRadius: 22, paddingHorizontal: 15, paddingVertical: 10, marginRight: 10 },
+    sendBtn: { width: 45, height: 45, borderRadius: 22.5, justifyContent: 'center', alignItems: 'center' },
+    iconBtn: { padding: 8, marginRight: 5 },
+
+    previewContainer: { padding: 10, flexDirection: 'row', alignItems: 'center' },
+    previewImage: { width: 80, height: 80, borderRadius: 10, marginRight: 10 },
+    removePreviewBtn: { position: 'absolute', top: 5, left: 80, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 12 }
 });

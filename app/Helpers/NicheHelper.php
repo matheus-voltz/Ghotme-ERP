@@ -23,7 +23,8 @@ if (!function_exists('niche_translate')) {
             'Veículo', 'Veiculo', 'Vehicle',
             'Itens/Peças', 'Peças', 'Pecas', 'Items/Parts', 'Parts',
             'Histórico do veículo', 'Vehicle history',
-            'Dossiê do Veículo', 'Vehicle dossier'
+            'Dossiê do Veículo', 'Vehicle dossier',
+            'Oficina', 'Workshop', 'Sua oficina'
         ];
 
         $replace = [
@@ -32,7 +33,8 @@ if (!function_exists('niche_translate')) {
             $entity, $entity, $entity,
             $inventory, $inventory, $inventory, $inventory, $inventory,
             __('Histórico do') . ' ' . strtolower($entity), __('Vehicle history'),
-            __('Dossiê do') . ' ' . $entity, __('Vehicle dossier')
+            __('Dossiê do') . ' ' . $entity, __('Vehicle dossier'),
+            __('Empresa'), __('Business'), __('Sua empresa')
         ];
 
         return str_ireplace($search, $replace, $string);
