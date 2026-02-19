@@ -39,7 +39,21 @@
             @isset($menu->icon)
               <i class="{{ $menu->icon }}"></i>
             @endisset
-            <div>{{ isset($menu->name) ? __($menu->name) : '' }}</div>
+            @php
+              $menuName = isset($menu->name) ? __($menu->name) : '';
+              // Dynamic Niche Translation (Robust)
+              $search = ['Veículos', 'Veículo', 'veículo', 'veículos', 'Itens/Peças', 'Peças'];
+              $replace = [
+                  niche('entities'), 
+                  niche('entity'), 
+                  strtolower(niche('entity')), 
+                  strtolower(niche('entities')),
+                  niche('inventory_items'),
+                  niche('inventory_items')
+              ];
+              $menuName = str_replace($search, $replace, $menuName);
+            @endphp
+            <div>{{ $menuName }}</div>
           </a>
 
           {{-- submenu --}}

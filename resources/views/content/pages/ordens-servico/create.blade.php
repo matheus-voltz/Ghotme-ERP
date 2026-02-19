@@ -32,7 +32,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Veículo</label>
+                            <label class="form-label">{{ niche('entity') }}</label>
                             <select name="veiculo_id" id="veiculo_id" class="select2 form-select" required disabled>
                                 <option value="">Selecione o Cliente Primeiro</option>
                             </select>
@@ -47,7 +47,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">KM na Entrada</label>
+                            <label class="form-label">{{ niche('metric') }} na Entrada</label>
                             <input type="number" name="km_entry" class="form-control" placeholder="0" />
                         </div>
                     </div>
@@ -92,7 +92,7 @@
             <!-- Peças -->
             <div class="card">
                 <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">Peças e Insumos</h5>
+                    <h5 class="card-title mb-0">{{ niche('inventory_items') }}</h5>
                 </div>
                 <div class="card-body pt-4">
                     <div class="table-responsive">
@@ -100,7 +100,7 @@
                             <thead>
                                 <tr>
                                     <th width="50">Add</th>
-                                    <th>Peça</th>
+                                    <th>Item</th>
                                     <th>Venda Un.</th>
                                     <th>Qtd</th>
                                 </tr>
@@ -154,15 +154,15 @@
             vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
 
             if (clientId) {
-                fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
+                fetch(`/api/get-vehicles/${clientId}`)
                     .then(res => {
                         if (!res.ok) throw new Error('Erro na resposta do servidor');
                         return res.json();
                     })
                     .then(data => {
-                        let html = '<option value="">Selecione o Veículo</option>';
+                        let html = '<option value="">Selecione o {{ niche("entity") }}</option>';
                         if (data.length === 0) {
-                            html = '<option value="">Nenhum veículo encontrado para este cliente</option>';
+                            html = '<option value="">Nenhum {{ niche("entity") }} encontrado para este cliente</option>';
                         } else {
                             data.forEach(v => {
                                 html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
@@ -171,9 +171,9 @@
                         vehicleSelect.html(html).prop('disabled', false);
                     })
                     .catch(err => {
-                        console.error('Erro ao buscar veículos:', err);
-                        vehicleSelect.html('<option value="">Erro ao carregar veículos</option>').prop('disabled', true);
-                        alert('Não foi possível carregar os veículos deste cliente. Verifique o console para mais detalhes.');
+                        console.error('Erro ao buscar {{ niche("entities") }}:', err);
+                        vehicleSelect.html('<option value="">Erro ao carregar</option>').prop('disabled', true);
+                        alert('Não foi possível carregar os {{ niche("entities") }}.');
                     });
             }
         });

@@ -25,7 +25,7 @@
                     <th>ID</th>
                     <th>Data</th>
                     <th>Cliente</th>
-                    <th>Veículo</th>
+                    <th>{{ niche('entity') }}</th>
                     <th>Status</th>
                     <th>Total (R$)</th>
                     <th>Ações</th>

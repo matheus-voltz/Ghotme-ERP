@@ -31,7 +31,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Data/Hora</th>
-                                <th>Cliente / Veículo</th>
+                                <th>Cliente / {{ niche('entity') }}</th>
                                 <th>Serviço Solicitado</th>
                                 <th>Ações Rápidas</th>
                             </tr>

@@ -40,9 +40,9 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Veículo</label>
+                            <label class="form-label">{{ niche('entity') }}</label>
                             <select name="veiculo_id" id="veiculo_id" class="select2 form-select" required>
-                                <option value="">Selecione o Veículo</option>
+                                <option value="">Selecione o {{ niche('entity') }}</option>
                                 @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}" {{ $order->veiculo_id == $vehicle->id ? 'selected' : '' }}>
                                     {{ $vehicle->placa }} - {{ $vehicle->modelo }}
@@ -65,7 +65,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">KM na Entrada</label>
+                            <label class="form-label">{{ niche('metric') }} na Entrada</label>
                             <input type="number" name="km_entry" class="form-control" value="{{ $order->km_entry }}" />
                         </div>
                     </div>

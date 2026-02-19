@@ -2,6 +2,34 @@
 
 use Illuminate\Support\Facades\Config;
 
+if (!function_exists('niche_translate')) {
+    /**
+     * Traduz uma string baseada no nicho atual.
+     */
+    function niche_translate($string)
+    {
+        $search = [
+            'Clientes & Veículos', 'Clientes & Veiculos',
+            'Veículos', 'Veiculos', 'Veículo', 'Veiculo',
+            'veículos', 'veiculos', 'veículo', 'veiculo',
+            'Itens/Peças', 'Peças', 'Pecas',
+            'Histórico do veículo', 'Historico do veiculo',
+            'Dossiê do Veículo', 'Dossie do Veiculo'
+        ];
+
+        $replace = [
+            'Clientes & ' . niche('entities'), 'Clientes & ' . niche('entities'),
+            niche('entities'), niche('entities'), niche('entity'), niche('entity'),
+            strtolower(niche('entities')), strtolower(niche('entities')), strtolower(niche('entity')), strtolower(niche('entity')),
+            niche('inventory_items'), niche('inventory_items'), niche('inventory_items'),
+            'Histórico do ' . strtolower(niche('entity')), 'Histórico do ' . strtolower(niche('entity')),
+            'Dossiê do ' . niche('entity'), 'Dossiê do ' . niche('entity')
+        ];
+
+        return str_replace($search, $replace, $string);
+    }
+}
+
 if (!function_exists('niche')) {
     /**
      * Get the current niche configuration.

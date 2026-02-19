@@ -2,28 +2,15 @@
 
 @section('title', 'Painel do Mecânico')
 
-@php
-$niche = auth()->user()->niche ?? 'workshop';
-$portalName = 'Oficina';
-$itemTerm = 'Veículo';
-$itemIcon = 'ti tabler-car';
+@extends('layouts/contentNavbarLayout')
 
-if ($niche === 'pet_shop') {
-$portalName = 'Pet Shop';
-$itemTerm = 'Pet';
-$itemIcon = 'ti tabler-dog';
-} elseif ($niche === 'tech_assistance') {
-$portalName = 'Assistência';
-$itemTerm = 'Dispositivo';
-$itemIcon = 'ti tabler-device-mobile';
-}
-@endphp
+@section('title', 'Painel do Técnico')
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="row align-items-center mb-4">
         <div class="col">
-            <h4 class="fw-bold py-3 mb-0"><span class="text-muted fw-light">{{ $portalName }} /</span> Meus Serviços</h4>
+            <h4 class="fw-bold py-3 mb-0"><span class="text-muted fw-light">Operacional /</span> Meus Serviços</h4>
         </div>
         <div class="col-auto">
             <span class="badge bg-label-primary rounded-pill">{{ count($orders) }} Ativos</span>
@@ -83,7 +70,7 @@ $itemIcon = 'ti tabler-device-mobile';
                 case 'approved': $statusClass = 'bg-label-success'; $statusText = 'Aprovado'; break;
                 case 'in_progress': $statusClass = 'bg-label-primary'; $statusText = 'Em Andamento'; break;
                 case 'testing': $statusClass = 'bg-label-info'; $statusText = 'Em Teste'; break;
-                case 'cleaning': $statusClass = 'bg-label-warning'; $statusText = ($niche == 'pet_shop' ? 'Banho/Tosa' : 'Limpeza'); break;
+                case 'cleaning': $statusClass = 'bg-label-warning'; $statusText = (niche('current') == 'pet' ? 'Banho/Tosa' : 'Limpeza'); break;
                 }
                 @endphp
                 <span class="badge {{ $statusClass }} rounded-pill px-3 py-2">{{ $statusText }}</span>
@@ -91,10 +78,10 @@ $itemIcon = 'ti tabler-device-mobile';
 
             <div class="d-flex align-items-center mb-4 p-3 bg-label-secondary rounded-3">
                 <div class="avatar avatar-md me-3">
-                    <span class="avatar-initial rounded-circle bg-white text-secondary"><i class="{{ $itemIcon }} fs-4"></i></span>
+                    <span class="avatar-initial rounded-circle bg-white text-secondary"><i class="ti {{ niche_config('icons.entity') }} fs-4"></i></span>
                 </div>
                 <div>
-                    <h6 class="mb-0 text-dark">{{ $order->veiculo->modelo ?? $itemTerm . ' não informado' }}</h6>
+                    <h6 class="mb-0 text-dark">{{ $order->veiculo->modelo ?? niche('entity') . ' não informado' }}</h6>
                     <small class="text-muted">{{ $order->veiculo->placa ?? '' }}</small>
                 </div>
             </div>

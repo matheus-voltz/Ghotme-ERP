@@ -2,7 +2,7 @@
     <ul class="nav nav-pills mb-3" role="tablist">
         <li class="nav-item">
             <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-details" aria-controls="navs-details" aria-selected="true">
-                <i class="ti tabler-car me-1"></i> Detalhes
+                <i class="ti {{ niche_config('icons.entity') }} me-1"></i> Detalhes
             </button>
         </li>
         <li class="nav-item">
@@ -35,20 +35,20 @@
                             <span>{{ $vehicle->client->name ?? $vehicle->client->company_name }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span><strong>Ano:</strong></span>
+                            <span><strong>{{ niche('year') }}:</strong></span>
                             <span>{{ $vehicle->ano_fabricacao }}/{{ $vehicle->ano_modelo }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span><strong>Cor:</strong></span>
+                            <span><strong>{{ niche('color') }}:</strong></span>
                             <span>{{ $vehicle->cor ?? 'N/A' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span><strong>Renavam:</strong></span>
+                            <span><strong>{{ niche('secondary_identifier') }}:</strong></span>
                             <span>{{ $vehicle->renavan ?? 'N/A' }}</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span><strong>KM Atual:</strong></span>
-                            <span>{{ number_format($vehicle->km_atual ?? 0, 0, ',', '.') }} km</span>
+                            <span><strong>{{ niche('metric') }} Atual:</strong></span>
+                            <span>{{ number_format($vehicle->km_atual ?? 0, 0, ',', '.') }} {{ niche('metric_unit') }}</span>
                         </li>
                     </ul>
                 </div>
@@ -107,7 +107,7 @@
                         @endif
 
                         <div class="d-flex justify-content-between align-items-center mt-2">
-                            <span class="badge bg-label-secondary">KM: {{ number_format($item->km ?? 0, 0, ',', '.') }}</span>
+                            <span class="badge bg-label-secondary">{{ niche('metric') }}: {{ number_format($item->km ?? 0, 0, ',', '.') }}</span>
                             @if($item->cost)
                             <span class="fw-bold text-heading">Total: R$ {{ number_format($item->cost, 2, ',', '.') }}</span>
                             @elseif($item->ordemServico)
@@ -121,7 +121,7 @@
             @else
             <div class="text-center py-5">
                 <i class="ti tabler-clipboard-list display-1 text-muted mb-3"></i>
-                <p>Nenhum histórico de serviços encontrado para este veículo.</p>
+                <p>Nenhum histórico de serviços encontrado para este {{ niche('entity') }}.</p>
             </div>
             @endif
         </div>

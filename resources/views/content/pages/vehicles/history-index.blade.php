@@ -65,7 +65,7 @@
             <div class="card-body">
                 <div class="row align-items-end">
                     <div class="col-md-8">
-                        <label class="form-label" for="vehicle-search">Buscar Veículo (Placa ou Chassi)</label>
+                        <label class="form-label" for="vehicle-search">Buscar {{ niche('entity') }} ({{ niche('identifier') }} ou Chassi)</label>
                         <select id="vehicle-search" class="select2 form-select"></select>
                     </div>
                     <div class="col-md-4 mt-md-0 mt-4">
@@ -85,7 +85,7 @@
                 <div class="user-avatar-section mb-6">
                     <div class="d-flex align-items-center flex-column">
                         <div class="bg-label-primary p-4 rounded mb-4">
-                            <i class="ti tabler-car icon-32px"></i>
+                            <i class="ti {{ niche_config('icons.entity') }} icon-32px"></i>
                         </div>
                         <div class="user-info text-center">
                             <h4 id="info-plate">---</h4>
@@ -97,10 +97,10 @@
                 <div class="info-container">
                     <ul class="list-unstyled mb-6">
                         <li class="mb-2"><span class="fw-medium me-2">Dono:</span> <span id="info-owner">---</span></li>
-                        <li class="mb-2"><span class="fw-medium me-2">KM Atual:</span> <span id="info-km">---</span></li>
+                        <li class="mb-2"><span class="fw-medium me-2">{{ niche('metric') }} Atual:</span> <span id="info-km">---</span></li>
                         <li class="mb-2"><span class="fw-medium me-2">Chassi:</span> <span id="info-chassis" class="text-break">---</span></li>
-                        <li class="mb-2"><span class="fw-medium me-2">Cor:</span> <span id="info-color">---</span></li>
-                        <li class="mb-2"><span class="fw-medium me-2">Ano:</span> <span id="info-year">---</span></li>
+                        <li class="mb-2"><span class="fw-medium me-2">{{ niche('color') }}:</span> <span id="info-color">---</span></li>
+                        <li class="mb-2"><span class="fw-medium me-2">{{ niche('year') }}:</span> <span id="info-year">---</span></li>
                     </ul>
                 </div>
             </div>
@@ -116,7 +116,7 @@
             <div class="card-body">
                 <div id="vehicle-timeline" class="timeline">
                     <!-- Dinâmico via JS -->
-                    <p class="text-center text-muted py-10">Selecione um veículo para ver o histórico.</p>
+                    <p class="text-center text-muted py-10">Selecione um {{ strtolower(niche('entity')) }} para ver o histórico.</p>
                 </div>
             </div>
         </div>
@@ -145,7 +145,7 @@
                             <input type="text" name="date" class="form-control flatpickr" placeholder="YYYY-MM-DD" required>
                         </div>
                         <div class="col-6">
-                            <label class="form-label">KM no momento</label>
+                            <label class="form-label">{{ niche('metric') }} no momento</label>
                             <input type="number" name="km" class="form-control" placeholder="0" required>
                         </div>
                     </div>

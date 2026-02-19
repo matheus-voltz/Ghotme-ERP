@@ -49,7 +49,7 @@
           <th>Nome</th>
           <th>Documento</th>
           <th>Email</th>
-          <th>Veículos</th>
+          <th>{{ niche('entities') }}</th>
           <th>Ações</th>
         </tr>
       </thead>
@@ -147,14 +147,14 @@
 
         <hr class="my-4">
         <div id="existingVehiclesSection" class="mb-4 d-none">
-            <h6 class="mb-2"><i class="ti tabler-car-garage me-1"></i> Veículos do Cliente</h6>
+            <h6 class="mb-2"><i class="ti tabler-home-heart me-1"></i> {{ niche('entities') }} do Cliente</h6>
             <div id="existingVehiclesList" class="list-group list-group-flush mb-3 border rounded">
                 <!-- Preenchido via JS -->
             </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h6 class="mb-0" id="vehicleFormTitle"><i class="ti tabler-car me-1"></i> Dados do Veículo</h6>
+            <h6 class="mb-0" id="vehicleFormTitle"><i class="ti {{ niche_config('icons.entity', 'tabler-car') }} me-1"></i> Dados do {{ niche('entity') }}</h6>
             <a href="javascript:void(0)" id="btnToggleVehicle" class="btn btn-sm btn-label-primary d-none">
                 <i class="ti tabler-plus me-1"></i> Adicionar Mais
             </a>
@@ -163,16 +163,16 @@
         <div id="vehicleFieldsContainer">
             <div class="row">
                 <div class="col-md-6 mb-4">
-                    <label class="form-label text-primary">Placa</label>
-                    <input type="text" name="veiculo_placa" class="form-control" placeholder="ABC-1234" />
+                    <label class="form-label text-primary">{{ niche('identifier') }}</label>
+                    <input type="text" name="veiculo_placa" class="form-control" />
                 </div>
                 <div class="col-md-6 mb-4">
-                    <label class="form-label">Marca</label>
-                    <input type="text" name="veiculo_marca" class="form-control" placeholder="Ex: Toyota" />
+                    <label class="form-label">{{ niche('brand') }}</label>
+                    <input type="text" name="veiculo_marca" class="form-control" />
                 </div>
                 <div class="col-md-12 mb-4">
-                    <label class="form-label">Modelo</label>
-                    <input type="text" name="veiculo_modelo" class="form-control" placeholder="Ex: Corolla" />
+                    <label class="form-label">{{ niche('model') }}</label>
+                    <input type="text" name="veiculo_modelo" class="form-control" />
                 </div>
             </div>
         </div>

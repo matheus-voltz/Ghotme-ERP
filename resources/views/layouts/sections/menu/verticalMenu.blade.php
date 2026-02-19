@@ -69,15 +69,7 @@ $configData = Helper::appClasses();
         @endisset
         @php
         $menuName = isset($menu->name) ? __($menu->name) : '';
-
-        // Dynamic Niche Translation
-        $menuName = str_replace('Veículos', niche('entities'), $menuName);
-        $menuName = str_replace('veículo', strtolower(niche('entity')), $menuName);
-        $menuName = str_replace('Veículo', niche('entity'), $menuName);
-
-        if ($menuName === 'Itens/Peças') {
-        $menuName = niche('inventory_items');
-        }
+        $menuName = niche_translate($menuName);
         @endphp
         <div>{{ $menuName }}</div>
         @isset($menu->badge)

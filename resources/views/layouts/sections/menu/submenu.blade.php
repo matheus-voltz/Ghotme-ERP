@@ -36,7 +36,11 @@ use Illuminate\Support\Facades\Route;
           @if (isset($submenu->icon))
           <i class="{{ $submenu->icon }}"></i>
           @endif
-          <div>{{ isset($submenu->name) ? __($submenu->name) : '' }}</div>
+          @php
+            $submenuName = isset($submenu->name) ? __($submenu->name) : '';
+            $submenuName = niche_translate($submenuName);
+          @endphp
+          <div>{{ $submenuName }}</div>
           @isset($submenu->badge)
             <div class="badge bg-{{ $submenu->badge[0] }} rounded-pill ms-auto">{{ $submenu->badge[1] }}</div>
           @endisset
