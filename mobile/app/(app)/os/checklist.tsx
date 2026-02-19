@@ -180,7 +180,7 @@ export default function ChecklistVisual() {
           )}
         </View>
         <Text style={[styles.subtitle, { color: colors.subText }]}>OS: #{osId || 'N/A'}</Text>
-        <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do veículo para registrar avarias</Text>
+        <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do {labels.entity.toLowerCase()} para registrar avarias</Text>
       </View>
 
       <View style={styles.carWrapper}>

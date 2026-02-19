@@ -13,6 +13,8 @@ import {
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
+import { useNiche } from '../../../context/NicheContext';
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -47,7 +49,17 @@ const numberFormat = (value: any) => {
 export default function DashboardScreen() {
   const { user } = useAuth();
   const { colors, activeTheme } = useTheme();
+  const { labels, niche } = useNiche();
   const [data, setData] = useState<any>(null);
+
+  const getEstablishmentName = () => {
+    switch (niche) {
+      case 'pet': return 'do Pet Shop';
+      case 'beauty_clinic': return 'da Clínica';
+      case 'electronics': return 'da Assistência';
+      default: return 'da Oficina';
+    }
+  };
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -110,14 +122,14 @@ export default function DashboardScreen() {
           <View style={[styles.statCard, { borderLeftColor: '#FF9F43', backgroundColor: colors.card }]}>
             <Text style={[styles.statLabel, { color: colors.subText }]}>Novos Clientes</Text>
             <Text style={[styles.statValue, { color: colors.text }]}>{data.totalClients || 0}</Text>
-            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Base ativa na oficina</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Base ativa {getEstablishmentName().replace('do ', 'no ').replace('da ', 'na ')}</Text>
           </View>
         </ScrollView>
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
-          <TouchableOpacity 
-            style={[styles.statusBox, { backgroundColor: colors.card }]} 
+          <TouchableOpacity
+            style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } })}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
@@ -127,7 +139,7 @@ export default function DashboardScreen() {
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } })}
           >
@@ -138,7 +150,7 @@ export default function DashboardScreen() {
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } })}
           >
@@ -180,7 +192,7 @@ export default function DashboardScreen() {
       <View style={styles.adminStatsContainer}>
         {/* Mechanic Summary Cards */}
         <View style={styles.statusGrid}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Minhas Ordens' } })}
           >
@@ -191,7 +203,7 @@ export default function DashboardScreen() {
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Minhas Prontas' } })}
           >
@@ -202,7 +214,7 @@ export default function DashboardScreen() {
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Prontas Hoje</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Orçamentos' } })}
           >
@@ -284,7 +296,7 @@ export default function DashboardScreen() {
           <View>
             <Text style={styles.welcomeText}>Olá, {user?.name || 'Bem-vindo'}</Text>
             <Text style={styles.subtitleText}>
-              {user?.role === 'admin' ? 'Resumo da oficina hoje' : 'Seu portal de trabalho'}
+              {user?.role === 'admin' ? `Resumo ${getEstablishmentName()} hoje` : 'Seu portal de trabalho'}
             </Text>
           </View>
           <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>

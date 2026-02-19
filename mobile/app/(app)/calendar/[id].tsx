@@ -5,6 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../../context/ThemeContext';
 
+import api from '../../../services/api';
+
 export default function EventDetailsScreen() {
     const router = useRouter();
     const { colors } = useTheme();
@@ -24,10 +26,11 @@ export default function EventDetailsScreen() {
                     style: "destructive",
                     onPress: async () => {
                         try {
-                            // api.delete(`/calendar/events/${id}`);
+                            await api.delete(`/calendar/events/${id}`);
                             Alert.alert("Sucesso", "Agendamento removido.");
                             router.back();
                         } catch (e) {
+                            console.error("Erro ao excluir:", e);
                             Alert.alert("Erro", "Falha ao excluir.");
                         }
                     }

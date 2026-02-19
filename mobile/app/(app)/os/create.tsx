@@ -9,12 +9,17 @@ import { useTheme } from '../../../context/ThemeContext';
 // IMPORTANT: Install @react-native-picker/picker if not already installed
 // expo install @react-native-picker/picker
 
+import { useNiche } from '../../../context/NicheContext';
+
+// ...
+
 export default function CreateOrderScreen() {
     const router = useRouter();
     const { colors } = useTheme();
+    const { labels, niche } = useNiche();
 
     const [loading, setLoading] = useState(false);
-    const [vehiclesLoading, setVehiclesLoading] = useState(false); // Novo estado
+    const [vehiclesLoading, setVehiclesLoading] = useState(false);
     const [clients, setClients] = useState<any[]>([]);
     const [vehicles, setVehicles] = useState<any[]>([]);
 
@@ -53,11 +58,9 @@ export default function CreateOrderScreen() {
         try {
             console.log("Buscando veículos para cliente ID:", cid);
             const response = await api.get(`/clients/${cid}/vehicles`);
-            console.log("Resposta do servidor (veículos):", response.data);
 
             if (Array.isArray(response.data)) {
                 setVehicles(response.data);
-                // Se só houver um veículo, já seleciona ele automaticamente
                 if (response.data.length === 1) {
                     setVehicleId(response.data[0].id.toString());
                 }
@@ -171,12 +174,10 @@ export default function CreateOrderScreen() {
                             <Ionicons name="chevron-down" size={20} color={colors.subText} style={{ position: 'absolute', right: 15 }} />
                         </TouchableOpacity>
                     </View>
-
-                    {/* Veículo */}
                     <View style={styles.inputGroup}>
                         <View style={styles.labelRow}>
-                            <Ionicons name="car-sport-outline" size={16} color={colors.subText} />
-                            <Text style={[styles.label, { color: colors.subText }]}>Veículo *</Text>
+                            <Ionicons name={niche === 'pet' ? "paw-outline" : (niche === 'electronics' ? "laptop-outline" : "car-sport-outline")} size={16} color={colors.subText} />
+                            <Text style={[styles.label, { color: colors.subText }]}>{labels.entity} *</Text>
                         </View>
                         <View style={[styles.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, opacity: (clientId && !vehiclesLoading) ? 1 : 0.6 }]}>
                             <Picker
@@ -185,10 +186,10 @@ export default function CreateOrderScreen() {
                                 enabled={clientId !== '' && !vehiclesLoading}
                                 dropdownIconColor={colors.text}
                             >
-                                <Picker.Item 
-                                    label={vehiclesLoading ? "Carregando veículos..." : (clientId ? "Selecione o Veículo" : "Selecione o Cliente Primeiro")} 
-                                    value="" 
-                                    color={colors.subText} 
+                                <Picker.Item
+                                    label={vehiclesLoading ? `Carregando ${labels.entities.toLowerCase()}...` : (clientId ? `Selecione o ${labels.entity}` : "Selecione o Cliente Primeiro")}
+                                    value=""
+                                    color={colors.subText}
                                 />
                                 {vehicles.map((v) => (
                                     <Picker.Item
@@ -273,20 +274,20 @@ export default function CreateOrderScreen() {
                             />
                         </View>
                     </View>
-                </View>
+                </View >
 
                 {/* Info Box */}
-                <View style={[styles.infoBox, { backgroundColor: colors.primary + '15' }]}>
+                < View style={[styles.infoBox, { backgroundColor: colors.primary + '15' }]} >
                     <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
                     <Text style={[styles.infoText, { color: colors.text }]}>
                         A adição de serviços e peças poderá ser feita na tela de detalhes da OS após a criação.
                     </Text>
-                </View>
+                </View >
 
-            </ScrollView>
+            </ScrollView >
 
             {/* Fixed Bottom Action Bar */}
-            <View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
+            < View style={[styles.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]} >
                 <TouchableOpacity
                     style={[styles.submitButton, { backgroundColor: colors.primary, opacity: loading ? 0.7 : 1 }]}
                     onPress={handleSubmit}
@@ -301,52 +302,54 @@ export default function CreateOrderScreen() {
                         </>
                     )}
                 </TouchableOpacity>
-            </View>
+            </View >
 
             {/* Client Search Modal */}
-            {showClientModal && (
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20, zIndex: 100 }]}>
-                    <View style={{ backgroundColor: colors.card, borderRadius: 16, height: '80%', padding: 20 }}>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Selecionar Cliente</Text>
-                            <TouchableOpacity onPress={() => setShowClientModal(false)}>
-                                <Ionicons name="close" size={24} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
+            {
+                showClientModal && (
+                    <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20, zIndex: 100 }]}>
+                        <View style={{ backgroundColor: colors.card, borderRadius: 16, height: '80%', padding: 20 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Selecionar Cliente</Text>
+                                <TouchableOpacity onPress={() => setShowClientModal(false)}>
+                                    <Ionicons name="close" size={24} color={colors.text} />
+                                </TouchableOpacity>
+                            </View>
 
-                        <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.background, borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, borderWidth: 1, borderColor: colors.border }}>
-                            <Ionicons name="search" size={20} color={colors.subText} />
-                            <TextInput
-                                style={{ flex: 1, padding: 12, fontSize: 16, color: colors.text }}
-                                placeholder="Buscar cliente..."
-                                placeholderTextColor={colors.subText}
-                                value={clientSearch}
-                                onChangeText={setClientSearch}
-                                autoFocus
+                            <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.background, borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, borderWidth: 1, borderColor: colors.border }}>
+                                <Ionicons name="search" size={20} color={colors.subText} />
+                                <TextInput
+                                    style={{ flex: 1, padding: 12, fontSize: 16, color: colors.text }}
+                                    placeholder="Buscar cliente..."
+                                    placeholderTextColor={colors.subText}
+                                    value={clientSearch}
+                                    onChangeText={setClientSearch}
+                                    autoFocus
+                                />
+                            </View>
+
+                            <FlatList
+                                data={filteredClients}
+                                keyExtractor={item => item.id.toString()}
+                                showsVerticalScrollIndicator={false}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity
+                                        style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: colors.border }}
+                                        onPress={() => handleSelectClient(item)}
+                                    >
+                                        <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{item.name || item.company_name}</Text>
+                                        <Text style={{ fontSize: 14, color: colors.subText }}>ID: {item.id}</Text>
+                                    </TouchableOpacity>
+                                )}
+                                ListEmptyComponent={
+                                    <Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum cliente encontrado.</Text>
+                                }
                             />
                         </View>
-
-                        <FlatList
-                            data={filteredClients}
-                            keyExtractor={item => item.id.toString()}
-                            showsVerticalScrollIndicator={false}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity
-                                    style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: colors.border }}
-                                    onPress={() => handleSelectClient(item)}
-                                >
-                                    <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{item.name || item.company_name}</Text>
-                                    <Text style={{ fontSize: 14, color: colors.subText }}>ID: {item.id}</Text>
-                                </TouchableOpacity>
-                            )}
-                            ListEmptyComponent={
-                                <Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum cliente encontrado.</Text>
-                            }
-                        />
                     </View>
-                </View>
-            )}
-        </KeyboardAvoidingView>
+                )
+            }
+        </KeyboardAvoidingView >
     );
 }
 

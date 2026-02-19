@@ -16,9 +16,21 @@ LocaleConfig.locales['pt-br'] = {
 };
 LocaleConfig.defaultLocale = 'pt-br';
 
+import { useNiche } from '../../../context/NicheContext';
+
 export default function CalendarScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const { niche } = useNiche();
+
+  const getTitle = () => {
+    switch (niche) {
+      case 'pet': return 'Agenda do Pet Shop';
+      case 'beauty_clinic': return 'Agenda da Clínica';
+      case 'electronics': return 'Agenda da Assistência';
+      default: return 'Agenda da Oficina';
+    }
+  };
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);

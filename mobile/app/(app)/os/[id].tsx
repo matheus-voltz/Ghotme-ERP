@@ -37,7 +37,7 @@ const getStatusColor = (status: string) => {
 export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
     const { colors } = useTheme();
-    const { labels } = useNiche();
+    const { labels, niche } = useNiche();
     const [os, setOs] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -116,13 +116,13 @@ export default function OSDetailScreen() {
             "Deseja concluir este serviço e notificar o cliente?",
             [
                 { text: "Cancelar", style: "cancel" },
-                { 
-                    text: "Sim, Notificar WhatsApp", 
-                    onPress: () => processFinalization(true) 
+                {
+                    text: "Sim, Notificar WhatsApp",
+                    onPress: () => processFinalization(true)
                 },
-                { 
-                    text: "Apenas Finalizar", 
-                    onPress: () => processFinalization(false) 
+                {
+                    text: "Apenas Finalizar",
+                    onPress: () => processFinalization(false)
                 }
             ]
         );
@@ -136,8 +136,11 @@ export default function OSDetailScreen() {
 
             if (notify) {
                 const phone = os.client?.whatsapp || os.client?.phone;
-                const message = `Olá ${os.client?.name || 'Cliente'}! 🚗\nSeu ${labels.entity.toLowerCase()} ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto na oficina Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
-                
+                const emoji = niche === 'pet' ? '🐾' : (niche === 'electronics' ? '💻' : '🚗');
+                const establishment = niche === 'pet' ? 'Pet Shop' : (niche === 'beauty_clinic' ? 'Clínica' : 'Oficina');
+
+                const message = `Olá ${os.client?.name || 'Cliente'}! ${emoji}\nSeu ${labels.entity.toLowerCase()} ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto no ${establishment} Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
+
                 if (phone) {
                     const cleanPhone = phone.replace(/\D/g, '');
                     const url = `whatsapp://send?phone=55${cleanPhone}&text=${encodeURIComponent(message)}`;
@@ -194,14 +197,14 @@ export default function OSDetailScreen() {
                         return (
                             <View key={step} style={styles.stepWrapper}>
                                 <View style={[
-                                    styles.stepDot, 
+                                    styles.stepDot,
                                     isActive && { backgroundColor: '#7367F0', borderColor: '#7367F0' },
                                     isCurrent && { borderWidth: 4, borderColor: '#CE9FFC' }
                                 ]}>
                                     {isActive && <Ionicons name="checkmark" size={12} color="#fff" />}
                                 </View>
                                 <Text style={[
-                                    styles.stepLabel, 
+                                    styles.stepLabel,
                                     isActive && { color: '#7367F0', fontWeight: 'bold' }
                                 ]}>{labels[index]}</Text>
                             </View>
@@ -243,12 +246,22 @@ export default function OSDetailScreen() {
                 {/* Vehicle Info */}
                 <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="car" size={20} color={colors.primary} />
+                        <Ionicons name={niche === 'pet' ? "paw" : (niche === 'electronics' ? "laptop" : "car")} size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.entity}</Text>
                     </View>
                     <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
-                    <View style={[styles.plateBadge, { borderColor: colors.border, backgroundColor: colors.background }]}>
-                        <Text style={[styles.plateText, { color: colors.text }]}>{os.veiculo?.placa}</Text>
+
+                    {/* Identifier Badge (Plate/Serial/Name) */}
+                    <View style={[
+                        styles.plateBadge,
+                        { borderColor: colors.border, backgroundColor: colors.background },
+                        niche === 'automotive' ? { borderWidth: 2, borderRadius: 4 } : { borderWidth: 0, paddingHorizontal: 0 }
+                    ]}>
+                        <Text style={[
+                            styles.plateText,
+                            { color: colors.text },
+                            niche === 'automotive' ? { letterSpacing: 2, textTransform: 'uppercase' } : { fontSize: 16 }
+                        ]}>{os.veiculo?.placa}</Text>
                     </View>
                     <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} | {labels.metric}: {os.km_entry}</Text>
                 </View>
@@ -374,7 +387,7 @@ export default function OSDetailScreen() {
 
                 {/* BOTÃO FINALIZAR GERAL */}
                 {os.status !== 'finalized' && os.status !== 'canceled' && (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={[styles.finalizeButton, { backgroundColor: '#28C76F' }]}
                         onPress={handleFinalizeOS}
                         disabled={updating}

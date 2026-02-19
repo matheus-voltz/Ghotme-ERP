@@ -14,6 +14,9 @@ interface NicheLabels {
   model: string;
   color: string;
   year: string;
+  features?: string;
+  inventory_items?: string;
+  checklist_categories?: { [key: string]: string[] };
 }
 
 interface NicheContextData {

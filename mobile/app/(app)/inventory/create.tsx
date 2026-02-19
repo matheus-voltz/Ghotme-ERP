@@ -22,9 +22,14 @@ const CustomInput = ({ label, icon, value, onChangeText, placeholder, keyboardTy
     </View>
 );
 
+import { useNiche } from '../../../context/NicheContext';
+
+// ...
+
 export default function CreateInventoryScreen() {
     const router = useRouter();
     const { colors } = useTheme();
+    const { labels } = useNiche();
     const [loading, setLoading] = useState(false);
 
     const [form, setForm] = useState({
@@ -47,16 +52,18 @@ export default function CreateInventoryScreen() {
         setLoading(true);
         try {
             await api.post('/inventory/items', form);
-            Alert.alert("Sucesso", "Peça adicionada ao estoque!", [
+            Alert.alert("Sucesso", `${labels.inventory_items?.split('/')[0] || 'Item'} adicionado ao estoque!`, [
                 { text: "OK", onPress: () => router.back() }
             ]);
         } catch (error: any) {
-            console.error("Erro ao salvar peça:", error);
-            Alert.alert("Erro", "Não foi possível salvar a peça.");
+            console.error("Erro ao salvar item:", error);
+            Alert.alert("Erro", "Não foi possível salvar o item.");
         } finally {
             setLoading(false);
         }
     };
+
+    const itemLabel = labels.inventory_items?.split('/')[0] || 'Peça';
 
     return (
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: '#F3F4F6' }}>
@@ -64,7 +71,7 @@ export default function CreateInventoryScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="chevron-back" size={28} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Nova Peça</Text>
+                <Text style={styles.headerTitle}>Novo {itemLabel}</Text>
                 <View style={{ width: 40 }} />
             </View>
 
@@ -72,15 +79,16 @@ export default function CreateInventoryScreen() {
                 <View style={styles.card}>
                     <View style={styles.cardHeader}>
                         <Ionicons name="cube-outline" size={20} color="#7367F0" />
-                        <Text style={styles.cardTitle}>Dados do Item</Text>
+                        <Text style={styles.cardTitle}>Dados do {itemLabel}</Text>
                     </View>
-                    
-                    <CustomInput label="Nome da Peça *" icon="pricetag-outline" value={form.name} onChangeText={(v:any) => updateForm('name', v)} placeholder="Ex: Filtro de Óleo" />
-                    <CustomInput label="SKU / Código" icon="barcode-outline" value={form.sku} onChangeText={(v:any) => updateForm('sku', v)} placeholder="FIL-1234" />
-                    
+
+                    <CustomInput label={`Nome do ${itemLabel} *`} icon="pricetag-outline" value={form.name} onChangeText={(v: any) => updateForm('name', v)} placeholder="Ex: Filtro de Óleo" />
+                    <CustomInput label="SKU / Código" icon="barcode-outline" value={form.sku} onChangeText={(v: any) => updateForm('sku', v)} placeholder="FIL-1234" />
+// ...
+
                     <View style={styles.row}>
-                        <CustomInput label="Quantidade *" icon="layers-outline" value={form.quantity} onChangeText={(v:any) => updateForm('quantity', v)} placeholder="10" keyboardType="numeric" />
-                        <CustomInput label="Estoque Mín." icon="alert-circle-outline" value={form.min_quantity} onChangeText={(v:any) => updateForm('min_quantity', v)} placeholder="5" keyboardType="numeric" />
+                        <CustomInput label="Quantidade *" icon="layers-outline" value={form.quantity} onChangeText={(v: any) => updateForm('quantity', v)} placeholder="10" keyboardType="numeric" />
+                        <CustomInput label="Estoque Mín." icon="alert-circle-outline" value={form.min_quantity} onChangeText={(v: any) => updateForm('min_quantity', v)} placeholder="5" keyboardType="numeric" />
                     </View>
                 </View>
 
@@ -90,15 +98,15 @@ export default function CreateInventoryScreen() {
                         <Text style={styles.cardTitle}>Valores (R$)</Text>
                     </View>
                     <View style={styles.row}>
-                        <CustomInput label="Custo (Compra)" icon="trending-down-outline" value={form.cost_price} onChangeText={(v:any) => updateForm('cost_price', v)} placeholder="0.00" keyboardType="numeric" />
-                        <CustomInput label="Venda (Cliente) *" icon="trending-up-outline" value={form.selling_price} onChangeText={(v:any) => updateForm('selling_price', v)} placeholder="0.00" keyboardType="numeric" />
+                        <CustomInput label="Custo (Compra)" icon="trending-down-outline" value={form.cost_price} onChangeText={(v: any) => updateForm('cost_price', v)} placeholder="0.00" keyboardType="numeric" />
+                        <CustomInput label="Venda (Cliente) *" icon="trending-up-outline" value={form.selling_price} onChangeText={(v: any) => updateForm('selling_price', v)} placeholder="0.00" keyboardType="numeric" />
                     </View>
                 </View>
             </ScrollView>
 
             <View style={styles.footer}>
                 <TouchableOpacity activeOpacity={0.8} onPress={handleSubmit} disabled={loading}>
-                    <LinearGradient colors={['#7367F0', '#CE9FFC']} start={{x:0, y:0}} end={{x:1, y:0}} style={styles.submitBtn}>
+                    <LinearGradient colors={['#7367F0', '#CE9FFC']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.submitBtn}>
                         {loading ? <ActivityIndicator color="#fff" /> : (
                             <>
                                 <Ionicons name="save-outline" size={22} color="#fff" />

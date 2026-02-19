@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
+import { useNiche } from '../../../context/NicheContext';
 
 const statusTranslations: { [key: string]: string } = {
     'pending': 'Pendentes',
@@ -16,6 +17,7 @@ export default function OSListScreen() {
     const { status, title } = useLocalSearchParams();
     const router = useRouter();
     const { colors } = useTheme();
+    const { labels, niche } = useNiche();
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -47,7 +49,10 @@ export default function OSListScreen() {
                 <Text style={[styles.date, { color: colors.subText }]}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
             </View>
             <Text style={[styles.clientName, { color: colors.text }]}>{item.client?.name || item.client?.company_name || 'N/A'}</Text>
-            <Text style={[styles.vehicle, { color: colors.subText }]}>{item.veiculo?.marca || 'N/A'} {item.veiculo?.modelo || ''} - {item.veiculo?.placa || ''}</Text>
+            <Text style={[styles.vehicle, { color: colors.subText }]}>
+                {item.veiculo?.marca || 'N/A'} {item.veiculo?.modelo || ''}
+                {niche === 'pet' ? '' : ` - ${item.veiculo?.placa || ''}`}
+            </Text>
             <View style={styles.footer}>
                 <Text style={[styles.total, { color: colors.primary }]}>
                     R$ {(Number(item.total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

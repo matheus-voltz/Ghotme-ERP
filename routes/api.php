@@ -45,16 +45,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/os/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
     Route::post('/os/items/{itemId}/toggle-timer', [ApiOrdemServicoController::class, 'toggleTimer']);
     Route::post('/os/items/{itemId}/complete', [ApiOrdemServicoController::class, 'completeItem']);
-    
+
     // Checklist
     Route::post('/checklist/visual', [ApiChecklistController::class, 'storeVisual']);
     Route::post('/os/technical-checklist', [ApiTechnicalChecklistController::class, 'store']);
     Route::get('/os/{osId}/technical-checklist', [ApiTechnicalChecklistController::class, 'index']);
 
+    // Inventory
+    Route::get('/inventory/items-list', [ApiInventoryController::class, 'index']);
+    Route::post('/inventory/items', [ApiInventoryController::class, 'store']);
+
     // Chat
-    Route::get('/chat/contacts', [ChatController::class, 'getContacts']);
-    Route::get('/chat/messages/{userId}', [ChatController::class, 'getMessages']);
-    Route::post('/chat/messages', [ChatController::class, 'sendMessage']);
+    Route::get('/chat/contacts', [ChatController::class, 'contacts']);
+    Route::get('/chat/messages/{userId}', [ChatController::class, 'messages']);
+    Route::post('/chat/messages', [ChatController::class, 'send']);
+
+    // Calendar
+    Route::get('/calendar/events', [\App\Http\Controllers\CalendarController::class, 'fetchEvents']);
+    Route::post('/calendar/events', [\App\Http\Controllers\CalendarController::class, 'store']);
+    Route::put('/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'update']);
+    Route::delete('/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'destroy']);
 
     // Push Token
     Route::post('/user/push-token', [AuthController::class, 'updatePushToken']);

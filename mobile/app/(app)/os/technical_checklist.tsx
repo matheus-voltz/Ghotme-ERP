@@ -5,25 +5,24 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 
-const CATEGORIES = {
-    'Motor': ['Óleo do Motor', 'Filtro de Ar', 'Correia Dentada', 'Velas', 'Sistema de Arrefecimento'],
-    'Freios': ['Pastilhas Dianteiras', 'Discos Dianteiros', 'Lona Traseira', 'Fluido de Freio'],
-    'Suspensão': ['Amortecedores', 'Buchas', 'Pneus', 'Alinhamento'],
-    'Elétrica': ['Bateria', 'Alternador', 'Lâmpadas', 'Motor de Arranque']
-};
+import { useNiche } from '../../../context/NicheContext';
 
 export default function TechnicalChecklistScreen() {
     const { osId } = useLocalSearchParams();
     const router = useRouter();
     const { colors } = useTheme();
+    const { labels } = useNiche();
     const [loading, setLoading] = useState(false);
     const [items, setItems] = useState<any[]>([]);
+
+    // Get categories from niche labels or use empty default
+    const categories = labels.checklist_categories || {};
 
     useEffect(() => {
         // Inicializa o estado com os itens padrão
         const initialItems: any[] = [];
-        Object.entries(CATEGORIES).forEach(([category, list]) => {
-            list.forEach(item => {
+        Object.entries(categories).forEach(([category, list]) => {
+            (list as string[]).forEach(item => {
                 initialItems.push({ category, item, status: 'ok', observation: '' });
             });
         });
@@ -47,7 +46,7 @@ export default function TechnicalChecklistScreen() {
     };
 
     const updateItem = (category: string, item: string, field: string, value: any) => {
-        setItems(prev => prev.map(p => 
+        setItems(prev => prev.map(p =>
             (p.category === category && p.item === item) ? { ...p, [field]: value } : p
         ));
     };
@@ -69,11 +68,11 @@ export default function TechnicalChecklistScreen() {
     };
 
     const renderStatusButton = (currentStatus: string, targetStatus: string, icon: any, color: string, onPress: () => void) => (
-        <TouchableOpacity 
+        <TouchableOpacity
             style={[
-                styles.statusBtn, 
+                styles.statusBtn,
                 currentStatus === targetStatus && { backgroundColor: color + '20', borderColor: color }
-            ]} 
+            ]}
             onPress={onPress}
         >
             <Ionicons name={icon} size={20} color={currentStatus === targetStatus ? color : '#ccc'} />
@@ -96,7 +95,7 @@ export default function TechnicalChecklistScreen() {
                 {Object.keys(CATEGORIES).map(category => (
                     <View key={category} style={[styles.section, { backgroundColor: colors.card }]}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>{category}</Text>
-                        
+
                         {items.filter(i => i.category === category).map((item, index) => (
                             <View key={index} style={[styles.row, { borderBottomColor: colors.border }]}>
                                 <View style={styles.rowTop}>
@@ -107,7 +106,7 @@ export default function TechnicalChecklistScreen() {
                                         {renderStatusButton(item.status, 'danger', 'close-circle', '#EA5455', () => updateItem(category, item.item, 'status', 'danger'))}
                                     </View>
                                 </View>
-                                
+
                                 {item.status !== 'ok' && (
                                     <TextInput
                                         style={[styles.obsInput, { color: colors.text, borderColor: colors.border }]}

@@ -5,10 +5,13 @@ import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 
+import { useNiche } from '../../../context/NicheContext';
+
 export default function InventoryScreen() {
     const router = useRouter();
     const { colors } = useTheme();
-    
+    const { labels } = useNiche();
+
     const [items, setItems] = useState<any[]>([]);
     const [filteredItems, setFilteredItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -37,8 +40,8 @@ export default function InventoryScreen() {
         setSearch(text);
         if (text) {
             const lower = text.toLowerCase();
-            const filtered = items.filter(item => 
-                item.name.toLowerCase().includes(lower) || 
+            const filtered = items.filter(item =>
+                item.name.toLowerCase().includes(lower) ||
                 (item.sku && item.sku.toLowerCase().includes(lower))
             );
             setFilteredItems(filtered);
@@ -64,14 +67,13 @@ export default function InventoryScreen() {
             </View>
         </View>
     );
-
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="chevron-back" size={28} color="#333" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Estoque de Peças</Text>
+                <Text style={styles.headerTitle}>Estoque de {labels.inventory_items?.split('/')[0] || 'Peças'}</Text>
                 <TouchableOpacity onPress={fetchInventory}>
                     <Ionicons name="refresh" size={24} color="#7367F0" />
                 </TouchableOpacity>
@@ -79,9 +81,9 @@ export default function InventoryScreen() {
 
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#999" style={{ marginRight: 10 }} />
-                <TextInput 
+                <TextInput
                     style={styles.searchInput}
-                    placeholder="Buscar peça por nome ou SKU..."
+                    placeholder={`Buscar ${labels.inventory_items?.toLowerCase() || 'item'}...`}
                     value={search}
                     onChangeText={handleSearch}
                 />
@@ -98,13 +100,13 @@ export default function InventoryScreen() {
                     ListEmptyComponent={
                         <View style={styles.emptyState}>
                             <Ionicons name="search-outline" size={50} color="#ccc" />
-                            <Text style={styles.emptyText}>Nenhuma peça encontrada.</Text>
+                            <Text style={styles.emptyText}>Nenhum item encontrado.</Text>
                         </View>
                     }
                 />
             )}
 
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={styles.fab}
                 onPress={() => router.push('/inventory/create')}
             >

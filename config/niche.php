@@ -38,6 +38,12 @@ return [
                 'year' => 'Ano',
                 'features' => 'Opcionais',
                 'inventory_items' => 'Itens/Peças',
+                'checklist_categories' => [
+                    'Motor' => ['Óleo do Motor', 'Filtro de Ar', 'Correia Dentada', 'Velas', 'Sistema de Arrefecimento'],
+                    'Freios' => ['Pastilhas Dianteiras', 'Discos Dianteiros', 'Lona Traseira', 'Fluido de Freio'],
+                    'Suspensão' => ['Amortecedores', 'Buchas', 'Pneus', 'Alinhamento'],
+                    'Elétrica' => ['Bateria', 'Alternador', 'Lâmpadas', 'Motor de Arranque']
+                ],
             ],
             'icons' => [
                 'entity' => 'ti-car',
@@ -65,6 +71,12 @@ return [
                 'color' => 'Cor',
                 'year' => 'Ano de Fabricação',
                 'features' => 'Especificações',
+                'checklist_categories' => [
+                    'Tela / Display' => ['Riscos', 'Trincas', 'Touchscreen', 'Manchas', 'Dead Pixels'],
+                    'Carcaça' => ['Amassados', 'Riscos', 'Parafusos Faltando', 'Dobradiças'],
+                    'Bateria / Energia' => ['Saúde da Bateria', 'Conector de Carga', 'Carregador Original', 'Cabo USB'],
+                    'Funcional' => ['Wi-Fi / Bluetooth', 'Câmeras', 'Microfone', 'Alto-falantes', 'Botões Físicos']
+                ],
             ],
             'icons' => [
                 'entity' => 'ti-device-laptop',
@@ -94,6 +106,12 @@ return [
                 'year' => 'Data de Nascimento',
                 'features' => 'Alergias / Cuidados',
                 'inventory_items' => 'Insumos/Produtos',
+                'checklist_categories' => [
+                    'Exame Físico' => ['Mucosas', 'Hidratação', 'Temperatura', 'Batimentos Cardíacos', 'Respiração'],
+                    'Pele e Pelagem' => ['Queda de Pelo', 'Feridas', 'Parasitas (Pulgas/Carrapatos)', 'Nódulos', 'Otite'],
+                    'Higiene' => ['Unhas', 'Limpeza de Ouvidos', 'Glândulas Anais', 'Dentes / Tártaro'],
+                    'Comportamento' => ['Agressividade', 'Medo / Ansiedade', 'Sociabilidade', 'Apetite']
+                ],
             ],
             'icons' => [
                 'entity' => 'ti-dog',
@@ -119,6 +137,12 @@ return [
                 'year' => 'Última Visita',
                 'features' => 'Observações Clínicas',
                 'inventory_items' => 'Insumos / Dermocosméticos',
+                'checklist_categories' => [
+                    'Anamnese Facial' => ['Tipo de Pele', 'Manchas / Melasma', 'Acne / Cicatrizes', 'Rugas / Linhas', 'Flacidez'],
+                    'Anamnese Corporal' => ['Gordura Localizada', 'Celulite', 'Estrias', 'Flacidez Corporal', 'Retenção Hídrica'],
+                    'Histórico' => ['Alergias', 'Medicamentos em Uso', 'Procedimentos Anteriores', 'Gestante / Lactante'],
+                    'Hábitos' => ['Ingestão de Água', 'Alimentação', 'Atividade Física', 'Exposição Solar', 'Tabagismo']
+                ],
             ],
             'icons' => [
                 'entity' => 'ti-user-heart',

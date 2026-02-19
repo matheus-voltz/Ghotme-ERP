@@ -79,6 +79,31 @@ $pageConfigs = [
     border-radius: 50px;
     margin-bottom: 1rem;
   }
+
+  /* Animações dos Ícones dos Planos */
+  @keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+  }
+
+  @keyframes propulsion {
+    0% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-5px) rotate(-2deg); }
+    50% { transform: translateY(0px) rotate(0deg); }
+    75% { transform: translateY(-5px) rotate(2deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+  }
+
+  @keyframes rocketLaunch {
+    0% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0px rgba(115, 103, 240, 0)); }
+    50% { transform: translateY(-15px) scale(1.1); filter: drop-shadow(0 15px 20px rgba(115, 103, 240, 0.4)); }
+    100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 0px rgba(115, 103, 240, 0)); }
+  }
+
+  .animate-float { animation: float 4s ease-in-out infinite; }
+  .animate-propulsion { animation: propulsion 2s ease-in-out infinite; }
+  .animate-rocket { animation: rocketLaunch 3s ease-in-out infinite; }
 </style>
 @endsection
 
@@ -138,10 +163,10 @@ $pageConfigs = [
         class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1" />
       <div class="container">
         <div class="hero-text-box text-center position-relative">
-          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">O ERP que fala a língua do seu negócio</h1>
+          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">O ERP que se molda ao seu negócio</h1>
           <h2 class="hero-sub-title h6 mb-6">
-            O único sistema que se adapta automaticamente se você é uma <strong>Oficina</strong>, <strong>Pet Shop</strong> ou <strong>Assistência Técnica</strong>.<br class="d-none d-lg-block" />
-            Tenha controle total de vendas, estoque e financeiro com a terminologia que você já usa.
+            O único sistema inteligente que <strong>fala a sua língua</strong>. <br class="d-none d-lg-block" />
+            Nossa tecnologia adapta termos, ícones e processos instantaneamente para a realidade do seu segmento, seja ele qual for.
           </h2>
           <div class="landing-hero-btn d-inline-block position-relative">
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">Conheça nosso sistema <img
@@ -236,37 +261,40 @@ $pageConfigs = [
         <span class="badge bg-label-primary">Feito para você</span>
       </div>
       <h4 class="text-center mb-1">
-        Um sistema, <span class="fw-extrabold">múltiplos nichos</span>
+        Um sistema, <span class="fw-extrabold">infinitas possibilidades</span>
       </h4>
-      <p class="text-center mb-12">O Ghotme adapta termos, ícones e processos automaticamente para o seu negócio.</p>
+      <p class="text-center mb-12">Veja como o Ghotme se transforma para atender as necessidades específicas de cada mercado:</p>
       <div class="row g-6">
         <div class="col-md-4">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-info rounded-circle">
-                <i class="ti tabler-car fs-1"></i>
+                <i class="ti tabler-settings-automation fs-1"></i>
             </div>
-            <h5 class="fw-extrabold mb-3">Oficinas Mecânicas</h5>
-            <p class="text-muted small mb-0">Gestão completa de placas, chassi, quilometragem e histórico preventivo.</p>
+            <h5 class="fw-extrabold mb-3">Segmento Automotivo</h5>
+            <p class="text-muted small mb-0">Gestão de placas, chassi e histórico por veículos para Oficinas e Estéticas.</p>
           </div>
         </div>
         <div class="col-md-4">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-success rounded-circle">
-                <i class="ti tabler-dog fs-1"></i>
+                <i class="ti tabler-heart-handshake fs-1"></i>
             </div>
-            <h5 class="fw-extrabold mb-3">Pet Shops e Veterinárias</h5>
-            <p class="text-muted small mb-0">Rótulos automáticos para Raça, Espécie, Porte e controle de Banho/Tosa.</p>
+            <h5 class="fw-extrabold mb-3">Saúde e Bem-estar</h5>
+            <p class="text-muted small mb-0">Rótulos dinâmicos para Pets, Pacientes e controle de sessões para Clínicas e Pet Shops.</p>
           </div>
         </div>
         <div class="col-md-4">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-warning rounded-circle">
-                <i class="ti tabler-device-mobile fs-1"></i>
+                <i class="ti tabler-device-laptop fs-1"></i>
             </div>
-            <h5 class="fw-extrabold mb-3">Assistências Técnicas</h5>
-            <p class="text-muted small mb-0">Controle por Número de Série, Modelo e checklists de entrada de hardware.</p>
+            <h5 class="fw-extrabold mb-3">Tecnologia e Varejo</h5>
+            <p class="text-muted small mb-0">Foco em Serial, Modelo e garantia para Assistências Técnicas e Lojas em geral.</p>
           </div>
         </div>
+      </div>
+      <div class="text-center mt-8">
+          <p class="fw-medium text-primary">E muito mais... O Ghotme é configurável para qualquer prestador de serviço!</p>
       </div>
     </div>
   </section>
@@ -717,7 +745,7 @@ $pageConfigs = [
           <div class="card-header">
             <div class="text-center">
               <img src="{{ asset('assets/img/front-pages/icons/paper-airplane.png') }}" alt="paper airplane icon"
-                class="mb-8 pb-2" />
+                class="mb-8 pb-2 animate-float" />
               <h4 class="mb-0">Básico</h4>
               <div class="d-flex align-items-center justify-content-center">
                 <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -760,7 +788,7 @@ $pageConfigs = [
               <div class="position-absolute end-0 top-0 mt-n2">
                 <span class="badge bg-label-primary rounded-1">Popular</span>
               </div>
-              <img src="{{ asset('assets/img/front-pages/icons/plane.png') }}" alt="plane icon" class="mb-8 pb-2" />
+              <img src="{{ asset('assets/img/front-pages/icons/plane.png') }}" alt="plane icon" class="mb-8 pb-2 animate-propulsion" />
               <h4 class="mb-0">Padrão</h4>
               <div class="d-flex align-items-center justify-content-center">
                 <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -832,7 +860,7 @@ $pageConfigs = [
           <div class="card-header">
             <div class="text-center">
               <img src="{{ asset('assets/img/front-pages/icons/shuttle-rocket.png') }}" alt="shuttle rocket icon"
-                class="mb-8 pb-2" />
+                class="mb-8 pb-2 animate-rocket" />
               <h4 class="mb-0">Enterprise</h4>
               <div class="d-flex align-items-center justify-content-center">
                 <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -1019,46 +1047,82 @@ $pageConfigs = [
       </div>
       <div class="col-lg-7">
         <div class="accordion" id="accordionExample">
-          <div class="card accordion-item">
+          <!-- Pergunta 1: Multi-nicho -->
+          <div class="card accordion-item active">
             <h2 class="accordion-header" id="headingOne">
               <button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionOne"
-                aria-expanded="true" aria-controls="accordionOne">O Ghotme funciona em dispositivos móveis?</button>
+                aria-expanded="true" aria-controls="accordionOne">
+                <i class="ti tabler-adjustments-alt me-2 text-primary"></i> O Ghotme realmente se adapta ao meu nicho?
+              </button>
             </h2>
-
-            <div id="accordionOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">Sim! O Ghotme é totalmente responsivo e pode ser acessado de qualquer smartphone ou tablet, permitindo que você gerencie seu negócio de qualquer lugar.</div>
-            </div>
-          </div>
-          <div class="card accordion-item">
-            <h2 class="accordion-header" id="headingTwo">
-              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">Posso importar meus dados de outro sistema?</button>
-            </h2>
-            <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-              data-bs-parent="#accordionExample">
-              <div class="accordion-body">Sim, nossa equipe de suporte auxilia na importação de cadastros de clientes, produtos e fornecedores através de planilhas Excel.</div>
-            </div>
-          </div>
-          <div class="card accordion-item active">
-            <h2 class="accordion-header" id="headingThree">
-              <button type="button" class="accordion-button" data-bs-toggle="collapse"
-                data-bs-target="#accordionThree" aria-expanded="false" aria-controls="accordionThree">Como funciona o período de teste grátis?</button>
-            </h2>
-            <div id="accordionThree" class="accordion-collapse collapse show" aria-labelledby="headingThree"
-              data-bs-parent="#accordionExample">
+            <div id="accordionOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                Você pode testar todas as funcionalidades do plano Profissional por 7 dias sem compromisso. Não solicitamos cartão de crédito para o teste.
+                Com certeza! Ao se cadastrar, você escolhe seu segmento (Oficina, Pet Shop, Assistência, etc) e o sistema muda automaticamente todos os termos, ícones e processos para falar a sua língua. É um sistema feito sob medida para você.
               </div>
             </div>
           </div>
+
+          <!-- Pergunta 2: Pagamentos e Bitcoin -->
+          <div class="card accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                data-bs-target="#accordionTwo" aria-expanded="false" aria-controls="accordionTwo">
+                <i class="ti tabler-currency-bitcoin me-2 text-warning"></i> Quais formas de pagamento são aceitas?
+              </button>
+            </h2>
+            <div id="accordionTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Aceitamos cartões de crédito, boleto bancário e o inovador <strong>PIX Dinâmico</strong> com baixa automática. Além disso, o Ghotme já está preparado para o futuro e permite o recebimento através de <strong>Bitcoin</strong>.
+              </div>
+            </div>
+          </div>
+
+          <!-- Pergunta 3: Contabilidade/BPO -->
+          <div class="card accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                data-bs-target="#accordionThree" aria-expanded="false" aria-controls="accordionThree">
+                <i class="ti tabler-user-search me-2 text-info"></i> Meu contador terá acesso ao sistema?
+              </button>
+            </h2>
+            <div id="accordionThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Sim! Criamos um <strong>Portal do Contador</strong> exclusivo. Ele poderá baixar seus XMLs, conferir seu faturamento e realizar a auditoria financeira (BPO) sem que você precise enviar pilhas de papéis todo mês.
+              </div>
+            </div>
+          </div>
+
+          <!-- Pergunta 4: Conciliação Bancária -->
           <div class="card accordion-item">
             <h2 class="accordion-header" id="headingFour">
               <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
-                data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">O sistema emite Nota Fiscal?</button>
+                data-bs-target="#accordionFour" aria-expanded="false" aria-controls="accordionFour">
+                <i class="ti tabler-refresh me-2 text-success"></i> Como funciona a conciliação bancária?
+              </button>
             </h2>
             <div id="accordionFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
               data-bs-parent="#accordionExample">
-              <div class="accordion-body">Sim, o Ghotme está preparado para emissão de Notas Fiscais de Produto (NF-e) e Serviço (NFS-e) de forma integrada.</div>
+              <div class="accordion-body">
+                Basta importar o arquivo OFX do seu banco e o Ghotme faz o "match" automático com suas vendas e despesas. Você economiza horas de trabalho manual e evita erros de digitação no seu financeiro.
+              </div>
+            </div>
+          </div>
+
+          <!-- Pergunta 5: Suporte -->
+          <div class="card accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+              <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse"
+                data-bs-target="#accordionFive" aria-expanded="false" aria-controls="accordionFive">
+                <i class="ti tabler-headset me-2 text-danger"></i> Terei suporte para configurar o sistema?
+              </button>
+            </h2>
+            <div id="accordionFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+              data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                Sim! Oferecemos suporte humanizado via WhatsApp e chat interno. Nossa equipe ajuda você na importação de dados e na configuração inicial para que você comece a faturar o quanto antes.
+              </div>
             </div>
           </div>
         </div>
@@ -1069,21 +1133,24 @@ $pageConfigs = [
 <!-- FAQ: End -->
 
 <!-- CTA: Start -->
-<section id="landingCTA" class="section-py landing-cta position-relative p-lg-0 pb-0">
-  <img src="{{ asset('assets/img/front-pages/backgrounds/cta-bg-' . $configData['theme'] . '.png') }}"
-    class="position-absolute bottom-0 end-0 scaleX-n1-rtl h-100 w-100 z-n1" alt="cta image"
-    data-app-light-img="front-pages/backgrounds/cta-bg-light.png"
-    data-app-dark-img="front-pages/backgrounds/cta-bg-dark.png" />
-  <div class="container">
+<section id="landingCTA" class="section-py landing-cta position-relative p-lg-0 pb-0 overflow-hidden">
+  <div class="container position-relative z-1">
     <div class="row align-items-center gy-12">
       <div class="col-lg-6 text-start text-sm-center text-lg-start">
-        <h3 class="cta-title text-primary fw-bold mb-1">Pronto para transformar sua empresa?</h3>
-        <h5 class="text-body mb-8">Comece agora seu teste grátis de 30 dias e sinta a diferença.</h5>
-        <a href="{{ url('/register') }}" class="btn btn-lg btn-primary">Quero Começar</a>
+        <h3 class="cta-title text-primary fw-extrabold mb-2 display-5">Faça sua empresa <span class="text-dark">decolar hoje!</span></h3>
+        <h5 class="text-body mb-8 opacity-75">Junte-se a centenas de empreendedores que automatizaram sua gestão com o Ghotme. <strong>Teste grátis por 30 dias</strong>, sem compromisso.</h5>
+        <div class="d-flex flex-column flex-sm-row gap-4 justify-content-sm-center justify-content-lg-start">
+            <a href="{{ url('/register') }}" class="btn btn-lg btn-primary shadow-lg px-5 py-3">
+                Começar Agora Gratuitamente <i class="ti tabler-rocket ms-2"></i>
+            </a>
+            <a href="#landingFeatures" class="btn btn-lg btn-outline-secondary px-5 py-3">
+                Ver Funcionalidades
+            </a>
+        </div>
       </div>
       <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
         <img src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-dark.png') }}" alt="cta dashboard"
-          class="img-fluid mt-lg-4" />
+          class="img-fluid mt-lg-4 hover-shadow-xl transition-all" style="border-radius: 1rem; transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);" />
       </div>
     </div>
   </div>
