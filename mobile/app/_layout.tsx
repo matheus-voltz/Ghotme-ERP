@@ -36,12 +36,18 @@ function RootLayoutNav() {
   return <Slot />;
 }
 
+import { NicheProvider } from '../context/NicheContext';
+
+// ... (imports)
+
 export default function Layout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <RootLayoutNav />
+          <NicheProvider>
+            <RootLayoutNav />
+          </NicheProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>

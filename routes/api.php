@@ -24,6 +24,7 @@ Route::post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/niche-config', [App\Http\Controllers\Api\NicheConfigController::class, 'index']);
     Route::post('/user/profile-photo', [AuthController::class, 'updateProfilePhoto']);
     Route::post('/logout', [AuthController::class, 'logout']);
 

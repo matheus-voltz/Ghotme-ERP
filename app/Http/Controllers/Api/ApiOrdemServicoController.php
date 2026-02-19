@@ -15,8 +15,12 @@ class ApiOrdemServicoController extends Controller
     {
         $user = $request->user();
         $query = OrdemServico::with(['client', 'veiculo', 'user'])->latest();
-        if ($user->role !== 'admin') { $query->where('user_id', $user->id); }
-        if ($request->has('status')) { $query->where('status', $request->status); }
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
+        }
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
         return response()->json($query->paginate(50));
     }
 
@@ -34,7 +38,7 @@ class ApiOrdemServicoController extends Controller
             ->with(['client', 'veiculo'])
             ->latest()
             ->get()
-            ->map(function($os) {
+            ->map(function ($os) {
                 return [
                     'id' => $os->id,
                     'client' => $os->client ? ($os->client->name ?: $os->client->company_name) : 'N/A',
@@ -52,7 +56,7 @@ class ApiOrdemServicoController extends Controller
     public function getDashboardStats(Request $request)
     {
         $user = $request->user();
-        $formatOS = function($os) {
+        $formatOS = function ($os) {
             return [
                 'id' => $os->id,
                 'client_name' => $os->client ? ($os->client->name ?: $os->client->company_name) : 'Cliente Removido',
@@ -65,7 +69,11 @@ class ApiOrdemServicoController extends Controller
         };
 
         if ($user->role === 'admin') {
-            $monthlyRevenue = OrdemServico::where('status', 'finalized')->whereMonth('created_at', Carbon::now()->month)->sum('total');
+            $monthlyRevenue = OrdemServico::where('status', 'finalized')
+                ->whereMonth('created_at', Carbon::now()->month)
+                ->with(['items', 'parts'])
+                ->get()
+                ->sum('total');
             $osStats = [
                 'pending' => OrdemServico::where('status', 'pending')->count(),
                 'running' => OrdemServico::where('status', 'running')->count(),
@@ -109,7 +117,9 @@ class ApiOrdemServicoController extends Controller
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
         if ($item->status === 'in_progress') {
             $item->status = 'paused';
-            if ($item->started_at) { $item->duration_seconds += now()->diffInSeconds($item->started_at); }
+            if ($item->started_at) {
+                $item->duration_seconds += now()->diffInSeconds($item->started_at);
+            }
             $item->started_at = null;
         } else {
             $item->status = 'in_progress';
@@ -122,8 +132,12 @@ class ApiOrdemServicoController extends Controller
     public function completeItem($itemId)
     {
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
-        if ($item->status === 'in_progress' && $item->started_at) { $item->duration_seconds += now()->diffInSeconds($item->started_at); }
-        $item->status = 'completed'; $item->started_at = null; $item->save();
+        if ($item->status === 'in_progress' && $item->started_at) {
+            $item->duration_seconds += now()->diffInSeconds($item->started_at);
+        }
+        $item->status = 'completed';
+        $item->started_at = null;
+        $item->save();
         return response()->json(['success' => true, 'item' => $item]);
     }
 }

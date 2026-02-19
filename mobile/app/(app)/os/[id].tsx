@@ -14,6 +14,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
+import { useNiche } from '../../../context/NicheContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const statusTranslations: { [key: string]: string } = {
@@ -36,6 +37,7 @@ const getStatusColor = (status: string) => {
 export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
     const { colors } = useTheme();
+    const { labels } = useNiche();
     const [os, setOs] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -134,7 +136,7 @@ export default function OSDetailScreen() {
 
             if (notify) {
                 const phone = os.client?.whatsapp || os.client?.phone;
-                const message = `Olá ${os.client?.name || 'Cliente'}! 🚗\nSeu veículo ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto na oficina Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
+                const message = `Olá ${os.client?.name || 'Cliente'}! 🚗\nSeu ${labels.entity.toLowerCase()} ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto na oficina Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
                 
                 if (phone) {
                     const cleanPhone = phone.replace(/\D/g, '');
@@ -242,13 +244,13 @@ export default function OSDetailScreen() {
                 <View style={[styles.section, { backgroundColor: colors.card }]}>
                     <View style={styles.sectionHeader}>
                         <Ionicons name="car" size={20} color={colors.primary} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Veículo</Text>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.entity}</Text>
                     </View>
                     <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
                     <View style={[styles.plateBadge, { borderColor: colors.border, backgroundColor: colors.background }]}>
                         <Text style={[styles.plateText, { color: colors.text }]}>{os.veiculo?.placa}</Text>
                     </View>
-                    <Text style={[styles.subInfoText, { color: colors.subText }]}>Cor: {os.veiculo?.cor} | KM: {os.km_entry}</Text>
+                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} | {labels.metric}: {os.km_entry}</Text>
                 </View>
 
                 {/* Description / Problem */}
