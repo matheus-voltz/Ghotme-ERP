@@ -132,7 +132,10 @@ export default function LoginScreen() {
 
         try {
             setLoading(true);
-            const response = await signIn({ email, password });
+            const response = await signIn({
+                email: email.trim(),
+                password: password.trim()
+            });
 
             if (response?.two_factor) {
                 setShow2FA(true);

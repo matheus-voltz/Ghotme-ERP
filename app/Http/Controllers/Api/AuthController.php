@@ -16,9 +16,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $email = trim($request->email);
+        $user = User::where('email', $email)->first();
 
         if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            \Illuminate\Support\Facades\Log::warning('Login falhou para: ' . $request->email);
             return response()->json(['success' => false, 'message' => 'Credenciais inválidas'], 401);
         }
 
