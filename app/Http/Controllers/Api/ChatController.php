@@ -92,6 +92,21 @@ class ChatController extends Controller
 
         broadcast(new \App\Events\MessageReceived($message))->toOthers();
 
+        // Send Push Notification
+        $receiver = User::find($request->receiver_id);
+        if ($receiver && $receiver->expo_push_token) {
+            $senderName = Auth::user()->name;
+            $body = $message->message ? $message->message : '📷 Imagem';
+            $title = "Nova mensagem de {$senderName}";
+
+            \App\Helpers\Helpers::sendExpoNotification(
+                $receiver->expo_push_token,
+                $title,
+                $body,
+                ['type' => 'chat_message', 'sender_id' => Auth::id()]
+            );
+        }
+
         return response()->json($message, 201);
     }
 }

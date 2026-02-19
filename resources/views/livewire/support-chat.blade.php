@@ -1,11 +1,33 @@
-<div class="app-chat card overflow-hidden" wire:poll.2000ms="checkNewMessages">
+<style>
+  #chat-history-body {
+    height: calc(100vh - 380px); /* Altura fixa para permitir scroll */
+    overflow-y: auto !important;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Estilização da Scrollbar para ficar elegante */
+  #chat-history-body::-webkit-scrollbar {
+    width: 6px;
+  }
+  #chat-history-body::-webkit-scrollbar-thumb {
+    background-color: rgba(115, 103, 240, 0.2);
+    border-radius: 10px;
+  }
+  #chat-history-body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+</style>
+
+<div class="app-chat card overflow-hidden">
   <div class="row g-0">
     <!-- Sidebar Left -->
     <div class="col app-chat-sidebar-left app-sidebar overflow-hidden" id="app-chat-sidebar-left">
       <div
         class="chat-sidebar-left-user sidebar-header d-flex flex-column justify-content-center align-items-center flex-wrap px-6 pt-12">
-        <div class="avatar avatar-xl avatar-{{ $userStatus == 'active' ? 'online' : ($userStatus == 'away' ? 'away' : ($userStatus == 'busy' ? 'busy' : 'offline')) }} chat-sidebar-avatar">
-          <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle" />
+        <div class="avatar avatar-xl avatar-{{ $userStatus }} chat-sidebar-avatar">
+          <img src="{{ auth()->user()->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
         </div>
         <h5 class="mt-4 mb-0">{{ auth()->user()->name }}</h5>
         <span>{{ auth()->user()->email }}</span>
@@ -17,23 +39,23 @@
           <p class="text-uppercase text-body-secondary mb-1">Status</p>
           <div class="d-grid gap-2 pt-2 text-heading ms-2">
             <div class="form-check form-check-success">
-              <input name="chat-user-status" class="form-check-input" type="radio" value="active" id="user-active"
-                wire:click="changeStatus('active')" {{ $userStatus == 'active' ? 'checked' : '' }} />
-              <label class="form-check-label" for="user-active">Online</label>
+              <input name="chat-user-status" class="form-check-input" type="radio" value="online" id="user-online"
+                wire:click="updateStatus('online')" {{ $userStatus == 'online' ? 'checked' : '' }} />
+              <label class="form-check-label" for="user-online">Online</label>
             </div>
             <div class="form-check form-check-warning">
-              <input name="chat-user-status" class="form-check-input" type="radio" value="away" id="user-away" 
-                wire:click="changeStatus('away')" {{ $userStatus == 'away' ? 'checked' : '' }} />
+              <input name="chat-user-status" class="form-check-input" type="radio" value="away" id="user-away"
+                wire:click="updateStatus('away')" {{ $userStatus == 'away' ? 'checked' : '' }} />
               <label class="form-check-label" for="user-away">Ausente</label>
             </div>
             <div class="form-check form-check-danger">
-              <input name="chat-user-status" class="form-check-input" type="radio" value="busy" id="user-busy" 
-                wire:click="changeStatus('busy')" {{ $userStatus == 'busy' ? 'checked' : '' }} />
+              <input name="chat-user-status" class="form-check-input" type="radio" value="busy" id="user-busy"
+                wire:click="updateStatus('busy')" {{ $userStatus == 'busy' ? 'checked' : '' }} />
               <label class="form-check-label" for="user-busy">Não Perturbe</label>
             </div>
             <div class="form-check form-check-secondary">
-              <input name="chat-user-status" class="form-check-input" type="radio" value="offline" id="user-offline" 
-                wire:click="changeStatus('offline')" {{ $userStatus == 'offline' ? 'checked' : '' }} />
+              <input name="chat-user-status" class="form-check-input" type="radio" value="offline" id="user-offline"
+                wire:click="updateStatus('offline')" {{ $userStatus == 'offline' ? 'checked' : '' }} />
               <label class="form-check-label" for="user-offline">Offline</label>
             </div>
           </div>
@@ -46,9 +68,9 @@
     <div class="col app-chat-contacts app-sidebar flex-grow-0 overflow-hidden border-end" id="app-chat-contacts">
       <div class="sidebar-header h-px-75 px-5 border-bottom d-flex align-items-center">
         <div class="d-flex align-items-center me-6 me-lg-0">
-          <div class="flex-shrink-0 avatar avatar-{{ $userStatus == 'active' ? 'online' : ($userStatus == 'away' ? 'away' : ($userStatus == 'busy' ? 'busy' : 'offline')) }} me-4" data-bs-toggle="sidebar" data-overlay="app-overlay-ex"
+          <div class="flex-shrink-0 avatar avatar-{{ $userStatus }} me-4" data-bs-toggle="sidebar" data-overlay="app-overlay-ex"
             data-target="#app-chat-sidebar-left">
-            <img class="user-avatar rounded-circle cursor-pointer" src="{{ asset('assets/img/avatars/1.png') }}"
+            <img class="user-avatar rounded-circle cursor-pointer" src="{{ auth()->user()->profile_photo_url }}"
               alt="Avatar" />
           </div>
           <div class="flex-grow-1 input-group input-group-merge">
@@ -61,38 +83,38 @@
           data-overlay data-bs-toggle="sidebar" data-target="#app-chat-contacts"></i>
       </div>
       <div class="sidebar-body">
-        
+
         <!-- Tabs -->
         <div class="d-flex justify-content-between px-3 py-2 border-bottom">
-            <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'team' ? 'btn-primary' : 'btn-text-secondary' }}" 
-                wire:click="setTab('team')" title="Equipe Interna">
-                <i class="ti tabler-users"></i>
-            </button>
-            <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'support' ? 'btn-primary' : 'btn-text-secondary' }}" 
-                wire:click="setTab('support')" title="Suporte Ghotme">
-                <i class="ti tabler-headset"></i>
-            </button>
-            <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'clients' ? 'btn-primary' : 'btn-text-secondary' }}" 
-                wire:click="setTab('clients')" title="Clientes (CRM)">
-                <i class="ti tabler-brand-whatsapp"></i>
-            </button>
+          <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'team' ? 'btn-primary' : 'btn-text-secondary' }}"
+            wire:click="setTab('team')" title="Equipe Interna">
+            <i class="ti tabler-users"></i>
+          </button>
+          <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'support' ? 'btn-primary' : 'btn-text-secondary' }}"
+            wire:click="setTab('support')" title="Suporte Ghotme">
+            <i class="ti tabler-headset"></i>
+          </button>
+          <button class="btn btn-sm btn-icon rounded-pill {{ $activeTab == 'clients' ? 'btn-primary' : 'btn-text-secondary' }}"
+            wire:click="setTab('clients')" title="Clientes (CRM)">
+            <i class="ti tabler-brand-whatsapp"></i>
+          </button>
         </div>
 
         <!-- Chats -->
         <ul class="list-unstyled chat-contact-list py-2 mb-0" id="chat-list">
           <li class="chat-contact-list-item chat-contact-list-item-title mt-0">
             <h5 class="text-primary mb-0">
-                @if($activeTab == 'team') Minha Equipe ({{ $teamCount }})
-                @elseif($activeTab == 'support') Suporte Ghotme ({{ $supportCount }})
-                @else Clientes ({{ $clientCount }}) @endif
+              @if($activeTab == 'team') Minha Equipe ({{ $teamCount }})
+              @elseif($activeTab == 'support') Suporte Ghotme ({{ $supportCount }})
+              @else Clientes ({{ $clientCount }}) @endif
             </h5>
           </li>
-          
+
           @foreach($contacts as $contact)
           <li class="chat-contact-list-item {{ $activeUserId == $contact->id ? 'active' : '' }} mb-1" wire:click="selectUser({{ $contact->id }})" style="cursor: pointer;">
             <a class="d-flex align-items-center">
-              <div class="flex-shrink-0 avatar avatar-{{ $contact->status == 'active' ? 'online' : ($contact->status == 'away' ? 'away' : ($contact->status == 'busy' ? 'busy' : 'offline')) }}">
-                <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($contact->name, 0, 2) }}</span>
+              <div class="flex-shrink-0 avatar avatar-{{ $contact->chat_status }}">
+                <img src="{{ $contact->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
               </div>
               <div class="chat-contact-info flex-grow-1 ms-4">
                 <div class="d-flex justify-content-between align-items-center">
@@ -133,25 +155,32 @@
             <div class="d-flex overflow-hidden align-items-center">
               <i class="icon-base ti tabler-menu-2 icon-lg cursor-pointer d-lg-none d-block me-4"
                 data-bs-toggle="sidebar" data-overlay data-target="#app-chat-contacts"></i>
-              <div class="flex-shrink-0 avatar avatar-{{ $activeUser->status == 'active' ? 'online' : ($activeUser->status == 'away' ? 'away' : ($activeUser->status == 'busy' ? 'busy' : 'offline')) }}">
-                 <span class="avatar-initial rounded-circle bg-label-primary">{{ substr($activeUser->name, 0, 2) }}</span>
+              <div class="flex-shrink-0 avatar avatar-{{ $activeUser->chat_status }}">
+                <img src="{{ $activeUser->profile_photo_url }}" alt="Avatar" class="rounded-circle" />
               </div>
               <div class="chat-contact-info flex-grow-1 ms-4">
                 <h6 class="m-0 fw-normal">{{ $activeUser->name }}</h6>
-                <small class="user-status text-body">{{ ucfirst($activeUser->status == 'active' ? 'online' : ($activeUser->status == 'away' ? 'ausente' : ($activeUser->status == 'busy' ? 'não perturbe' : 'offline'))) }}</small>
+                <small class="user-status text-body">{{ ucfirst($activeUser->chat_status == 'online' ? 'online' : ($activeUser->chat_status == 'away' ? 'ausente' : ($activeUser->chat_status == 'busy' ? 'não perturbe' : 'offline'))) }}</small>
               </div>
             </div>
           </div>
         </div>
-        
-        <div class="chat-history-body" wire:poll.2000ms>
+
+        <div class="chat-history-body" id="chat-history-body" wire:poll.3000ms>
           <ul class="list-unstyled chat-history">
             @foreach($messages as $msg)
             <li class="chat-message {{ $msg->sender_id == auth()->id() ? 'chat-message-right' : '' }}">
               <div class="d-flex overflow-hidden">
                 <div class="chat-message-wrapper flex-grow-1">
                   <div class="chat-message-text">
+                    @if($msg->attachment_path)
+                    <div class="mb-2 position-relative">
+                      <img src="{{ \Illuminate\Support\Facades\Storage::url($msg->attachment_path) }}" class="img-fluid rounded cursor-pointer" style="max-width: 200px; max-height: 200px; object-fit: cover;" onclick="window.open(this.src, '_blank')" alt="Anexo" />
+                    </div>
+                    @endif
+                    @if($msg->message)
                     <p class="mb-0">{{ $msg->message }}</p>
+                    @endif
                   </div>
                   <div class="text-end text-body-secondary mt-1">
                     <small>{{ $msg->created_at->format('H:i') }}</small>
@@ -162,14 +191,37 @@
             @endforeach
           </ul>
         </div>
-        
+
         <!-- Chat message form -->
-        <div class="chat-history-footer shadow-xs">
+        <div class="chat-history-footer shadow-xs position-relative">
+          @if ($attachment)
+          <div class="position-absolute bottom-100 start-0 mb-3 ms-3 p-2 bg-white rounded shadow-sm border d-flex align-items-center gap-2">
+            <img src="{{ $attachment->temporaryUrl() }}" width="60" height="60" class="rounded object-fit-cover">
+            <button type="button" class="btn-close btn-sm" wire:click="$set('attachment', null)"></button>
+          </div>
+          @endif
+
           <form wire:submit.prevent="sendMessage" class="form-send-message d-flex justify-content-between align-items-center ">
+            <div class="me-2">
+              <label for="chat-attachment" class="btn btn-icon btn-text-secondary rounded-pill cursor-pointer" title="Anexar Imagem">
+                <i class="ti tabler-paperclip"></i>
+              </label>
+              <input type="file" id="chat-attachment" wire:model="attachment" class="d-none" accept="image/*">
+            </div>
+
             <input wire:model="message" class="form-control message-input border-0 me-4 shadow-none"
               placeholder="Digite sua mensagem..." />
+
             <div class="message-actions d-flex align-items-center">
-              <button type="submit" class="btn btn-primary d-flex send-msg-btn">
+              <div class="position-relative">
+                <button type="button" class="btn btn-icon btn-text-secondary rounded-pill me-2" id="emoji-picker-btn" title="Emojis">
+                  <i class="ti tabler-mood-smile"></i>
+                </button>
+                <div id="emoji-picker-container" class="position-absolute bottom-100 start-0 mb-3 d-none shadow-lg border rounded" style="z-index: 1000;">
+                   <emoji-picker></emoji-picker>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary d-flex send-msg-btn" wire:loading.attr="disabled">
                 <span class="align-middle d-md-inline-block d-none">Enviar</span>
                 <i class="icon-base ti tabler-send icon-16px ms-md-2 ms-0"></i>
               </button>
@@ -184,3 +236,25 @@
     <div class="app-overlay"></div>
   </div>
 </div>
+
+<script>
+  function scrollToBottom() {
+    const chatHistoryBody = document.getElementById('chat-history-body');
+    if (chatHistoryBody) {
+      chatHistoryBody.scrollTop = chatHistoryBody.scrollHeight;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', scrollToBottom);
+  
+  window.addEventListener('message-sent', event => {
+      setTimeout(scrollToBottom, 50);
+  });
+
+  // Roda o scroll após cada atualização do Livewire (poll)
+  document.addEventListener('livewire:initialized', () => {
+      Livewire.hook('morph.updated', ({ el, component }) => {
+          scrollToBottom();
+      });
+  });
+</script>

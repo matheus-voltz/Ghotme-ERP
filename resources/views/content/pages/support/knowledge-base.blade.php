@@ -50,36 +50,67 @@
   </div>
 </div>
 
-<div class="card">
-  <div class="card-header border-bottom">
+<div class="card bg-transparent shadow-none">
+  <div class="card-header border-bottom mb-4 p-0 pb-3">
     <h5 class="mb-0">Perguntas Frequentes (FAQ)</h5>
   </div>
-  <div class="card-body pt-4">
-    <div class="accordion" id="accordionFAQ">
-      <div class="accordion-item">
+  <div class="card-body p-0">
+    <div class="accordion accordion-flush" id="accordionFAQ">
+
+      <!-- Existing Questions -->
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
         <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-            Como converter um orçamento em Ordem de Serviço?
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+            <i class="ti tabler-file-invoice me-2 text-primary"></i> Como converter um orçamento em Ordem de Serviço?
           </button>
         </h2>
         <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-          <div class="accordion-body">
+          <div class="accordion-body bg-white text-muted small pt-0">
             Basta ir em <strong>Orçamentos > Aguardando aprovação</strong> e clicar no ícone de check verde na linha do orçamento desejado. O sistema criará a OS automaticamente copiando todos os itens.
           </div>
         </div>
       </div>
-      <div class="accordion-item">
+
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
         <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-            Como funciona a baixa automática de estoque?
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+            <i class="ti tabler-package me-2 text-success"></i> Como funciona a baixa automática de estoque?
           </button>
         </h2>
         <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
-          <div class="accordion-body">
+          <div class="accordion-body bg-white text-muted small pt-0">
             Ao finalizar uma Ordem de Serviço que contenha peças, o sistema automaticamente debita as quantidades do seu inventário.
           </div>
         </div>
       </div>
+
+      <!-- New Portal Questions -->
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+            <i class="ti tabler-browser me-2 text-info"></i> O que meu cliente pode fazer no Portal do Cliente?
+          </button>
+        </h2>
+        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+          <div class="accordion-body bg-white text-muted small pt-0">
+            No portal, seu cliente pode acompanhar o status do serviço em tempo real (check-in, manutenção, testes, pronto), visualizar e aprovar orçamentos pendentes, e consultar o histórico de serviços realizados.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+            <i class="ti tabler-click me-2 text-warning"></i> Como o cliente aprova um orçamento online?
+          </button>
+        </h2>
+        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+          <div class="accordion-body bg-white text-muted small pt-0">
+            Ao acessar o portal (via link enviado por WhatsApp/Email), o cliente verá uma notificação de "Orçamentos Pendentes". Ao clicar, ele vê os detalhes e pode clicar em "Aprovar Orçamento", o que atualiza o status no seu sistema instantaneamente.
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

@@ -365,6 +365,49 @@ $customizerHidden = 'customizer-hide';
                     </a>
                 </div>
             </div>
+
+            <!-- FAQ Section -->
+            <div class="mt-5">
+                <h5 class="fw-bold mb-4">Perguntas Frequentes</h5>
+                <div class="accordion accordion-flush" id="portalFaq">
+                    <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                <i class="ti tabler-search me-2 text-primary"></i> Como acompanho o serviço?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#portalFaq">
+                            <div class="accordion-body bg-white text-muted small pt-0">
+                                Você pode acompanhar todo o progresso em tempo real através deste portal. As etapas são atualizadas automaticamente conforme nossa equipe trabalha no seu veículo.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                <i class="ti tabler-currency-real me-2 text-primary"></i> Posso aprovar orçamentos?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#portalFaq">
+                            <div class="accordion-body bg-white text-muted small pt-0">
+                                Sim! Se houver orçamentos pendentes, eles aparecerão no topo desta página. Você pode visualizar os detalhes e aprovar ou reprovar itens diretamente pelo celular.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                <i class="ti tabler-credit-card me-2 text-primary"></i> Como posso pagar?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#portalFaq">
+                            <div class="accordion-body bg-white text-muted small pt-0">
+                                Aceitamos cartões de crédito, débito, PIX e dinheiro. O pagamento pode ser realizado presencialmente na retirada do veículo ou conforme combinado com o consultor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\User;
 use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Auth;
@@ -10,8 +11,11 @@ use SergiX44\Nutgram\Nutgram;
 
 class SupportChat extends Component
 {
+    use WithFileUploads;
+
     public $activeUserId;
     public $message = '';
+    public $attachment;
     public $search = '';
     public $activeTab = 'team'; // team, support, clients
     public $userStatus;
@@ -19,16 +23,15 @@ class SupportChat extends Component
 
     public function mount()
     {
-        $this->userStatus = Auth::user()->status ?? 'active';
-        $this->lastMessageId = ChatMessage::max('id');
-        
-        // Ao iniciar, tenta selecionar o primeiro colega de equipe
-        $firstContact = User::where('id', '!=', Auth::id())
-            ->where('company_id', Auth::user()->company_id)
-            ->first();
-            
-        if ($firstContact) {
-            $this->activeUserId = $firstContact->id;
+        $this->userStatus = Auth::user()->chat_status ?? 'online';
+    }
+
+    public function updateStatus($newStatus)
+    {
+        $validStatuses = ['online', 'away', 'busy', 'offline'];
+        if (in_array($newStatus, $validStatuses)) {
+            $this->userStatus = $newStatus;
+            Auth::user()->update(['chat_status' => $newStatus]);
         }
     }
 
@@ -38,67 +41,79 @@ class SupportChat extends Component
         $this->activeUserId = null; // Limpa a seleção ao trocar de aba
     }
 
-    public function changeStatus($status)
-    {
-        $this->userStatus = $status;
-        Auth::user()->update(['status' => $status]);
-    }
-
-    public function checkNewMessages()
-    {
-        $latestMessage = ChatMessage::where('receiver_id', Auth::id())
-            ->orderBy('id', 'desc')
-            ->first();
-
-        if ($latestMessage && $latestMessage->id > $this->lastMessageId) {
-            $this->lastMessageId = $latestMessage->id;
-            $senderName = $latestMessage->sender->name;
-            $this->dispatch('new-chat-message', [
-                'sender' => $senderName,
-                'message' => substr($latestMessage->message, 0, 50) . (strlen($latestMessage->message) > 50 ? '...' : '')
-            ]);
-        }
-    }
-
     public function selectUser($userId)
     {
         $this->activeUserId = $userId;
         // Marcar mensagens como lidas
         ChatMessage::where('sender_id', $userId)
             ->where('receiver_id', Auth::id())
+            ->where('is_read', false)
             ->update(['is_read' => true]);
+    }
+
+    /**
+     * Verifica se há novas mensagens para o chat atual.
+     * Chamado via wire:poll na view.
+     */
+    public function checkNewMessages()
+    {
+        // O poll apenas força o re-render
+        return;
     }
 
     public function sendMessage()
     {
         $this->validate([
-            'message' => 'required|string|max:1000',
+            'message' => 'nullable|string|max:1000',
+            'attachment' => 'nullable|image|max:10240', // 10MB
         ]);
+
+        if (!$this->message && !$this->attachment) {
+            $this->addError('message', 'Mensagem ou anexo é obrigatório.');
+            return;
+        }
 
         if (!$this->activeUserId) {
             return;
         }
 
+        $attachmentPath = null;
+        if ($this->attachment) {
+            $attachmentPath = $this->attachment->store('chat_attachments', 'public');
+        }
+
         $message = ChatMessage::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $this->activeUserId,
-            'message' => $this->message,
+            'message' => $this->message ?? '',
+            'attachment_path' => $attachmentPath,
         ]);
 
-        // Enviar para Telegram se o usuário estiver conectado
+        // Send Notification if User has Push Token
         $receiver = User::find($this->activeUserId);
-        if ($receiver && $receiver->telegram_chat_id) {
-            try {
-                // Usando o helper app() para instanciar o Nutgram sem injeção direta no método
-                app(Nutgram::class)->sendMessage($this->message, ['chat_id' => $receiver->telegram_chat_id]);
-            } catch (\Exception $e) {
-                // Logar erro mas não parar o chat
-                \Log::error("Erro ao enviar Telegram: " . $e->getMessage());
-            }
+        if ($receiver && $receiver->expo_push_token) {
+            $senderName = Auth::user()->name;
+            $body = $message->message ? $message->message : '📷 Imagem';
+            $title = "Nova mensagem de {$senderName}";
+
+            $res = \App\Helpers\Helpers::sendExpoNotification(
+                $receiver->expo_push_token,
+                $title,
+                $body,
+                ['type' => 'chat_message', 'sender_id' => Auth::id()]
+            );
+            
+            \Illuminate\Support\Facades\Log::info("Chat Notification Sent to User {$receiver->id}", [
+                'token' => $receiver->expo_push_token,
+                'response' => $res
+            ]);
+        } else {
+            \Illuminate\Support\Facades\Log::warning("Chat Notification NOT Sent: User {$this->activeUserId} has no push token.");
         }
 
-        $this->message = '';
-        // Scroll to bottom event could be dispatched here
+        // Enviar para Telegram se o usuário estiver conectado
+        $this->reset(['message', 'attachment']);
+        $this->dispatch('message-sent');
     }
 
     public function render()
@@ -111,45 +126,39 @@ class SupportChat extends Component
             ->where('name', 'like', '%' . $this->search . '%')
             ->get();
 
-        // 2. Suporte Ghotme (Super Admins - Usuários sem company_id ou role específica)
-        // Assumindo que admins do sistema não têm company_id ou têm uma flag
+        // 2. Suporte Ghotme (Super Admins)
         $supportContacts = User::where('id', '!=', $user->id)
-            ->where(function($q) {
+            ->where(function ($q) {
                 $q->whereNull('company_id')
-                  ->orWhere('role', 'super_admin'); 
+                    ->orWhere('role', 'super_admin');
             })
             ->where('name', 'like', '%' . $this->search . '%')
             ->get();
 
-        // 3. Clientes (CRM) - Placeholder
-        $clientContacts = collect(); 
+        // 3. Clientes (CRM)
+        $clientContacts = collect();
 
-        // Seleciona a lista baseada na aba ativa
-        $contacts = match($this->activeTab) {
+        $contacts = match ($this->activeTab) {
             'team' => $teamContacts,
             'support' => $supportContacts,
             'clients' => $clientContacts,
             default => $teamContacts
         };
 
+        $activeUser = $this->activeUserId ? User::find($this->activeUserId) : null;
         $messages = [];
-        $activeUser = null;
 
         if ($this->activeUserId) {
-            $activeUser = User::find($this->activeUserId);
-            // Se for User
-            if ($activeUser) {
-                $messages = ChatMessage::where(function($q) {
-                        $q->where('sender_id', Auth::id())
-                        ->where('receiver_id', $this->activeUserId);
-                    })
-                    ->orWhere(function($q) {
-                        $q->where('sender_id', $this->activeUserId)
+            $messages = ChatMessage::where(function ($q) {
+                $q->where('sender_id', Auth::id())
+                    ->where('receiver_id', $this->activeUserId);
+            })
+                ->orWhere(function ($q) {
+                    $q->where('sender_id', $this->activeUserId)
                         ->where('receiver_id', Auth::id());
-                    })
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-            }
+                })
+                ->orderBy('created_at', 'asc')
+                ->get();
         }
 
         return view('livewire.support-chat', [
