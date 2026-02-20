@@ -73,8 +73,51 @@ class AccountingController extends Controller
             return back()->with('error', 'Erro ao ler o arquivo OFX. Verifique se o formato é válido.');
         }
 
-        // Armazenar na sessão para conciliação (ou passar para a view)
-        return back()->with('ofx_data', $ofxTransactions);
+        // Passar os dados para uma tela específica de conciliação
+        return view('content.accounting.reconcile', compact('ofxTransactions'));
+    }
+
+    public function conciliate(Request $request)
+    {
+        $request->validate([
+            'bank_id' => 'required',
+            'action' => 'required|in:match,create',
+            'transaction_id' => 'required_if:action,match',
+            'amount' => 'required|numeric',
+            'type' => 'required',
+            'date' => 'required|date',
+            'description' => 'required|string',
+        ]);
+
+        $companyId = Auth::user()->company_id;
+
+        if ($request->action === 'match') {
+            $transaction = FinancialTransaction::where('id', $request->transaction_id)
+                ->where('company_id', $companyId)
+                ->firstOrFail();
+
+            $transaction->update([
+                'bank_transaction_id' => $request->bank_id,
+                'status' => 'paid',
+                'paid_at' => $request->date,
+            ]);
+        } else {
+            // Criar novo lançamento direto do banco
+            FinancialTransaction::create([
+                'company_id' => $companyId,
+                'description' => $request->description,
+                'amount' => $request->amount,
+                'type' => $request->type,
+                'status' => 'paid',
+                'due_date' => $request->date,
+                'paid_at' => $request->date,
+                'bank_transaction_id' => $request->bank_id,
+                'user_id' => Auth::id(),
+                'category' => 'Conciliação Bancária'
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     public function auditTransaction(Request $request, $id)

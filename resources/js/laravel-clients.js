@@ -4,7 +4,15 @@
 
 'use strict';
 
+console.log('Script laravel-clients.js carregado com sucesso!');
+
 document.addEventListener('DOMContentLoaded', function (e) {
+    // Garantir que baseUrl existe
+    if (typeof baseUrl === 'undefined') {
+        window.baseUrl = window.location.origin + '/';
+    }
+    console.log('Base URL detectada:', baseUrl);
+
     const dt_table = document.querySelector('.datatables-clients'),
         offCanvasForm = document.getElementById('offcanvasAddClients'),
         formClient = document.getElementById('addNewClientsForm'),
@@ -12,6 +20,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
         sectionPJ = document.getElementById('sectionPJ'),
         customFieldsContainer = document.getElementById('custom-fields-container'),
         customFieldsList = document.getElementById('custom-fields-list');
+
+    // Fix for baseUrl issues
+    const fetchUrl = (path) => {
+        const cleanBase = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+        const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+        return cleanBase + cleanPath;
+    };
 
     // Function to render custom fields
     function renderCustomFields(fields) {
@@ -64,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         const dt_clients = new DataTable(dt_table, {
             processing: true,
             serverSide: true,
-            ajax: { url: baseUrl + 'clients-list' },
+            ajax: { url: fetchUrl('clients-list') },
             columns: [
                 { data: 'id' },
                 { data: 'id' },
@@ -146,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 $('#viewClientModal').modal('show');
                 $('#clientModalContent').html('<div class="text-center p-4"><div class="spinner-border text-primary"></div></div>');
 
-                fetch(`${baseUrl}clients/${id}/quick-view`)
+                fetch(fetchUrl(`clients/${id}/quick-view`))
                     .then(res => res.text())
                     .then(html => {
                         $('#clientModalContent').html(html);
@@ -158,11 +173,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
         document.addEventListener('click', function (e) {
             if (e.target.closest('.view-vehicle-dossier')) {
                 const id = e.target.closest('.view-vehicle-dossier').dataset.id;
-
-                // Precisamos garantir que o modal exista na página. 
-                // Se não existir (estamos na página de clientes, não veículos), precisamos criar ou redirecionar.
-                // Como o modal é grande, o ideal é ter ele na página.
-                // Vou injetar o modal dinamicamente se não existir.
 
                 let modalEl = document.getElementById('viewDossierModal');
                 if (!modalEl) {
@@ -187,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
                 document.getElementById('dossierModalContent').innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>';
 
-                fetch(`${baseUrl}vehicles/${id}/dossier`)
+                fetch(fetchUrl(`vehicles/${id}/dossier`))
                     .then(res => res.text())
                     .then(html => {
                         document.getElementById('dossierModalContent').innerHTML = html;
@@ -209,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     buttonsStyling: false
                 }).then(result => {
                     if (result.isConfirmed) {
-                        fetch(`${baseUrl}clients-list/${id}`, {
+                        fetch(fetchUrl(`clients-list/${id}`), {
                             method: 'DELETE',
                             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
                         }).then(res => res.json()).then(data => {
@@ -230,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 document.getElementById('offcanvasAddClientsLabel').innerHTML = 'Editar Cliente';
                 formClient.reset();
 
-                fetch(`${baseUrl}clients-list/${id}/edit`)
+                fetch(fetchUrl(`clients-list/${id}/edit`))
                     .then(res => res.json())
                     .then(data => {
                         const client = data.client;
@@ -276,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                 </div>
                             `).join('');
 
-                            // Na edição, se já tem carro, esconde o form de "novo carro" por padrão
                             vehicleFields.classList.add('d-none');
                             btnToggle.classList.remove('d-none');
                         } else {
@@ -310,19 +319,20 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
 
                 // Carregar campos personalizados vazios para novo cliente
-                // Para isso, precisamos de uma rota que retorne apenas as definições
-                // Vou usar a mesma rota de edit mas com ID 0 ou um endpoint específico
-                // Como o trait já lida com isso, vou buscar via fetch
-                fetch(`${baseUrl}settings/custom-fields?entity=Clients`)
-                    .then(res => res.json())
+                console.log('Buscando campos para novo cliente...');
+                fetch(fetchUrl(`settings/custom-fields?entity=Clients`))
+                    .then(res => {
+                        console.log('Resposta do servidor recebida:', res.status);
+                        return res.json();
+                    })
                     .then(fields => {
+                        console.log('Campos recebidos:', fields);
                         renderCustomFields(fields);
-                    }).catch(() => {
-                        // Se falhar ou não quiser criar endpoint agora, apenas limpa
+                    }).catch(err => {
+                        console.error('Erro ao buscar campos personalizados:', err);
                         customFieldsContainer.classList.add('d-none');
                     });
 
-                // No cadastro novo, sempre mostra os campos do veículo
                 document.getElementById('existingVehiclesSection').classList.add('d-none');
                 document.getElementById('vehicleFieldsContainer').classList.remove('d-none');
                 document.getElementById('btnToggleVehicle').classList.add('d-none');
@@ -335,20 +345,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
         formClient.addEventListener('submit', function (e) {
             e.preventDefault();
             const id = document.getElementById('client_id').value;
-            const url = id ? `${baseUrl}clients-list/${id}` : `${baseUrl}clients-list`;
-            const method = id ? 'PUT' : 'POST';
+            const url = id ? fetchUrl(`clients-list/${id}`) : fetchUrl('clients-list');
 
-            // Use FormData directly for reliable field capturing
             const formData = new FormData(formClient);
-
-            // Garantir que CPF/CNPJ vão limpos para o servidor para bater com a validação
             if (formData.get('cpf')) formData.set('cpf', formData.get('cpf').replace(/\D/g, ''));
             if (formData.get('cnpj')) formData.set('cnpj', formData.get('cnpj').replace(/\D/g, ''));
 
             if (id) formData.append('_method', 'PUT');
 
             fetch(url, {
-                method: 'POST', // Always POST for Laravel when sending files/formdata, with _method override
+                method: 'POST',
                 body: formData,
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
@@ -368,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
                             location.reload();
                         });
                     } else {
-                        // Limpar erros anteriores
                         formClient.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
                         formClient.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
@@ -377,32 +382,18 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                 const input = formClient.querySelector(`[name="${key}"]`);
                                 if (input) {
                                     input.classList.add('is-invalid');
-
-                                    // Criar div de erro
                                     const feedback = document.createElement('div');
                                     feedback.className = 'invalid-feedback';
                                     feedback.innerText = data.errors[key][0];
-
-                                    // Inserir após o input (ou após o container do input se for um grupo)
                                     if (input.closest('.input-group')) {
                                         input.closest('.input-group').after(feedback);
-                                    } else if (input.classList.contains('select2-hidden-accessible')) {
-                                        const select2Container = input.nextElementSibling;
-                                        if (select2Container && select2Container.classList.contains('select2-container')) {
-                                            select2Container.after(feedback);
-                                        }
                                     } else {
                                         input.after(feedback);
                                     }
                                 }
                             });
                         } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erro!',
-                                text: data.message || 'Erro inesperado',
-                                customClass: { confirmButton: 'btn btn-primary' }
-                            });
+                            Swal.fire({ icon: 'error', title: 'Erro!', text: data.message || 'Erro inesperado' });
                         }
                     }
                 })

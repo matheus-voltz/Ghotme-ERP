@@ -123,6 +123,33 @@
 
         <!-- Coluna Direita: Resumo -->
         <div class="col-md-4">
+            @if(isset($customFields) && $customFields->count() > 0)
+            <div class="card mb-4">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-0">Informações Adicionais</h5>
+                </div>
+                <div class="card-body pt-4">
+                    @foreach($customFields as $field)
+                    <div class="mb-3">
+                        <label class="form-label">{{ $field->name }}</label>
+                        @if($field->type === 'select')
+                            <select name="custom_fields[{{ $field->id }}]" class="form-select" {{ $field->required ? 'required' : '' }}>
+                                <option value="">Selecione...</option>
+                                @foreach($field->options as $opt)
+                                    <option value="{{ $opt }}">{{ $opt }}</option>
+                                @endforeach
+                            </select>
+                        @elseif($field->type === 'textarea')
+                            <textarea name="custom_fields[{{ $field->id }}]" class="form-control" rows="2" {{ $field->required ? 'required' : '' }}></textarea>
+                        @else
+                            <input type="{{ $field->type }}" name="custom_fields[{{ $field->id }}]" class="form-control" {{ $field->required ? 'required' : '' }} />
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <div class="card">
                 <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Ações</h5>

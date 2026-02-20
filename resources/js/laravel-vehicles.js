@@ -7,7 +7,44 @@
 document.addEventListener('DOMContentLoaded', function (e) {
     const dt_table = document.querySelector('.datatables-vehicles'),
         offCanvasForm = document.getElementById('offcanvasAddVehicles'),
-        formVehicle = document.getElementById('addNewVehicleForm');
+        formVehicle = document.getElementById('addNewVehicleForm'),
+        customFieldsContainer = document.getElementById('custom-fields-container'),
+        customFieldsList = document.getElementById('custom-fields-list');
+
+    // Function to render custom fields
+    function renderCustomFields(fields) {
+        if (!fields || fields.length === 0) {
+            customFieldsContainer.classList.add('d-none');
+            return;
+        }
+
+        customFieldsContainer.classList.remove('d-none');
+        customFieldsList.innerHTML = fields.map(field => {
+            const value = field.current_value || '';
+            const required = field.required ? 'required' : '';
+            let input = '';
+
+            if (field.type === 'select') {
+                const options = Array.isArray(field.options) ? field.options : [];
+                input = `
+                    <select name="custom_fields[${field.id}]" class="form-select" ${required}>
+                        <option value="">Selecione...</option>
+                        ${options.map(opt => `<option value="${opt}" ${value == opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>`;
+            } else if (field.type === 'textarea') {
+                input = `<textarea name="custom_fields[${field.id}]" class="form-control" rows="2" ${required}>${value}</textarea>`;
+            } else {
+                input = `<input type="${field.type}" name="custom_fields[${field.id}]" class="form-control" value="${value}" ${required} />`;
+            }
+
+            return `
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">${field.name}</label>
+                    ${input}
+                </div>
+            `;
+        }).join('');
+    }
 
     // Select2 initialization
     var select2 = $('.select2');
@@ -141,14 +178,18 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 fetch(`${baseUrl}vehicles-list/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
-                        document.getElementById('vehicle_id').value = data.id;
-                        document.getElementById('add-vehicle-placa').value = data.placa;
-                        document.getElementById('add-vehicle-marca').value = data.marca;
-                        document.getElementById('add-vehicle-modelo').value = data.modelo;
-                        document.getElementById('add-vehicle-ano-fabricacao').value = data.ano_fabricacao || '';
-                        document.getElementById('add-vehicle-renavam').value = data.renavam || '';
-                        $('#vehicle-cliente').val(data.cliente_id).trigger('change');
-                        $('#vehicle-status').val(data.ativo ? '1' : '0');
+                        const vehicle = data.vehicle;
+                        document.getElementById('vehicle_id').value = vehicle.id;
+                        document.getElementById('add-vehicle-placa').value = vehicle.placa;
+                        document.getElementById('add-vehicle-marca').value = vehicle.marca;
+                        document.getElementById('add-vehicle-modelo').value = vehicle.modelo;
+                        document.getElementById('add-vehicle-ano-fabricacao').value = vehicle.ano_fabricacao || '';
+                        document.getElementById('add-vehicle-renavam').value = vehicle.renavam || '';
+                        $('#vehicle-cliente').val(vehicle.cliente_id).trigger('change');
+                        $('#vehicle-status').val(vehicle.ativo ? '1' : '0');
+
+                        // Renderizar campos personalizados
+                        renderCustomFields(data.custom_fields);
                     });
             }
         });
@@ -160,6 +201,15 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formVehicle.reset();
                 $('#vehicle-cliente').val('').trigger('change');
                 document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Cadastrar Veículo';
+
+                // Carregar campos personalizados vazios para novo veículo
+                fetch(`${baseUrl}settings/custom-fields?entity=Vehicles`)
+                    .then(res => res.json())
+                    .then(fields => {
+                        renderCustomFields(fields);
+                    }).catch(() => {
+                        customFieldsContainer.classList.add('d-none');
+                    });
             });
         }
     }

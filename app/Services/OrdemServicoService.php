@@ -26,6 +26,11 @@ class OrdemServicoService
             $this->syncItems($os, $data['services'] ?? []);
             $this->syncParts($os, $data['parts'] ?? []);
 
+            // Salva campos personalizados
+            if (isset($data['custom_fields'])) {
+                $os->syncCustomFields($data['custom_fields']);
+            }
+
             $this->logHistory($os, 'entrada_oficina', 'Entrada na Oficina', 'O veículo deu entrada para avaliação técnica.');
             $this->logHistory($os, 'aguardando_orcamento', 'Aguardando Orçamento', 'A equipe técnica está avaliando o veículo para elaboração do orçamento.');
 
@@ -46,6 +51,11 @@ class OrdemServicoService
 
             $this->syncItems($os, $data['services'] ?? [], true);
             $this->syncParts($os, $data['parts'] ?? [], true);
+
+            // Salva campos personalizados
+            if (isset($data['custom_fields'])) {
+                $os->syncCustomFields($data['custom_fields']);
+            }
 
             return $os;
         });

@@ -234,6 +234,7 @@ Route::middleware([
     // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
     Route::post('/accounting/import-ofx', [App\Http\Controllers\AccountingController::class, 'importOfx'])->name('accounting.import-ofx');
+    Route::post('/accounting/conciliate', [App\Http\Controllers\AccountingController::class, 'conciliate'])->name('accounting.conciliate');
     Route::post('/accounting/audit/{id}', [App\Http\Controllers\AccountingController::class, 'auditTransaction'])->name('accounting.audit');
     Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export');
     Route::get('/fiscal/emit-invoice', [App\Http\Controllers\TaxInvoiceController::class, 'createFromOS'])->name('tax.invoice.create');

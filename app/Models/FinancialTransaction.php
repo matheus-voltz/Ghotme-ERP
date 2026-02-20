@@ -24,7 +24,10 @@ class FinancialTransaction extends Model
         'supplier_id',
         'related_type',
         'related_id',
-        'user_id'
+        'user_id',
+        'bank_transaction_id',
+        'bank_name',
+        'bank_metadata'
     ];
 
     protected $casts = [

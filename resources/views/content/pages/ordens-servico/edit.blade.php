@@ -169,6 +169,34 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
         <!-- Coluna Direita: Resumo -->
         <div class="col-md-4">
+            @if(isset($customFields) && $customFields->count() > 0)
+            <div class="card mb-4">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-0">Informações Adicionais</h5>
+                </div>
+                <div class="card-body pt-4">
+                    @foreach($customFields as $field)
+                    <div class="mb-3">
+                        <label class="form-label">{{ $field->name }}</label>
+                        @php $val = $field->current_value; @endphp
+                        @if($field->type === 'select')
+                            <select name="custom_fields[{{ $field->id }}]" class="form-select" {{ $field->required ? 'required' : '' }}>
+                                <option value="">Selecione...</option>
+                                @foreach($field->options as $opt)
+                                    <option value="{{ $opt }}" {{ $val == $opt ? 'selected' : '' }}>{{ $opt }}</option>
+                                @endforeach
+                            </select>
+                        @elseif($field->type === 'textarea')
+                            <textarea name="custom_fields[{{ $field->id }}]" class="form-control" rows="2" {{ $field->required ? 'required' : '' }}>{{ $val }}</textarea>
+                        @else
+                            <input type="{{ $field->type }}" name="custom_fields[{{ $field->id }}]" class="form-control" value="{{ $val }}" {{ $field->required ? 'required' : '' }} />
+                        @endif
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <div class="card mb-4">
                 <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Ações</h5>

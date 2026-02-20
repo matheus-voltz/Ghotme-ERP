@@ -74,7 +74,11 @@ class OrdemServicoController extends Controller
         $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
-        return view('content.pages.ordens-servico.create', compact('clients', 'services', 'parts'));
+        
+        // Carrega campos disponíveis para nova OS
+        $customFields = (new OrdemServico())->getAvailableCustomFields();
+
+        return view('content.pages.ordens-servico.create', compact('clients', 'services', 'parts', 'customFields'));
     }
 
     public function store(StoreOrdemServicoRequest $request)
@@ -154,8 +158,11 @@ class OrdemServicoController extends Controller
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
+        
+        // Carrega campos personalizados preenchidos
+        $customFields = $order->getCustomFieldsWithValues();
 
-        return view('content.pages.ordens-servico.edit', compact('order', 'clients', 'services', 'parts', 'vehicles'));
+        return view('content.pages.ordens-servico.edit', compact('order', 'clients', 'services', 'parts', 'vehicles', 'customFields'));
     }
 
     public function update(UpdateOrdemServicoRequest $request, $id)

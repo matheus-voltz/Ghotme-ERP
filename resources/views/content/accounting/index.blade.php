@@ -39,59 +39,6 @@
         <div class="col-md-3"><div class="card bg-info text-white p-3"><h5>{{ __('Audit') }} {{ $totals['audited_count'] }}/{{ $expenses->count() }}</h5></div></div>
     </div>
 
-    @if(session('ofx_data'))
-    <!-- ABA DE CONCILIAÇÃO -->
-    <div class="card mb-4 border-primary">
-        <div class="card-header bg-label-primary d-flex justify-content-between">
-            <h5 class="mb-0">{{ __('Bank Reconciliation') }} ({{ count(session('ofx_data')) }} {{ __('entries') }})</h5>
-            <a href="{{ route('accounting.index') }}" class="btn btn-xs btn-outline-danger">{{ __('Clear Extract') }}</a>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm">
-                <thead class="table-light">
-                    <tr>
-                        <th>{{ __('Bank (Statement)') }}</th>
-                        <th>{{ __('Value') }}</th>
-                        <th>{{ __('ERP Status (Suggestion)') }}</th>
-                        <th>{{ __('Action') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach(session('ofx_data') as $ofx)
-                    @php
-                        $match = $revenue->first(fn($r) => abs($r->total - abs($ofx['amount'])) < 0.01)
-                                 ?? $expenses->first(fn($e) => abs($e->amount - abs($ofx['amount'])) < 0.01);
-                    @endphp
-                    <tr class="{{ $match ? 'table-success-light' : '' }}">
-                        <td>
-                            <small class="text-muted d-block">{{ date('d/m/Y', strtotime($ofx['date'])) }}</small>
-                            <strong>{{ $ofx['memo'] }}</strong>
-                        </td>
-                        <td class="{{ $ofx['amount'] < 0 ? 'text-danger' : 'text-success' }}">
-                            R$ {{ number_format($ofx['amount'], 2, ',', '.') }}
-                        </td>
-                        <td>
-                            @if($match)
-                                <span class="badge bg-label-success">{{ __('Match Found') }} (#{{ $match->id }})</span>
-                            @else
-                                <span class="badge bg-label-secondary">{{ __('Not Linked') }}</span>
-                            @endif
-                        </td>
-                        <td>
-                            @if($match)
-                                <button class="btn btn-xs btn-success">{{ __('Confirm Link') }}</button>
-                            @else
-                                <button class="btn btn-xs btn-primary">{{ __('Post to ERP') }}</button>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
-
     <div class="nav-align-top mb-4">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-rev">{{ __('Revenue & Invoices') }}</button></li>
