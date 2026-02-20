@@ -253,6 +253,12 @@ Route::middleware([
     Route::get('/settings/company-data', [CompanySettingController::class, 'index'])->name('settings.company-data');
     Route::post('/settings/company-data', [CompanySettingController::class, 'update'])->name('settings.company-data.update');
 
+    // Custom Fields
+    Route::get('/settings/custom-fields', [App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
+    Route::post('/settings/custom-fields', [App\Http\Controllers\CustomFieldController::class, 'store'])->name('settings.custom-fields.store');
+    Route::put('/settings/custom-fields/{id}', [App\Http\Controllers\CustomFieldController::class, 'update'])->name('settings.custom-fields.update');
+    Route::delete('/settings/custom-fields/{id}', [App\Http\Controllers\CustomFieldController::class, 'destroy'])->name('settings.custom-fields.destroy');
+
     // Custom Checklist
     Route::get('/settings/custom-checklist', [ChecklistController::class, 'index'])->name('settings.custom-checklist');
     Route::get('/settings/custom-checklist-list', [ChecklistController::class, 'dataBase'])->name('settings.custom-checklist.list');

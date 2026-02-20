@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 
 class UserManagement extends Controller
 {
@@ -17,19 +18,21 @@ class UserManagement extends Controller
    */
   public function index(): View
   {
-    // dd('UserManagement');
-    $users = User::all();
-    $userCount = $users->count();
-    $verified = User::whereNotNull('email_verified_at')->get()->count();
-    $notVerified = User::whereNull('email_verified_at')->get()->count();
-    $usersUnique = $users->unique(['email']);
-    $userDuplicates = $users->diff($usersUnique)->count();
+    $currentUser = Auth::user();
+    $companyId = $currentUser->company_id;
 
+    // Filtra apenas usuários da mesma empresa
+    $query = User::where('company_id', $companyId);
+    
+    $userCount = $query->count();
+    $verified = (clone $query)->whereNotNull('email_verified_at')->count();
+    $notVerified = (clone $query)->whereNull('email_verified_at')->count();
+    
     return view('content.laravel-example.user-management', [
       'totalUser' => $userCount,
       'verified' => $verified,
       'notVerified' => $notVerified,
-      'userDuplicates' => $userDuplicates,
+      'userDuplicates' => 0, // Removido por não fazer sentido no contexto de empresa única
     ]);
   }
 
@@ -40,6 +43,9 @@ class UserManagement extends Controller
    */
   public function dataBase(Request $request): JsonResponse
   {
+    $currentUser = Auth::user();
+    $companyId = $currentUser->company_id;
+
     $columns = [
       1 => 'id',
       2 => 'name',
@@ -48,15 +54,16 @@ class UserManagement extends Controller
       5 => 'is_active',
     ];
 
-    $totalData = User::count(); // Total records without filtering
+    // Segurança: Sempre filtra pela empresa do usuário logado
+    $query = User::where('company_id', $companyId);
+
+    $totalData = $query->count();
     $totalFiltered = $totalData;
 
     $limit = $request->input('length');
     $start = $request->input('start');
     $order = $columns[$request->input('order.0.column')] ?? 'id';
     $dir = $request->input('order.0.dir') ?? 'desc';
-
-    $query = User::query();
 
     // Search handling
     if (!empty($request->input('search.value'))) {
@@ -93,7 +100,6 @@ class UserManagement extends Controller
       ];
     }
 
-    // ✅ Always return full DataTables structure, even if no results
     return response()->json([
       'draw' => intval($request->input('draw')),
       'recordsTotal' => intval($totalData),
@@ -103,20 +109,7 @@ class UserManagement extends Controller
   }
 
   /**
-   * Show the form for creating a new resource.
-   *
-   * @return \Illuminate\Http\Response
-   */
-  public function create()
-  {
-    // return view('content.laravel-example.user-management');
-  }
-
-  /**
    * Store a newly created resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\Response
    */
   public function store(Request $request)
   {
@@ -124,33 +117,21 @@ class UserManagement extends Controller
     $currentUser = auth()->user();
 
     if ($userID) {
-      // update the value
-      $users = User::updateOrCreate(
-        ['id' => $userID],
-        [
-          'name' => $request->name,
-          'email' => $request->email,
-          'company' => $request->company,
-          'contact_number' => $request->userContact,
-          'country' => $request->country,
-          'role' => $request->role,
-          'plan' => $request->plan,
-        ]
-      );
+      // Segurança: Verifica se o usuário a ser editado pertence à mesma empresa
+      $userToUpdate = User::where('id', $userID)->where('company_id', $currentUser->company_id)->firstOrFail();
 
-      //criar um response json status ok e mensagem updated
+      $userToUpdate->update([
+        'name' => $request->name,
+        'email' => $request->email,
+        'contact_number' => $request->userContact,
+        'role' => $request->role,
+      ]);
+
       return response()->json('atualizado');
     } else {
       // Check limits based on plan
       $limit = ($currentUser->plan === 'enterprise') ? 10 : 3;
-      // Assuming we need to count users created by this "admin" (SaaS context)
-      // Since I don't see a strict parent_id yet, I will assume we might need to add one or use a scope.
-      // For now, I will use a placeholder scope or just count all if it's a single tenant per DB (unlikely).
-      // Let's assume there is a way to associate.
-      // Actually, reading the prompt "o user consegue criar 3 usuarios (funcionarios)", implies relationship.
-      // I will add 'parent_id' => $currentUser->id to the creation and count by it.
-
-      $createdCount = User::where('parent_id', $currentUser->id)->count();
+      $createdCount = User::where('company_id', $currentUser->company_id)->count();
 
       if ($createdCount >= $limit) {
         return response()->json(['message' => "Seu plano permite apenas {$limit} usuários. Faça upgrade para Enterprise para ter mais."], 403);
@@ -160,90 +141,50 @@ class UserManagement extends Controller
       $userEmail = User::where('email', $request->email)->first();
 
       if (empty($userEmail)) {
-        $users = User::create([
+        User::create([
           'name' => $request->name,
           'email' => $request->email,
           'password' => bcrypt(Str::random(10)),
-          'parent_id' => $currentUser->id, // Linking to creator
-          'company' => $currentUser->company, // Inherit company? often yes
+          'company_id' => $currentUser->company_id,
+          'parent_id' => $currentUser->id,
+          'role' => $request->role ?? 'funcionario',
+          'status' => 'active',
+          'is_active' => 1
         ]);
 
-        // user created
         return response()->json('Criado');
       } else {
-        // user already exist
-        return response()->json(['message' => "already exits"], 422);
+        return response()->json(['message' => "E-mail já cadastrado no sistema."], 422);
       }
     }
   }
 
   /**
-   * Display the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function show($id)
-  {
-    //
-  }
-
-  /**
-   * Show the form for editing the specified resource.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function edit($id): JsonResponse
-  {
-    $user = User::findOrFail($id);
-    return response()->json($user);
-  }
-
-  /**
-   * Update the specified resource in storage.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
-   */
-  public function update(Request $request, $id) {}
-
-  /**
    * Remove the specified resource from storage.
-   *
-   * @param  int  $id
-   * @return \Illuminate\Http\Response
    */
   public function destroy($id)
   {
-    $users = User::where('id', $id)->delete();
+    $currentUser = Auth::user();
+    // Segurança: Só deleta se for da mesma empresa
+    User::where('id', $id)->where('company_id', $currentUser->company_id)->delete();
+    return response()->json(['status' => 'success']);
   }
 
   /**
    * Suspend the specified user account.
-   *
-   * @param  \Illuminate\Http\Request  $request
-   * @return \Illuminate\Http\Response
    */
   public function suspendUser(Request $request)
   {
+    $currentUser = Auth::user();
     $userId = $request->id;
-    $user = User::find($userId);
+    $user = User::where('id', $userId)->where('company_id', $currentUser->company_id)->first();
 
     if ($user) {
-      // Toggle suspension or just suspend? "Suspend" implies turning off.
-      // Assuming is_active = 1 is active, 0 is suspended.
-      // If we want to strictly "suspend", we set to 0.
-      // If the user is already suspended, maybe we want to activate? 
-      // The request says "suspend/account", so I'll assume it sets to suspended state.
-      // However, usually these buttons are toggles. I will make provided ID suspended.
       $user->is_active = 0;
       $user->save();
-
       return response()->json(['status' => 'success', 'message' => 'User suspended successfully']);
     }
 
-    return response()->json(['status' => 'error', 'message' => 'User not found'], 404);
+    return response()->json(['status' => 'error', 'message' => 'User not found or access denied'], 404);
   }
 }

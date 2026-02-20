@@ -156,6 +156,11 @@ class VehiclesController extends Controller
             ]);
         }
 
+        // Salva campos personalizados
+        if ($request->has('custom_fields')) {
+            $vehicle->syncCustomFields($request->custom_fields);
+        }
+
         return response()->json(['success' => true, 'message' => "Veículo {$status} com sucesso!"]);
     }
 
@@ -173,7 +178,12 @@ class VehiclesController extends Controller
     public function edit(string $id)
     {
         $vehicle = Vehicles::findOrFail($id);
-        return response()->json($vehicle);
+        $customFields = $vehicle->getCustomFieldsWithValues();
+
+        return response()->json([
+            'vehicle' => $vehicle,
+            'custom_fields' => $customFields
+        ]);
     }
 
     /**

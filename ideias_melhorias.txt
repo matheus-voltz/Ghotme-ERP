@@ -1,38 +1,31 @@
-1. 🤖 Inteligência e IA (O "Uau" do Cliente)
-   * Leitura de Documentos via IA (OCR): O usuário tira foto do documento do carro (CRLV) ou da CNH do cliente, e o
-     sistema preenche tudo sozinho (Nome, CPF, Placa, Chassi). Isso economiza minutos valiosos na recepção.
-   * Diagnóstico por Voz: O mecânico, com as mãos sujas, clica num botão de microfone e dita os problemas. O sistema
-     transcreve o texto direto nas observações da OS.
-   * Previsão de Receita: Baseado nos orçamentos pendentes e na média de aprovação, o dashboard mostra: "Você tem R$
-     15.000,00 em orçamentos na rua com 70% de chance de fechamento nos próximos 5 dias".
+1. "Painel de Passos" (Kanban Financeiro)
+  A Omie não usa apenas tabelas para o financeiro; eles usam um Kanban (como o seu de OS) para Contas a Receber.
+   * Ideia: Criar um Kanban financeiro onde os cards são os pagamentos pendentes. As colunas seriam: A Vencer -> Vencendo
+     Hoje -> Atrasado -> Cobrança Enviada -> Recebido. Isso facilita visualmente o fluxo de caixa.
 
 
-  2. 📱 Experiência e Fidelização (CRM Ativo)
-   * Lembretes de Revisão Automáticos: O sistema detecta que o cliente trocou o óleo há 6 meses e envia um WhatsApp
-     automático: "Olá João, está na hora da nova revisão do seu [Modelo]. Vamos agendar?"
-   * Cartão de Fidelidade Digital: Cada R$ 100,00 em serviços geram pontos que podem ser trocados por descontos ou
-     brindes (ex: uma lavagem grátis).
-   * Página de Status "Onde está meu carro?": Uma URL simplificada onde o cliente vê uma barra de progresso: [Entrada]
-     -> [Peças Chegaram] -> [Em Manutenção] -> [Testes Finais] -> [Pronto].
+  2. Portal do Contador (Self-Service)
+  A Omie cresceu "dentro" dos escritórios de contabilidade.
+   * Ideia: Você já tem um slug para isso no menu. Implemente uma funcionalidade onde o contador do seu cliente tem um login
+     único (ou um link seguro) para baixar todos os XMLs de notas fiscais e o relatório de fechamento do mês (DRE)
+     automaticamente, sem o cliente precisar enviar por e-mail.
 
 
-  3. 🏢 Gestão B2B e Frotas (Para Grandes Clientes)
-   * Faturamento de Frotas: Permitir que uma empresa (ex: uma locadora) tenha 10 carros na oficina e o Ghotme gere uma
-     fatura única mensal com todos os serviços agrupados.
-   * Portal do Frotista: Uma área onde o gestor da frota vê o custo por placa, média de gasto anual e quais carros estão
-     parados na sua oficina agora.
+  3. "Omie Academy" Integrada (Educação)
+  Eles têm uma barra de pesquisa e vídeos curtos de 1 minuto para cada funcionalidade dentro do próprio sistema.
+   * Ideia: No seu Dashboard, adicione um card ou um botão de interrogação flutuante que abre um modal com pequenos "Gifs"
+     ou vídeos ensinando a "Como criar uma OS" ou "Como fechar o caixa". Isso reduz o suporte e retém o usuário.
 
 
-  4. 💰 Financeiro Avançado
-   * Split de Comissões Real-time: Assim que a OS é paga, o sistema já separa a parte do mecânico (ex: 10% da mão de
-     obra) e mostra no painel dele quanto ele já ganhou no mês.
-   * Fluxo de Caixa Projetado: Um gráfico que cruza o Contas a Pagar (aluguel, luz, fornecedores) com o Contas a Receber
-     (parcelamentos de cartões, boletos) para prever se faltará dinheiro daqui a 15 dias.
+  4. Gestão de Contratos e Recorrência
+  Muitas oficinas atendem frotas (empresas) que pagam um valor fixo mensal ou por faturamento quinzenal.
+   * Ideia: Criar um módulo de Contratos de Manutenção. O sistema gera automaticamente uma "Ordem de Serviço de Revisão
+     Mensal" ou uma "Fatura de Mensalidade" todo dia 01 para os clientes configurados como "Frota".
 
 
-  5. 📦 Estoque e Compras
-   * Pedido de Compra Automático: Quando uma peça atinge o "Estoque Mínimo", o sistema gera um PDF de pedido de compra
-     pronto para ser enviado ao fornecedor.
-   * Curva ABC de Peças: Relatório que mostra quais peças trazem mais lucro e quais estão "encalhadas" no estoque
-     ocupando espaço e dinheiro.
+  5. Robô de Cobrança (Automação de WhatsApp)
+  A Omie automatiza o envio de boletos e lembretes.
+   * Ideia: Já que você tem integração com WhatsApp, crie um comando (Job do Laravel) que roda todo dia às 09h e envia: "Olá
+     [Cliente], identificamos que sua OS #[ID] vence amanhã. Segue o link para pagamento/PIX: [LINK]". Isso aumenta
+     absurdamente a percepção de valor do seu software para o dono da oficina.
 

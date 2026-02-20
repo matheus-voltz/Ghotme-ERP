@@ -9,7 +9,44 @@ document.addEventListener('DOMContentLoaded', function (e) {
         offCanvasForm = document.getElementById('offcanvasAddClients'),
         formClient = document.getElementById('addNewClientsForm'),
         sectionPF = document.getElementById('sectionPF'),
-        sectionPJ = document.getElementById('sectionPJ');
+        sectionPJ = document.getElementById('sectionPJ'),
+        customFieldsContainer = document.getElementById('custom-fields-container'),
+        customFieldsList = document.getElementById('custom-fields-list');
+
+    // Function to render custom fields
+    function renderCustomFields(fields) {
+        if (!fields || fields.length === 0) {
+            customFieldsContainer.classList.add('d-none');
+            return;
+        }
+
+        customFieldsContainer.classList.remove('d-none');
+        customFieldsList.innerHTML = fields.map(field => {
+            const value = field.current_value || '';
+            const required = field.required ? 'required' : '';
+            let input = '';
+
+            if (field.type === 'select') {
+                const options = Array.isArray(field.options) ? field.options : [];
+                input = `
+                    <select name="custom_fields[${field.id}]" class="form-select" ${required}>
+                        <option value="">Selecione...</option>
+                        ${options.map(opt => `<option value="${opt}" ${value == opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>`;
+            } else if (field.type === 'textarea') {
+                input = `<textarea name="custom_fields[${field.id}]" class="form-control" rows="2" ${required}>${value}</textarea>`;
+            } else {
+                input = `<input type="${field.type}" name="custom_fields[${field.id}]" class="form-control" value="${value}" ${required} />`;
+            }
+
+            return `
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">${field.name}</label>
+                    ${input}
+                </div>
+            `;
+        }).join('');
+    }
 
     // Toggle PF/PJ
     document.querySelectorAll('.client-type-toggle').forEach(radio => {
@@ -196,26 +233,30 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 fetch(`${baseUrl}clients-list/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
-                        document.getElementById('client_id').value = data.id;
-                        if (data.type === 'PF') {
+                        const client = data.client;
+                        document.getElementById('client_id').value = client.id;
+                        if (client.type === 'PF') {
                             document.getElementById('typePF').checked = true;
                             sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
-                            document.querySelector('[name="name"]').value = data.name || '';
-                            document.querySelector('[name="cpf"]').value = data.cpf || '';
+                            document.querySelector('[name="name"]').value = client.name || '';
+                            document.querySelector('[name="cpf"]').value = client.cpf || '';
                         } else {
                             document.getElementById('typePJ').checked = true;
                             sectionPF.classList.add('d-none'); sectionPJ.classList.remove('d-none');
-                            document.querySelector('[name="company_name"]').value = data.company_name || '';
-                            document.querySelector('[name="cnpj"]').value = data.cnpj || '';
+                            document.querySelector('[name="company_name"]').value = client.company_name || '';
+                            document.querySelector('[name="cnpj"]').value = client.cnpj || '';
                         }
-                        document.querySelector('[name="email"]').value = data.email || '';
-                        document.querySelector('[name="whatsapp"]').value = data.whatsapp || '';
-                        document.querySelector('[name="cep"]').value = data.cep || '';
-                        document.querySelector('[name="rua"]').value = data.rua || '';
-                        document.querySelector('[name="numero"]').value = data.numero || '';
-                        document.querySelector('[name="bairro"]').value = data.bairro || '';
-                        document.querySelector('[name="cidade"]').value = data.cidade || '';
-                        document.querySelector('[name="estado"]').value = data.estado || '';
+                        document.querySelector('[name="email"]').value = client.email || '';
+                        document.querySelector('[name="whatsapp"]').value = client.whatsapp || '';
+                        document.querySelector('[name="cep"]').value = client.cep || '';
+                        document.querySelector('[name="rua"]').value = client.rua || '';
+                        document.querySelector('[name="numero"]').value = client.numero || '';
+                        document.querySelector('[name="bairro"]').value = client.bairro || '';
+                        document.querySelector('[name="cidade"]').value = client.cidade || '';
+                        document.querySelector('[name="estado"]').value = client.estado || '';
+
+                        // Renderizar campos personalizados
+                        renderCustomFields(data.custom_fields);
 
                         // Mostrar veículos existentes
                         const existingSection = document.getElementById('existingVehiclesSection');
@@ -223,9 +264,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         const vehicleFields = document.getElementById('vehicleFieldsContainer');
                         const btnToggle = document.getElementById('btnToggleVehicle');
 
-                        if (data.vehicles && data.vehicles.length > 0) {
+                        if (client.vehicles && client.vehicles.length > 0) {
                             existingSection.classList.remove('d-none');
-                            listContainer.innerHTML = data.vehicles.map(v => `
+                            listContainer.innerHTML = client.vehicles.map(v => `
                                 <div class="list-group-item d-flex justify-content-between align-items-center py-2">
                                     <div>
                                         <span class="fw-bold text-primary">${v.placa}</span> - 
@@ -267,6 +308,19 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 formClient.reset();
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
+
+                // Carregar campos personalizados vazios para novo cliente
+                // Para isso, precisamos de uma rota que retorne apenas as definições
+                // Vou usar a mesma rota de edit mas com ID 0 ou um endpoint específico
+                // Como o trait já lida com isso, vou buscar via fetch
+                fetch(`${baseUrl}settings/custom-fields?entity=Clients`)
+                    .then(res => res.json())
+                    .then(fields => {
+                        renderCustomFields(fields);
+                    }).catch(() => {
+                        // Se falhar ou não quiser criar endpoint agora, apenas limpa
+                        customFieldsContainer.classList.add('d-none');
+                    });
 
                 // No cadastro novo, sempre mostra os campos do veículo
                 document.getElementById('existingVehiclesSection').classList.add('d-none');

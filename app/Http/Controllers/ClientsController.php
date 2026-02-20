@@ -161,8 +161,13 @@ class ClientsController extends Controller
         ]);
 
         return DB::transaction(function () use ($request, $validated) {
-            // Cria o cliente (o company_id é injetado automaticamente pela Trait se o user estiver logado)
+            // Cria o cliente
             $client = Clients::create($validated);
+
+            // Salva campos personalizados
+            if ($request->has('custom_fields')) {
+                $client->syncCustomFields($request->custom_fields);
+            }
 
             if ($request->filled('veiculo_placa')) {
                 $vehicle = Vehicles::create([
@@ -196,7 +201,12 @@ class ClientsController extends Controller
     public function edit($id)
     {
         $client = Clients::with('vehicles')->findOrFail($id);
-        return response()->json($client);
+        $customFields = $client->getCustomFieldsWithValues();
+        
+        return response()->json([
+            'client' => $client,
+            'custom_fields' => $customFields
+        ]);
     }
 
     /**
@@ -252,9 +262,16 @@ class ClientsController extends Controller
             'email.email' => 'Informe um e-mail válido.',
         ]);
 
-        $client->update($validated);
+        return DB::transaction(function () use ($client, $validated, $request) {
+            $client->update($validated);
 
-        return response()->json(['success' => true, 'message' => 'Cliente atualizado com sucesso!']);
+            // Salva campos personalizados
+            if ($request->has('custom_fields')) {
+                $client->syncCustomFields($request->custom_fields);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Cliente atualizado com sucesso!']);
+        });
     }
 
     /**

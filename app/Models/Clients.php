@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
+use App\Traits\HasCustomFields;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 
@@ -11,7 +12,7 @@ use Illuminate\Support\Str;
 
 class Clients extends Model implements Auditable
 {
-    use BelongsToCompany, AuditableTrait;
+    use BelongsToCompany, AuditableTrait, HasCustomFields;
 
     protected $table = 'clients';
 

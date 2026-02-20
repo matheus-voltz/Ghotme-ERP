@@ -145,6 +145,12 @@
             </div>
         </div>
 
+        <div id="custom-fields-container" class="row g-3 d-none">
+            <hr class="my-4">
+            <h6 class="mb-4">Informações Adicionais</h6>
+            <div id="custom-fields-list" class="row"></div>
+        </div>
+
         <hr class="my-4">
         <div id="existingVehiclesSection" class="mb-4 d-none">
             <h6 class="mb-2"><i class="ti tabler-home-heart me-1"></i> {{ niche('entities') }} do Cliente</h6>

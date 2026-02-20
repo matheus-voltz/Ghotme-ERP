@@ -288,14 +288,14 @@
       "slug": "settings",
       "submenu": [
         {
-          "url": "/settings/user-management",
-          "name": "Usuários e permissões",
-          "slug": "pages-user-management"
-        },
-        {
           "url": "/settings/custom-checklist",
           "name": "Checklist personalizado",
           "slug": "settings.custom-checklist"
+        },
+        {
+          "url": "/settings/custom-fields",
+          "name": "Campos Personalizados",
+          "slug": "settings.custom-fields"
         },
         {
           "url": "/settings/os-settings",

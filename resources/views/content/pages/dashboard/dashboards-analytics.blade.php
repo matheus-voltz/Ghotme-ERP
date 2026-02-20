@@ -94,10 +94,10 @@ $configData = Helper::appClasses();
 
   <!-- Quick Stats Column -->
   <div class="col-xl-4 col-lg-5 col-md-12">
-    <div class="row g-4 h-100">
+    <div class="row g-4">
       <!-- Receita Mensal -->
-      <div class="col-12 col-sm-6 col-md-12 h-50">
-        <div class="card h-100 shadow-sm border-0">
+      <div class="col-12 col-sm-6 col-md-12">
+        <div class="card shadow-sm border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
@@ -122,8 +122,8 @@ $configData = Helper::appClasses();
       </div>
 
       <!-- Conversão -->
-      <div class="col-12 col-sm-6 col-md-12 h-50">
-        <div class="card h-100 shadow-sm border-0">
+      <div class="col-12 col-sm-6 col-md-12">
+        <div class="card shadow-sm border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
@@ -145,7 +145,38 @@ $configData = Helper::appClasses();
   </div>
 
   <!-- Performance Chart -->
-  <div class="col-xl-8 col-lg-7">
+  <div class="col-xl-8 col-lg-7 mt-4">
+    <div class="row g-4 mb-4">
+      <!-- Ticket Médio -->
+      <div class="col-md-6 col-12">
+        <div class="card shadow-sm border-0 bg-label-primary bg-opacity-10 h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="avatar avatar-md bg-label-primary rounded p-1 me-3">
+              <i class="ti tabler-receipt-2 fs-2"></i>
+            </div>
+            <div>
+              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Average Ticket') }}</span>
+              <h4 class="mb-0 fw-bold">R$ {{ number_format($avgTicket, 2, ',', '.') }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Taxa de Retenção -->
+      <div class="col-md-6 col-12">
+        <div class="card shadow-sm border-0 bg-label-info bg-opacity-10 h-100">
+          <div class="card-body d-flex align-items-center">
+            <div class="avatar avatar-md bg-label-info rounded p-1 me-3">
+              <i class="ti tabler-users-group fs-2"></i>
+            </div>
+            <div>
+              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Retention Rate') }}</span>
+              <h4 class="mb-0 fw-bold">{{ number_format($retentionRate, 1) }}%</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
         <div>
