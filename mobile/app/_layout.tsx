@@ -17,10 +17,13 @@ function RootLayoutNav() {
     if (loading || !fontsLoaded) return;
 
     const inAuthGroup = segments[0] === '(auth)';
+    const isExpiredPage = segments[0] === 'expired';
 
     if (!user && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (user && (inAuthGroup || segments.length === 0)) {
+    } else if (user && user.is_expired && !isExpiredPage) {
+      router.replace('/expired');
+    } else if (user && !user.is_expired && (inAuthGroup || isExpiredPage || segments.length === 0)) {
       router.replace('/(app)/(tabs)');
     }
   }, [user, loading, segments, fontsLoaded]);

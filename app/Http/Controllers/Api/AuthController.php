@@ -34,6 +34,7 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
+        $user->is_expired = $user->isTrialExpired();
 
         return response()->json([
             'success' => true,
@@ -64,6 +65,7 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth-token')->plainTextToken;
+        $user->is_expired = $user->isTrialExpired();
 
         return response()->json([
             'success' => true,
@@ -80,7 +82,9 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $user = $request->user();
+        $user->is_expired = $user->isTrialExpired();
+        return response()->json($user);
     }
 
     public function updateProfilePhoto(Request $request)

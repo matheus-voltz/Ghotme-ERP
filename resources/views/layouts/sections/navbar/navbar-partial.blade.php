@@ -1,6 +1,24 @@
 @php
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+
+$user = Auth::user();
+$showTrialBanner = false;
+$trialDaysLeft = 0;
+$bannerClass = 'bg-label-warning';
+
+if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends_at) {
+    $trialDaysLeft = (int)now()->diffInDays($user->trial_ends_at, false);
+    
+    // Mostra banner se faltar 7 dias ou menos, ou se já expirou
+    if ($trialDaysLeft <= 7) {
+        $showTrialBanner = true;
+        if ($trialDaysLeft <= 0) {
+            $bannerClass = 'bg-label-danger';
+        }
+    }
+}
 @endphp
 
 <!--  Brand demo (display only for navbar-full and hide on below xl) -->
@@ -31,6 +49,7 @@ use Illuminate\Support\Facades\Route;
 @endif
 
 <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+  
   @if ($configData['hasCustomizer'] == true)
   <!-- Style Switcher -->
   <div class="navbar-nav align-items-center">

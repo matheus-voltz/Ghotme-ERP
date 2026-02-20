@@ -17,27 +17,23 @@ class CheckTrialStatus
     {
         $user = $request->user();
 
-        if ($user && $user->plan === 'free') {
-            $trialDuration = 30;
-            $createdAt = $user->created_at ?? now();
-            $daysUsed = (int)abs(now()->diffInDays($createdAt));
-            $trialDaysLeft = max(0, $trialDuration - $daysUsed);
-
-            // If trial expired
-            if ($trialDaysLeft <= 0) {
+        // Se o usuário não tem plano definido ou o plano ainda é 'free'
+        if ($user && ($user->plan === 'free' || empty($user->plan))) {
+            
+            // Verifica se a data de término do teste já passou
+            if ($user->trial_ends_at && now()->greaterThan($user->trial_ends_at)) {
                 $currentRouteName = $request->route()->getName();
 
                 $allowedRoutes = [
                     'settings',
                     'logout',
                     'sanctum.csrf-cookie',
-                    'dashboard' // Maybe allow dashboard to redirect? No, redirect to settings.
+                    'dashboard',
+                    'settings.select-plan',
+                    'settings.generate-payment'
                 ];
 
-                // Allow if route name is exactly in allowed list
-                // OR if it starts with 'settings.' (billing actions)
-                // OR if it starts with 'profile.' (user profile actions)
-                // OR if it starts with 'livewire.' (needed for components to work)
+                // Permite acesso apenas às rotas de faturamento e perfil
                 if (
                     in_array($currentRouteName, $allowedRoutes) ||
                     str_starts_with($currentRouteName ?? '', 'settings.') ||
@@ -47,7 +43,7 @@ class CheckTrialStatus
                     return $next($request);
                 }
 
-                // Block access
+                // Bloqueia acesso para o restante do sistema
                 if ($request->expectsJson()) {
                     return response()->json(['message' => 'Seu período de teste expirou. Atualize seu plano.'], 403);
                 }

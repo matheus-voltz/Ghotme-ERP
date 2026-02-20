@@ -41,11 +41,14 @@ $customizerHidden = 'customizer-hide';
         <h4 class="mb-1">Verificação em duas etapas 💬</h4>
         <div x-data="{ recovery: false }">
           <div class="text-start mb-6" x-show="! recovery">
-            Confirme o acesso à sua conta inserindo o código de autenticação fornecido pelo seu
-            aplicativo autenticador.
+            Proteja seu negócio com segurança de nível militar. O Ghotme ERP utiliza autenticação de dois fatores (2FA) para garantir que apenas você e sua equipe tenham acesso aos dados sensíveis.
+            <br><br>
+            Abra seu aplicativo autenticador (Google Authenticator, Authy, etc) e digite o código de 6 dígitos gerado.
           </div>
           <div class="text-start mb-6" x-show="recovery">
-            Confirme o acesso à sua conta inserindo um dos seus códigos de recuperação de emergência.
+            Não conseguiu acessar o seu celular ou aplicativo de autenticação nesse momento? Sem problemas.
+            <br><br>
+            Confirme o acesso à sua conta de forma segura inserindo um dos códigos de recuperação de emergência que você salvou no ato de ativação do 2FA.
           </div>
           <x-validation-errors class="mb-1" />
           <form method="POST" action="{{ route('two-factor.login') }}">

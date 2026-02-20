@@ -74,12 +74,13 @@
       ]
     },
     {
-      "name": "Customers & Vehicles",
+      "name": "Customers & Entities",
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": [
         "clients",
         "vehicles",
-        "vehicle-history"
+        "vehicle-history",
+        "fleet"
       ],
       "submenu": [
         {
@@ -91,6 +92,12 @@
           "url": "/vehicles",
           "name": "Vehicles",
           "slug": "vehicles"
+        },
+        {
+          "url": "/fleet-management",
+          "name": "Gestão de Frotas / B2B",
+          "slug": "fleet.management",
+          "feature": "fleet_management"
         },
         {
           "url": "/vehicle-history",
@@ -135,6 +142,12 @@
           "url": "/inventory/stock-out",
           "name": "Saída de estoque",
           "slug": "inventory.stock-out"
+        },
+        {
+          "url": "/inventory/purchase-orders",
+          "name": "Suprimento Automático",
+          "slug": "inventory.purchase-orders",
+          "feature": "auto_supply"
         },
         {
           "url": "/inventory/adjustments",
@@ -199,6 +212,12 @@
           "url": "/finance/reports",
           "name": "Relatórios financeiros",
           "slug": "finance.reports"
+        },
+        {
+          "url": "/finance/bpo",
+          "name": "BPO Financeiro",
+          "slug": "finance.bpo",
+          "feature": "financial_bpo"
         }
       ]
     },
@@ -206,11 +225,18 @@
       "name": "Fiscal & Contábil",
       "icon": "menu-icon icon-base ti tabler-receipt-tax",
       "slug": "accounting",
+      "feature": "accountant_portal",
       "submenu": [
         {
           "url": "/accounting",
           "name": "Portal do Contador",
           "slug": "accounting.index"
+        },
+        {
+          "url": "/fiscal/invoices",
+          "name": "Notas Fiscais (Ilimitadas)",
+          "slug": "fiscal.invoices",
+          "feature": "unlimited_invoices"
         }
       ]
     },

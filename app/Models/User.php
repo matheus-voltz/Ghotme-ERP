@@ -25,6 +25,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     use TwoFactorAuthenticatable;
     use SoftDeletes; // Use SoftDeletes
 
+    const PLAN_STANDARD = 'padrao';
+    const PLAN_ENTERPRISE = 'enterprise';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -60,6 +63,51 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'status',
         'deleted_reason', // Add deleted_reason
     ];
+
+    /**
+     * Verifica se o período de teste expirou.
+     */
+    public function isTrialExpired()
+    {
+        // Se já tiver um plano ativo que não seja 'free', não expirou
+        if (!empty($this->plan) && $this->plan !== self::PLAN_STANDARD && $this->plan !== 'free') {
+            return false;
+        }
+
+        return $this->trial_ends_at && now()->greaterThan($this->trial_ends_at);
+    }
+
+    /**
+     * Verifica se o usuário tem acesso a uma funcionalidade baseada no seu plano.
+     */
+    public function hasFeature($feature)
+    {
+        // Se o teste expirou, bloqueia todas as funcionalidades operacionais
+        if ($this->isTrialExpired()) {
+            return false;
+        }
+
+        $plan = strtolower($this->plan ?? self::PLAN_STANDARD);
+
+        // Funcionalidades exclusivas do Enterprise
+        $enterpriseFeatures = [
+            'priority_support',
+            'auto_supply',      // Robô de reposição
+            'financial_bpo',    // BPO Financeiro
+            'accountant_portal', // Portal do Contador
+            'unlimited_invoices', // Emissão ilimitada
+            'fleet_management',  // Gestão de frotas
+            'advanced_b2b',      // B2B avançado
+            'max_users_10'       // Até 10 usuários
+        ];
+
+        if (in_array($feature, $enterpriseFeatures)) {
+            return $plan === self::PLAN_ENTERPRISE;
+        }
+
+        // Funcionalidades comuns a todos ou ao plano Padrão
+        return true;
+    }
 
     public function billingHistory()
     {

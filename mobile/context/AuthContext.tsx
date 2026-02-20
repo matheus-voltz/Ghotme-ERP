@@ -26,10 +26,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             const userToken = await SecureStore.getItemAsync('userToken');
             const userData = await SecureStore.getItemAsync('userData');
 
-            if (userToken && userData) {
-                const parsedUser = JSON.parse(userData);
-                setUser(parsedUser);
+            if (userToken) {
                 api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+                
+                // Tenta buscar dados atualizados da API para verificar expiração/plano
+                try {
+                    const response = await api.get('/user');
+                    const updatedUser = response.data;
+                    if (!updatedUser.profile_photo_url) {
+                        updatedUser.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedUser.name)}&color=7367F0&background=F3F2FF`;
+                    }
+                    await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
+                    setUser(updatedUser);
+                } catch (apiError) {
+                    // Se a API falhar (ex: sem internet), usa os dados do cache
+                    if (userData) {
+                        setUser(JSON.parse(userData));
+                    }
+                }
             }
         } catch (error) {
             console.log('Error loading auth data', error);

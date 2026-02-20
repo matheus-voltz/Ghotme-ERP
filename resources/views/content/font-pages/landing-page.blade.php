@@ -309,7 +309,7 @@ $pageConfigs = [
       </h4>
       <p class="text-center mb-12">{{ __('See how Ghotme transforms to meet the specific needs of each market:') }}</p>
       <div class="row g-6">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-info rounded-circle">
               <i class="ti tabler-settings-automation fs-1"></i>
@@ -318,7 +318,7 @@ $pageConfigs = [
             <p class="text-muted small mb-0">{{ __('Management of plates, chassis and history by vehicles for Workshops and Aesthetics.') }}</p>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-success rounded-circle">
               <i class="ti tabler-heart-handshake fs-1"></i>
@@ -327,13 +327,22 @@ $pageConfigs = [
             <p class="text-muted small mb-0">{{ __('Dynamic labels for Pets, Patients and session control for Clinics and Pet Shops.') }}</p>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <div class="card niche-card shadow-sm text-center p-5 h-100">
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-warning rounded-circle">
               <i class="ti tabler-device-laptop fs-1"></i>
             </div>
             <h5 class="fw-extrabold mb-3">{{ __('Technology and Retail') }}</h5>
             <p class="text-muted small mb-0">{{ __('Focus on Serial, Model and warranty for Technical Assistance and Stores in general.') }}</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card niche-card shadow-sm text-center p-5 h-100">
+            <div class="avatar avatar-xl mx-auto mb-4 bg-label-primary rounded-circle">
+              <i class="ti tabler-building-skyscraper fs-1"></i>
+            </div>
+            <h5 class="fw-extrabold mb-3">{{ __('Construção e Engenharia') }}</h5>
+            <p class="text-muted small mb-0">{{ __('Controle de obras, medições e emissão de RDO (Relatório Diário de Obra) em tempo real.') }}</p>
           </div>
         </div>
       </div>
@@ -823,8 +832,8 @@ $pageConfigs = [
                 <i class="ti tabler-checkup-list icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Checklist Rápido') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Preencha os itens da vistoria com poucos toques.') }}</p>
+                <h6 class="mb-1">{{ __('RDO e Checklist Técnico') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Emita Relatórios Diários de Obra direto do canteiro.') }}</p>
               </div>
             </div>
           </div>
@@ -1209,7 +1218,7 @@ $pageConfigs = [
             </h2>
             <div id="accordionOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
               <div class="accordion-body">
-                {{ __('Absolutely! When registering, you choose your segment (Workshop, Pet Shop, Assistance, etc.) and the system automatically changes all terms, icons and processes to speak your language. It is a system tailored for you.') }}
+                {{ __('Absolutely! When registering, you choose your segment (Workshop, Pet Shop, Construction, Assistance, etc.) and the system automatically changes all terms, icons and processes to speak your language. It is a system tailored for you.') }}
               </div>
             </div>
           </div>

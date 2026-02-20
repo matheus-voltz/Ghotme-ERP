@@ -28,6 +28,23 @@ $configData = Helper::appClasses();
     @foreach ($menuData[0]->menu as $menu)
     {{-- adding active and open class if child is active --}}
 
+    {{-- plan and trial check --}}
+    @php
+        $user = auth()->user();
+        $isExpired = $user->isTrialExpired();
+        $isAllowedInExpired = in_array($menu->slug, ['dashboard', 'settings']);
+        
+        // Se expirou e não for Dashboard ou Configurações, pula a renderização
+        if ($isExpired && !$isAllowedInAllowedList = in_array($menu->slug, ['dashboard', 'settings'])) {
+            continue;
+        }
+
+        // Feature check normal
+        if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
+            continue;
+        }
+    @endphp
+
     {{-- menu headers --}}
     @if (isset($menu->menuHeader))
     <li class="menu-header small">

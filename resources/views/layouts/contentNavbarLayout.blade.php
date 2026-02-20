@@ -65,24 +65,41 @@
           @endif
 
           @auth
-            @if(auth()->user()->plan === 'free')
-              @php
-                $creationDate = auth()->user()->created_at;
-                $trialEnds = auth()->user()->trial_ends_at ?? $creationDate->addDays(30);
-                $isExpired = now()->greaterThan($trialEnds);
-              @endphp
+            @php
+              $user = auth()->user();
+              $showTrialBanner = false;
+              $trialDaysLeft = 0;
+              $bannerClass = 'alert-warning';
+              $bannerIcon = 'tabler-alert-triangle';
+              
+              if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends_at) {
+                  $trialDaysLeft = (int)now()->diffInDays($user->trial_ends_at, false);
+                  if ($trialDaysLeft <= 7) {
+                      $showTrialBanner = true;
+                      if ($trialDaysLeft <= 0) {
+                          $bannerClass = 'alert-danger';
+                          $bannerIcon = 'tabler-circle-x';
+                      }
+                  }
+              }
+            @endphp
 
-              @if($isExpired)
-                <div class="alert alert-danger d-flex align-items-center mb-6" role="alert">
-                  <span class="alert-icon rounded-circle bg-danger p-1 me-3">
-                    <i class="icon-base ti tabler-alert-triangle text-white"></i>
-                  </span>
-                  <div class="d-flex flex-column">
-                    <h6 class="alert-heading mb-1 text-danger">Seu período de teste grátis expirou!</h6>
-                    <span>Acesse as <a href="{{ route('settings') }}" class="fw-bold text-danger text-decoration-underline">Configurações de Faturamento</a> para escolher um plano e continuar usando o sistema sem interrupções.</span>
-                  </div>
+            @if($showTrialBanner)
+              <div class="alert {{ $bannerClass }} alert-dismissible d-flex align-items-center mb-6" role="alert">
+                <span class="alert-icon rounded-circle p-1 me-3">
+                  <i class="icon-base ti {{ $bannerIcon }}"></i>
+                </span>
+                <div class="d-flex flex-column">
+                  @if($trialDaysLeft > 0)
+                    <h6 class="alert-heading mb-1">Atenção: Período de teste chegando ao fim!</h6>
+                    <span>Faltam apenas <strong>{{ $trialDaysLeft }} {{ \Illuminate\Support\Str::plural('dia', $trialDaysLeft) }}</strong> para o bloqueio da sua conta. <a href="{{ route('settings') }}" class="fw-bold text-decoration-underline">Assine um plano agora</a> para manter seus dados ativos.</span>
+                  @else
+                    <h6 class="alert-heading mb-1">Seu período de teste expirou!</h6>
+                    <span>Acesse as <a href="{{ route('settings') }}" class="fw-bold text-decoration-underline text-danger">Configurações de Faturamento</a> para regularizar sua conta e continuar usando o sistema.</span>
+                  @endif
                 </div>
-              @endif
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
             @endif
           @endauth
 
