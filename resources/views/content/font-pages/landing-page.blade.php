@@ -742,6 +742,119 @@ $pageConfigs = [
 </section>
 <!-- Payment Platforms: End -->
 
+<!-- Mobile App Section: Start -->
+<section id="landingApp" class="section-py bg-body landing-app position-relative">
+  <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
+    class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100 z-n1" style="opacity: 0.2;" />
+  <div class="container">
+    <div class="row align-items-center gy-6">
+      <!-- Image Side -->
+      <div class="col-lg-6 text-center text-lg-start position-relative">
+        <style>
+          .mobile-hero-img {
+            max-width: 320px;
+            animation: floatingMobileReal 4s ease-in-out infinite;
+            filter: drop-shadow(-20px 20px 40px rgba(var(--bs-primary-rgb), 0.3));
+          }
+
+          @keyframes floatingMobileReal {
+            0% {
+              transform: translateY(0px) rotate(-2deg);
+            }
+
+            50% {
+              transform: translateY(-15px) rotate(-1deg);
+            }
+
+            100% {
+              transform: translateY(0px) rotate(-2deg);
+            }
+          }
+        </style>
+        <div class="d-inline-block position-relative pt-5">
+          <!-- Blob background behind phone -->
+          <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-label-primary" style="width: 350px; height: 350px; opacity: 0.5; filter: blur(40px); z-index: 0;"></div>
+          <img src="{{ asset('assets/img/front-pages/landing-page/meu-mobile.png') }}" alt="Ghotme Mobile App Dashboard" class="img-fluid mobile-hero-img position-relative z-1" />
+        </div>
+      </div>
+
+      <!-- Content Side -->
+      <div class="col-lg-6">
+        <div class="mb-4 text-start">
+          <span class="badge bg-label-primary">{{ __('Gestão na Palma da Mão') }}</span>
+        </div>
+        <h3 class="mb-4 display-6 fw-extrabold">
+          {{ __('Seu ERP completo em') }}
+          <span class="text-primary position-relative z-1">{{ __('Qualquer Lugar') }}
+            <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+              class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%;" />
+          </span>
+        </h3>
+        <p class="mb-5 fs-5">
+          {{ __('O aplicativo do Ghotme permite que você e sua equipe controlem o negócio de onde estiverem. Abra ordens de serviço, consulte estoques e analise métricas em tempo real.') }}
+        </p>
+
+        <div class="row gy-4">
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center border-bottom pb-4">
+              <div class="badge bg-label-primary rounded p-2 me-4">
+                <i class="ti tabler-camera icon-lg"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">{{ __('Vistoria Foto Integrada') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Tire fotos pelo celular e anexe na OS na hora.') }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center border-bottom pb-4">
+              <div class="badge bg-label-success rounded p-2 me-4">
+                <i class="ti tabler-bell-ringing icon-lg"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">{{ __('Notificações Push') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Seja avisado sobre orçamentos aprovados.') }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center">
+              <div class="badge bg-label-info rounded p-2 me-4">
+                <i class="ti tabler-checkup-list icon-lg"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">{{ __('Checklist Rápido') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Preencha os itens da vistoria com poucos toques.') }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center">
+              <div class="badge bg-label-warning rounded p-2 me-4">
+                <i class="ti tabler-chart-pie icon-lg"></i>
+              </div>
+              <div>
+                <h6 class="mb-1">{{ __('Dashboard Financeiro') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Veja seu faturamento de forma rápida.') }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 d-flex gap-3">
+          <a href="#" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
+            <i class="ti tabler-brand-apple icon-md me-2"></i> {{ __('App Store') }}
+          </a>
+          <a href="#" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
+            <i class="ti tabler-brand-google-play icon-md me-2"></i> {{ __('Google Play') }}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Mobile App Section: End -->
+
 <!-- Pricing plans: Start -->
 <section id="landingPricing" class="section-py bg-body landing-pricing">
   <div class="container">
