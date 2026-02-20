@@ -165,5 +165,43 @@ return [
                 'identifier' => 'ti-id',
             ],
         ],
+        'construction' => [
+            'labels' => [
+                'entity' => 'Obra',
+                'entities' => 'Obras',
+                'new_entity' => 'Nova Obra',
+                'identifier' => 'ART / RRT',
+                'secondary_identifier' => 'Cód. Obra',
+                'metric' => 'Progresso',
+                'metric_unit' => '%',
+                'fuel' => 'Clima',
+                'fuel_levels' => ['Bom', 'Nublado', 'Chuvoso', 'Impraticável'],
+                'visual_inspection_title' => 'Relatório Fotográfico',
+                'visual_inspection_help' => 'Clique na planta para marcar pontos de atenção ou ocorrências.',
+                'brand' => 'Tipo de Obra',
+                'model' => 'Projeto',
+                'color' => 'Status',
+                'year' => 'Previsão de Entrega',
+                'features' => 'Responsáveis / Engenheiros',
+                'inventory_items' => 'Materiais / Equipamentos',
+                'in_service_label' => 'Em Execução',
+                'timeline_checkin_body' => 'Início das atividades registrado com sucesso no RDO.',
+                'timeline_execution_body' => 'As equipes estão em campo executando as atividades programadas.',
+                'timeline_finalizing_body' => 'Atividades do dia concluídas e relatório de progresso gerado.',
+                'checklist_categories' => [
+                    'Efetivo (Mão de Obra)' => ['Mestre de Obra', 'Pedreiros', 'Serventes', 'Eletricistas', 'Encanadores'],
+                    'Segurança (EPI/EPC)' => ['Uso de Capacete', 'Botas de Segurança', 'Sinalização de Área', 'Extintores', 'Cintos de Segurança'],
+                    'Equipamentos' => ['Betoneira', 'Andaimes', 'Furadeiras/Marteletes', 'Escadas', 'Container/Almoxarifado'],
+                    'Infraestrutura' => ['Limpeza do Canteiro', 'Ligação Provisória Luz', 'Ligação Provisória Água', 'Banheiros Químicos']
+                ],
+            ],
+            'icons' => [
+                'entity' => 'ti-building-skyscraper',
+                'identifier' => 'ti-file-certificate',
+            ],
+            'components' => [
+                'visual_inspection' => 'components.visual-inspection.construction',
+            ]
+        ],
     ],
 ];

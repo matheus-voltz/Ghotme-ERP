@@ -11,6 +11,7 @@ if (!function_exists('niche_translate')) {
         $entities = niche('entities', null, $company);
         $entity = niche('entity', null, $company);
         $inventory = niche('inventory_items', null, $company);
+        $currentNiche = get_current_niche($company);
 
         $search = [
             'Clientes & Veículos', 'Clientes & Veiculos', 'Customers & Vehicles',
@@ -19,17 +20,21 @@ if (!function_exists('niche_translate')) {
             'Itens/Peças', 'Peças', 'Pecas', 'Items/Parts', 'Parts',
             'Histórico do veículo', 'Vehicle history',
             'Dossiê do Veículo', 'Vehicle dossier',
-            'Oficina', 'Workshop', 'Sua oficina'
+            'Oficina', 'Workshop', 'Sua oficina',
+            'do veículo', 'da oficina'
         ];
+
+        $workshopReplacement = ($currentNiche === 'construction') ? 'Canteiro' : __('Empresa');
 
         $replace = [
             __('Clientes') . ' & ' . $entities, __('Clientes') . ' & ' . $entities, __('Customers') . ' & ' . $entities,
             $entities, $entities, $entities,
             $entity, $entity, $entity,
             $inventory, $inventory, $inventory, $inventory, $inventory,
-            __('Histórico do') . ' ' . strtolower($entity), __('Vehicle history'),
-            __('Dossiê do') . ' ' . $entity, __('Vehicle dossier'),
-            __('Empresa'), __('Business'), __('Sua empresa')
+            __('Histórico da') . ' ' . strtolower($entity), __('Vehicle history'),
+            __('Dossiê da') . ' ' . $entity, __('Vehicle dossier'),
+            $workshopReplacement, __('Business'), 'Sua ' . strtolower($workshopReplacement),
+            'da ' . strtolower($entity), 'da ' . strtolower($workshopReplacement)
         ];
 
         return str_ireplace($search, $replace, $string);

@@ -39,6 +39,12 @@ class NicheInitializerService
                 ['name' => 'Limpeza de Pele Profunda', 'price' => 150.00],
                 ['name' => 'Aplicação de Botox (Zona)', 'price' => 600.00],
                 ['name' => 'Drenagem Linfática', 'price' => 120.00],
+            ],
+            'construction' => [
+                ['name' => 'Visita Técnica / Diagnóstico', 'price' => 250.00],
+                ['name' => 'Medição de Obra (Levantamento)', 'price' => 180.00],
+                ['name' => 'Supervisão de Diária', 'price' => 350.00],
+                ['name' => 'Emissão de Laudo / ART', 'price' => 450.00],
             ]
         ];
 
@@ -59,6 +65,7 @@ class NicheInitializerService
             'pet' => ['Estado da Pelagem', 'Presença de Parasitas', 'Corte de Unhas', 'Limpeza de Ouvidos'],
             'electronics' => ['Riscos na Tela', 'Saúde da Bateria', 'Câmeras Testadas', 'Wi-Fi e Bluetooth'],
             'beauty_clinic' => ['Alergias', 'Uso de Ácidos', 'Gravidez', 'Cirurgias Prévias'],
+            'construction' => ['EPIs Básicos (Capacete/Bota)', 'Limpeza e Organização', 'Almoxarifado Trancado', 'Quadro de Luz Provisório'],
         ];
 
         $items = $defaults[$niche] ?? [];

@@ -147,6 +147,23 @@ $customizerHidden = 'customizer-hide';
           </div>
 
           <div class="mb-6">
+            <label for="niche" class="form-label">Segmento (Nicho)</label>
+            <select class="form-select @error('niche') is-invalid @enderror" id="niche" name="niche">
+              <option value="" disabled {{ old('niche') ? '' : 'selected' }}>Selecione o seu segmento</option>
+              @foreach(config('niche.niches') as $key => $niche)
+                <option value="{{ $key }}" {{ old('niche') == $key ? 'selected' : '' }}>
+                   {{ $niche['labels']['entities'] ?? ucfirst($key) }}
+                </option>
+              @endforeach
+            </select>
+            @error('niche')
+            <span class="invalid-feedback" role="alert">
+              <span class="fw-medium">{{ $message }}</span>
+            </span>
+            @enderror
+          </div>
+
+          <div class="mb-6">
             <label for="cnpj" class="form-label">CNPJ da Empresa</label>
             <input type="text" class="form-control @error('cnpj') is-invalid @enderror" id="cnpj" name="cnpj"
               placeholder="00.000.000/0000-00" value="{{ old('cnpj') }}" maxlength="18" />
