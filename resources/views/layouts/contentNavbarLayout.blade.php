@@ -126,6 +126,80 @@
   @endif
   <!-- Drag Target Area To SlideIn Menu On Small Screens -->
   <div class="drag-target"></div>
+
+  <!-- Ghotme Academy Floating Button -->
+  <button class="btn btn-primary btn-icon rounded-pill shadow-lg position-fixed" 
+          style="bottom: 25px; right: 25px; width: 50px; height: 50px; z-index: 9999;" 
+          data-bs-toggle="modal" data-bs-target="#academyModal" title="Ghotme Academy">
+    <i class="ti tabler-help fs-2"></i>
+  </button>
+
+  <!-- Academy Modal -->
+  <div class="modal fade" id="academyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-label-primary p-4">
+          <h5 class="modal-title d-flex align-items-center"><i class="ti tabler-school me-2 fs-2"></i> Ghotme Academy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0">
+          <div class="p-4 border-bottom">
+            <div class="input-group input-group-merge shadow-none">
+              <span class="input-group-text border-0 ps-0" id="academy-search-addon"><i class="ti tabler-search fs-4"></i></span>
+              <input type="text" id="academySearch" class="form-control border-0 ps-2" placeholder="O que você deseja aprender hoje?" aria-label="Search" aria-describedby="academy-search-addon">
+            </div>
+          </div>
+          <div id="academyContent" class="p-4" style="max-height: 450px; overflow-y: auto;">
+            <!-- Conteúdo carregado via JS -->
+            <div class="text-center py-5">
+              <div class="spinner-border text-primary"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const academyModal = document.getElementById('academyModal');
+      const academySearch = document.getElementById('academySearch');
+      const academyContent = document.getElementById('academyContent');
+
+      function loadTutorials(query = '') {
+        fetch(`/api/academy?search=${query}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.length === 0) {
+              academyContent.innerHTML = '<div class="text-center py-5"><p class="text-muted">Nenhum tutorial encontrado para sua busca.</p></div>';
+              return;
+            }
+            academyContent.innerHTML = '<div class="row g-4">' + data.map(item => `
+              <div class="col-md-6">
+                <div class="card shadow-none border h-100">
+                  <div class="ratio ratio-16x9 card-img-top">
+                    <iframe src="${item.video_url}" title="YouTube video" allowfullscreen></iframe>
+                  </div>
+                  <div class="card-body p-3">
+                    <span class="badge bg-label-primary mb-2">${item.category}</span>
+                    <h6 class="card-title mb-1">${item.title}</h6>
+                    <p class="card-text small text-muted mb-0">${item.description}</p>
+                  </div>
+                </div>
+              </div>
+            `).join('') + '</div>';
+          });
+      }
+
+      academyModal.addEventListener('shown.bs.modal', () => loadTutorials());
+      
+      let timeout = null;
+      academySearch.addEventListener('input', (e) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => loadTutorials(e.target.value), 500);
+      });
+    });
+  </script>
   </div>
   <!-- / Layout wrapper -->
 @endsection

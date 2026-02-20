@@ -100,6 +100,12 @@
           "feature": "fleet_management"
         },
         {
+          "url": "/maintenance-contracts",
+          "name": "Contratos de Manutenção",
+          "slug": "maintenance-contracts",
+          "feature": "maintenance_contracts"
+        },
+        {
           "url": "/vehicle-history",
           "name": "Vehicle history",
           "slug": "vehicle-history"
@@ -204,6 +210,11 @@
           "slug": "finance.cash-flow"
         },
         {
+          "url": "/finance/kanban",
+          "name": "Kanban de Recebíveis",
+          "slug": "finance.kanban"
+        },
+        {
           "url": "/finance/payment-methods",
           "name": "Formas de pagamento",
           "slug": "finance.payment-methods"
@@ -225,7 +236,6 @@
       "name": "Fiscal & Contábil",
       "icon": "menu-icon icon-base ti tabler-receipt-tax",
       "slug": "accounting",
-      "feature": "accountant_portal",
       "submenu": [
         {
           "url": "/accounting",

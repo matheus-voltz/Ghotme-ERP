@@ -4062,6 +4062,12 @@
     "src": "resources/js/cep-lookup.js",
     "isEntry": true
   },
+  "resources/js/financial-kanban.js": {
+    "file": "assets/financial-kanban-Dn_88LE_.js",
+    "name": "financial-kanban",
+    "src": "resources/js/financial-kanban.js",
+    "isEntry": true
+  },
   "resources/js/inventory-items.js": {
     "file": "assets/inventory-items-B0Tf-OK6.js",
     "name": "inventory-items",

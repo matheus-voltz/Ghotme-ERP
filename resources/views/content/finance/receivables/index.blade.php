@@ -64,9 +64,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     render: (data, type, full) => {
                         let html = '<div class="d-flex gap-2">';
                         if (full.status === 'pending') {
-                            html += `<button class="btn btn-sm btn-success mark-paid" data-id="${data}" title="{{ __('Mark as Paid') }}"><i class="ti tabler-check"></i></button>`;
+                            html += `<button class="btn btn-sm btn-icon btn-label-success mark-paid" data-id="${data}" title="{{ __('Mark as Paid') }}"><i class="ti tabler-check"></i></button>`;
                         }
-                        html += `<button class="btn btn-sm btn-danger delete-record" data-id="${data}" title="{{ __('Delete') }}"><i class="ti tabler-trash"></i></button></div>`;
+                        html += `<a href="${baseUrl}finance/transaction/${data}/pdf" target="_blank" class="btn btn-sm btn-icon btn-label-secondary" title="PDF"><i class="ti tabler-file-text"></i></a>`;
+                        html += `<button class="btn btn-sm btn-icon btn-label-danger delete-record" data-id="${data}" title="{{ __('Delete') }}"><i class="ti tabler-trash"></i></button></div>`;
                         return html;
                     }
                 }

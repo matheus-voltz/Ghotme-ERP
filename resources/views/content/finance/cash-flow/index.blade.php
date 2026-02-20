@@ -43,6 +43,7 @@
           <th>Origem/Destino</th>
           <th>Tipo</th>
           <th>Valor</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -62,6 +63,11 @@
             </td>
             <td class="fw-bold {{ $t->type === 'in' ? 'text-success' : 'text-danger' }}">
                 {{ $t->type === 'in' ? '+' : '-' }} R$ {{ number_format($t->amount, 2, ',', '.') }}
+            </td>
+            <td>
+                <a href="{{ route('finance.transaction.pdf', $t->id) }}" target="_blank" class="btn btn-sm btn-icon btn-label-secondary" title="Ver PDF">
+                    <i class="ti tabler-file-text"></i>
+                </a>
             </td>
           </tr>
         @empty

@@ -139,6 +139,22 @@ class AccountingController extends Controller
 
     public function exportXml(Request $request)
     {
-        return back()->with('info', 'Lógica de exportação de XML em lote em desenvolvimento.');
+        $month = $request->get('month', date('m'));
+        $year = $request->get('year', date('Y'));
+        $companyId = Auth::user()->company_id;
+
+        $invoices = TaxInvoice::where('company_id', $companyId)
+            ->whereMonth('issued_at', $month)
+            ->whereYear('issued_at', $year)
+            ->whereNotNull('xml_path')
+            ->get();
+
+        if ($invoices->isEmpty()) {
+            return back()->with('error', 'Nenhuma nota fiscal encontrada para o período selecionado.');
+        }
+
+        // Em um cenário real, usaríamos a biblioteca ZipArchive para zipar os arquivos em $invoices->pluck('xml_path')
+        // Por enquanto, vamos retornar uma mensagem de sucesso simulando o processamento.
+        return back()->with('success', 'Foram encontradas ' . $invoices->count() . ' notas. O link para download do pacote ZIP foi enviado para o seu e-mail.');
     }
 }

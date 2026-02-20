@@ -117,4 +117,23 @@ class FinanceController extends Controller
 
         return view('content.finance.cash-flow.index', compact('incomes', 'expenses', 'balance', 'recentTransactions'));
     }
+
+    public function downloadPdf($id)
+    {
+        $transaction = FinancialTransaction::with(['client', 'company'])->findOrFail($id);
+        $company = \App\Models\Company::find(Auth::user()->company_id);
+
+        $data = [
+            'transaction' => $transaction,
+            'company' => $company
+        ];
+
+        // Se o DomPDF estiver instalado, gera o PDF. Caso contrário, mostra o HTML para teste.
+        if (class_exists('\Barryvdh\DomPDF\Facade\Pdf')) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('content.finance.pdf.transaction-invoice', $data);
+            return $pdf->download("Fatura-{$id}.pdf");
+        }
+
+        return view('content.finance.pdf.transaction-invoice', $data);
+    }
 }

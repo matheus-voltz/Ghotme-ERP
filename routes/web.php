@@ -149,6 +149,12 @@ Route::middleware([
     Route::get('/clients/{id}/quick-view', [ClientsController::class, 'quickView'])->name('clients.quick-view');
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
+    
+    // Maintenance Contracts
+    Route::get('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'index'])->name('maintenance-contracts.index');
+    Route::post('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'store'])->name('maintenance-contracts.store');
+    Route::delete('/maintenance-contracts/{id}', [App\Http\Controllers\MaintenanceContractController::class, 'destroy'])->name('maintenance-contracts.destroy');
+
     Route::post('/clients-list', [ClientsController::class, 'store'])->name('clients-list.store');
     Route::get('/clients-list/{id}/edit', [ClientsController::class, 'edit'])->name('clients-list.edit');
     Route::put('/clients-list/{id}', [ClientsController::class, 'update'])->name('clients-list.update');
@@ -214,6 +220,10 @@ Route::middleware([
     Route::delete('/services/packages/{id}', [ServicePackageController::class, 'destroy'])->name('services.packages.destroy');
 
     // Finance
+    Route::get('/finance/kanban', [App\Http\Controllers\FinancialKanbanController::class, 'index'])->name('finance.kanban');
+    Route::get('/finance/kanban/data', [App\Http\Controllers\FinancialKanbanController::class, 'fetch'])->name('finance.kanban.data');
+    Route::post('/finance/kanban/update', [App\Http\Controllers\FinancialKanbanController::class, 'updateStatus'])->name('finance.kanban.update');
+
     Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
     Route::get('/finance/accounts-payable', [FinanceController::class, 'payables'])->name('finance.payables');
     Route::get('/finance/data', [FinanceController::class, 'dataBase'])->name('finance.data');
@@ -222,6 +232,7 @@ Route::middleware([
     Route::delete('/finance/transactions/{id}', [FinanceController::class, 'destroy'])->name('finance.transactions.destroy');
 
     Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
+    Route::get('/finance/transaction/{id}/pdf', [FinanceController::class, 'downloadPdf'])->name('finance.transaction.pdf');
 
     Route::get('/finance/payment-methods', [PaymentMethodController::class, 'index'])->name('finance.payment-methods');
     Route::get('/finance/payment-methods-list', [PaymentMethodController::class, 'dataBase'])->name('finance.payment-methods.list');
@@ -327,6 +338,7 @@ Route::middleware([
     Route::delete('/calendar/events/{id}', [App\Http\Controllers\CalendarController::class, 'destroy'])->name('calendar.destroy');
 
     Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
+    Route::get('/api/academy', [App\Http\Controllers\AcademyController::class, 'index']);
     Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
     Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');
 
