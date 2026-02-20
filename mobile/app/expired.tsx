@@ -27,8 +27,7 @@ export default function ExpiredScreen() {
         <Animated.View entering={FadeInUp.delay(500)} style={styles.content}>
           <Text style={styles.title}>Teste Finalizado 🚀</Text>
           <Text style={styles.description}>
-            Olá, {user?.name}!{'
-'}
+            Olá, {user?.name}!{'\n'}
             Seu período de 30 dias de teste chegou ao fim. Esperamos que o Ghotme tenha sido útil para sua gestão.
           </Text>
 

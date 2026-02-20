@@ -128,5 +128,33 @@ class OrdemServicoService
             'performer' => Auth::user()->name,
             'created_by' => Auth::id()
         ]);
+
+        // Gerar Comissão se a OS for finalizada
+        if ($type === 'os_finalizada') {
+            $this->generateCommission($os);
+        }
+    }
+
+    protected function generateCommission(OrdemServico $os)
+    {
+        $user = $os->user; // Técnico responsável
+        
+        if ($user && $user->commission_percentage > 0) {
+            $baseAmount = $os->total; // Ou apenas mão de obra se preferir
+            $commissionAmount = ($baseAmount * $user->commission_percentage) / 100;
+
+            \App\Models\Commission::updateOrCreate(
+                ['ordem_servico_id' => $os->id],
+                [
+                    'company_id' => $os->company_id,
+                    'user_id' => $user->id,
+                    'description' => "Comissão OS #{$os->id}",
+                    'base_amount' => $baseAmount,
+                    'percentage' => $user->commission_percentage,
+                    'commission_amount' => $commissionAmount,
+                    'status' => 'pending'
+                ]
+            );
+        }
     }
 }

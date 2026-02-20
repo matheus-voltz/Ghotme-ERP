@@ -335,11 +335,6 @@
       "slug": "support",
       "submenu": [
         {
-          "url": "/support/chat",
-          "name": "Chat Suporte",
-          "slug": "support.chat"
-        },
-        {
           "url": "/support/chat-whatsapp",
           "name": "WhatsApp",
           "slug": "support.whatsapp"

@@ -171,6 +171,13 @@ class HomePage extends Controller
         ->count();
     $retentionRate = $totalClients > 0 ? ($retentionCount / $totalClients) * 100 : 0;
 
+    // Academy Highlights
+    $academyHighlights = [
+        ['title' => 'Abrindo sua primeira OS', 'duration' => '1:30', 'icon' => 'tabler-file-plus'],
+        ['title' => 'Configurações Iniciais', 'duration' => '2:15', 'icon' => 'tabler-settings'],
+        ['title' => 'Gestão Financeira', 'duration' => '3:00', 'icon' => 'tabler-wallet'],
+    ];
+
     return [
       'osStats' => $osStats,
       'revenueMonth' => $revenueMonth,
@@ -180,6 +187,7 @@ class HomePage extends Controller
       'totalClients' => $totalClients,
       'avgTicket' => $avgTicket,
       'retentionRate' => $retentionRate,
+      'academyHighlights' => $academyHighlights,
       'lowStockItems' => InventoryItem::whereRaw('quantity <= min_quantity')->count(),
       'pendingBudgets' => Budget::where('status', 'pending')->count(),
       'recentOS' => OrdemServico::with(['client', 'veiculo'])->orderBy('created_at', 'desc')->limit(5)->get(),

@@ -429,6 +429,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
     borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   chatButton: {
     width: 45,
@@ -465,7 +467,8 @@ const styles = StyleSheet.create({
     borderRadius: 22.5,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)'
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    overflow: 'hidden'
   },
   avatarText: {
     color: '#fff',

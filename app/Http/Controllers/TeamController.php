@@ -135,6 +135,7 @@ class TeamController extends Controller
                     'email' => trim($request->email),
                     'contact_number' => $request->userContact,
                     'role' => $request->role,
+                    'commission_percentage' => $request->commission_percentage ?? 0,
                 ]);
 
                 return response()->json(['message' => 'Colaborador atualizado com sucesso.']);
@@ -167,6 +168,7 @@ class TeamController extends Controller
                     'role' => $request->role ?? 'funcionario',
                     'plan' => 'free',
                     'contact_number' => $request->userContact,
+                    'commission_percentage' => $request->commission_percentage ?? 0,
                     'status' => 'active',
                     'email_verified_at' => now(),
                     'is_active' => 1

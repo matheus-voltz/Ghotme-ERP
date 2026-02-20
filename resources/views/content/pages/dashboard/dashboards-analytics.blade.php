@@ -144,39 +144,8 @@ $configData = Helper::appClasses();
     </div>
   </div>
 
-  <!-- Performance Chart -->
-  <div class="col-xl-8 col-lg-7 mt-4">
-    <div class="row g-4 mb-4">
-      <!-- Ticket Médio -->
-      <div class="col-md-6 col-12">
-        <div class="card shadow-sm border-0 bg-label-primary bg-opacity-10 h-100">
-          <div class="card-body d-flex align-items-center">
-            <div class="avatar avatar-md bg-label-primary rounded p-1 me-3">
-              <i class="ti tabler-receipt-2 fs-2"></i>
-            </div>
-            <div>
-              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Average Ticket') }}</span>
-              <h4 class="mb-0 fw-bold">R$ {{ number_format($avgTicket, 2, ',', '.') }}</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Taxa de Retenção -->
-      <div class="col-md-6 col-12">
-        <div class="card shadow-sm border-0 bg-label-info bg-opacity-10 h-100">
-          <div class="card-body d-flex align-items-center">
-            <div class="avatar avatar-md bg-label-info rounded p-1 me-3">
-              <i class="ti tabler-users-group fs-2"></i>
-            </div>
-            <div>
-              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Retention Rate') }}</span>
-              <h4 class="mb-0 fw-bold">{{ number_format($retentionRate, 1) }}%</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
+  <!-- Performance Chart Row -->
+  <div class="col-xl-8 col-lg-12 mt-4">
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
         <div>
@@ -197,11 +166,39 @@ $configData = Helper::appClasses();
   </div>
 
   <!-- Status & Profitability Column -->
-  <div class="col-xl-4 col-lg-5">
-    <div class="row g-4 h-100">
+  <div class="col-xl-4 col-lg-12 mt-4">
+    <div class="row g-4">
+      <!-- Ticket Médio -->
+      <div class="col-xl-12 col-md-6">
+        <div class="card shadow-sm border-0 bg-label-primary bg-opacity-10">
+          <div class="card-body d-flex align-items-center">
+            <div class="avatar avatar-md bg-label-primary rounded p-1 me-3">
+              <i class="ti tabler-receipt-2 fs-2"></i>
+            </div>
+            <div>
+              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Average Ticket') }}</span>
+              <h4 class="mb-0 fw-bold">R$ {{ number_format($avgTicket, 2, ',', '.') }}</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Taxa de Retenção -->
+      <div class="col-xl-12 col-md-6">
+        <div class="card shadow-sm border-0 bg-label-info bg-opacity-10">
+          <div class="card-body d-flex align-items-center">
+            <div class="avatar avatar-md bg-label-info rounded p-1 me-3">
+              <i class="ti tabler-users-group fs-2"></i>
+            </div>
+            <div>
+              <span class="text-muted d-block small ls-1 text-uppercase fw-bold">{{ __('Retention Rate') }}</span>
+              <h4 class="mb-0 fw-bold">{{ number_format($retentionRate, 1) }}%</h4>
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- Status OS -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0 h-100">
+      <div class="col-xl-12 col-md-12">
+        <div class="card shadow-sm border-0">
           <div class="card-header py-3 bg-transparent border-bottom">
             <h5 class="mb-0 fw-bold">{{ __('OS Status') }}</h5>
           </div>
@@ -210,47 +207,12 @@ $configData = Helper::appClasses();
               <div id="osDistributionChart"></div>
             </div>
           </div>
-          <div class="card-footer bg-transparent border-0 pt-0 pb-4">
-            <div class="d-flex justify-content-around text-center">
-              <div>
-                <strong class="d-block text-warning h6 mb-0">{{ round(($osDistribution['pending'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">{{ __('Pending') }}</span>
-              </div>
-              <div>
-                <strong class="d-block text-info h6 mb-0">{{ round(($osDistribution['running'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">{{ __('Running') }}</span>
-              </div>
-              <div>
-                <strong class="d-block text-success h6 mb-0">{{ round(($osDistribution['finalized'] / max(1, array_sum($osDistribution))) * 100) }}%</strong>
-                <span class="text-muted small">{{ __('Finalized') }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Profitability -->
-      <div class="col-12">
-        <div class="card shadow-sm border-0 h-100">
-          <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
-            <h5 class="mb-0 fw-bold">{{ __('Profitability') }}</h5>
-            <span class="badge bg-label-primary">{{ __('Current Month') }}</span>
-          </div>
-          <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
-            <div id="profitabilityRadialChart"></div>
-            <div class="text-center mt-n2">
-              <h2 class="mb-0 {{ $monthlyProfitability >= 0 ? 'text-success' : 'text-danger' }} fw-bolder">
-                {{ $monthlyProfitability >= 0 ? '+' : '' }}{{ number_format($monthlyProfitability, 1, ',', '.') }}%
-              </h2>
-              <span class="text-muted fw-medium">{{ __('Net Margin') }}</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Recent Activities -->
+  <!-- Recent Activities & Profitability Row -->
   <div class="col-xl-6 col-lg-12">
     <div class="card h-100 shadow-sm border-0">
       <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
@@ -312,17 +274,34 @@ $configData = Helper::appClasses();
     </div>
   </div>
 
-  <!-- Top Services Chart -->
+  <!-- Top Services & Profitability -->
   <div class="col-xl-6 col-lg-12">
-    <div class="card h-100 shadow-sm border-0">
-      <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-bold">{{ __('Top 5 Services (Revenue)') }}</h5>
-        <div class="avatar avatar-sm bg-label-success rounded">
-          <i class="ti tabler-trending-up fs-4"></i>
+    <div class="row g-4 h-100">
+      <div class="col-md-6 col-12">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold">{{ __('Profitability') }}</h5>
+          </div>
+          <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
+            <div id="profitabilityRadialChart"></div>
+            <div class="text-center mt-n2">
+              <h2 class="mb-0 {{ $monthlyProfitability >= 0 ? 'text-success' : 'text-danger' }} fw-bolder">
+                {{ $monthlyProfitability >= 0 ? '+' : '' }}{{ number_format($monthlyProfitability, 1, ',', '.') }}%
+              </h2>
+              <span class="text-muted fw-medium">{{ __('Net Margin') }}</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="card-body px-2">
-        <div id="topServicesChart"></div>
+      <div class="col-md-6 col-12">
+        <div class="card h-100 shadow-sm border-0">
+          <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold small">{{ __('Top 5 Services') }}</h5>
+          </div>
+          <div class="card-body p-2">
+            <div id="topServicesChart"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -574,11 +553,15 @@ $configData = Helper::appClasses();
           enabled: true,
           textAnchor: 'start',
           style: {
-            colors: ['#fff'],
-            fontSize: '11px'
+            colors: ['#5d596c'],
+            fontSize: '11px',
+            fontWeight: '600'
           },
           formatter: (val, opt) => opt.w.globals.labels[opt.dataPointIndex] + ": R$ " + val.toLocaleString('pt-BR'),
           offsetX: 0,
+          dropShadow: {
+            enabled: false
+          }
         },
         xaxis: {
           categories: @json($topServiceLabels),

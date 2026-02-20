@@ -115,6 +115,8 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
     </li>
     <!--/ Language -->
 
+    @livewire('navbar-chat-badge')
+
     <!-- Notifications -->
     <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
       <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">

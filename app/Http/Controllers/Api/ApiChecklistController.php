@@ -47,10 +47,10 @@ class ApiChecklistController extends Controller
                     'vehicle_inspection_id' => $inspection->id,
                     'part_name' => $partName,
                     'type' => 'risk',
-                    'notes' => 'Registrado via Mobile',
+                    'notes' => $request->notes[$index] ?? 'Registrado via Mobile',
                     'photo_path' => $photoPath,
-                    'x_coordinate' => 0,
-                    'y_coordinate' => 0
+                    'x_coordinate' => $request->coordinates[$index]['x'] ?? 0,
+                    'y_coordinate' => $request->coordinates[$index]['y'] ?? 0
                 ]);
             }
 

@@ -76,7 +76,8 @@
             <div class="col-md-3 mb-3">
               <label class="form-label">Nível de {{ niche('fuel') }}</label>
               <select name="fuel_level" class="form-select" required>
-                @foreach(niche('fuel_levels') as $level)
+                @php $fuelLevels = niche('fuel_levels') ?? []; @endphp
+                @foreach($fuelLevels as $level)
                 <option value="{{ $level }}">{{ $level }}</option>
                 @endforeach
               </select>
@@ -165,13 +166,21 @@
           <small class="text-muted">{{ niche('visual_inspection_help') }}</small>
         </div>
         <div class="card-body text-center">
+          @php $inspectionComponent = niche_config('components.visual_inspection'); @endphp
+          
+          @if($inspectionComponent)
           <div id="vehicle-visual-inspection" style="position: relative; display: inline-block; cursor: crosshair;">
             <!-- Car Blueprint Component -->
-            @include(niche_config('components.visual_inspection'))
+            @include($inspectionComponent)
 
             <!-- Markers Container -->
             <div id="markers-container"></div>
           </div>
+          @else
+          <div class="alert alert-info">
+            <i class="ti tabler-info-circle me-2"></i> Inspeção visual não disponível para este nicho.
+          </div>
+          @endif
           <input type="hidden" name="damage_points_json" id="damage_points_json">
         </div>
       </div>
@@ -220,15 +229,15 @@
 
       carBlueprint.addEventListener('click', function(e) {
         // Ignora cliques nos ícones de remover
-        if (e.target.classList.contains('remove-marker')) return;
+        if (e.target.classList.contains('remove-marker') || e.target.closest('.remove-marker')) return;
 
-        const rect = visualContainer.getBoundingClientRect();
+        const rect = carBlueprint.getBoundingClientRect();
 
-        // Corrige offset se o clique for no SVG ou Wrapper
+        // Posição do clique relativa ao SVG
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
 
-        // Calculate percentage
+        // Calculate percentage baseada no tamanho real renderizado do SVG
         const xPercent = (x / rect.width) * 100;
         const yPercent = (y / rect.height) * 100;
 
@@ -240,6 +249,11 @@
           showCancelButton: true,
           confirmButtonText: 'Marcar',
           cancelButtonText: 'Cancelar',
+          customClass: {
+            confirmButton: 'btn btn-primary me-3',
+            cancelButton: 'btn btn-label-secondary'
+          },
+          buttonsStyling: false,
           inputValidator: (value) => {
             if (!value) return 'Escreva algo!'
           }

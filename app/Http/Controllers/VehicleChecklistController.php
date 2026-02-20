@@ -88,10 +88,11 @@ class VehicleChecklistController extends Controller
                     foreach ($damagePoints as $point) {
                         \App\Models\VehicleInspectionDamagePoint::create([
                             'vehicle_inspection_id' => $inspection->id,
+                            'part_name' => \Illuminate\Support\Str::limit($point['note'], 50),
                             'x_coordinate' => $point['x'],
                             'y_coordinate' => $point['y'],
                             'notes' => $point['note'],
-                            'type' => 'risk' // Default type
+                            'type' => 'risk'
                         ]);
                     }
                 }
@@ -109,7 +110,7 @@ class VehicleChecklistController extends Controller
     {
         $token = $request->query('token');
 
-        $query = VehicleInspection::withoutGlobalScope('company')
+        $query = VehicleInspection::withoutGlobalScopes() // Remove global scope to allow public viewing
             ->with(['veiculo.client', 'user', 'items.checklistItem', 'company', 'damagePoints']);
 
         if ($token) {

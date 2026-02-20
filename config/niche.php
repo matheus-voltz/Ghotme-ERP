@@ -17,6 +17,46 @@ return [
     'current' => env('APP_NICHE', 'automotive'),
 
     'niches' => [
+        'workshop' => [
+            'labels' => [
+                'entity' => 'Veículo',
+                'entities' => 'Veículos',
+                'new_entity' => 'Novo Veículo',
+                'identifier' => 'Placa',
+                'secondary_identifier' => 'Renavam',
+                'metric' => 'KM',
+                'metric_unit' => 'km',
+                'fuel' => 'Combustível',
+                'fuel_levels' => ['Reserva', '1/4', '1/2', '3/4', 'Cheio'],
+                'visual_inspection_title' => 'Vistoria Visual (Tira-Teima)',
+                'visual_inspection_help' => 'Clique na imagem para marcar avarias.',
+                'visual_inspection_prompt_title' => 'Descreva a avaria',
+                'visual_inspection_prompt_placeholder' => 'Ex: Risco, Amassado...',
+                'brand' => 'Marca',
+                'model' => 'Modelo',
+                'color' => 'Cor',
+                'year' => 'Ano',
+                'features' => 'Opcionais',
+                'inventory_items' => 'Itens/Peças',
+                'in_service_label' => 'Na Oficina',
+                'timeline_checkin_body' => 'O seu veículo deu entrada com sucesso na oficina.',
+                'timeline_execution_body' => 'Nossos técnicos estão trabalhando no seu veículo neste momento.',
+                'timeline_finalizing_body' => 'Realizamos os últimos ajustes e testes para garantir sua segurança total.',
+                'checklist_categories' => [
+                    'Motor' => ['Óleo do Motor', 'Filtro de Ar', 'Correia Dentada', 'Velas', 'Sistema de Arrefecimento'],
+                    'Freios' => ['Pastilhas Dianteiras', 'Discos Dianteiros', 'Lona Traseira', 'Fluido de Freio'],
+                    'Suspensão' => ['Amortecedores', 'Buchas', 'Pneus', 'Alinhamento'],
+                    'Elétrica' => ['Bateria', 'Alternador', 'Lâmpadas', 'Motor de Arranque']
+                ],
+            ],
+            'icons' => [
+                'entity' => 'ti-car',
+                'identifier' => 'ti-id',
+            ],
+            'components' => [
+                'visual_inspection' => 'components.visual-inspection.automotive',
+            ]
+        ],
         'automotive' => [
             'labels' => [
                 'entity' => 'Veículo',

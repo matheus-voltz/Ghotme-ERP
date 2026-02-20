@@ -306,6 +306,8 @@ Route::middleware([
 
     // New Team Route for "Equipe > Colaboradores"
     Route::get('/team/employees', [App\Http\Controllers\TeamController::class, 'index'])->name('team.employees');
+    Route::get('/team/commissions', [App\Http\Controllers\CommissionController::class, 'index'])->name('team.commissions');
+    Route::post('/team/commissions/{id}/pay', [App\Http\Controllers\CommissionController::class, 'markAsPaid'])->name('team.commissions.pay');
 
     Route::get('/user-list', [UserManagement::class, 'dataBase'])->name('user-list');
     Route::get('/user-list/{id}/edit', [UserManagement::class, 'edit'])->name('user-list.edit');

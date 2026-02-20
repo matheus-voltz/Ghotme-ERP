@@ -123,6 +123,7 @@
                 $('#add-user-email').val(data.email);
                 $('#add-user-contact').val(data.contact_number);
                 $('#user-role').val(data.role || 'subscriber');
+                $('#commission_percentage').val(data.commission_percentage || 0);
             });
         });
 
@@ -332,6 +333,13 @@
                         <option value="editor">Editor</option>
                         <option value="admin">Administrador (Limitado)</option>
                     </select>
+                </div>
+                <div class="mb-6">
+                    <label class="form-label" for="commission_percentage">% de Comissão sobre Serviços</label>
+                    <div class="input-group">
+                        <input type="number" id="commission_percentage" name="commission_percentage" class="form-control" placeholder="0" min="0" max="100" />
+                        <span class="input-group-text">%</span>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary me-3 data-submit">Salvar</button>

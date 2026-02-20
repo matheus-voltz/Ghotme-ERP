@@ -172,17 +172,32 @@
   @endif
 
   <!-- Cabeçalho com Logo da Empresa -->
-  <div class="row mb-5 align-items-center">
-    <div class="col-sm-6 text-center text-sm-start">
-      @if($inspection->company && $inspection->company->logo_path)
-      <img src="{{ asset('storage/' . $inspection->company->logo_path) }}" alt="Logo {{ $inspection->company->name }}" style="max-height: 100px; max-width: 300px;" class="mb-3">
-      @else
-      <h2 class="mb-1 fw-bold text-primary">{{ $inspection->company->name ?? config('app.name') }}</h2>
-      @endif
+  <div class="row mb-5 align-items-center header-print-area">
+    <div class="col-sm-7">
+      <div class="d-flex align-items-center gap-3 company-branding">
+        @php
+          $logoUrl = ($inspection->company && $inspection->company->logo_path) 
+                     ? asset('storage/' . $inspection->company->logo_path) 
+                     : null;
+        @endphp
+
+        @if($logoUrl)
+          <img src="{{ $logoUrl }}" alt="Logo" class="company-logo-img" style="max-height: 80px; max-width: 200px; object-fit: contain;">
+        @else
+          <div class="bg-label-primary p-2 rounded">
+            <i class="ti tabler-building-store fs-1"></i>
+          </div>
+        @endif
+
+        <div class="company-text-details">
+          <h2 class="mb-0 fw-bold text-primary company-name-display">{{ $inspection->company->name ?? config('app.name') }}</h2>
+          <p class="mb-0 text-muted small">{{ $inspection->company->email ?? '' }} {{ $inspection->company->phone ? '| ' . $inspection->company->phone : '' }}</p>
+        </div>
+      </div>
     </div>
-    <div class="col-sm-6 text-center text-sm-end">
-      <h3 class="mb-1 fw-bold">{{ __('Checklist de Entrada') }}</h3>
-      <p class="text-muted">{{ __('Documento gerado para segurança do cliente e da oficina.') }}</p>
+    <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+      <h3 class="mb-1 fw-bold text-uppercase title-print">{{ __('Checklist de Entrada') }}</h3>
+      <p class="text-muted mb-0 small">{{ __('Protocolo de segurança e transparência.') }}</p>
     </div>
   </div>
 
@@ -233,10 +248,37 @@
       <!-- Visual Inspection Display -->
       @if($inspection->damagePoints->isNotEmpty())
       <div class="card mb-5 border-dashed bg-lighter">
-        <div class="card-header bg-transparent">
+        <div class="card-header bg-transparent text-center border-bottom mb-4">
           <h5 class="mb-0 fw-bold"><i class="icon-base ti tabler-camera ti-md me-2"></i>{{ niche('visual_inspection_title') }}</h5>
+          <small class="text-muted">Mapa de avarias externas identificadas na entrada</small>
         </div>
         <div class="card-body">
+          <!-- Mapa Visual com Marcadores -->
+          @php $inspectionComponent = niche_config('components.visual_inspection'); @endphp
+          
+          @if($inspectionComponent)
+          <div class="text-center mb-5">
+            <div id="vehicle-visual-display" style="position: relative; display: inline-block; width: 100%; max-width: 900px;">
+              <!-- Car Blueprint Component -->
+              <div style="width: 100%;">
+                @include($inspectionComponent)
+              </div>
+
+              <!-- Markers Layer (Overlay) -->
+              <div id="display-markers-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                @foreach($inspection->damagePoints as $point)
+                <div class="damage-marker-fixed" 
+                     style="position: absolute; left: {{ $point->x_coordinate }}%; top: {{ $point->y_coordinate }}%; pointer-events: auto;"
+                     data-bs-toggle="tooltip" 
+                     title="{{ $point->notes }}">
+                  <div class="marker-dot"></div>
+                </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
+          @endif
+
           <div class="row g-4">
             @foreach($inspection->damagePoints as $point)
             <div class="col-xl-3 col-md-4 col-sm-6">
@@ -409,5 +451,68 @@
         });
     }
   });
+
+  // Init Tooltips
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
 </script>
+
+<style>
+  /* Estilos para tela */
+  .damage-marker-fixed {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #display-markers-container .marker-dot {
+    width: 14px;
+    height: 14px;
+    background-color: #ea5455 !important;
+    border: 2px solid #fff !important;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ajustes específicos para Impressão */
+  @media print {
+    .no-print { display: none !important; }
+    .card { border: none !important; shadow: none !important; }
+    .bg-lighter { background-color: transparent !important; }
+    
+    /* Forçar cores na impressão */
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    #vehicle-visual-display {
+      width: 100% !important;
+      max-width: 800px !important;
+      margin: 0 auto !important;
+    }
+
+    .damage-marker-fixed .marker-dot {
+      background-color: red !important;
+      border: 2px solid white !important;
+    }
+
+    /* Garantir layout lado a lado no cabeçalho */
+    .row.align-items-center {
+      display: table !important;
+      width: 100% !important;
+    }
+    .col-sm-7 { display: table-cell !important; width: 60% !important; vertical-align: middle !important; }
+    .col-sm-5 { display: table-cell !important; width: 40% !important; vertical-align: middle !important; text-align: right !important; }
+  }
+</style>
 @endsection
