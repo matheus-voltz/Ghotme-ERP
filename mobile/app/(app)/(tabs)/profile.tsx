@@ -250,11 +250,11 @@ export default function ProfileScreen() {
 
                     <Text style={[styles.sectionHeader, { color: colors.text }]}>{t('support')}</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
-                        {renderSettingItem("help-circle-outline", t('help'), "Perguntas frequentes")}
+                        {renderSettingItem("help-circle-outline", t('help'), "Perguntas frequentes", () => router.push('/screens/faq'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("chatbox-ellipses-outline", t('team_chat'), "Falar com o time", () => router.push('/chat/contacts'))}
+                        {renderSettingItem("chatbox-ellipses-outline", t('team_chat'), "Falar com o time", () => router.push({ pathname: '/chat/contacts', params: { type: 'team' } }))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("mail-outline", t('contact_us'), "Enviar mensagem")}
+                        {renderSettingItem("mail-outline", t('contact_us'), "Falar com o suporte", () => router.push({ pathname: '/chat/contacts', params: { type: 'support' } }))}
                     </View>
 
                     <TouchableOpacity style={[styles.logoutButton, { backgroundColor: activeTheme === 'dark' ? '#2f2b3a' : '#ffebee' }]} onPress={handleSignOut}>

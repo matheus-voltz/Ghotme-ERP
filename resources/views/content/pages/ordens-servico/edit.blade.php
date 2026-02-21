@@ -169,6 +169,39 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
         <!-- Coluna Direita: Resumo -->
         <div class="col-md-4">
+            <!-- Card de Faturamento / NF-e -->
+            <div class="card mb-4 border-primary">
+                <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Faturamento / NF-e</h5>
+                    <i class="ti tabler-receipt-tax text-primary"></i>
+                </div>
+                <div class="card-body pt-4">
+                    @php
+                        $invoice = \App\Models\TaxInvoice::where('ordem_servico_id', $order->id)->first();
+                    @endphp
+
+                    @if($invoice)
+                        <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
+                            <span class="alert-icon rounded-circle p-1 me-2"><i class="ti tabler-check"></i></span>
+                            <span>Nota Fiscal #{{ $invoice->invoice_number }} emitida</span>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a href="{{ $invoice->pdf_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                <i class="ti tabler-file-type-pdf me-1"></i> Baixar PDF
+                            </a>
+                            <a href="{{ $invoice->xml_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                <i class="ti tabler-file-code me-1"></i> Baixar XML
+                            </a>
+                        </div>
+                    @else
+                        <p class="small text-muted mb-3">Esta Ordem de Serviço ainda não possui nota fiscal emitida.</p>
+                        <a href="{{ route('tax.invoice.create', ['os' => $order->id]) }}" class="btn btn-primary w-100">
+                            <i class="ti tabler-send me-1"></i> Emitir Nota Fiscal
+                        </a>
+                    @endif
+                </div>
+            </div>
+
             @if(isset($customFields) && $customFields->count() > 0)
             <div class="card mb-4">
                 <div class="card-header border-bottom">

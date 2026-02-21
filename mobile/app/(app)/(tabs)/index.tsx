@@ -95,42 +95,102 @@ export default function DashboardScreen() {
     if (!data) return null;
     return (
       <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.adminStatsContainer}>
-        {/* Horizontal Financial Summary */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.horizontalScroll}
-        >
-          {/* Revenue Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#7367F0', backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.statLabel, { color: colors.subText }]}>Receita Mensal</Text>
-            <Text style={[styles.statValue, { color: colors.text }]}>R$ {numberFormat(data.monthlyRevenue)}</Text>
+        {/* Executive 2x2 Grid */}
+        <View style={styles.executiveGrid}>
+          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#7367F020' }]}>
+              <Ionicons name="cash-outline" size={18} color="#7367F0" />
+            </View>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>Faturamento</Text>
+            <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>R$ {numberFormat(data.monthlyRevenue)}</Text>
             <View style={styles.growthContainer}>
               <Ionicons
                 name={data.revenueGrowth >= 0 ? "trending-up" : "trending-down"}
-                size={14}
+                size={12}
                 color={data.revenueGrowth >= 0 ? "#28C76F" : "#EA5455"}
               />
-              <Text style={[styles.growthText, { color: data.revenueGrowth >= 0 ? "#28C76F" : "#EA5455" }]}>
-                {Math.abs(data.revenueGrowth || 0).toFixed(1)}% vs ant.
+              <Text style={[styles.growthText, { color: data.revenueGrowth >= 0 ? "#28C76F" : "#EA5455", fontSize: 10 }]}>
+                {Math.abs(data.revenueGrowth || 0).toFixed(1)}%
               </Text>
             </View>
           </View>
 
-          {/* Profitability Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#28C76F', backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#28C76F20' }]}>
+              <Ionicons name="pie-chart-outline" size={18} color="#28C76F" />
+            </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('profitability')}</Text>
-            <Text style={[styles.statValue, { color: colors.text }]}>{data.monthlyProfitability || 0}%</Text>
-            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Margem média do mês</Text>
+            <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.monthlyProfitability || 0}%</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Margem real</Text>
           </View>
 
-          {/* Clients Card */}
-          <View style={[styles.statCard, { borderLeftColor: '#FF9F43', backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#FF9F4320' }]}>
+              <Ionicons name="people-outline" size={18} color="#FF9F43" />
+            </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('new_clients')}</Text>
-            <Text style={[styles.statValue, { color: colors.text }]}>{data.totalClients || 0}</Text>
-            <Text style={[styles.statSubLabel, { color: colors.subText }]}>{t('active_base')} {getEstablishmentName().replace('do ', 'no ').replace('da ', 'na ')}</Text>
+            <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.totalClients || 0}</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Base ativa</Text>
           </View>
-        </ScrollView>
+
+          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#00CFE820' }]}>
+              <Ionicons name="flash-outline" size={18} color="#00CFE8" />
+            </View>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>Produtividade</Text>
+            <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>
+              {data.osStats?.finalized_today || 0}/{((data.osStats?.pending || 0) + (data.osStats?.running || 0) + (data.osStats?.finalized_today || 0)) || 0}
+            </Text>
+            <View style={styles.miniProgressBarContainer}>
+              <View style={[styles.miniProgressBar, {
+                width: `${Math.min(100, (data.osStats?.finalized_today * 100 / ((data.osStats?.pending + data.osStats?.running + data.osStats?.finalized_today) || 1)))}%`,
+                backgroundColor: '#00CFE8'
+              }]} />
+            </View>
+          </View>
+        </View>
+
+        {/* Quick Actions Bar */}
+        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }]}>Ações Rápidas</Text>
+        <View style={styles.quickActionsContainer}>
+          {[
+            { icon: 'add-circle', label: 'Nova OS', color: '#7367F0', route: '/os/create' },
+            { icon: 'person-add', label: 'Cliente', color: '#28C76F', route: '/clients/create' },
+            { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
+            { icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
+          ].map((action, idx) => (
+            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => router.push(action.route as any)}>
+              <View style={[styles.quickActionIcon, { backgroundColor: action.color + '15' }]}>
+                <Ionicons name={action.icon as any} size={22} color={action.color} />
+              </View>
+              <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Financial Trends Chart */}
+        <View style={{ marginTop: 10 }}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Fluxo de Receita (7 dias)</Text>
+          <View style={[styles.chartContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={styles.chartBars}>
+              {data.revenueChart?.map((day: any, idx: number) => {
+                const maxVal = Math.max(...data.revenueChart.map((d: any) => d.value), 1);
+                const height = (day.value / maxVal) * 100;
+                return (
+                  <View key={idx} style={styles.chartColumn}>
+                    <View style={styles.chartValueWrapper}>
+                      {day.value > 0 && <Text style={[styles.chartValueText, { color: colors.text }]}>{day.value > 1000 ? (day.value / 1000).toFixed(1) + 'k' : day.value.toFixed(0)}</Text>}
+                    </View>
+                    <View style={[styles.chartBar, { height: `${Math.max(2, height)}%`, backgroundColor: idx === 6 ? '#7367F0' : '#7367F040' }]} />
+                    <Text style={[styles.chartLabel, { color: colors.subText }]}>{day.day}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+
+        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10 }]}>Status Operacional</Text>
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
@@ -596,6 +656,70 @@ const styles = StyleSheet.create({
   alertRow: {
     gap: 10,
   },
+  executiveGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 20,
+  },
+  executiveCard: {
+    width: '48%',
+    borderRadius: 20,
+    padding: 15,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+  miniIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  miniProgressBarContainer: {
+    height: 4,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    borderRadius: 2,
+    marginTop: 10,
+    overflow: 'hidden',
+  },
+  miniProgressBar: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(115, 103, 240, 0.05)',
+    borderRadius: 20,
+    padding: 15,
+    marginVertical: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(115, 103, 240, 0.1)',
+  },
+  quickActionItem: {
+    alignItems: 'center',
+    width: '22%',
+  },
+  quickActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  quickActionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
   alertItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -607,6 +731,42 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginLeft: 10,
+  },
+  chartContainer: {
+    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    marginBottom: 20,
+  },
+  chartBars: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    height: 120,
+    paddingTop: 20,
+  },
+  chartColumn: {
+    alignItems: 'center',
+    width: '12%',
+  },
+  chartBar: {
+    width: 10,
+    borderRadius: 5,
+  },
+  chartLabel: {
+    fontSize: 9,
+    marginTop: 8,
+    fontWeight: '600',
+  },
+  chartValueWrapper: {
+    position: 'absolute',
+    top: -15,
+    width: 40,
+    alignItems: 'center',
+  },
+  chartValueText: {
+    fontSize: 8,
+    fontWeight: 'bold',
   },
   card: {
     backgroundColor: '#fff',

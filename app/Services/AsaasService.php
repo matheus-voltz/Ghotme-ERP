@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AsaasService
 {
@@ -11,43 +12,95 @@ class AsaasService
 
     public function __construct()
     {
-        // Pega as chaves do .env ou config (Adicionar no seu .env ASAAS_API_KEY)
-        $this->apiKey = config('services.asaas.key', env('ASAAS_API_KEY'));
-        $this->baseUrl = config('services.asaas.url', 'https://www.asaas.com/api/v3');
+        // Tenta ler das configurações do Laravel ou direto do ENV
+        $this->apiKey = config('services.asaas.key') ?: env('ASAAS_API_KEY');
+        
+        // Se ainda estiver vazio, tenta ler via getenv (alguns servidores requerem)
+        if (empty($this->apiKey)) {
+            $this->apiKey = getenv('ASAAS_API_KEY');
+        }
+
+        $this->baseUrl = config('services.asaas.url') ?: 'https://sandbox.asaas.com/api/v3';
+
+        if (empty($this->apiKey)) {
+            Log::error('ERRO CRÍTICO: ASAAS_API_KEY não encontrada em nenhum lugar (config, env ou getenv).');
+        }
     }
 
-    /**
-     * Gera um pagamento PIX dinâmico
-     */
-    public function generatePix($amount, $customerName, $customerCpfCnpj, $description, $externalReference)
+    public function getOrCreateCustomer($user)
     {
-        // 1. Criar a cobrança no Asaas
+        if (empty($this->apiKey)) {
+            throw new \Exception("Chave de API do Asaas não configurada. Verifique seu arquivo .env");
+        }
+
+        // 1. Tentar buscar por CPF/CNPJ
         $response = Http::withHeaders(['access_token' => $this->apiKey])
-            ->post($this->baseUrl . '/payments', [
-                'billingType' => 'PIX',
-                'value' => $amount,
-                'description' => $description,
-                'externalReference' => $externalReference,
-                'dueDate' => date('Y-m-d'), // Vencimento hoje
-                // Idealmente você criaria o cliente no Asaas antes e passaria o ID aqui
-                'customer' => $this->getOrCreateCustomer($customerName, $customerCpfCnpj),
+            ->get($this->baseUrl . '/customers', [
+                'cpfCnpj' => preg_replace('/\D/', '', $user->cpf_cnpj)
             ]);
 
-        if (!$response->successful()) return null;
+        if ($response->successful() && !empty($response->json('data'))) {
+            return $response->json('data')[0]['id'];
+        }
 
-        $paymentId = $response->json('id');
+        // 2. Se não achar, criar novo
+        $createResponse = Http::withHeaders(['access_token' => $this->apiKey])
+            ->post($this->baseUrl . '/customers', [
+                'name' => $user->name,
+                'cpfCnpj' => preg_replace('/\D/', '', $user->cpf_cnpj),
+                'email' => $user->email,
+                'mobilePhone' => preg_replace('/\D/', '', $user->contact_number),
+                'externalReference' => (string) $user->id,
+            ]);
 
-        // 2. Buscar o QR Code do pagamento gerado
-        $pixResponse = Http::withHeaders(['access_token' => $this->apiKey])
-            ->get($this->baseUrl . "/payments/{$paymentId}/pixQrCode");
+        if ($createResponse->successful()) {
+            return $createResponse->json('id');
+        }
 
-        return $pixResponse->json();
+        $errorMsg = $createResponse->json('errors')[0]['description'] ?? 'Erro desconhecido na API do Asaas';
+        throw new \Exception("Erro ao criar cliente no Asaas: " . $errorMsg);
     }
 
-    private function getOrCreateCustomer($name, $cpfCnpj)
+    public function createSubscription($customerId, $method, $amount, $description)
     {
-        // Lógica simplificada: busca por CPF/CNPJ ou cria um novo
-        // Aqui deve ser aprimorado para produção
-        return 'cus_000005789456'; // Exemplo de ID fixo para teste
+        $response = Http::withHeaders(['access_token' => $this->apiKey])
+            ->post($this->baseUrl . '/subscriptions', [
+                'customer' => $customerId,
+                'billingType' => strtoupper($method),
+                'value' => $amount,
+                'nextDueDate' => now()->addDays(1)->toDateString(),
+                'cycle' => 'MONTHLY',
+                'description' => $description
+            ]);
+
+        return $response->json();
+    }
+
+    public function createPayment($customerId, $method, $amount, $description)
+    {
+        $response = Http::withHeaders(['access_token' => $this->apiKey])
+            ->post($this->baseUrl . '/payments', [
+                'customer' => $customerId,
+                'billingType' => strtoupper($method),
+                'value' => $amount,
+                'dueDate' => now()->toDateString(),
+                'description' => $description
+            ]);
+
+        return $response->json();
+    }
+
+    public function getSubscriptionPayments($subscriptionId)
+    {
+        return Http::withHeaders(['access_token' => $this->apiKey])
+            ->get($this->baseUrl . "/subscriptions/{$subscriptionId}/payments")
+            ->json();
+    }
+
+    public function getPixData($paymentId)
+    {
+        return Http::withHeaders(['access_token' => $this->apiKey])
+            ->get($this->baseUrl . "/payments/{$paymentId}/pixQrCode")
+            ->json();
     }
 }

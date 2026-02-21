@@ -42,7 +42,12 @@ const translations = {
         // OS Tabs e Botões
         all: 'Todas',
         new_os: 'Nova OS',
-        // ...
+        faq_title: 'Perguntas Frequentes',
+        faq_search_placeholder: 'Como podemos ajudar?',
+        faq_empty: 'Nenhuma pergunta encontrada para sua busca.',
+        faq_still_questions: 'Ainda com dúvidas?',
+        faq_support_subtitle: 'Nosso time está pronto para te ajudar.',
+        faq_talk_now: 'Falar Agora',
     },
     'en': {
         welcome: 'Welcome',
@@ -76,6 +81,12 @@ const translations = {
         // OS Tabs
         all: 'All',
         new_os: 'New OS',
+        faq_title: 'Frequently Asked Questions',
+        faq_search_placeholder: 'How can we help?',
+        faq_empty: 'No questions found for your search.',
+        faq_still_questions: 'Still have questions?',
+        faq_support_subtitle: 'Our team is ready to help you.',
+        faq_talk_now: 'Talk Now',
     },
     'es': {
         welcome: 'Bienvenido',
@@ -109,6 +120,12 @@ const translations = {
         // OS Tabs
         all: 'Todas',
         new_os: 'Nueva OS',
+        faq_title: 'Preguntas Frecuentes',
+        faq_search_placeholder: '¿Cómo podemos ayudar?',
+        faq_empty: 'No se encontraron preguntas para su búsqueda.',
+        faq_still_questions: '¿Aún tienes dudas?',
+        faq_support_subtitle: 'Nuestro equipo está listo para ayudarte.',
+        faq_talk_now: 'Hablar Ahora',
     },
     'fr': {
         welcome: 'Bienvenue',
@@ -142,6 +159,12 @@ const translations = {
         // OS Tabs
         all: 'Toutes',
         new_os: 'Nouvelle OS',
+        faq_title: 'Questions Fréquentes',
+        faq_search_placeholder: 'Comment pouvons-nous vous aider ?',
+        faq_empty: 'Aucune question trouvée pour votre recherche.',
+        faq_still_questions: 'Encore des questions ?',
+        faq_support_subtitle: 'Notre équipe est prête à vous aider.',
+        faq_talk_now: 'Parler Maintenant',
     }
 };
 

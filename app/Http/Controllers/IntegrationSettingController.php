@@ -21,7 +21,9 @@ class IntegrationSettingController extends Controller
             'asaas_api_key' => 'nullable|string|max:255',
             'asaas_environment' => 'required|in:sandbox,production',
             'whatsapp_token' => 'nullable|string|max:255',
-            'whatsapp_phone_number_id' => 'nullable|string|max:255'
+            'whatsapp_phone_number_id' => 'nullable|string|max:255',
+            'fiscal_api_token' => 'nullable|string|max:255',
+            'fiscal_environment' => 'required|in:sandbox,production',
         ]);
 
         $settings->fill($validated);

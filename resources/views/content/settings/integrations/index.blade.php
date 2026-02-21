@@ -61,6 +61,33 @@
             </div>
         </div>
     </div>
+    <!-- Fiscal Integration -->
+    <div class="col-md-6 mb-6">
+        <div class="card h-100 border-primary">
+            <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Integração Fiscal / NF-e</h5>
+                <i class="ti tabler-receipt-tax text-primary"></i>
+            </div>
+            <div class="card-body pt-6">
+                <form id="formFiscal">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="form-label">API Token (Focus NFe)</label>
+                        <input type="password" name="fiscal_api_token" class="form-control" value="{{ $settings->fiscal_api_token }}" placeholder="Seu Token de API" />
+                        <small class="text-muted">Integração via Focus NFe. Use o token de homologação ou produção.</small>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Ambiente Fiscal</label>
+                        <select name="fiscal_environment" class="form-select">
+                            <option value="sandbox" {{ $settings->fiscal_environment == 'sandbox' ? 'selected' : '' }}>Homologação (Sem Valor Fiscal)</option>
+                            <option value="production" {{ $settings->fiscal_environment == 'production' ? 'selected' : '' }}>Produção (Emissão Real)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Salvar Configuração Fiscal</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -84,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     handleUpdate('formAsaas');
     handleUpdate('formWhatsApp');
+    handleUpdate('formFiscal');
 });
 </script>
 @endsection

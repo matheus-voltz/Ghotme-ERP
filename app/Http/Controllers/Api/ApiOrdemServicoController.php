@@ -9,6 +9,8 @@ use App\Models\Clients;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\FinancialTransaction;
+use App\Models\User;
+use App\Models\InventoryItem;
 
 class ApiOrdemServicoController extends Controller
 {
@@ -97,6 +99,21 @@ class ApiOrdemServicoController extends Controller
                 ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
             $monthlyProfitability = round($monthlyRevenue > 0 ? (($monthlyRevenue - $monthlyExpenses) / $monthlyRevenue) * 100 : 0, 1);
 
+            // Last 7 days chart data
+            $revenueChart = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::today()->subDays($i);
+                $dailyFinancial = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+                    ->whereDate('paid_at', $date)->sum('amount');
+                $dailyOS = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+                    ->whereDate('updated_at', $date)->get()->sum('total');
+
+                $revenueChart[] = [
+                    'day' => $date->format('d/m'),
+                    'value' => (float)($dailyFinancial + $dailyOS)
+                ];
+            }
+
 
             $osStats = [
                 'pending' => OrdemServico::where('status', 'pending')->count(),
@@ -109,7 +126,8 @@ class ApiOrdemServicoController extends Controller
                 'monthlyProfitability' => $monthlyProfitability,
                 'totalClients' => Clients::count(),
                 'osStats' => $osStats,
-                'lowStockCount' => 3,
+                'revenueChart' => $revenueChart,
+                'lowStockCount' => InventoryItem::whereColumn('quantity', '<=', 'min_quantity')->count(),
                 'pendingBudgetsCount' => Budget::where('status', 'pending')->count(),
                 'recentOS' => OrdemServico::whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
                 'unreadNotificationsCount' => $user->unreadNotifications->count()

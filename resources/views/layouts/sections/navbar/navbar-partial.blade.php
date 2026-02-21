@@ -246,8 +246,22 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
           <a class="dropdown-item" href="{{ route('settings') }}">
             <span class="d-flex align-items-center align-middle">
               <i class="flex-shrink-0 icon-base ti tabler-file-dollar me-3 icon-md"></i><span
-                class="flex-grow-1 align-middle">Faturamento</span>
-              <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">4</span>
+                class="flex-grow-1 align-middle">{{ __('Faturamento') }}</span>
+              @php
+                // 1. Contar faturas pendentes da assinatura
+                $pendingBilling = \App\Models\BillingHistory::where('user_id', Auth::id())
+                  ->where('status', 'pending')
+                  ->count();
+                
+                // 2. Verificar se está no plano grátis (opcional: mostrar badge azul de upgrade)
+                $isFree = Auth::user()->plan === 'free' || empty(Auth::user()->plan);
+              @endphp
+
+              @if($pendingBilling > 0)
+                <span class="flex-shrink-0 badge bg-danger d-flex align-items-center justify-content-center">{{ $pendingBilling }}</span>
+              @elseif($isFree)
+                <span class="flex-shrink-0 badge bg-label-info d-flex align-items-center justify-content-center">Free</span>
+              @endif
             </span>
           </a>
         </li>

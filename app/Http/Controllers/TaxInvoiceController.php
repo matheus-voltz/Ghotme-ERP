@@ -4,50 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Models\OrdemServico;
 use App\Models\TaxInvoice;
+use App\Services\FiscalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TaxInvoiceController extends Controller
 {
+    protected $fiscalService;
+
+    public function __construct(FiscalService $fiscalService)
+    {
+        $this->fiscalService = $fiscalService;
+    }
+
     /**
-     * Prepara e emite a nota fiscal (Simulação para integração futura)
+     * Prepara e emite a nota fiscal via API
      */
     public function createFromOS(Request $request)
     {
         $osId = $request->get('os');
-        $os = OrdemServico::where('id', $osId)
+        $os = OrdemServico::with(['client', 'items.service', 'parts.part'])->where('id', $osId)
             ->where('company_id', Auth::user()->company_id)
             ->firstOrFail();
 
-        // 1. Verificar se já existe nota autorizada para essa OS
+        // 1. Verificar se já existe nota autorizada
         $existing = TaxInvoice::where('ordem_servico_id', $os->id)
-            ->where('status', 'authorized')
+            ->where('status', 'issued')
             ->first();
 
         if ($existing) {
-            return back()->with('error', 'Já existe uma Nota Fiscal autorizada para esta OS #' . $os->id);
+            return back()->with('error', 'Já existe uma Nota Fiscal para esta OS #' . $os->id);
         }
 
-        // 2. Criar registro de nota fiscal pendente
-        $invoice = TaxInvoice::create([
-            'company_id' => $os->company_id,
-            'ordem_servico_id' => $os->id,
-            'invoice_type' => 'nfse', // Padrão serviço p/ oficina
-            'status' => 'processing',
-            'total_amount' => $os->total,
-            'tax_amount' => $os->total * 0.05, // Exemplo 5% ISS (deve vir de config)
-            'issued_at' => now(),
-        ]);
+        try {
+            // 2. Transmitir via Serviço Fiscal
+            $invoice = $this->fiscalService->transmitFromOS($os);
 
-        // 3. Aqui entraria o código de integração com a API (FocusNFe, PlugNotas, etc)
-        // Por agora, vamos simular sucesso para demonstrar o fluxo
-        
-        $invoice->update([
-            'status' => 'authorized',
-            'number' => rand(1000, 9999),
-            'series' => '1',
-        ]);
-
-        return back()->with('success', 'Nota Fiscal emitida com sucesso para a OS #' . $os->id);
+            return back()->with('success', "Nota Fiscal #{$invoice->invoice_number} emitida com sucesso!");
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erro ao emitir nota: ' . $e->getMessage());
+        }
     }
 }
