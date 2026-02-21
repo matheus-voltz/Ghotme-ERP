@@ -206,6 +206,7 @@ class SettingsController extends Controller
                 'status' => $status,
                 'amount' => number_format($amount, 2, ',', '.'),
                 'invoice_url' => $invoiceUrl,
+                'bank_slip_url' => $result['bankSlipUrl'] ?? $invoiceUrl,
             ];
 
             if ($method === 'pix') {

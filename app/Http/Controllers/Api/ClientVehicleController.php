@@ -24,7 +24,7 @@ class ClientVehicleController extends Controller
         return response()->json($clients);
     }
 
-    public function getVehicles($clientId)
+    public function getClientVehicles($clientId)
     {
         // Corrigido de client_id para cliente_id conforme a migração
         $vehicles = Vehicles::where('cliente_id', $clientId)
