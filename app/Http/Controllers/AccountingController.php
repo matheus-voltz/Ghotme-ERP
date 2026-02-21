@@ -7,6 +7,7 @@ use App\Models\TaxInvoice;
 use App\Models\Company;
 use App\Models\FinancialTransaction;
 use App\Services\OfxParserService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,21 +37,21 @@ class AccountingController extends Controller
             return redirect()->route('dashboard')->with('error', 'Nenhuma empresa cadastrada.');
         }
 
-        $month = $request->get('month', date('m'));
-        $year = $request->get('year', date('Y'));
+        // Filtro por Intervalo de Datas
+        $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->toDateString());
+        $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->toDateString());
         
-        // Receitas e Despesas do Mês
+        // Receitas (OS finalizadas no período)
         $revenue = OrdemServico::where('company_id', $company->id)
             ->whereIn('status', ['completed', 'finalized', 'paid'])
-            ->whereMonth('updated_at', $month)
-            ->whereYear('updated_at', $year)
+            ->whereBetween('updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->with(['client'])
             ->get();
 
+        // Despesas (Lançamentos no período)
         $expenses = FinancialTransaction::where('company_id', $company->id)
-            ->where('type', 'out') // Despesas
-            ->whereMonth('due_date', $month)
-            ->whereYear('due_date', $year)
+            ->where('type', 'out')
+            ->whereBetween('due_date', [$startDate, $endDate])
             ->get();
 
         // Lógica para o DRE (Agrupamento por Categoria)
@@ -58,9 +59,9 @@ class AccountingController extends Controller
             return $items->sum('amount');
         });
 
+        // Notas Fiscais emitidas no período
         $invoices = TaxInvoice::where('company_id', $company->id)
-            ->whereMonth('issued_at', $month)
-            ->whereYear('issued_at', $year)
+            ->whereBetween('issued_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->get();
 
         $totals = [
@@ -78,13 +79,13 @@ class AccountingController extends Controller
             'expenses' => $expenses,
             'invoices' => $invoices,
             'totals' => $totals,
-            'month' => $month,
-            'year' => $year,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
             'company' => $company,
             'dreData' => $dreData,
             'isPublic' => $isPublic,
-            'isMenu' => !$isPublic, // Oculta o menu se for público
-            'isNavbar' => true // Mantém a barra superior para mostrar o nome da oficina
+            'isMenu' => !$isPublic,
+            'isNavbar' => true
         ]);
     }
 

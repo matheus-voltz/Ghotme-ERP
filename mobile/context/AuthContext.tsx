@@ -9,6 +9,7 @@ type AuthContextType = {
     signOut: () => Promise<void>;
     verify2FA: (email: string, code: string) => Promise<void>;
     updateUser: (newData: any) => Promise<void>;
+    refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -21,6 +22,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loadStorageData();
     }, []);
 
+    const fixPhotoUrl = (userObj: any) => {
+        if (!userObj) return userObj;
+        if (!userObj.profile_photo_url) {
+            userObj.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(userObj.name || 'U')}&color=7367F0&background=F3F2FF`;
+        } else if (userObj.profile_photo_url.includes('localhost') || userObj.profile_photo_url.includes('127.0.0.1')) {
+            const baseUrl = api.defaults.baseURL?.replace('/api', '');
+            if (baseUrl) {
+                userObj.profile_photo_url = userObj.profile_photo_url.replace(/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?/, baseUrl);
+            }
+        }
+        return userObj;
+    };
+
     async function loadStorageData() {
         try {
             const userToken = await SecureStore.getItemAsync('userToken');
@@ -28,14 +42,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
             if (userToken) {
                 api.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
-                
+
                 // Tenta buscar dados atualizados da API para verificar expiração/plano
                 try {
                     const response = await api.get('/user');
-                    const updatedUser = response.data;
-                    if (!updatedUser.profile_photo_url) {
-                        updatedUser.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(updatedUser.name)}&color=7367F0&background=F3F2FF`;
-                    }
+                    const updatedUser = fixPhotoUrl(response.data);
+
                     await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
                     setUser(updatedUser);
                 } catch (apiError) {
@@ -52,10 +64,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
-    async function saveAuthData(user: any, token: string) {
-        if (!user.profile_photo_url) {
-            user.profile_photo_url = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&color=7367F0&background=F3F2FF`;
-        }
+    async function saveAuthData(rawUser: any, token: string) {
+        const user = fixPhotoUrl(rawUser);
 
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         await SecureStore.setItemAsync('userToken', token);
@@ -65,11 +75,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function updateUser(newData: any) {
         try {
-            const updatedUser = { ...user, ...newData };
+            const updatedUser = fixPhotoUrl({ ...user, ...newData });
             await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
             setUser(updatedUser);
         } catch (error) {
             console.error("Error updating user:", error);
+        }
+    }
+
+    async function refreshUser() {
+        try {
+            const response = await api.get('/user');
+            const updatedUser = fixPhotoUrl(response.data);
+            await SecureStore.setItemAsync('userData', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+        } catch (error) {
+            console.error('Error in refreshUser:', error);
         }
     }
 
@@ -101,7 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, signIn, signOut, verify2FA, updateUser }}>
+        <AuthContext.Provider value={{ user, loading, signIn, signOut, verify2FA, updateUser, refreshUser }}>
             {children}
         </AuthContext.Provider>
     );

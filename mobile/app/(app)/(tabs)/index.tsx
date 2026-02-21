@@ -312,10 +312,10 @@ export default function DashboardScreen() {
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
-              style={[styles.chatButton, { marginRight: 15 }]}
+              style={styles.chatButton}
               onPress={() => router.push('/screens/notifications')}
             >
-              <Ionicons name="notifications-outline" size={22} color="#fff" />
+              <Ionicons name="notifications-outline" size={24} color="#fff" />
               {data?.unreadNotificationsCount > 0 && (
                 <View style={[styles.badge, { backgroundColor: '#EA5455' }]}>
                   <Text style={styles.badgeText}>{data.unreadNotificationsCount > 9 ? '9+' : data.unreadNotificationsCount}</Text>
@@ -327,7 +327,7 @@ export default function DashboardScreen() {
               style={styles.chatButton}
               onPress={() => router.push('/chat/contacts')}
             >
-              <Ionicons name="chatbubbles-outline" size={22} color="#fff" />
+              <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
               {unreadCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -340,7 +340,7 @@ export default function DashboardScreen() {
                 {user?.profile_photo_url ? (
                   <Image
                     source={{ uri: user.profile_photo_url }}
-                    style={{ width: '100%', height: '100%', borderRadius: 21 }}
+                    style={{ width: '100%', height: '100%', borderRadius: 18 }}
                     contentFit="cover"
                   />
                 ) : (
@@ -440,33 +440,25 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   profileButton: {
-    width: 48,
-    height: 48,
-    borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.5)',
-    borderRadius: 24,
+    padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
   chatButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    padding: 8,
+    marginRight: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    position: 'relative',
   },
   badge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
+    top: 6,
+    right: 4,
     backgroundColor: '#FF9F43',
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -478,9 +470,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   avatarPlaceholder: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator, Modal } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator, Modal, RefreshControl } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,7 +11,7 @@ import api from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
 
 export default function ProfileScreen() {
-    const { user, signOut, updateUser } = useAuth();
+    const { user, signOut, updateUser, refreshUser } = useAuth();
     const { theme, setTheme, colors, activeTheme } = useTheme();
     const router = useRouter();
     const [uploading, setUploading] = useState(false);
@@ -118,6 +118,16 @@ export default function ProfileScreen() {
         }
     };
 
+    const [refreshing, setRefreshing] = useState(false);
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        if (refreshUser) {
+            await refreshUser();
+        }
+        await fetchStats();
+        setRefreshing(false);
+    }, [refreshUser]);
+
     const getCompletedToday = () => {
         if (!stats) return 0;
         return user?.role === 'admin'
@@ -146,7 +156,19 @@ export default function ProfileScreen() {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar barStyle={activeTheme === 'dark' ? "light-content" : "light-content"} backgroundColor="#7367F0" />
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={{ paddingBottom: 100 }}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#7367F0']}
+                        tintColor="#7367F0"
+                        progressViewOffset={10}
+                    />
+                }
+            >
                 {/* Header Section */}
                 <LinearGradient
                     colors={['#7367F0', '#CE9FFC']}
