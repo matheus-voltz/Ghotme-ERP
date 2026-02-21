@@ -54,7 +54,7 @@ class SettingsController extends Controller
             'name' => 'Padrão',
             'price' => '149,00',
             'period' => 'Mês',
-            'description' => 'O plano ideal para o crescimento da sua oficina.'
+            'description' => 'O plano ideal para o crescimento da sua empresa.'
         ];
 
         if ($user->plan === 'enterprise') {
@@ -69,7 +69,7 @@ class SettingsController extends Controller
                 'name' => 'Padrão',
                 'price' => $user->plan_type === 'yearly' ? '1.490,00' : '149,00',
                 'period' => $user->plan_type === 'yearly' ? 'Ano' : 'Mês',
-                'description' => 'O plano ideal para o crescimento da sua oficina.'
+                'description' => 'O plano ideal para o crescimento da sua empresa.'
             ];
         } elseif ($user->plan === 'free') {
             $planDetails = [
