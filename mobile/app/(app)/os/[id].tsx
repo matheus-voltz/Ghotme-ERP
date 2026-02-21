@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
@@ -35,6 +36,8 @@ const getStatusColor = (status: string) => {
     }
 };
 
+import { SuccessAnimation } from '../../../components/SuccessAnimation';
+
 export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
     const { colors } = useTheme();
@@ -43,6 +46,7 @@ export default function OSDetailScreen() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [timers, setTimers] = useState<{ [key: number]: number }>({});
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const fetchOSDetails = async () => {
         try {
@@ -104,6 +108,7 @@ export default function OSDetailScreen() {
 
     const toggleItemTimer = async (itemId: number) => {
         try {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             const response = await api.post(`/os/items/${itemId}/toggle-timer`);
             if (response.data.success) {
                 fetchOSDetails();
@@ -115,6 +120,7 @@ export default function OSDetailScreen() {
 
     const completeItem = async (itemId: number) => {
         try {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             const response = await api.post(`/os/items/${itemId}/complete`);
             if (response.data.success) {
                 fetchOSDetails();
@@ -145,8 +151,10 @@ export default function OSDetailScreen() {
     const processFinalization = async (notify: boolean) => {
         try {
             setUpdating(true);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
             await api.patch(`/os/${id}/status`, { status: 'finalized' });
             setOs({ ...os, status: 'finalized' });
+            setShowSuccess(true);
 
             if (notify) {
                 const phone = os.client?.whatsapp || os.client?.phone;
@@ -454,6 +462,12 @@ export default function OSDetailScreen() {
 
                 <View style={{ height: 100 }} />
             </ScrollView>
+
+            <SuccessAnimation
+                visible={showSuccess}
+                onFinish={() => setShowSuccess(false)}
+                message="Ordem Finalizada!"
+            />
         </View>
     );
 }

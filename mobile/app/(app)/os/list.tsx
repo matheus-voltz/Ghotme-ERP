@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, StatusBar } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, StatusBar, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
@@ -7,6 +7,8 @@ import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import { Skeleton } from '../../../components/Skeleton';
 
 const statusTranslations: { [key: string]: string } = {
     'pending': 'Pendentes',
@@ -22,32 +24,62 @@ export default function OSListScreen() {
     const { labels, niche } = useNiche();
     const [data, setData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        // ... (existing fetchData logic if needed, or stick to initial load)
-        // Since we are replacing the whole component logic slightly to add animations, let's keep it simple.
-        fetchData();
-    }, [status]);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchData = async () => {
         try {
             const response = await api.get('/os', { params: { status } });
-            // Se for paginado, os dados estão em .data.data, senão em .data
             const list = response.data.data || response.data;
             setData(Array.isArray(list) ? list : []);
         } catch (error) {
             console.error("List fetch error:", error);
             Alert.alert("Erro", "Não foi possível carregar a lista.");
         } finally {
-            setLoading(false);
+            // Pequeno delay para percepção do skeleton
+            setTimeout(() => {
+                setLoading(false);
+                setRefreshing(false);
+            }, 600);
         }
     };
 
+    useEffect(() => {
+        fetchData();
+    }, [status]);
+
+    const onRefresh = useCallback(() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setRefreshing(true);
+        fetchData();
+    }, [status]);
+
+    const renderSkeleton = () => (
+        <View style={styles.list}>
+            {[1, 2, 3, 4, 5].map(i => (
+                <View key={i} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <View style={styles.cardHeader}>
+                        <Skeleton width={50} height={20} borderRadius={6} />
+                        <Skeleton width={80} height={14} />
+                    </View>
+                    <Skeleton width="60%" height={18} style={{ marginBottom: 10 }} />
+                    <Skeleton width="40%" height={14} style={{ marginBottom: 15 }} />
+                    <View style={[styles.footer, { borderTopColor: colors.border }]}>
+                        <Skeleton width={100} height={20} />
+                        <Skeleton width={80} height={24} borderRadius={20} />
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
+
     const renderItem = ({ item, index }: { item: any, index: number }) => (
-        <Animated.View entering={FadeInDown.delay(index * 100).duration(500).springify()}>
+        <Animated.View entering={FadeInDown.delay(index * 50).duration(400).springify()}>
             <TouchableOpacity
                 style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-                onPress={() => router.push(`/os/${item.id}`)}
+                onPress={() => {
+                    Haptics.selectionAsync();
+                    router.push(`/os/${item.id}`);
+                }}
                 activeOpacity={0.9}
             >
                 <View style={styles.cardHeader}>
@@ -73,7 +105,7 @@ export default function OSListScreen() {
                     </Text>
                     <View style={styles.actionBtn}>
                         <Text style={styles.actionText}>Ver Detalhes</Text>
-                        <Ionicons name="chevron-forward" size={16} color="#7367F0" />
+                        <Ionicons name="chevron-forward" size={16} color={colors.primary} />
                     </View>
                 </View>
             </TouchableOpacity>
@@ -101,13 +133,12 @@ export default function OSListScreen() {
                 </View>
             </LinearGradient>
 
-            {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#7367F0" />
-                </View>
-            ) : (
+            {loading ? renderSkeleton() : (
                 <FlatList
                     data={data}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#7367F0" />
+                    }
                     keyExtractor={(item) => item.id.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.list}
@@ -125,7 +156,7 @@ export default function OSListScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f8f9fa' },
+    container: { flex: 1 },
     header: {
         paddingTop: 60,
         paddingBottom: 25,
@@ -150,23 +181,16 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#fff',
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
     list: {
         paddingTop: 20,
         paddingHorizontal: 20,
         paddingBottom: 40,
     },
     card: {
-        backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,

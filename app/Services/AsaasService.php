@@ -12,28 +12,16 @@ class AsaasService
 
     public function __construct()
     {
-        // Tenta ler das configurações do Laravel ou direto do ENV
         $this->apiKey = config('services.asaas.key') ?: env('ASAAS_API_KEY');
-        
-        // Se ainda estiver vazio, tenta ler via getenv (alguns servidores requerem)
-        if (empty($this->apiKey)) {
-            $this->apiKey = getenv('ASAAS_API_KEY');
-        }
-
         $this->baseUrl = config('services.asaas.url') ?: 'https://sandbox.asaas.com/api/v3';
-
-        if (empty($this->apiKey)) {
-            Log::error('ERRO CRÍTICO: ASAAS_API_KEY não encontrada em nenhum lugar (config, env ou getenv).');
-        }
     }
 
     public function getOrCreateCustomer($user)
     {
         if (empty($this->apiKey)) {
-            throw new \Exception("Chave de API do Asaas não configurada. Verifique seu arquivo .env");
+            throw new \Exception("Chave de API do Asaas não configurada.");
         }
 
-        // 1. Tentar buscar por CPF/CNPJ
         $response = Http::withHeaders(['access_token' => $this->apiKey])
             ->get($this->baseUrl . '/customers', [
                 'cpfCnpj' => preg_replace('/\D/', '', $user->cpf_cnpj)
@@ -43,7 +31,6 @@ class AsaasService
             return $response->json('data')[0]['id'];
         }
 
-        // 2. Se não achar, criar novo
         $createResponse = Http::withHeaders(['access_token' => $this->apiKey])
             ->post($this->baseUrl . '/customers', [
                 'name' => $user->name,
@@ -57,37 +44,67 @@ class AsaasService
             return $createResponse->json('id');
         }
 
-        $errorMsg = $createResponse->json('errors')[0]['description'] ?? 'Erro desconhecido na API do Asaas';
-        throw new \Exception("Erro ao criar cliente no Asaas: " . $errorMsg);
+        throw new \Exception("Erro ao criar cliente no Asaas.");
     }
 
-    public function createSubscription($customerId, $method, $amount, $description)
+    /**
+     * Cria cobrança/assinatura com suporte a Cartão Direto
+     */
+    public function createSubscription($customerId, $method, $amount, $description, $cardData = null, $user = null)
     {
+        $payload = [
+            'customer' => $customerId,
+            'billingType' => strtoupper($method),
+            'value' => $amount,
+            'nextDueDate' => now()->addDays(1)->toDateString(),
+            'cycle' => 'MONTHLY',
+            'description' => $description
+        ];
+
+        if ($method === 'credit_card' && $cardData) {
+            $payload['creditCard'] = $cardData;
+            $payload['creditCardHolderInfo'] = $this->formatHolderInfo($user);
+            $payload['remoteIp'] = request()->ip();
+        }
+
         $response = Http::withHeaders(['access_token' => $this->apiKey])
-            ->post($this->baseUrl . '/subscriptions', [
-                'customer' => $customerId,
-                'billingType' => strtoupper($method),
-                'value' => $amount,
-                'nextDueDate' => now()->addDays(1)->toDateString(),
-                'cycle' => 'MONTHLY',
-                'description' => $description
-            ]);
+            ->post($this->baseUrl . '/subscriptions', $payload);
 
         return $response->json();
     }
 
-    public function createPayment($customerId, $method, $amount, $description)
+    public function createPayment($customerId, $method, $amount, $description, $cardData = null, $user = null)
     {
+        $payload = [
+            'customer' => $customerId,
+            'billingType' => strtoupper($method),
+            'value' => $amount,
+            'dueDate' => now()->toDateString(),
+            'description' => $description
+        ];
+
+        if ($method === 'credit_card' && $cardData) {
+            $payload['creditCard'] = $cardData;
+            $payload['creditCardHolderInfo'] = $this->formatHolderInfo($user);
+            $payload['remoteIp'] = request()->ip();
+        }
+
         $response = Http::withHeaders(['access_token' => $this->apiKey])
-            ->post($this->baseUrl . '/payments', [
-                'customer' => $customerId,
-                'billingType' => strtoupper($method),
-                'value' => $amount,
-                'dueDate' => now()->toDateString(),
-                'description' => $description
-            ]);
+            ->post($this->baseUrl . '/payments', $payload);
 
         return $response->json();
+    }
+
+    protected function formatHolderInfo($user)
+    {
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'cpfCnpj' => preg_replace('/\D/', '', $user->cpf_cnpj),
+            'postalCode' => preg_replace('/\D/', '', $user->zip_code),
+            'addressNumber' => 'SN',
+            'phone' => preg_replace('/\D/', '', $user->contact_number),
+        ];
     }
 
     public function getSubscriptionPayments($subscriptionId)

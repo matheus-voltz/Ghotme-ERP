@@ -44,26 +44,32 @@ export default function LoginScreen() {
     // Animações
     const formOpacity = useSharedValue(0);
     const formTranslateY = useSharedValue(50);
-    const logoScale = useSharedValue(0.5);
-    const logoTranslateY = useSharedValue(0);
+    const logoScale = useSharedValue(0);
+    const logoTranslateY = useSharedValue(20);
 
     useEffect(() => {
-        formOpacity.value = withDelay(300, withTiming(1, { duration: 800 }));
-        formTranslateY.value = withDelay(300, withSpring(0));
+        formOpacity.value = withDelay(400, withTiming(1, { duration: 800 }));
+        formTranslateY.value = withDelay(400, withSpring(0));
 
-        // Entrance + Breathing Animation
-        logoScale.value = withSpring(1, { damping: 10 }, (finished) => {
-            if (finished) {
-                logoScale.value = withRepeat(
-                    withSequence(
-                        withTiming(1.03, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-                        withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-                    ),
-                    -1, // Infinite
-                    true // Reverse
-                );
-            }
+        // Entrada Suave (Saindo do "trampolim")
+        logoScale.value = withTiming(1, {
+            duration: 1000,
+            easing: Easing.bezier(0.25, 0.1, 0.25, 1)
         });
+        logoTranslateY.value = withTiming(0, {
+            duration: 1000,
+            easing: Easing.out(Easing.exp)
+        });
+
+        // Flutuação sutil (Parallax) em vez de pulso
+        logoTranslateY.value = withDelay(1000, withRepeat(
+            withSequence(
+                withTiming(-6, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
+                withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) })
+            ),
+            -1,
+            true
+        ));
 
         // Tenta biometria automática após carregar
         setTimeout(autoBiometrics, 1000);

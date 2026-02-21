@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,6 +23,7 @@ export default function ChatScreen() {
     const [text, setText] = useState('');
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [sending, setSending] = useState(false);
+    const [showAirplane, setShowAirplane] = useState(false);
     const flatListRef = useRef<FlatList>(null);
 
     useEffect(() => {
@@ -60,6 +62,8 @@ export default function ChatScreen() {
         if ((!text.trim() && !selectedImage) || sending) return;
 
         setSending(true);
+        setShowAirplane(true);
+        setTimeout(() => setShowAirplane(false), 1500);
 
         const tempMsg = {
             id: Date.now(),
@@ -152,9 +156,9 @@ export default function ChatScreen() {
                     <Ionicons name="arrow-back" size={24} color={colors.text} />
                 </TouchableOpacity>
                 {photo ? (
-                    <Image 
-                        source={{ uri: photo as string }} 
-                        style={styles.avatar} 
+                    <Image
+                        source={{ uri: photo as string }}
+                        style={styles.avatar}
                         contentFit="cover"
                     />
                 ) : (
@@ -178,8 +182,8 @@ export default function ChatScreen() {
             <View style={[styles.inputWrapper, { backgroundColor: colors.card, paddingBottom: insets.bottom + 10 }]}>
                 {selectedImage && (
                     <View style={styles.previewContainer}>
-                        <Image 
-                            source={{ uri: selectedImage }} 
+                        <Image
+                            source={{ uri: selectedImage }}
                             style={styles.previewImage}
                             contentFit="cover"
                         />
@@ -220,6 +224,17 @@ export default function ChatScreen() {
                     </TouchableOpacity>
                 </View>
             </View>
+
+            {showAirplane && (
+                <View style={styles.airplaneOverlay} pointerEvents="none">
+                    <LottieView
+                        source={{ uri: 'https://assets9.lottiefiles.com/packages/lf20_mkmfclal.json' }}
+                        autoPlay
+                        loop={false}
+                        style={styles.airplaneLottie}
+                    />
+                </View>
+            )}
         </KeyboardAvoidingView>
     );
 }
@@ -248,5 +263,17 @@ const styles = StyleSheet.create({
 
     previewContainer: { padding: 10, flexDirection: 'row', alignItems: 'center' },
     previewImage: { width: 80, height: 80, borderRadius: 10, marginRight: 10 },
-    removePreviewBtn: { position: 'absolute', top: 5, left: 80, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 12 }
+    removePreviewBtn: { position: 'absolute', top: 5, left: 80, backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: 12 },
+
+    airplaneOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 999,
+        backgroundColor: 'transparent'
+    },
+    airplaneLottie: {
+        width: 300,
+        height: 300
+    }
 });

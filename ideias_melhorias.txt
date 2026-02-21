@@ -29,3 +29,20 @@
      [Cliente], identificamos que sua OS #[ID] vence amanhã. Segue o link para pagamento/PIX: [LINK]". Isso aumenta
      absurdamente a percepção de valor do seu software para o dono da oficina.
 
+. Skeleton Screens (Carregamento Fluido)
+Atualmente, as telas usam o ActivityIndicator (aquele círculo girando). Implementar Skeleton Screens (estruturas cinzas que simulam o conteúdo antes de carregar) no Dashboard e na lista de OS daria uma sensação de velocidade e modernidade muito superior.
+
+2. Animações Lottie (Micro-interações)
+Adicionar animações leves em momentos chave, como:
+
+Um check animado ao finalizar uma Ordem de Serviço.
+Uma animação de "aviãozinho" ao enviar uma mensagem no chat.
+Isso cria uma conexão emocional com o usuário e torna o uso do app mais prazeroso.
+3. Haptic Feedback (Resposta Tátil)
+Adicionar vibrações sutis (quase imperceptíveis) ao clicar em botões de ação (como o cronômetro da OS ou o botão de finalizar). No iPhone e Androids modernos, isso passa uma percepção de "hardware premium".
+
+4. Gráficos Interativos no Dashboard
+O gráfico de faturamento atual é visualmente bonito, mas poderíamos torná-lo interativo, permitindo ao admin tocar em uma barra para ver o valor exato daquele dia com um tooltip flutuante.
+
+5. Onboarding de Boas-Vindas
+Para novos usuários, um pequeno carrossel de introdução (ou um tour guiado) apresentando as principais funções (FAQ, Chat, Dashboard) ajuda muito na retenção e no entendimento da ferramenta.

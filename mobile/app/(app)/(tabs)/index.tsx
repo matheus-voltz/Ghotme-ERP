@@ -22,7 +22,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter, router } from 'expo-router';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, FadeIn, FadeOut } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { Skeleton } from '../../../components/Skeleton';
 
 // Helper for status translations
 const statusTranslations: { [key: string]: string } = {
@@ -57,6 +59,7 @@ export default function DashboardScreen() {
   const { unreadCount } = useChat();
   const { t, language } = useLanguage();
   const [data, setData] = useState<any>(null);
+  const [selectedChartIndex, setSelectedChartIndex] = useState<number | null>(null);
 
   const getEstablishmentName = () => {
     switch (niche) {
@@ -77,8 +80,11 @@ export default function DashboardScreen() {
       console.error("Dashboard error:", error);
       Alert.alert('Erro', 'Não foi possível carregar os dados do painel.');
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      // Simular um pequeno delay para mostrar o skeleton se for muito rápido
+      setTimeout(() => {
+        setLoading(false);
+        setRefreshing(false);
+      }, 800);
     }
   };
 
@@ -87,9 +93,52 @@ export default function DashboardScreen() {
   }, []);
 
   const onRefresh = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setRefreshing(true);
     fetchDashboardData();
   }, []);
+
+  const handleActionPress = (route: string) => {
+    Haptics.selectionAsync();
+    router.push(route as any);
+  };
+
+  const renderSkeleton = () => (
+    <View style={styles.adminStatsContainer}>
+      <View style={styles.executiveGrid}>
+        {[1, 2, 3, 4].map(i => (
+          <View key={i} style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Skeleton width={32} height={32} borderRadius={10} style={{ marginBottom: 10 }} />
+            <Skeleton width="60%" height={12} style={{ marginBottom: 8 }} />
+            <Skeleton width="90%" height={24} style={{ marginBottom: 8 }} />
+            <Skeleton width="40%" height={10} />
+          </View>
+        ))}
+      </View>
+      <Skeleton width="40%" height={18} style={{ marginVertical: 15 }} />
+      <View style={styles.quickActionsContainer}>
+        {[1, 2, 3, 4].map(i => (
+          <View key={i} style={styles.quickActionItem}>
+            <Skeleton width={48} height={48} borderRadius={16} style={{ marginBottom: 6 }} />
+            <Skeleton width="80%" height={10} />
+          </View>
+        ))}
+      </View>
+      <Skeleton width="60%" height={18} style={{ marginVertical: 15 }} />
+      <Skeleton width="100%" height={160} borderRadius={24} />
+      <View style={{ height: 20 }} />
+      <Skeleton width="60%" height={18} style={{ marginBottom: 15 }} />
+      <View style={styles.statusGrid}>
+        {[1, 2, 3].map(i => (
+          <View key={i} style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Skeleton width={40} height={40} borderRadius={20} style={{ marginBottom: 10 }} />
+            <Skeleton width="60%" height={18} style={{ marginBottom: 5 }} />
+            <Skeleton width="80%" height={10} />
+          </View>
+        ))}
+      </View>
+    </View>
+  );
 
   const renderAdminHeader = () => {
     if (!data) return null;
@@ -159,7 +208,10 @@ export default function DashboardScreen() {
             { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             { icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
           ].map((action, idx) => (
-            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => router.push(action.route as any)}>
+            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => {
+              Haptics.selectionAsync();
+              router.push(action.route as any);
+            }}>
               <View style={[styles.quickActionIcon, { backgroundColor: action.color + '15' }]}>
                 <Ionicons name={action.icon as any} size={22} color={action.color} />
               </View>
@@ -176,14 +228,36 @@ export default function DashboardScreen() {
               {data.revenueChart?.map((day: any, idx: number) => {
                 const maxVal = Math.max(...data.revenueChart.map((d: any) => d.value), 1);
                 const height = (day.value / maxVal) * 100;
+                const isSelected = selectedChartIndex === idx;
                 return (
-                  <View key={idx} style={styles.chartColumn}>
+                  <TouchableOpacity
+                    key={idx}
+                    style={styles.chartColumn}
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      Haptics.selectionAsync();
+                      setSelectedChartIndex(isSelected ? null : idx);
+                    }}
+                  >
                     <View style={styles.chartValueWrapper}>
-                      {day.value > 0 && <Text style={[styles.chartValueText, { color: colors.text }]}>{day.value > 1000 ? (day.value / 1000).toFixed(1) + 'k' : day.value.toFixed(0)}</Text>}
+                      {(day.value > 0 && (isSelected || idx === 6)) && (
+                        <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)}>
+                          <Text style={[styles.chartValueText, { color: colors.text, fontWeight: isSelected ? 'bold' : 'normal' }]}>
+                            R$ {day.value > 1000 ? (day.value / 1000).toFixed(1) + 'k' : day.value.toFixed(0)}
+                          </Text>
+                        </Animated.View>
+                      )}
                     </View>
-                    <View style={[styles.chartBar, { height: `${Math.max(2, height)}%`, backgroundColor: idx === 6 ? '#7367F0' : '#7367F040' }]} />
-                    <Text style={[styles.chartLabel, { color: colors.subText }]}>{day.day}</Text>
-                  </View>
+                    <View style={[
+                      styles.chartBar,
+                      {
+                        height: `${Math.max(2, height)}%`,
+                        backgroundColor: isSelected ? '#CE9FFC' : (idx === 6 ? '#7367F0' : '#7367F040'),
+                        width: isSelected ? 14 : 10,
+                      }
+                    ]} />
+                    <Text style={[styles.chartLabel, { color: colors.subText, fontWeight: isSelected ? 'bold' : 'normal' }]}>{day.day}</Text>
+                  </TouchableOpacity>
                 );
               })}
             </View>
@@ -196,7 +270,10 @@ export default function DashboardScreen() {
         <View style={styles.statusGrid}>
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } })}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } });
+            }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="hourglass-outline" size={20} color="#FF9F43" />
@@ -207,7 +284,10 @@ export default function DashboardScreen() {
 
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } })}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } });
+            }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="play-outline" size={20} color="#00CFE8" />
@@ -218,7 +298,10 @@ export default function DashboardScreen() {
 
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } })}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } });
+            }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
@@ -430,10 +513,7 @@ export default function DashboardScreen() {
         }
       >
         {loading && !refreshing ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#7367F0" />
-            <Text style={{ marginTop: 10, color: colors.subText }}>Carregando...</Text>
-          </View>
+          renderSkeleton()
         ) : (
           <View>
             {user?.role === 'admin' ? (

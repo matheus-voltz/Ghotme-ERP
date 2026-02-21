@@ -13,6 +13,7 @@ import {
 import { Stack, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import Animated, {
     FadeInDown,
     FadeInRight,
@@ -104,7 +105,10 @@ const AccordionItem = ({ item, isExpanded, onToggle, colors }: {
             ]}
         >
             <TouchableOpacity
-                onPress={onToggle}
+                onPress={() => {
+                    Haptics.selectionAsync();
+                    onToggle();
+                }}
                 activeOpacity={0.7}
                 style={styles.faqHeader}
             >

@@ -131,24 +131,34 @@ class SettingsController extends Controller
 
         try {
             $customerId = $this->asaas->getOrCreateCustomer($user);
-
-            if ($user->plan_type === 'monthly') {
-                // Cria Assinatura Recorrente
-                $result = $this->asaas->createSubscription($customerId, $method, $amount, $description);
-            } else {
-                // Cria Pagamento Único
-                $result = $this->asaas->createPayment($customerId, $method, $amount, $description);
+            
+            $cardData = null;
+            if ($method === 'credit_card') {
+                $expiry = explode('/', $request->card_expiry);
+                $cardData = [
+                    'holderName' => $request->card_name,
+                    'number' => preg_replace('/\D/', '', $request->card_number),
+                    'expiryMonth' => $expiry[0] ?? '',
+                    'expiryYear' => '20' . ($expiry[1] ?? ''),
+                    'ccv' => $request->card_cvv
+                ];
             }
 
-            if (!isset($result['id'])) {
+            if ($user->plan_type === 'monthly') {
+                $result = $this->asaas->createSubscription($customerId, $method, $amount, $description, $cardData, $user);
+            } else {
+                $result = $this->asaas->createPayment($customerId, $method, $amount, $description, $cardData, $user);
+            }
+
+            if (isset($result['errors'])) {
                 return response()->json(['success' => false, 'message' => $result['errors'][0]['description'] ?? 'Erro no Asaas']);
             }
 
             $invoiceUrl = $result['invoiceUrl'] ?? null;
-            $paymentId = $result['id']; // Default to result ID
+            $paymentId = $result['id'];
+            $status = ($method === 'credit_card' && isset($result['status']) && $result['status'] === 'CONFIRMED') ? 'paid' : 'pending';
 
-            // If it's a subscription, we MUST fetch the first payment's ID and URL
-            if ($user->plan_type === 'monthly') {
+            if ($user->plan_type === 'monthly' && $status === 'pending') {
                 $payments = $this->asaas->getSubscriptionPayments($result['id']);
                 if (!empty($payments['data'])) {
                     $paymentId = $payments['data'][0]['id'];
@@ -163,15 +173,24 @@ class SettingsController extends Controller
                 'amount' => $amount,
                 'payment_method' => ucfirst($method),
                 'payment_url' => $invoiceUrl,
-                'status' => 'pending',
+                'status' => $status,
+                'paid_at' => $status === 'paid' ? now() : null,
             ]);
+
+            // Se pagou com cartão e confirmou, ativa o plano na hora
+            if ($status === 'paid') {
+                $user->update([
+                    'plan' => $planToCharge,
+                    'selected_plan' => null
+                ]);
+            }
 
             $responseData = [
                 'success' => true,
                 'payment_id' => $paymentId,
+                'status' => $status,
                 'amount' => number_format($amount, 2, ',', '.'),
                 'invoice_url' => $invoiceUrl,
-                'bank_slip_url' => $result['bankSlipUrl'] ?? ($payments['data'][0]['bankSlipUrl'] ?? null),
             ];
 
             if ($method === 'pix') {

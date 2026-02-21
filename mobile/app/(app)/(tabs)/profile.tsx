@@ -9,6 +9,7 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../../services/api';
 import { useLanguage } from '../../../context/LanguageContext';
+import * as Haptics from 'expo-haptics';
 
 export default function ProfileScreen() {
     const { user, signOut, updateUser, refreshUser } = useAuth();
@@ -82,16 +83,19 @@ export default function ProfileScreen() {
             "Escolha o Tema",
             "Selecione a aparência do aplicativo",
             [
-                { text: "Claro", onPress: () => setTheme('light') },
-                { text: "Escuro", onPress: () => setTheme('dark') },
-                { text: "Sistema", onPress: () => setTheme('system') },
+                { text: "Claro", onPress: () => { Haptics.selectionAsync(); setTheme('light'); } },
+                { text: "Escuro", onPress: () => { Haptics.selectionAsync(); setTheme('dark'); } },
+                { text: "Sistema", onPress: () => { Haptics.selectionAsync(); setTheme('system'); } },
                 { text: "Cancelar", style: "cancel" }
             ]
         );
     };
 
     const renderSettingItem = (icon: any, title: string, subtitle?: string, onPress?: () => void) => (
-        <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+        <TouchableOpacity style={styles.settingItem} onPress={() => {
+            Haptics.selectionAsync();
+            onPress?.();
+        }}>
             <View style={[styles.iconContainer, { backgroundColor: colors.iconBg }]}>
                 <Ionicons name={icon} size={22} color={colors.primary} />
             </View>
@@ -120,6 +124,7 @@ export default function ProfileScreen() {
 
     const [refreshing, setRefreshing] = useState(false);
     const onRefresh = useCallback(async () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setRefreshing(true);
         if (refreshUser) {
             await refreshUser();
