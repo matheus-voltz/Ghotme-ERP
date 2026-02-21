@@ -27,6 +27,7 @@
                         <option value="pagar_me" {{ $settings->active_payment_gateway == 'pagar_me' ? 'selected' : '' }}>Pagar.me</option>
                         <option value="pagbank" {{ $settings->active_payment_gateway == 'pagbank' ? 'selected' : '' }}>PagBank</option>
                         <option value="stripe" {{ $settings->active_payment_gateway == 'stripe' ? 'selected' : '' }}>Stripe</option>
+                        <option value="bitcoin" {{ $settings->active_payment_gateway == 'bitcoin' ? 'selected' : '' }}>Bitcoin (Gateway)</option>
                     </select>
                 </div>
             </div>
@@ -56,6 +57,11 @@
                             <li class="nav-item">
                                 <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-stripe">
                                     <i class="ti tabler-brand-stripe me-1"></i> Stripe
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#tab-bitcoin">
+                                    <i class="ti tabler-currency-bitcoin me-1"></i> Bitcoin
                                 </button>
                             </li>
                         </ul>
@@ -131,100 +137,99 @@
                                                 <option value="production" {{ $settings->pagbank_environment == 'production' ? 'selected' : '' }}>Produção</option>
                                             </select>
                                         </div>
+                                        <div class="col-md-4">
+                                            <div class="alert alert-soft-warning d-flex align-items-center" role="alert">
+                                                <span class="alert-icon text-warning me-2">
+                                                    <i class="ti tabler-info-circle ti-xs"></i>
+                                                </span>
+                                                <div>PagBank (antigo PagSeguro) é amplamente conhecido e confiável.</div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="alert alert-soft-warning d-flex align-items-center" role="alert">
-                                            <span class="alert-icon text-warning me-2">
-                                                <i class="ti tabler-info-circle ti-xs"></i>
-                                            </span>
-                                            <div>PagBank (antigo PagSeguro) é amplamente conhecido e confiável.</div>
+                                </div>
+                                <!-- Stripe -->
+                                <div class="tab-pane fade" id="tab-stripe" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <div class="mb-4">
+                                                <label class="form-label">Publicable Key (Stripe)</label>
+                                                <input type="password" name="stripe_public_key" class="form-control" value="{{ $settings->stripe_public_key }}" placeholder="pk_test_..." />
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">Secret Key (Stripe)</label>
+                                                <input type="password" name="stripe_secret_key" class="form-control" value="{{ $settings->stripe_secret_key }}" placeholder="sk_test_..." />
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">Webhook Secret (Stripe)</label>
+                                                <input type="password" name="stripe_webhook_secret" class="form-control" value="{{ $settings->stripe_webhook_secret }}" placeholder="whsec_..." />
+                                            </div>
+                                            <div class="mb-4">
+                                                <label class="form-label">Ambiente Stripe</label>
+                                                <select name="stripe_environment" class="form-select">
+                                                    <option value="sandbox" {{ $settings->stripe_environment == 'sandbox' ? 'selected' : '' }}>Testes</option>
+                                                    <option value="production" {{ $settings->stripe_environment == 'production' ? 'selected' : '' }}>Produção/Live</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="alert alert-soft-dark d-flex align-items-center" role="alert">
+                                                <span class="alert-icon text-dark me-2">
+                                                    <i class="ti tabler-brand-stripe ti-xs"></i>
+                                                </span>
+                                                <div>Stripe é o padrão global para pagamentos online.</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Stripe -->
-                            <div class="tab-pane fade" id="tab-stripe" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <div class="mb-4">
-                                            <label class="form-label">Publicable Key (Stripe)</label>
-                                            <input type="password" name="stripe_public_key" class="form-control" value="{{ $settings->stripe_public_key }}" placeholder="pk_test_..." />
+                        </div>
+
+                        <hr class="my-6">
+
+                        <div class="row">
+                            <!-- Fiscal -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card bg-lighter shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-4">Integração Fiscal (Focus NFe)</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">API Token</label>
+                                            <input type="password" name="fiscal_api_token" class="form-control bg-white" value="{{ $settings->fiscal_api_token }}" placeholder="Token Fiscal" />
                                         </div>
-                                        <div class="mb-4">
-                                            <label class="form-label">Secret Key (Stripe)</label>
-                                            <input type="password" name="stripe_secret_key" class="form-control" value="{{ $settings->stripe_secret_key }}" placeholder="sk_test_..." />
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label">Webhook Secret (Stripe)</label>
-                                            <input type="password" name="stripe_webhook_secret" class="form-control" value="{{ $settings->stripe_webhook_secret }}" placeholder="whsec_..." />
-                                        </div>
-                                        <div class="mb-4">
-                                            <label class="form-label">Ambiente Stripe</label>
-                                            <select name="stripe_environment" class="form-select">
-                                                <option value="sandbox" {{ $settings->stripe_environment == 'sandbox' ? 'selected' : '' }}>Testes</option>
-                                                <option value="production" {{ $settings->stripe_environment == 'production' ? 'selected' : '' }}>Produção/Live</option>
+                                        <div class="mb-3">
+                                            <label class="form-label">Ambiente Fiscal</label>
+                                            <select name="fiscal_environment" class="form-select bg-white">
+                                                <option value="sandbox" {{ $settings->fiscal_environment == 'sandbox' ? 'selected' : '' }}>Homologação</option>
+                                                <option value="production" {{ $settings->fiscal_environment == 'production' ? 'selected' : '' }}>Produção</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="alert alert-soft-dark d-flex align-items-center" role="alert">
-                                            <span class="alert-icon text-dark me-2">
-                                                <i class="ti tabler-brand-stripe ti-xs"></i>
-                                            </span>
-                                            <div>Stripe é o padrão global para pagamentos online.</div>
+                                </div>
+                            </div>
+
+                            <!-- Others -->
+                            <div class="col-md-6 mb-4">
+                                <div class="card bg-lighter shadow-none border">
+                                    <div class="card-body">
+                                        <h6 class="fw-bold mb-4">Comunicação (WhatsApp Meta)</h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Access Token</label>
+                                            <input type="password" name="whatsapp_token" class="form-control bg-white" value="{{ $settings->whatsapp_token }}" placeholder="Token Meta" />
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone Number ID</label>
+                                            <input type="text" name="whatsapp_phone_number_id" class="form-control bg-white" value="{{ $settings->whatsapp_phone_number_id }}" placeholder="ID do Número" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr class="my-6">
-
-                    <div class="row">
-                        <!-- Fiscal -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card bg-lighter shadow-none border">
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-4">Integração Fiscal (Focus NFe)</h6>
-                                    <div class="mb-3">
-                                        <label class="form-label">API Token</label>
-                                        <input type="password" name="fiscal_api_token" class="form-control bg-white" value="{{ $settings->fiscal_api_token }}" placeholder="Token Fiscal" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Ambiente Fiscal</label>
-                                        <select name="fiscal_environment" class="form-select bg-white">
-                                            <option value="sandbox" {{ $settings->fiscal_environment == 'sandbox' ? 'selected' : '' }}>Homologação</option>
-                                            <option value="production" {{ $settings->fiscal_environment == 'production' ? 'selected' : '' }}>Produção</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-end gap-3 mt-4">
+                            <button type="submit" class="btn btn-primary px-5 btn-lg">
+                                <i class="ti tabler-device-floppy me-2"></i> Salvar Todas as Integrações
+                            </button>
                         </div>
-
-                        <!-- Others -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card bg-lighter shadow-none border">
-                                <div class="card-body">
-                                    <h6 class="fw-bold mb-4">Comunicação (WhatsApp Meta)</h6>
-                                    <div class="mb-3">
-                                        <label class="form-label">Access Token</label>
-                                        <input type="password" name="whatsapp_token" class="form-control bg-white" value="{{ $settings->whatsapp_token }}" placeholder="Token Meta" />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">Phone Number ID</label>
-                                        <input type="text" name="whatsapp_phone_number_id" class="form-control bg-white" value="{{ $settings->whatsapp_phone_number_id }}" placeholder="ID do Número" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-3 mt-4">
-                        <button type="submit" class="btn btn-primary px-5 btn-lg">
-                            <i class="ti tabler-device-floppy me-2"></i> Salvar Todas as Integrações
-                        </button>
-                    </div>
                 </form>
             </div>
         </div>
