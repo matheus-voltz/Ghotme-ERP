@@ -104,6 +104,11 @@ Route::post('/ordens-servico/checklist/{id}/send-email', [VehicleChecklistContro
 Route::get('/portal/{uuid}', [CustomerPortalController::class, 'index'])->name('customer.portal.index');
 Route::get('/portal/os/{uuid}', [CustomerPortalController::class, 'showOrder'])->name('customer.portal.order');
 
+// Public Accountant Portal
+Route::get('/portal-contador/{token}', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.public');
+Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export-xml');
+Route::get('/accounting/export-pdf', [App\Http\Controllers\AccountingController::class, 'exportPdf'])->name('accounting.export-pdf');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -244,7 +249,6 @@ Route::middleware([
 
     // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
-    Route::get('/portal-contador/{token}', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.public');
     Route::post('/accounting/generate-token', function() {
         $company = \App\Models\Company::find(auth()->user()->company_id);
         $company->update(['accountant_token' => \Illuminate\Support\Str::random(32)]);
@@ -253,7 +257,6 @@ Route::middleware([
     Route::post('/accounting/import-ofx', [App\Http\Controllers\AccountingController::class, 'importOfx'])->name('accounting.import-ofx');
     Route::post('/accounting/conciliate', [App\Http\Controllers\AccountingController::class, 'conciliate'])->name('accounting.conciliate');
     Route::post('/accounting/audit/{id}', [App\Http\Controllers\AccountingController::class, 'auditTransaction'])->name('accounting.audit');
-    Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export');
     Route::get('/fiscal/emit-invoice', [App\Http\Controllers\TaxInvoiceController::class, 'createFromOS'])->name('tax.invoice.create');
     
     // Reports

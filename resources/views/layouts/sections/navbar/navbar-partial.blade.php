@@ -115,9 +115,12 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
     </li>
     <!--/ Language -->
 
-    @livewire('navbar-chat-badge')
+    @if(Auth::check())
+      @livewire('navbar-chat-badge')
+    @endif
 
     <!-- Notifications -->
+    @if(Auth::check())
     <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
       <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
         <div class="position-relative">
@@ -192,13 +195,15 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
         </li>
       </ul>
     </li>
+    @endif
     <!--/ Notifications -->
 
     <!-- User -->
+    @if(Auth::check())
     <li class="nav-item navbar-dropdown dropdown-user dropdown">
       <a class="nav-link dropdown-toggle hide-arrow p-0" href="javascript:void(0);" data-bs-toggle="dropdown">
         <div class="avatar avatar-online">
-          <img src="{{ Auth::user() ? Auth::user()->profile_photo_url : asset('assets/img/avatars/1.png') }}" alt
+          <img src="{{ Auth::user()->profile_photo_url }}" alt
             class="rounded-circle" />
         </div>
       </a>
@@ -209,17 +214,13 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
             <div class="d-flex align-items-center">
               <div class="flex-shrink-0 me-2">
                 <div class="avatar avatar-online">
-                  <img src="{{ Auth::user() ? Auth::user()->profile_photo_url : asset('assets/img/avatars/1.png') }}"
+                  <img src="{{ Auth::user()->profile_photo_url }}"
                     alt class="rounded-circle" />
                 </div>
               </div>
               <div class="flex-grow-1">
                 <h6 class="mb-0">
-                  @if (Auth::check())
                   {{ Auth::user()->name }}
-                  @else
-                  Luke Skywalker
-                  @endif
                 </h6>
                 <small class="text-body-secondary">{{ Auth::user()->role === 'admin' ? 'Administrador' : 'Funcionário' }}</small>
               </div>
@@ -234,7 +235,7 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
             href="{{ Route::has('profile.show') ? route('profile.show') : 'javascript:void(0);' }}">
             <i class="icon-base ti tabler-user me-3 icon-md"></i><span class="align-middle">Meu Perfil</span> </a>
         </li>
-        @if (Auth::check() && Auth::user()->role === 'admin' && Laravel\Jetstream\Jetstream::hasApiFeatures())
+        @if (Auth::user()->role === 'admin' && Laravel\Jetstream\Jetstream::hasApiFeatures())
         <li>
           <a class="dropdown-item" href="{{ route('api-tokens.index') }}">
             <i class="icon-base ti tabler-settings me-3 icon-md"></i><span class="align-middle">Tokens de API</span> </a>
@@ -251,7 +252,7 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
           </a>
         </li>
         @endif
-        @if (Auth::User() && Laravel\Jetstream\Jetstream::hasTeamFeatures())
+        @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())
         <li>
           <div class="dropdown-divider my-1 mx-n2"></div>
         </li>
@@ -263,7 +264,7 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
         </li>
         <li>
           <a class="dropdown-item"
-            href="{{ Auth::user() ? route('teams.show', Auth::user()->currentTeam->id) : 'javascript:void(0)' }}">
+            href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
             <i class="icon-base bx bx-cog icon-md me-3"></i><span>Configurações da Equipe</span>
           </a>
         </li>
@@ -285,18 +286,13 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
           <div class="dropdown-divider my-1"></div>
         </li>
         @endif
-        @if (Auth::user())
         @foreach (Auth::user()->allTeams() as $team)
-        {{-- Below commented code read by artisan command while installing jetstream. !! Do not remove if you want to use jetstream. --}}
-
         <x-switchable-team :team="$team" />
         @endforeach
-        @endif
         @endif
         <li>
           <div class="dropdown-divider my-1 mx-n2"></div>
         </li>
-        @if (Auth::check())
         <li>
           <a class="dropdown-item" href="{{ route('logout') }}"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -306,19 +302,18 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
         <form method="POST" id="logout-form" action="{{ route('logout') }}">
           @csrf
         </form>
-        @else
-        <li>
-          <div class="d-grid px-2 pt-2 pb-1">
-            <a class="btn btn-sm btn-danger d-flex"
-              href="{{ Route::has('login') ? route('login') : url('auth/login-basic') }}" target="_blank">
-              <small class="align-middle">Entrar</small>
-              <i class="icon-base ti tabler-login ms-2 icon-14px"></i>
-            </a>
-          </div>
-        </li>
-        @endif
       </ul>
     </li>
+    @else
+    <li class="nav-item">
+      <div class="d-grid px-2">
+        <a class="btn btn-sm btn-primary d-flex" href="{{ route('login') }}">
+          <small class="align-middle">Entrar no Sistema</small>
+          <i class="icon-base ti tabler-login ms-2 icon-14px"></i>
+        </a>
+      </div>
+    </li>
+    @endif
     <!--/ User -->
   </ul>
 </div>

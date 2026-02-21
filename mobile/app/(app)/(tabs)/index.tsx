@@ -315,7 +315,7 @@ export default function DashboardScreen() {
               style={[styles.chatButton, { marginRight: 15 }]}
               onPress={() => router.push('/screens/notifications')}
             >
-              <Ionicons name="notifications-outline" size={24} color="#fff" />
+              <Ionicons name="notifications-outline" size={22} color="#fff" />
               {data?.unreadNotificationsCount > 0 && (
                 <View style={[styles.badge, { backgroundColor: '#EA5455' }]}>
                   <Text style={styles.badgeText}>{data.unreadNotificationsCount > 9 ? '9+' : data.unreadNotificationsCount}</Text>
@@ -327,7 +327,7 @@ export default function DashboardScreen() {
               style={styles.chatButton}
               onPress={() => router.push('/chat/contacts')}
             >
-              <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
+              <Ionicons name="chatbubbles-outline" size={22} color="#fff" />
               {unreadCount > 0 && (
                 <View style={styles.badge}>
                   <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
@@ -340,7 +340,7 @@ export default function DashboardScreen() {
                 {user?.profile_photo_url ? (
                   <Image
                     source={{ uri: user.profile_photo_url }}
-                    style={{ width: '100%', height: '100%', borderRadius: 22.5 }}
+                    style={{ width: '100%', height: '100%', borderRadius: 21 }}
                     contentFit="cover"
                   />
                 ) : (
@@ -440,18 +440,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   profileButton: {
-    width: 49,
-    height: 49,
+    width: 48,
+    height: 48,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
-    borderRadius: 24.5,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
   chatButton: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center',
     alignItems: 'center',
@@ -478,9 +478,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   avatarPlaceholder: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.2)',

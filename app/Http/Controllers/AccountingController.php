@@ -167,20 +167,73 @@ class AccountingController extends Controller
     {
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
-        $companyId = Auth::user()->company_id;
+        $token = $request->get('token');
+        
+        if ($token) {
+            $company = Company::where('accountant_token', $token)->firstOrFail();
+        } else {
+            $company = Company::find(Auth::user()->company_id);
+        }
 
-        $invoices = TaxInvoice::where('company_id', $companyId)
+        $invoices = TaxInvoice::where('company_id', $company->id)
             ->whereMonth('issued_at', $month)
             ->whereYear('issued_at', $year)
-            ->whereNotNull('xml_path')
+            ->whereNotNull('xml_url')
             ->get();
 
         if ($invoices->isEmpty()) {
-            return back()->with('error', 'Nenhuma nota fiscal encontrada para o período selecionado.');
+            return back()->with('error', 'Nenhum XML encontrado para este período.');
         }
 
-        // Em um cenário real, usaríamos a biblioteca ZipArchive para zipar os arquivos em $invoices->pluck('xml_path')
-        // Por enquanto, vamos retornar uma mensagem de sucesso simulando o processamento.
-        return back()->with('success', 'Foram encontradas ' . $invoices->count() . ' notas. O link para download do pacote ZIP foi enviado para o seu e-mail.');
+        $zipFileName = "Notas_Fiscais_{$month}_{$year}.zip";
+        $zipPath = storage_path("app/public/{$zipFileName}");
+        $zip = new \ZipArchive();
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+            foreach ($invoices as $invoice) {
+                // Em um sistema real, leríamos o arquivo de $invoice->xml_url
+                // Para este teste, vamos criar um XML fictício no ZIP
+                $content = "<?xml version='1.0' encoding='UTF-8'?><nfe><infNFe><total><vNF>{$invoice->total_amount}</vNF></total></infNFe></nfe>";
+                $zip->addFromString("Nota_{$invoice->invoice_number}.xml", $content);
+            }
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $month = $request->get('month', date('m'));
+        $year = $request->get('year', date('Y'));
+        $token = $request->get('token');
+        
+        if ($token) {
+            $company = Company::where('accountant_token', $token)->firstOrFail();
+        } else {
+            $company = Company::find(Auth::user()->company_id);
+        }
+
+        $invoices = TaxInvoice::where('company_id', $company->id)
+            ->whereMonth('issued_at', $month)
+            ->whereYear('issued_at', $year)
+            ->get();
+
+        if ($invoices->isEmpty()) {
+            return back()->with('error', 'Nenhum PDF encontrado para este período.');
+        }
+
+        $zipFileName = "Recibos_PDF_{$month}_{$year}.zip";
+        $zipPath = storage_path("app/public/{$zipFileName}");
+        $zip = new \ZipArchive();
+
+        if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
+            foreach ($invoices as $invoice) {
+                $zip->addFromString("Recibo_{$invoice->invoice_number}.txt", "Simulação de PDF para a nota {$invoice->invoice_number}");
+            }
+            $zip->close();
+        }
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 }

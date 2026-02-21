@@ -12,6 +12,35 @@
 
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
+    @if($isPublic)
+    <div class="text-center mb-10 mt-4">
+        <div class="app-brand justify-content-center flex-column mb-4">
+            <a href="javascript:void(0);" class="app-brand-link flex-column gap-3">
+                <span class="app-brand-logo demo" style="width: 150px; height: 150px;">
+                    @include('_partials.macros', ['width' => 150, 'height' => 150, 'withbg' => "fill: #7367f0"])
+                </span>
+                <span class="app-brand-text demo menu-text fw-bolder fs-1 ms-0" style="font-size: 3rem !important;">{{ config('variables.templateName') }}</span>
+            </a>
+        </div>
+        <h3 class="fw-bold mt-4">Portal do Contador</h3>
+        <p class="text-muted fs-5">Acesso exclusivo para conferência e exportação de dados da empresa <strong>{{ $company->name }}</strong></p>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible" role="alert">
+      {{ session('success') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
+    @if(session('error'))
+    <div class="alert alert-danger alert-dismissible" role="alert">
+      {{ session('error') }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold py-3 mb-0">
             <span class="text-muted fw-light">{{ __('Fiscal') }} /</span> {{ __('BPO Financeiro') }}
@@ -99,6 +128,17 @@
             </div>
             <!-- ABA RECEITAS -->
             <div class="tab-pane fade show active" id="tab-rev" role="tabpanel">
+                <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Notas Fiscais do Período</h6>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('accounting.export-xml', ['month' => $month, 'year' => $year, 'token' => request('token')]) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="ti tabler-file-code me-1"></i> Exportar XMLs
+                        </a>
+                        <a href="{{ route('accounting.export-pdf', ['month' => $month, 'year' => $year, 'token' => request('token')]) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="ti tabler-file-type-pdf me-1"></i> Exportar PDFs
+                        </a>
+                    </div>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead><tr><th>{{ __('Date') }}</th><th>{{ __('OS #') }}</th><th>{{ __('Customer') }}</th><th>{{ __('Value') }}</th><th>{{ __('Action') }}</th></tr></thead>

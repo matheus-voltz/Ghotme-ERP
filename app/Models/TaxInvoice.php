@@ -13,16 +13,23 @@ class TaxInvoice extends Model
         'company_id',
         'ordem_servico_id',
         'invoice_number',
-        'amount',
-        'xml_path',
-        'pdf_path',
-        'status', // 'issued', 'cancelled', 'error'
+        'invoice_type',
+        'status',
+        'number',
+        'series',
+        'access_key',
+        'total_amount',
+        'tax_amount',
+        'xml_url',
+        'pdf_url',
+        'error_message',
         'issued_at'
     ];
 
     protected $casts = [
         'issued_at' => 'datetime',
-        'amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'tax_amount' => 'decimal:2'
     ];
 
     public function ordemServico()
