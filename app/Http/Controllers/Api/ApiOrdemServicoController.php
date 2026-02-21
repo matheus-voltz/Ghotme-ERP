@@ -26,7 +26,7 @@ class ApiOrdemServicoController extends Controller
 
     public function show($id)
     {
-        $os = OrdemServico::with(['client', 'veiculo', 'user', 'items', 'parts'])->findOrFail($id);
+        $os = OrdemServico::with(['client', 'veiculo', 'user', 'items.service', 'parts.inventoryItem'])->findOrFail($id);
         return response()->json($os);
     }
 
@@ -87,7 +87,8 @@ class ApiOrdemServicoController extends Controller
                 'osStats' => $osStats,
                 'lowStockCount' => 3,
                 'pendingBudgetsCount' => Budget::where('status', 'pending')->count(),
-                'recentOS' => OrdemServico::whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS)
+                'recentOS' => OrdemServico::whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
+                'unreadNotificationsCount' => $user->unreadNotifications->count()
             ]);
         }
 
@@ -99,7 +100,8 @@ class ApiOrdemServicoController extends Controller
 
         return response()->json([
             'stats' => $stats,
-            'recentOS' => OrdemServico::where('user_id', $user->id)->whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS)
+            'recentOS' => OrdemServico::where('user_id', $user->id)->whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
+            'unreadNotificationsCount' => $user->unreadNotifications->count()
         ]);
     }
 
@@ -116,28 +118,17 @@ class ApiOrdemServicoController extends Controller
     {
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
         if ($item->status === 'in_progress') {
-            $item->status = 'paused';
-            if ($item->started_at) {
-                $item->duration_seconds += now()->diffInSeconds($item->started_at);
-            }
-            $item->started_at = null;
+            $item->stopTimer();
         } else {
-            $item->status = 'in_progress';
-            $item->started_at = now();
+            $item->startTimer();
         }
-        $item->save();
         return response()->json(['success' => true, 'item' => $item]);
     }
 
     public function completeItem($itemId)
     {
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
-        if ($item->status === 'in_progress' && $item->started_at) {
-            $item->duration_seconds += now()->diffInSeconds($item->started_at);
-        }
-        $item->status = 'completed';
-        $item->started_at = null;
-        $item->save();
+        $item->complete();
         return response()->json(['success' => true, 'item' => $item]);
     }
 }

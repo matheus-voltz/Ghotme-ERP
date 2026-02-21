@@ -63,29 +63,42 @@ export default function OSDetailScreen() {
 
     // Live timer update effect
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (os && os.items) {
-                const newTimers: { [key: number]: number } = {};
-                os.items.forEach((item: any) => {
-                    let elapsed = item.duration_seconds || 0;
-                    if (item.status === 'in_progress' && item.started_at) {
-                        const start = new Date(item.started_at).getTime();
-                        const now = new Date().getTime();
-                        elapsed += Math.floor((now - start) / 1000);
-                    }
-                    newTimers[item.id] = elapsed;
+        let interval: any;
+
+        if (os && os.items) {
+            // Setup initial elapsed times coming from secure backend calculation
+            const initialTimers: { [key: number]: number } = {};
+            os.items.forEach((item: any) => {
+                initialTimers[item.id] = item.elapsed_time || item.duration_seconds || 0;
+            });
+            setTimers(initialTimers);
+
+            // Just safely increment (+1 second) bypassing nasty timezone math constraints
+            interval = setInterval(() => {
+                setTimers(prevTimers => {
+                    const newTimers: { [key: number]: number } = { ...prevTimers };
+                    os.items.forEach((item: any) => {
+                        if (item.status === 'in_progress') {
+                            newTimers[item.id] = (newTimers[item.id] !== undefined ? newTimers[item.id] : (item.elapsed_time || 0)) + 1;
+                        } else {
+                            newTimers[item.id] = item.elapsed_time || item.duration_seconds || 0;
+                        }
+                    });
+                    return newTimers;
                 });
-                setTimers(newTimers);
-            }
-        }, 1000);
-        return () => clearInterval(interval);
+            }, 1000);
+        }
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [os]);
 
     const formatTime = (seconds: number) => {
-        if (!seconds) return "00:00:00";
+        if (!seconds || seconds <= 0) return "00:00:00";
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
-        const s = seconds % 60;
+        const s = Math.floor(seconds % 60);
         return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     };
 
@@ -93,7 +106,7 @@ export default function OSDetailScreen() {
         try {
             const response = await api.post(`/os/items/${itemId}/toggle-timer`);
             if (response.data.success) {
-                // ...
+                fetchOSDetails();
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível alterar o timer.');
@@ -104,7 +117,7 @@ export default function OSDetailScreen() {
         try {
             const response = await api.post(`/os/items/${itemId}/complete`);
             if (response.data.success) {
-                // ...
+                fetchOSDetails();
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível concluir o serviço.');
@@ -345,7 +358,7 @@ export default function OSDetailScreen() {
                     {os.items?.map((item: any) => (
                         <View key={`item-${item.id}`} style={[styles.timerItemRow, { borderBottomColor: colors.border }]}>
                             <View style={{ flex: 1 }}>
-                                <Text style={[styles.itemName, { color: colors.text }]}>{item.name}</Text>
+                                <Text style={[styles.itemName, { color: colors.text }]}>{item.service?.name || 'Serviço'}</Text>
                                 <View style={styles.timerBadge}>
                                     <Text style={styles.timerValue}>{formatTime(timers[item.id])}</Text>
                                 </View>
@@ -397,12 +410,29 @@ export default function OSDetailScreen() {
                         </View>
                         {os.parts.map((part: any) => (
                             <View key={`part-${part.id}`} style={[styles.itemRow, { borderBottomColor: colors.border }]}>
-                                <Text style={[styles.itemName, { color: colors.text }]}>{part.name}</Text>
+                                <Text style={[styles.itemName, { color: colors.text }]}>{part.inventoryItem?.name || 'Peça'}</Text>
                                 <Text style={[styles.itemQty, { color: colors.primary }]}>x{part.quantity}</Text>
                             </View>
                         ))}
                     </Animated.View>
                 )}
+
+                {/* Financial Summary */}
+                <Animated.View
+                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                    entering={FadeInDown.delay(700).duration(500).springify()}
+                >
+                    <View style={styles.sectionHeader}>
+                        <Ionicons name="wallet" size={20} color={'#28C76F'} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Resumo Financeiro</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
+                        <Text style={[styles.itemName, { color: colors.text, fontSize: 16 }]}>Total da Ordem</Text>
+                        <Text style={[{ color: '#28C76F', fontSize: 22, fontWeight: '900' }]}>
+                            {os.total ? `R$ ${parseFloat(os.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'R$ 0,00'}
+                        </Text>
+                    </View>
+                </Animated.View>
 
                 {/* BOTÃO FINALIZAR GERAL */}
                 {os.status !== 'finalized' && os.status !== 'canceled' && (
@@ -581,10 +611,12 @@ const styles = StyleSheet.create({
     },
     buttonRow: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
         gap: 10,
     },
     actionButton: {
-        flex: 1,
+        width: '48%', // Allow wrapping nicely
         height: 50,
         borderRadius: 12,
         flexDirection: 'row',
@@ -596,6 +628,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 3,
+        marginBottom: 5,
     },
     buttonText: {
         color: '#fff',

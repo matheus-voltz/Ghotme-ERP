@@ -18,7 +18,7 @@
 @endsection
 
 @section('page-script')
-@vite('resources/assets/js/app-chat.js')
+{{-- @vite('resources/assets/js/app-chat.js') --}}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('new-chat-message', event => {

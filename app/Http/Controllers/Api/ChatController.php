@@ -18,13 +18,11 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        // Get team members (same company) + Support Ghotme (Super Admins/NULL company)
+        // Get team members (same company) + Support Ghotme (Super Admins)
         $contacts = User::where('id', '!=', $user->id)
             ->where(function ($q) use ($user) {
                 $q->where('company_id', $user->company_id)
-                  ->orWhereNull('company_id')
-                  ->orWhere('role', 'super_admin')
-                  ->orWhere('role', 'admin');
+                    ->orWhere('role', 'super_admin');
             })
             ->get()
             ->map(function ($contact) use ($user) {
@@ -32,7 +30,7 @@ class ChatController extends Controller
                     ->where('receiver_id', $user->id)
                     ->where('is_read', false)
                     ->count();
-                
+
                 return $contact;
             });
 

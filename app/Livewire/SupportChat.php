@@ -7,7 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\User;
 use App\Models\ChatMessage;
 use Illuminate\Support\Facades\Auth;
-use SergiX44\Nutgram\Nutgram;
+use Illuminate\Support\Facades\Log;
 
 class SupportChat extends Component
 {
@@ -19,7 +19,6 @@ class SupportChat extends Component
     public $search = '';
     public $activeTab = 'team'; // team, support, clients
     public $userStatus;
-    public $lastMessageId;
 
     public function mount()
     {
@@ -38,27 +37,24 @@ class SupportChat extends Component
     public function setTab($tab)
     {
         $this->activeTab = $tab;
-        $this->activeUserId = null; // Limpa a seleção ao trocar de aba
+        $this->activeUserId = null; 
     }
 
     public function selectUser($userId)
     {
-        $this->activeUserId = $userId;
+        $this->activeUserId = (int) $userId;
+        
+        // Log para debug no terminal (verifique o log do laravel)
+        \Illuminate\Support\Facades\Log::info("Usuário selecionado no Chat: " . $this->activeUserId);
+
         // Marcar mensagens como lidas
-        ChatMessage::where('sender_id', $userId)
+        ChatMessage::withoutGlobalScopes()
+            ->where('sender_id', $this->activeUserId)
             ->where('receiver_id', Auth::id())
             ->where('is_read', false)
             ->update(['is_read' => true]);
-    }
-
-    /**
-     * Verifica se há novas mensagens para o chat atual.
-     * Chamado via wire:poll na view.
-     */
-    public function checkNewMessages()
-    {
-        // O poll apenas força o re-render
-        return;
+            
+        $this->dispatch('message-sent'); 
     }
 
     public function sendMessage()
@@ -69,7 +65,6 @@ class SupportChat extends Component
         ]);
 
         if (!$this->message && !$this->attachment) {
-            $this->addError('message', 'Mensagem ou anexo é obrigatório.');
             return;
         }
 
@@ -82,48 +77,16 @@ class SupportChat extends Component
             $attachmentPath = $this->attachment->store('chat_attachments', 'public');
         }
 
-        $message = ChatMessage::create([
+        // Criar a mensagem
+        ChatMessage::create([
+            'company_id' => Auth::user()->company_id,
             'sender_id' => Auth::id(),
             'receiver_id' => $this->activeUserId,
             'message' => $this->message ?? '',
             'attachment_path' => $attachmentPath,
+            'is_read' => false
         ]);
 
-        // Broadcast Message
-        $message->load('sender:id,name,profile_photo_path');
-        try {
-            broadcast(new \App\Events\MessageReceived($message))->toOthers();
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning("Broadcasting failed: " . $e->getMessage());
-        }
-
-        // Send Database Notification
-        $receiver = User::find($this->activeUserId);
-        $receiver->notify(new \App\Notifications\ChatMessageNotification($message));
-
-        // Send Notification if User has Push Token
-        $receiver = User::find($this->activeUserId);
-        if ($receiver && $receiver->expo_push_token) {
-            $senderName = Auth::user()->name;
-            $body = $message->message ? $message->message : '📷 Imagem';
-            $title = "Nova mensagem de {$senderName}";
-
-            $res = \App\Helpers\Helpers::sendExpoNotification(
-                $receiver->expo_push_token,
-                $title,
-                $body,
-                ['type' => 'chat_message', 'sender_id' => Auth::id()]
-            );
-            
-            \Illuminate\Support\Facades\Log::info("Chat Notification Sent to User {$receiver->id}", [
-                'token' => $receiver->expo_push_token,
-                'response' => $res
-            ]);
-        } else {
-            \Illuminate\Support\Facades\Log::warning("Chat Notification NOT Sent: User {$this->activeUserId} has no push token.");
-        }
-
-        // Enviar para Telegram se o usuário estiver conectado
         $this->reset(['message', 'attachment']);
         $this->dispatch('message-sent');
     }
@@ -132,56 +95,53 @@ class SupportChat extends Component
     {
         $user = Auth::user();
 
-        // 1. Equipe Interna (Mesma Empresa)
+        // 1. Equipe Interna
         $teamContacts = User::where('id', '!=', $user->id)
             ->where('company_id', $user->company_id)
             ->where('name', 'like', '%' . $this->search . '%')
-            ->get()
-            ->map(function ($contact) use ($user) {
-                $contact->unread_count = ChatMessage::where('sender_id', $contact->id)
-                    ->where('receiver_id', $user->id)
-                    ->where('is_read', false)
-                    ->count();
-                return $contact;
-            });
+            ->get();
 
-        // 2. Suporte Ghotme (Super Admins)
-        $supportContacts = User::where('id', '!=', $user->id)
+        // 2. Suporte Ghotme (Ignora escopo de empresa)
+        $supportContacts = User::withoutGlobalScopes()
+            ->where('id', '!=', $user->id)
             ->where(function ($q) {
-                $q->whereNull('company_id')
-                    ->orWhere('role', 'super_admin');
+                $q->where('role', 'super_admin')
+                  ->orWhere('email', 'suporte@ghotme.com.br');
             })
             ->where('name', 'like', '%' . $this->search . '%')
-            ->get()
-            ->map(function ($contact) use ($user) {
-                $contact->unread_count = ChatMessage::where('sender_id', $contact->id)
-                    ->where('receiver_id', $user->id)
-                    ->where('is_read', false)
-                    ->count();
-                return $contact;
-            });
-
-        // 3. Clientes (CRM)
-        $clientContacts = collect();
+            ->get();
 
         $contacts = match ($this->activeTab) {
             'team' => $teamContacts,
             'support' => $supportContacts,
-            'clients' => $clientContacts,
+            'clients' => collect(),
             default => $teamContacts
         };
 
-        $activeUser = $this->activeUserId ? User::find($this->activeUserId) : null;
+        // Adicionar contagem de não lidas para cada contato
+        $contacts->map(function ($contact) use ($user) {
+            $contact->unread_count = ChatMessage::withoutGlobalScopes()
+                ->where('sender_id', $contact->id)
+                ->where('receiver_id', $user->id)
+                ->where('is_read', false)
+                ->count();
+            return $contact;
+        });
+
+        // Buscar usuário ativo e mensagens (Ignorando escopo)
+        $activeUser = null;
         $messages = [];
 
         if ($this->activeUserId) {
-            $messages = ChatMessage::with('sender')->where(function ($q) {
-                $q->where('sender_id', Auth::id())
-                    ->where('receiver_id', $this->activeUserId);
-            })
+            $activeUser = User::withoutGlobalScopes()->find($this->activeUserId);
+            
+            $messages = ChatMessage::withoutGlobalScopes()
+                ->with('sender')
+                ->where(function ($q) {
+                    $q->where('sender_id', Auth::id())->where('receiver_id', $this->activeUserId);
+                })
                 ->orWhere(function ($q) {
-                    $q->where('sender_id', $this->activeUserId)
-                        ->where('receiver_id', Auth::id());
+                    $q->where('sender_id', $this->activeUserId)->where('receiver_id', Auth::id());
                 })
                 ->orderBy('created_at', 'asc')
                 ->get();
@@ -193,7 +153,7 @@ class SupportChat extends Component
             'activeUser' => $activeUser,
             'teamCount' => $teamContacts->count(),
             'supportCount' => $supportContacts->count(),
-            'clientCount' => $clientContacts->count(),
+            'clientCount' => 0,
         ]);
     }
 }

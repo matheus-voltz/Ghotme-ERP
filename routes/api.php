@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/os/items/{itemId}/complete', [ApiOrdemServicoController::class, 'completeItem']);
 
     // Checklist
+    Route::get('/checklist/visual/{osId}', [ApiChecklistController::class, 'getVisual']);
     Route::post('/checklist/visual', [ApiChecklistController::class, 'storeVisual']);
     Route::post('/os/technical-checklist', [ApiTechnicalChecklistController::class, 'store']);
     Route::get('/os/{osId}/technical-checklist', [ApiTechnicalChecklistController::class, 'index']);
@@ -66,6 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/calendar/events', [\App\Http\Controllers\CalendarController::class, 'store']);
     Route::put('/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'update']);
     Route::delete('/calendar/events/{id}', [\App\Http\Controllers\CalendarController::class, 'destroy']);
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\Api\ApiNotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\ApiNotificationController::class, 'markAsRead']);
 
     // Push Token
     Route::post('/user/push-token', [AuthController::class, 'updatePushToken']);

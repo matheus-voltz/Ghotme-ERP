@@ -308,6 +308,11 @@
           "slug": "settings.custom-fields"
         },
         {
+          "url": "/settings/import",
+          "name": "Importar Dados",
+          "slug": "settings.import"
+        },
+        {
           "url": "/settings/os-settings",
           "name": "Configurações da OS",
           "slug": "settings.os-settings"

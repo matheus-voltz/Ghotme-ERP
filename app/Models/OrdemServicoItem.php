@@ -20,6 +20,8 @@ class OrdemServicoItem extends Model
         'started_at' => 'datetime',
     ];
 
+    protected $appends = ['elapsed_time'];
+
     public function service()
     {
         return $this->belongsTo(Service::class);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions, ActivityIndicator, Modal } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import Svg, { Path, G, Rect } from 'react-native-svg';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../../context/ThemeContext';
 import { useAuth } from '../../../context/AuthContext';
+import { useNiche } from '../../../context/NicheContext';
 import api from '../../../services/api';
 
 const { width } = Dimensions.get('window');
@@ -16,12 +17,14 @@ export default function ChecklistVisual() {
   const { user } = useAuth();
   const { osId } = useLocalSearchParams();
   const { colors } = useTheme();
+  const { labels } = useNiche();
 
   const logoUrl = user?.company?.logo_url || (user?.company?.logo_path ? `${api.defaults.baseURL?.replace('/api', '')}/storage/${user?.company?.logo_path}` : null);
 
   const [permission, requestPermission] = useCameraPermissions();
   const [cameraVisible, setCameraVisible] = useState(false);
   const [selectedPart, setSelectedPart] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [damages, setDamages] = useState<any[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const cameraRef = React.useRef<any>(null);
@@ -30,7 +33,26 @@ export default function ChecklistVisual() {
     if (!permission?.granted) {
       requestPermission();
     }
-  }, []);
+    fetchChecklist();
+  }, [permission]);
+
+  const fetchChecklist = async () => {
+    try {
+      const response = await api.get(`/checklist/visual/${osId}`);
+      if (response.data && response.data.length > 0) {
+        const baseUrl = api.defaults.baseURL?.replace('/api', '');
+        const mappedDamages = response.data.map((d: any) => ({
+          ...d,
+          photo: d.photo && !d.photo.startsWith('http') && !d.photo.startsWith('file')
+            ? `${baseUrl}/storage/${d.photo}`
+            : d.photo
+        }));
+        setDamages(mappedDamages);
+      }
+    } catch (error) {
+      console.log('Nenhum checklist anterior ou erro:', error);
+    }
+  };
 
   const handlePartPress = (partName: string) => {
     setSelectedPart(partName);
@@ -171,13 +193,13 @@ export default function ChecklistVisual() {
             </TouchableOpacity>
             <Text style={[styles.title, { color: colors.text }]}>Vistoria Visual</Text>
           </View>
-          {logoUrl && (
+          {logoUrl ? (
             <Image
               source={{ uri: logoUrl }}
               style={{ width: 100, height: 40 }}
-              contentFit="contain"
+              resizeMode="contain"
             />
-          )}
+          ) : null}
         </View>
         <Text style={[styles.subtitle, { color: colors.subText }]}>OS: #{osId || 'N/A'}</Text>
         <Text style={[styles.subtitle, { color: colors.subText }]}>Toque nas partes do {labels.entity.toLowerCase()} para registrar avarias</Text>
@@ -263,15 +285,17 @@ export default function ChecklistVisual() {
 
       <View style={styles.listContainer}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>Fotos e Avarias ({damages.length})</Text>
-        {damages.length === 0 && (
+        {damages.length === 0 ? (
           <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Ionicons name="camera-outline" size={40} color="#ccc" />
             <Text style={{ color: '#999' }}>Nenhuma avaria registrada</Text>
           </View>
-        )}
+        ) : null}
         {damages.map((item) => (
           <View key={item.id} style={[styles.damageCard, { backgroundColor: colors.card }]}>
-            <Image source={{ uri: item.photo }} style={styles.thumb} />
+            <TouchableOpacity onPress={() => setSelectedImage(item.photo)}>
+              <Image source={{ uri: item.photo }} style={styles.thumb} />
+            </TouchableOpacity>
             <View style={styles.damageInfo}>
               <Text style={[styles.damagePart, { color: colors.text }]}>{item.part}</Text>
               <Text style={styles.damageDate}>Registrado às {item.date}</Text>
@@ -282,9 +306,9 @@ export default function ChecklistVisual() {
           </View>
         ))}
 
-        {damages.length > 0 && (
+        {damages.length > 0 ? (
           <TouchableOpacity
-            style={[styles.saveButton, isProcessing && { opacity: 0.7 }]}
+            style={[styles.saveButton, isProcessing ? { opacity: 0.7 } : {}]}
             onPress={handleSaveChecklist}
             disabled={isProcessing}
           >
@@ -294,8 +318,20 @@ export default function ChecklistVisual() {
               <Text style={styles.saveButtonText}>Finalizar e Sincronizar</Text>
             )}
           </TouchableOpacity>
-        )}
+        ) : null}
       </View>
+
+      <Modal visible={!!selectedImage} transparent={true} animationType="fade" onRequestClose={() => setSelectedImage(null)}>
+        <View style={styles.modalBackground}>
+          <TouchableOpacity style={styles.closeModalButton} onPress={() => setSelectedImage(null)}>
+            <Ionicons name="close" size={30} color="#fff" />
+          </TouchableOpacity>
+          {selectedImage ? (
+            <Image source={{ uri: selectedImage }} style={styles.fullScreenImage} resizeMode="contain" />
+          ) : null}
+        </View>
+      </Modal>
+
     </ScrollView>
   );
 }
@@ -320,5 +356,8 @@ const styles = StyleSheet.create({
   damagePart: { fontSize: 16, fontWeight: 'bold' },
   damageDate: { fontSize: 12, color: '#999', marginTop: 2 },
   saveButton: { backgroundColor: '#28C76F', padding: 16, borderRadius: 12, alignItems: 'center', marginTop: 10, marginBottom: 40 },
-  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' }
+  saveButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  modalBackground: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
+  closeModalButton: { position: 'absolute', top: 50, right: 20, zIndex: 10, padding: 10 },
+  fullScreenImage: { width: '100%', height: '80%' }
 });

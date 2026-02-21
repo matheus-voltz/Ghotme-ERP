@@ -2,6 +2,14 @@
 
 @section('title', __('Fiscal & Accounting') . ' & ' . __('Bank Reconciliation'))
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
+@endsection
+
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -57,7 +65,7 @@
                                 <td>#{{ $order->id }}</td>
                                 <td>{{ $order->client->name }}</td>
                                 <td>R$ {{ number_format($order->total, 2, ',', '.') }}</td>
-                                <td><a href="#" class="btn btn-xs btn-outline-primary">{{ __('View OS') }}</a></td>
+                                <td><a href="{{ route('ordens-servico.edit', $order->id) }}" class="btn btn-xs btn-outline-primary">{{ __('View OS') }}</a></td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -105,10 +113,107 @@
     </div>
 </div>
 
-<!-- Scripts e Modais Fiscais omitidos para brevidade (mantêm-se os mesmos) -->
+<!-- Modal Dados da Empresa (Fiscal) -->
+<div class="modal fade" id="fiscalConfigModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form action="{{ route('settings.company-data.update') }}" method="POST" enctype="multipart/form-data" class="modal-content" id="formFiscalConfig">
+            @csrf
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title">Configurações Fiscais da Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Razão Social</label>
+                        <input type="text" name="company_name" class="form-control" value="{{ $company->name }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Nome Fantasia</label>
+                        <input type="text" name="trade_name" class="form-control" value="{{ $company->trade_name ?? '' }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">CNPJ</label>
+                        <input type="text" name="cnpj" class="form-control" value="{{ $company->document ?? '' }}" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">E-mail de Contato</label>
+                        <input type="email" name="email" class="form-control" value="{{ $company->email }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">CEP</label>
+                        <input type="text" name="zip_code" class="form-control" value="{{ $company->zip_code ?? '' }}">
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">Cidade / UF</label>
+                        <div class="input-group">
+                            <input type="text" name="city" class="form-control" value="{{ $company->city ?? '' }}">
+                            <input type="text" name="state" class="form-control" style="max-width: 80px;" value="{{ $company->state ?? '' }}" maxlength="2">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     function filterData() {
         window.location.href = `{{ route('accounting.index') }}?month=${document.getElementById('monthFilter').value}&year=${document.getElementById('yearFilter').value}`;
     }
+
+    document.getElementById('formFiscalConfig').onsubmit = function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Salvando...';
+
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso!',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro ao salvar',
+                    text: data.message || 'Verifique os dados informados.'
+                });
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro de Conexão',
+                text: 'Não foi possível se comunicar com o servidor.'
+            });
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    };
 </script>
 @endsection

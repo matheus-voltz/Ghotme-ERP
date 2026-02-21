@@ -310,6 +310,18 @@ export default function DashboardScreen() {
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TouchableOpacity
+              style={[styles.chatButton, { marginRight: 15 }]}
+              onPress={() => router.push('/screens/notifications')}
+            >
+              <Ionicons name="notifications-outline" size={24} color="#fff" />
+              {data?.unreadNotificationsCount > 0 && (
+                <View style={[styles.badge, { backgroundColor: '#EA5455' }]}>
+                  <Text style={styles.badgeText}>{data.unreadNotificationsCount > 9 ? '9+' : data.unreadNotificationsCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
               style={styles.chatButton}
               onPress={() => router.push('/chat/contacts')}
             >
@@ -323,15 +335,15 @@ export default function DashboardScreen() {
 
             <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
               <View style={styles.avatarPlaceholder}>
-                {user?.profile_photo_url ? (
-                  <Image
-                    source={{ uri: user.profile_photo_url }}
-                    style={{ width: 45, height: 45, borderRadius: 22.5 }}
-                  />
+                <Image
+                  source={{ uri: user.profile_photo_url }}
+                  style={{ width: '100%', height: '100%', borderRadius: 22.5 }}
+                  contentFit="cover"
+                />
                 ) : (
-                  <Text style={styles.avatarText}>
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                  </Text>
+                <Text style={styles.avatarText}>
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </Text>
                 )}
               </View>
             </TouchableOpacity>

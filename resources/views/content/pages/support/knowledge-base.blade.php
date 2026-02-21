@@ -24,7 +24,7 @@
         <i class="ti tabler-file-text icon-xl mb-3 text-primary"></i>
         <h5>Primeiros Passos</h5>
         <p>Aprenda a cadastrar seus primeiros clientes e veículos no sistema.</p>
-        <a href="javascript:void(0)" class="btn btn-label-primary">Ver tutoriais</a>
+        <button type="button" class="btn btn-label-primary" onclick="openAcademy('primeiros passos')">Ver tutoriais</button>
       </div>
     </div>
   </div>
@@ -34,7 +34,7 @@
         <i class="ti tabler-wallet icon-xl mb-3 text-success"></i>
         <h5>Financeiro</h5>
         <p>Como gerenciar contas a pagar, receber e conciliação bancária.</p>
-        <a href="javascript:void(0)" class="btn btn-label-success">Ver tutoriais</a>
+        <button type="button" class="btn btn-label-success" onclick="openAcademy('financeiro')">Ver tutoriais</button>
       </div>
     </div>
   </div>
@@ -44,11 +44,26 @@
         <i class="ti tabler-settings icon-xl mb-3 text-warning"></i>
         <h5>Configurações</h5>
         <p>Personalize os modelos de impressão e integre com o WhatsApp.</p>
-        <a href="javascript:void(0)" class="btn btn-label-warning">Ver tutoriais</a>
+        <button type="button" class="btn btn-label-warning" onclick="openAcademy('configuração')">Ver tutoriais</button>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function openAcademy(searchTerm) {
+    const modal = new bootstrap.Modal(document.getElementById('academyModal'));
+    const searchInput = document.getElementById('academySearch');
+    
+    if (searchInput) {
+        searchInput.value = searchTerm;
+        // Dispara o evento de input para que o script global da Academy filtre os resultados
+        searchInput.dispatchEvent(new Event('input'));
+    }
+    
+    modal.show();
+}
+</script>
 
 <div class="card bg-transparent shadow-none">
   <div class="card-header border-bottom mb-4 p-0 pb-3">
@@ -107,6 +122,46 @@
         <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
           <div class="accordion-body bg-white text-muted small pt-0">
             Ao acessar o portal (via link enviado por WhatsApp/Email), o cliente verá uma notificação de "Orçamentos Pendentes". Ao clicar, ele vê os detalhes e pode clicar em "Aprovar Orçamento", o que atualiza o status no seu sistema instantaneamente.
+          </div>
+        </div>
+      </div>
+
+      <!-- Novas Funcionalidades -->
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+            <i class="ti tabler-adjustments-horizontal me-2 text-primary"></i> Como criar campos personalizados para meu nicho?
+          </button>
+        </h2>
+        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+          <div class="accordion-body bg-white text-muted small pt-0">
+            Vá em <strong>Configurações > Campos Personalizados</strong>. Lá você pode criar novos campos (texto, data, seleção) para Clientes, Veículos ou Ordens de Serviço. Por exemplo, em Pet Shop você pode criar o campo "Peso" no cadastro do Pet.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+            <i class="ti tabler-upload me-2 text-info"></i> Posso importar dados do meu sistema antigo?
+          </button>
+        </h2>
+        <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+          <div class="accordion-body bg-white text-muted small pt-0">
+            Sim! Em <strong>Configurações > Importar Dados</strong>, você pode baixar planilhas modelo para Clientes, Estoque e Veículos. Basta preenchê-las em formato CSV e subir no sistema para migrar tudo em segundos.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#faq7">
+            <i class="ti tabler-building-bank me-2 text-success"></i> Como funciona a Conciliação Bancária?
+          </button>
+        </h2>
+        <div id="faq7" class="accordion-collapse collapse" data-bs-parent="#accordionFAQ">
+          <div class="accordion-body bg-white text-muted small pt-0">
+            Exporte o arquivo <strong>.OFX</strong> do seu banco e importe em <strong>Fiscal & Contábil > Portal do Contador</strong>. O sistema identificará automaticamente transações que já existem no ERP e sugerirá o "match" para dar baixa automática no financeiro.
           </div>
         </div>
       </div>

@@ -47,10 +47,10 @@ class ApiChecklistController extends Controller
                     'vehicle_inspection_id' => $inspection->id,
                     'part_name' => $partName,
                     'type' => 'risk',
-                    'notes' => $request->notes[$index] ?? 'Registrado via Mobile',
+                    'notes' => $request->input("notes.{$index}", 'Registrado via Mobile'),
                     'photo_path' => $photoPath,
-                    'x_coordinate' => $request->coordinates[$index]['x'] ?? 0,
-                    'y_coordinate' => $request->coordinates[$index]['y'] ?? 0
+                    'x_coordinate' => $request->input("coordinates.{$index}.x", 0),
+                    'y_coordinate' => $request->input("coordinates.{$index}.y", 0)
                 ]);
             }
 
@@ -63,10 +63,34 @@ class ApiChecklistController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Erro Checklist: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json([
                 'success' => false,
                 'message' => 'Erro ao salvar vistoria: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function getVisual($osId)
+    {
+        $inspection = VehicleInspection::where('ordem_servico_id', $osId)
+            ->with('damagePoints')
+            ->latest()
+            ->first();
+
+        if (!$inspection || $inspection->damagePoints->isEmpty()) {
+            return response()->json([]);
+        }
+
+        $damages = $inspection->damagePoints->map(function ($point) {
+            return [
+                'id' => $point->id,
+                'part' => $point->part_name,
+                'photo' => $point->photo_path,
+                'date' => $point->created_at->format('d/m/Y H:i')
+            ];
+        });
+
+        return response()->json($damages);
     }
 }

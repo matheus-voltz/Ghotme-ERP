@@ -92,7 +92,7 @@ export default function TechnicalChecklistScreen() {
             </View>
 
             <ScrollView contentContainerStyle={styles.content}>
-                {Object.keys(CATEGORIES).map(category => (
+                {Object.keys(categories).map(category => (
                     <View key={category} style={[styles.section, { backgroundColor: colors.card }]}>
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>{category}</Text>
 
