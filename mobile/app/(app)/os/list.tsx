@@ -92,10 +92,11 @@ export default function OSListScreen() {
                 <Text style={[styles.clientName, { color: colors.text }]}>{item.client?.name || item.client?.company_name || 'N/A'}</Text>
 
                 <View style={styles.infoRow}>
-                    <Ionicons name={niche === 'pet' ? "paw-outline" : "car-sport-outline"} size={14} color={colors.subText} style={{ marginRight: 6 }} />
+                    <Ionicons name={niche === 'pet' ? "paw-outline" : (niche === 'electronics' ? "laptop-outline" : "car-sport-outline")} size={14} color={colors.subText} style={{ marginRight: 6 }} />
                     <Text style={[styles.vehicle, { color: colors.subText }]}>
                         {item.veiculo?.marca || 'N/A'} {item.veiculo?.modelo || ''}
-                        {niche === 'pet' ? '' : ` - ${item.veiculo?.placa || ''}`}
+                        {niche === 'automotive' && item.veiculo?.placa ? ` - ${item.veiculo.placa}` : ''}
+                        {niche !== 'automotive' && niche !== 'pet' && item.veiculo?.placa ? ` - Mod: ${item.veiculo.placa}` : ''}
                     </Text>
                 </View>
 

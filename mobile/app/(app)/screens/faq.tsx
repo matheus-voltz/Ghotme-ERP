@@ -38,7 +38,7 @@ const FAQ_DATA: FAQItem[] = [
         id: '1',
         category: 'Geral',
         question: 'Como faço para cadastrar uma nova Ordem de Serviço?',
-        answer: 'Para cadastrar uma nova OS, vá para a aba "Ordens" e clique no botão flutuante "+". Preencha os dados do cliente, do veículo e descreva o serviço a ser realizado.'
+        answer: 'Para cadastrar uma nova OS, vá para a aba "Ordens" e clique no botão flutuante "+". Preencha os dados primários do cliente e identifique seu item de serviço de forma detalhada.'
     },
     {
         id: '2',

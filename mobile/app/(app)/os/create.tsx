@@ -194,7 +194,7 @@ export default function CreateOrderScreen() {
                                 {vehicles.map((v) => (
                                     <Picker.Item
                                         key={v.id.toString()}
-                                        label={`${v.marca || ''} ${v.modelo} - ${v.placa}`}
+                                        label={`${v.marca || ''} ${v.modelo} ${niche === 'automotive' && v.placa ? `- ${v.placa}` : (v.placa ? `- Mod: ${v.placa}` : '')}`}
                                         value={v.id.toString()}
                                         color={colors.text}
                                     />

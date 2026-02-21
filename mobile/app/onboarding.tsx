@@ -12,7 +12,7 @@ const SLIDES = [
     {
         id: '1',
         title: 'Bem-vindo ao Ghotme ERP',
-        description: 'Sua oficina, pet shop ou assistência técnica na palma da sua mão.',
+        description: 'Toda a gestão da sua empresa na palma da sua mão, onde você estiver.',
         icon: 'rocket-outline',
         colors: ['#7367F0', '#CE9FFC']
     },

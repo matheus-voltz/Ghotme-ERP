@@ -33,6 +33,24 @@ class ApiOrdemServicoController extends Controller
         return response()->json($os);
     }
 
+    public function store(Request $request, \App\Services\OrdemServicoService $service)
+    {
+        $validated = $request->validate([
+            'client_id' => 'required|integer',
+            'veiculo_id' => 'required|integer',
+            'status' => 'required|string',
+            'description' => 'nullable|string',
+            'km_entry' => 'nullable|string',
+        ]);
+
+        try {
+            $os = clone $service->store($validated);
+            return response()->json($os, 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erro ao criar OS: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function getWatchDashboard(Request $request)
     {
         $user = $request->user();

@@ -280,18 +280,20 @@ export default function OSDetailScreen() {
                     <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
 
                     {/* Identifier Badge (Plate/Serial/Name) */}
-                    <View style={[
-                        styles.plateBadge,
-                        { borderColor: colors.border, backgroundColor: colors.background },
-                        niche === 'automotive' ? { borderWidth: 2, borderRadius: 4 } : { borderWidth: 0, paddingHorizontal: 0 }
-                    ]}>
-                        <Text style={[
-                            styles.plateText,
-                            { color: colors.text },
-                            niche === 'automotive' ? { letterSpacing: 2, textTransform: 'uppercase' } : { fontSize: 16 }
-                        ]}>{os.veiculo?.placa}</Text>
-                    </View>
-                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} | {labels.metric}: {os.km_entry}</Text>
+                    {os.veiculo?.placa ? (
+                        <View style={[
+                            styles.plateBadge,
+                            { borderColor: colors.border, backgroundColor: colors.background },
+                            niche === 'automotive' ? { borderWidth: 2, borderRadius: 4 } : { borderWidth: 0, paddingHorizontal: 0 }
+                        ]}>
+                            <Text style={[
+                                styles.plateText,
+                                { color: colors.text },
+                                niche === 'automotive' ? { letterSpacing: 2, textTransform: 'uppercase' } : { fontSize: 16 }
+                            ]}>{niche === 'automotive' ? os.veiculo.placa : `Mod: ${os.veiculo.placa}`}</Text>
+                        </View>
+                    ) : null}
+                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} {labels.metric ? `| ${labels.metric}: ${os.km_entry}` : ''}</Text>
                 </Animated.View>
 
                 {/* Description / Problem */}

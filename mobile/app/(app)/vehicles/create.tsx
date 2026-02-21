@@ -64,7 +64,7 @@ export default function CreateVehicleScreen() {
     }, [clientSearch, clients]);
 
     const handleLookupPlaca = async () => {
-        if (placa.length < 7) { Alert.alert("Ops", `Digite os 7 caracteres do(a) ${labels.identifier}.`); return; }
+        if (niche === 'automotive' && placa.length < 7) { Alert.alert("Ops", `Digite os 7 caracteres do(a) ${labels.identifier}.`); return; }
         setLookupLoading(true);
         try {
             const response = await api.get(`/api/vehicle-lookup/${placa}`);
@@ -128,9 +128,9 @@ export default function CreateVehicleScreen() {
                             <View style={styles.inputWrapper}>
                                 <Ionicons name="pricetag-outline" size={18} color="#7367F0" style={styles.inputIcon} />
                                 <TextInput
-                                    style={[styles.input, { textTransform: 'uppercase' }]}
+                                    style={[styles.input, niche === 'automotive' && { textTransform: 'uppercase' }]}
                                     value={placa} onChangeText={setPlaca}
-                                    placeholder={niche === 'pet' ? 'Nome do Pet' : 'ABC1234'} maxLength={20}
+                                    placeholder={niche === 'pet' ? 'Nome do Pet' : (niche === 'automotive' ? 'ABC1234' : labels.identifier)} maxLength={niche === 'automotive' ? 7 : 30}
                                 />
                             </View>
                         </View>
@@ -150,8 +150,8 @@ export default function CreateVehicleScreen() {
                         <Text style={styles.cardTitle}>Dados do {labels.entity}</Text>
                     </View>
                     <View style={styles.row}>
-                        <CustomInput label={`${labels.brand} *`} icon="ribbon-outline" value={marca} onChangeText={setMarca} placeholder={niche === 'pet' ? 'Cachorro/Gato' : 'Marca'} />
-                        <CustomInput label={`${labels.model} *`} icon="layers-outline" value={modelo} onChangeText={setModelo} placeholder={niche === 'pet' ? 'Labrador' : 'Modelo'} />
+                        <CustomInput label={`${labels.brand} *`} icon="ribbon-outline" value={marca} onChangeText={setMarca} placeholder={niche === 'pet' ? 'Ex: Cachorro/Gato' : (niche === 'electronics' ? 'Ex: Samsung' : 'Ex: Fiat')} />
+                        <CustomInput label={`${labels.model} *`} icon="layers-outline" value={modelo} onChangeText={setModelo} placeholder={niche === 'pet' ? 'Ex: Labrador' : (niche === 'electronics' ? 'Ex: S23 Ultra' : 'Ex: Palio')} />
                     </View>
                     <View style={styles.row}>
                         <CustomInput label={labels.year} icon="calendar-outline" value={anoFabricacao} onChangeText={setAnoFabricacao} placeholder="2024" keyboardType="numeric" />
