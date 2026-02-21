@@ -472,7 +472,7 @@
       </div>
     </div>
 
-    @if($user->plan === 'free' || isset($selectedPlanDetails))
+    @if($user->plan === 'free' || isset($selectedPlanDetails) || $user->isPaymentOverdue())
     <!-- Payment Methods -->
     <div class="card mb-6" id="payment-methods-card">
       <h5 class="card-header">Métodos de Pagamento</h5>

@@ -46,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'plan_type',
         'selected_plan',
         'trial_ends_at',
+        'payment_overdue_since',
         'role',
         'contact_number',
         'billing_address',
@@ -76,6 +77,33 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         }
 
         return $this->trial_ends_at && now()->greaterThan($this->trial_ends_at);
+    }
+
+    /**
+     * Verifica se há fatura em atraso.
+     */
+    public function isPaymentOverdue()
+    {
+        return !is_null($this->payment_overdue_since);
+    }
+
+    /**
+     * Pega quantos dias a fatura está em atraso.
+     */
+    public function getOverdueDays()
+    {
+        if (!$this->isPaymentOverdue()) {
+            return 0;
+        }
+        return (int) $this->payment_overdue_since->diffInDays(now());
+    }
+
+    /**
+     * Verifica se o sistema deve ser bloqueado por atraso (3 ou mais dias).
+     */
+    public function isLockedDueToOverdue()
+    {
+        return $this->isPaymentOverdue() && $this->getOverdueDays() >= 3;
     }
 
     /**
@@ -176,6 +204,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'trial_ends_at' => 'datetime',
+            'payment_overdue_since' => 'datetime',
             'notification_preferences' => 'json',
         ];
     }
