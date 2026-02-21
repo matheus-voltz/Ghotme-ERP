@@ -58,7 +58,8 @@ class AsaasService
             'value' => $amount,
             'nextDueDate' => now()->addDays(1)->toDateString(),
             'cycle' => 'MONTHLY',
-            'description' => $description
+            'description' => $description,
+            'externalReference' => (string) ($user ? $user->id : '')
         ];
 
         if ($method === 'credit_card' && $cardData) {
@@ -80,7 +81,8 @@ class AsaasService
             'billingType' => strtoupper($method),
             'value' => $amount,
             'dueDate' => now()->toDateString(),
-            'description' => $description
+            'description' => $description,
+            'externalReference' => (string) ($user ? $user->id : '')
         ];
 
         if ($installments > 1) {

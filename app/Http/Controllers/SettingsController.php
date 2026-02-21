@@ -196,7 +196,8 @@ class SettingsController extends Controller
             if ($status === 'paid') {
                 $user->update([
                     'plan' => $planToCharge,
-                    'selected_plan' => null
+                    'selected_plan' => null,
+                    'trial_ends_at' => $user->plan_type === 'yearly' ? now()->addYear() : now()->addMonth(),
                 ]);
             }
 
