@@ -16,10 +16,20 @@ class IntegrationSettingController extends Controller
     public function update(Request $request)
     {
         $settings = IntegrationSetting::first() ?? new IntegrationSetting();
-        
+
         $validated = $request->validate([
+            'active_payment_gateway' => 'required|in:asaas,pagar_me,pagbank,stripe',
             'asaas_api_key' => 'nullable|string|max:255',
             'asaas_environment' => 'required|in:sandbox,production',
+            'pagar_me_api_key' => 'nullable|string|max:255',
+            'pagar_me_encryption_key' => 'nullable|string|max:255',
+            'pagar_me_environment' => 'required|in:sandbox,production',
+            'pagbank_token' => 'nullable|string|max:255',
+            'pagbank_environment' => 'required|in:sandbox,production',
+            'stripe_public_key' => 'nullable|string|max:255',
+            'stripe_secret_key' => 'nullable|string|max:255',
+            'stripe_webhook_secret' => 'nullable|string|max:255',
+            'stripe_environment' => 'required|in:sandbox,production',
             'whatsapp_token' => 'nullable|string|max:255',
             'whatsapp_phone_number_id' => 'nullable|string|max:255',
             'fiscal_api_token' => 'nullable|string|max:255',

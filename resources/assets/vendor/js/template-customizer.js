@@ -78,7 +78,7 @@ class TemplateCustomizer {
     if (!window.Helpers) throw new Error('window.Helpers required.')
     this.settings = {}
     this.settings.displayCustomizer = typeof displayCustomizer !== 'undefined' ? displayCustomizer : DISPLAY_CUSTOMIZER
-    this.settings.lang = lang || 'en'
+    this.settings.lang = lang || 'pt_BR'
     if (defaultPrimaryColor) {
       this.settings.defaultPrimaryColor = defaultPrimaryColor
       primaryColorFlag = true
@@ -120,7 +120,7 @@ class TemplateCustomizer {
         this.settings.controls = this.settings.controls.slice(0, i).concat(this.settings.controls.slice(i + 1))
       }
     }
-    this.settings.onSettingsChange = typeof onSettingsChange === 'function' ? onSettingsChange : () => {}
+    this.settings.onSettingsChange = typeof onSettingsChange === 'function' ? onSettingsChange : () => { }
 
     this._loadSettings()
 
@@ -395,34 +395,34 @@ class TemplateCustomizer {
 
     const t = TemplateCustomizer.LANGUAGES[lang]
 
-    ;[
-      'panel_header',
-      'panel_sub_header',
-      'theming_header',
-      'color_label',
-      'theme_label',
-      'style_switch_light',
-      'style_switch_dark',
-      'layout_header',
-      'layout_label',
-      'layout_header_label',
-      'content_label',
-      'layout_static',
-      'layout_offcanvas',
-      'layout_fixed',
-      'layout_fixed_offcanvas',
-      'layout_dd_open_label',
-      'layout_navbar_label',
-      'layout_footer_label',
-      'misc_header',
-      'skin_label',
-      'semiDark_label',
-      'direction_label'
-    ].forEach(key => {
-      const el = this.container.querySelector(`.template-customizer-t-${key}`)
-      // eslint-disable-next-line no-unused-expressions
-      el && (el.textContent = t[key])
-    })
+      ;[
+        'panel_header',
+        'panel_sub_header',
+        'theming_header',
+        'color_label',
+        'theme_label',
+        'style_switch_light',
+        'style_switch_dark',
+        'layout_header',
+        'layout_label',
+        'layout_header_label',
+        'content_label',
+        'layout_static',
+        'layout_offcanvas',
+        'layout_fixed',
+        'layout_fixed_offcanvas',
+        'layout_dd_open_label',
+        'layout_navbar_label',
+        'layout_footer_label',
+        'misc_header',
+        'skin_label',
+        'semiDark_label',
+        'direction_label'
+      ].forEach(key => {
+        const el = this.container.querySelector(`.template-customizer-t-${key}`)
+        // eslint-disable-next-line no-unused-expressions
+        el && (el.textContent = t[key])
+      })
 
     this.settings.lang = lang
 
@@ -1450,22 +1450,22 @@ class TemplateCustomizer {
 TemplateCustomizer.COLORS = [
   {
     name: 'primary',
-    title: 'Primary',
+    title: 'Primária',
     color: rootStyles.getPropertyValue('--bs-primary').trim()
   },
   {
     name: 'success',
-    title: 'Success',
+    title: 'Sucesso',
     color: '#0D9394'
   },
   {
     name: 'warning',
-    title: 'Warning',
+    title: 'Aviso',
     color: '#FFAB1D'
   },
   {
     name: 'danger',
-    title: 'Danger',
+    title: 'Perigo',
     color: '#EB3D63'
   },
   {
@@ -1479,17 +1479,17 @@ TemplateCustomizer.COLORS = [
 TemplateCustomizer.THEMES = [
   {
     name: 'light',
-    title: 'Light',
+    title: 'Claro',
     image: '<i class="ti tabler-sun icon-base mb-0"></i>'
   },
   {
     name: 'dark',
-    title: 'Dark',
+    title: 'Escuro',
     image: '<i class="ti tabler-moon icon-base mb-0"></i>'
   },
   {
     name: 'system',
-    title: 'System',
+    title: 'Sistema',
     image: '<i class="ti tabler-device-desktop-analytics icon-base mb-0"></i>'
   }
 ]
@@ -1499,13 +1499,13 @@ TemplateCustomizer.SKINS = [
   {
     id: 0,
     name: 'default',
-    title: 'Default',
+    title: 'Padrão',
     image: 'skin-default.svg'
   },
   {
     id: 1,
     name: 'bordered',
-    title: 'Bordered',
+    title: 'Com Bordas',
     image: 'skin-border.svg'
   }
   // To add a new skin, simply add a new entry here:
@@ -1522,12 +1522,12 @@ TemplateCustomizer.SKINS = [
 TemplateCustomizer.LAYOUTS = [
   {
     name: 'expanded',
-    title: 'Expanded',
+    title: 'Expandido',
     image: 'layouts-expanded.svg'
   },
   {
     name: 'collapsed',
-    title: 'Collapsed',
+    title: 'Recolhido',
     image: 'layouts-collapsed.svg'
   }
 ]
@@ -1536,17 +1536,17 @@ TemplateCustomizer.LAYOUTS = [
 TemplateCustomizer.NAVBAR_OPTIONS = [
   {
     name: 'sticky',
-    title: 'Sticky',
+    title: 'Fixo',
     image: 'navbar-sticky.svg'
   },
   {
     name: 'static',
-    title: 'Static',
+    title: 'Estático',
     image: 'navbar-static.svg'
   },
   {
     name: 'hidden',
-    title: 'Hidden',
+    title: 'Oculto',
     image: 'navbar-hidden.svg'
   }
 ]
@@ -1555,12 +1555,12 @@ TemplateCustomizer.NAVBAR_OPTIONS = [
 TemplateCustomizer.HEADER_TYPES = [
   {
     name: 'fixed',
-    title: 'Fixed',
+    title: 'Fixo',
     image: 'horizontal-fixed.svg'
   },
   {
     name: 'static',
-    title: 'Static',
+    title: 'Estático',
     image: 'horizontal-static.svg'
   }
 ]
@@ -1569,12 +1569,12 @@ TemplateCustomizer.HEADER_TYPES = [
 TemplateCustomizer.CONTENT = [
   {
     name: 'compact',
-    title: 'Compact',
+    title: 'Compacto',
     image: 'content-compact.svg'
   },
   {
     name: 'wide',
-    title: 'Wide',
+    title: 'Largo',
     image: 'content-wide.svg'
   }
 ]
@@ -1583,12 +1583,12 @@ TemplateCustomizer.CONTENT = [
 TemplateCustomizer.DIRECTIONS = [
   {
     name: 'ltr',
-    title: 'Left to Right (En)',
+    title: 'Esq. para Dir.',
     image: 'direction-ltr.svg'
   },
   {
     name: 'rtl',
-    title: 'Right to Left (Ar)',
+    title: 'Dir. para Esq.',
     image: 'direction-rtl.svg'
   }
 ]
@@ -1645,14 +1645,23 @@ TemplateCustomizer.LANGUAGES = {
     panel_sub_header: 'Personalize e visualize em tempo real',
     theming_header: 'Tema',
     color_label: 'Cor Primária',
-    theme_label: 'Tema',
+    theme_label: 'Estilo',
+    style_switch_light: 'Claro',
+    style_switch_dark: 'Escuro',
     skin_label: 'Skins',
-    semiDark_label: 'Semi Escuro',
+    semiDark_label: 'Menu Semi-Escuro',
     layout_header: 'Layout',
     layout_label: 'Menu (Navegação)',
     layout_header_label: 'Tipos de Cabeçalho',
     content_label: 'Conteúdo',
+    layout_static: 'Estático',
+    layout_offcanvas: 'Offcanvas',
+    layout_fixed: 'Fixo',
+    layout_fixed_offcanvas: 'Fixo Offcanvas',
+    layout_dd_open_label: 'Abrir no Hover',
     layout_navbar_label: 'Tipo de Navbar',
+    layout_footer_label: 'Rodapé Fixo',
+    misc_header: 'Diversos',
     direction_label: 'Direção'
   },
   es: {

@@ -6,10 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class IntegrationSetting extends Model
 {
+    use \App\Traits\BelongsToCompany;
+
     protected $fillable = [
+        'company_id',
+        'active_payment_gateway',
         'asaas_api_key',
         'asaas_environment',
+        'pagar_me_api_key',
+        'pagar_me_encryption_key',
+        'pagar_me_environment',
+        'pagbank_token',
+        'pagbank_environment',
+        'stripe_public_key',
+        'stripe_secret_key',
+        'stripe_webhook_secret',
+        'stripe_environment',
         'whatsapp_token',
-        'whatsapp_phone_number_id'
+        'whatsapp_phone_number_id',
+        'fiscal_api_token',
+        'fiscal_environment'
     ];
 }

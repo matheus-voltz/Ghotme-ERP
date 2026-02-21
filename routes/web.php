@@ -311,6 +311,7 @@ Route::middleware([
 
     // System Errors
     Route::get('/settings/system-errors', [SystemErrorController::class, 'index'])->name('settings.system-errors');
+    Route::post('/settings/system-errors/auth', [SystemErrorController::class, 'authenticate'])->name('settings.system-errors.auth');
     Route::get('/settings/system-errors/{id}', [SystemErrorController::class, 'show'])->name('settings.system-errors.show');
     Route::delete('/settings/system-errors/clear', [SystemErrorController::class, 'destroyAll'])->name('settings.system-errors.clear');
 

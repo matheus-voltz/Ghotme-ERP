@@ -22,7 +22,7 @@ class HomePage extends Controller
   {
     $user = Auth::user();
     $companyId = $user->company_id ?? 0;
-    
+
     // Cache de 15 minutos para performance, chave varia por empresa e papel
     $cacheKey = "dashboard_stats_{$companyId}_" . ($user->role !== 'admin' ? "user_{$user->id}" : "admin");
 
@@ -34,7 +34,7 @@ class HomePage extends Controller
     });
 
     $view = ($user && $user->role !== 'admin') ? 'content.pages.dashboard.dashboards-employee' : 'content.pages.dashboard.dashboards-analytics';
-    
+
     return view($view, array_merge($data, ['user' => $user]));
   }
 
@@ -73,26 +73,26 @@ class HomePage extends Controller
     $startOfMonth = $now->copy()->startOfMonth();
     $lastMonth = $now->copy()->subMonth();
 
-    // 1. OS Stats (Simples)
+    // 1. OS Stats (Filtrado por Empresa)
     $osStats = [
-      'pending' => OrdemServico::where('status', 'pending')->count(),
-      'running' => OrdemServico::where('status', 'running')->count(),
-      'finalized_today' => OrdemServico::where('status', 'finalized')->whereDate('updated_at', $today)->count(),
-      'total_month' => OrdemServico::whereMonth('created_at', $now->month)->count(),
+      'pending' => OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count(),
+      'running' => OrdemServico::where('company_id', $companyId)->where('status', 'running')->count(),
+      'finalized_today' => OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->whereDate('updated_at', $today)->count(),
+      'total_month' => OrdemServico::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count(),
     ];
 
-    // 2. Cálculo de Receita OTIMIZADO (Soma no Banco)
-    $calculateRevenue = function($month, $year) {
+    $calculateRevenue = function ($month, $year) use ($companyId) {
       // Receita de Transações Diretas
-      $finRevenue = FinancialTransaction::where('type', 'in')
+      $finRevenue = FinancialTransaction::where('company_id', $companyId)
+        ->where('type', 'in')
         ->where('status', 'paid')
         ->whereMonth('paid_at', $month)
         ->whereYear('paid_at', $year)
         ->sum('amount');
 
       // Receita de Ordens de Serviço (Itens + Peças)
-      // Usamos subconsultas para evitar N+1
-      $osIds = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed', 'completed'])
+      $osIds = OrdemServico::where('company_id', $companyId)
+        ->whereIn('status', ['paid', 'finalized', 'completed'])
         ->whereMonth('updated_at', $month)
         ->whereYear('updated_at', $year)
         ->pluck('id');
@@ -105,9 +105,9 @@ class HomePage extends Controller
 
     $revenueMonth = $calculateRevenue($now->month, $now->year);
     $revenueLastMonth = $calculateRevenue($lastMonth->month, $lastMonth->year);
-    
-    $revenueGrowth = $revenueLastMonth > 0 
-      ? (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100 
+
+    $revenueGrowth = $revenueLastMonth > 0
+      ? (($revenueMonth - $revenueLastMonth) / $revenueLastMonth) * 100
       : ($revenueMonth > 0 ? 100 : 0);
 
     // 3. Financeiro Pendente (Contas a Pagar/Receber próximas)
@@ -132,27 +132,32 @@ class HomePage extends Controller
       $months[] = $mDate->translatedFormat('M');
 
       $revenueTrends[] = $calculateRevenue($mDate->month, $mDate->year);
-      
-      $expenseTrends[] = FinancialTransaction::where('type', 'out')
+
+      $expenseTrends[] = FinancialTransaction::where('company_id', $companyId)
+        ->where('type', 'out')
         ->where('status', 'paid')
         ->whereMonth('paid_at', $mDate->month)
         ->whereYear('paid_at', $mDate->year)
         ->sum('amount');
 
-      $budgetTrends[] = Budget::whereMonth('created_at', $mDate->month)
+      $budgetTrends[] = Budget::where('company_id', $companyId)
+        ->whereMonth('created_at', $mDate->month)
         ->whereYear('created_at', $mDate->year)
         ->count();
     }
 
-    // 5. Melhores Serviços (Ranking)
+    // 5. Melhores Serviços (Ranking) - Filtrado por Empresa
     $topServices = OrdemServicoItem::join('services', 'ordem_servico_items.service_id', '=', 'services.id')
+      ->join('ordem_servicos', 'ordem_servico_items.ordem_servico_id', '=', 'ordem_servicos.id')
+      ->where('ordem_servicos.company_id', $companyId)
       ->select('services.name', DB::raw('SUM(ordem_servico_items.price * ordem_servico_items.quantity) as total'))
       ->groupBy('services.name')
       ->orderBy('total', 'desc')
       ->limit(5)
       ->get();
 
-    $monthlyExpenses = FinancialTransaction::where('type', 'out')
+    $monthlyExpenses = FinancialTransaction::where('company_id', $companyId)
+      ->where('type', 'out')
       ->where('status', 'paid')
       ->whereMonth('paid_at', $now->month)
       ->whereYear('paid_at', $now->year)
@@ -161,21 +166,21 @@ class HomePage extends Controller
     // 6. Novas Métricas de Inteligência
     $totalClients = Clients::count();
     $avgTicket = $osStats['total_month'] > 0 ? $revenueMonth / $osStats['total_month'] : 0;
-    
+
     // Retenção: Clientes com mais de 1 OS nos últimos 6 meses
     $retentionCount = OrdemServico::select('client_id')
-        ->where('created_at', '>=', $now->copy()->subMonths(6))
-        ->groupBy('client_id')
-        ->having(DB::raw('count(*)'), '>', 1)
-        ->get()
-        ->count();
+      ->where('created_at', '>=', $now->copy()->subMonths(6))
+      ->groupBy('client_id')
+      ->having(DB::raw('count(*)'), '>', 1)
+      ->get()
+      ->count();
     $retentionRate = $totalClients > 0 ? ($retentionCount / $totalClients) * 100 : 0;
 
     // Academy Highlights
     $academyHighlights = [
-        ['title' => 'Abrindo sua primeira OS', 'duration' => '1:30', 'icon' => 'tabler-file-plus'],
-        ['title' => 'Configurações Iniciais', 'duration' => '2:15', 'icon' => 'tabler-settings'],
-        ['title' => 'Gestão Financeira', 'duration' => '3:00', 'icon' => 'tabler-wallet'],
+      ['title' => 'Abrindo sua primeira OS', 'duration' => '1:30', 'icon' => 'tabler-file-plus'],
+      ['title' => 'Configurações Iniciais', 'duration' => '2:15', 'icon' => 'tabler-settings'],
+      ['title' => 'Gestão Financeira', 'duration' => '3:00', 'icon' => 'tabler-wallet'],
     ];
 
     return [
@@ -188,20 +193,20 @@ class HomePage extends Controller
       'avgTicket' => $avgTicket,
       'retentionRate' => $retentionRate,
       'academyHighlights' => $academyHighlights,
-      'lowStockItems' => InventoryItem::whereRaw('quantity <= min_quantity')->count(),
-      'pendingBudgets' => Budget::where('status', 'pending')->count(),
-      'recentOS' => OrdemServico::with(['client', 'veiculo'])->orderBy('created_at', 'desc')->limit(5)->get(),
+      'lowStockItems' => InventoryItem::where('company_id', $companyId)->whereRaw('quantity <= min_quantity')->count(),
+      'pendingBudgets' => Budget::where('company_id', $companyId)->where('status', 'pending')->count(),
+      'recentOS' => OrdemServico::where('company_id', $companyId)->with(['client', 'veiculo'])->orderBy('created_at', 'desc')->limit(5)->get(),
       'months' => $months,
       'revenueTrends' => $revenueTrends,
       'expenseTrends' => $expenseTrends,
       'budgetTrends' => $budgetTrends,
       'osDistribution' => [
-        'pending' => OrdemServico::where('status', 'pending')->count(),
-        'running' => OrdemServico::where('status', 'running')->count(),
-        'finalized' => OrdemServico::where('status', 'finalized')->count(),
+        'pending' => OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count(),
+        'running' => OrdemServico::where('company_id', $companyId)->where('status', 'running')->count(),
+        'finalized' => OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->count(),
       ],
-      'conversionRate' => Budget::whereMonth('created_at', $now->month)->count() > 0 
-        ? (Budget::where('status', 'approved')->whereMonth('updated_at', $now->month)->count() / Budget::whereMonth('created_at', $now->month)->count()) * 100 
+      'conversionRate' => Budget::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count() > 0
+        ? (Budget::where('company_id', $companyId)->where('status', 'approved')->whereMonth('updated_at', $now->month)->count() / Budget::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count()) * 100
         : 0,
       'topServiceLabels' => $topServices->pluck('name')->map(fn($item) => str($item)->limit(15))->toArray(),
       'topServiceData' => $topServices->pluck('total')->toArray(),
