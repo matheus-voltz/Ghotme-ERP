@@ -35,6 +35,9 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
         $user->is_expired = $user->isTrialExpired();
+        $user->is_locked = $user->isLockedDueToOverdue();
+        $user->is_overdue = $user->isPaymentOverdue();
+        $user->overdue_days = $user->getOverdueDays();
 
         return response()->json([
             'success' => true,
@@ -66,6 +69,9 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth-token')->plainTextToken;
         $user->is_expired = $user->isTrialExpired();
+        $user->is_locked = $user->isLockedDueToOverdue();
+        $user->is_overdue = $user->isPaymentOverdue();
+        $user->overdue_days = $user->getOverdueDays();
 
         return response()->json([
             'success' => true,
@@ -84,6 +90,9 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->is_expired = $user->isTrialExpired();
+        $user->is_locked = $user->isLockedDueToOverdue();
+        $user->is_overdue = $user->isPaymentOverdue();
+        $user->overdue_days = $user->getOverdueDays();
         return response()->json($user);
     }
 

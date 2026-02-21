@@ -26,6 +26,7 @@ function RootLayoutNav() {
       const needsOnboarding = completed !== 'true';
       const inAuthGroup = segments[0] === '(auth)';
       const isExpiredPage = segments[0] === 'expired';
+      const isBlockedPage = segments[0] === 'blocked';
       const isOnboarding = segments[0] === 'onboarding';
 
       // 1. Onboarding Priority
@@ -50,12 +51,16 @@ function RootLayoutNav() {
           router.replace('/(auth)/login');
         }
       } else {
-        if (user.is_expired) {
+        if (user.is_locked) {
+          if (!isBlockedPage) {
+            router.replace('/blocked');
+          }
+        } else if (user.is_expired) {
           if (!isExpiredPage) {
             router.replace('/expired');
           }
         } else {
-          if (inAuthGroup || isExpiredPage || !segments[0]) {
+          if (inAuthGroup || isExpiredPage || isBlockedPage || !segments[0]) {
             router.replace('/(app)/(tabs)');
           }
         }
