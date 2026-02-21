@@ -106,6 +106,20 @@ class SettingsController extends Controller
         ]);
     }
 
+    public function cancelPlan(Request $request)
+    {
+        $user = auth()->user();
+        $user->update([
+            'selected_plan' => null,
+            'plan_type' => null
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Seleção de plano cancelada.'
+        ]);
+    }
+
     public function generatePayment(Request $request)
     {
         $user = auth()->user();
@@ -131,7 +145,7 @@ class SettingsController extends Controller
 
         try {
             $customerId = $this->asaas->getOrCreateCustomer($user);
-            
+
             $cardData = null;
             if ($method === 'credit_card') {
                 $expiry = explode('/', $request->card_expiry);
@@ -147,7 +161,8 @@ class SettingsController extends Controller
             if ($user->plan_type === 'monthly') {
                 $result = $this->asaas->createSubscription($customerId, $method, $amount, $description, $cardData, $user);
             } else {
-                $result = $this->asaas->createPayment($customerId, $method, $amount, $description, $cardData, $user);
+                $installments = ($method === 'credit_card') ? (int) ($request->installments ?? 1) : 1;
+                $result = $this->asaas->createPayment($customerId, $method, $amount, $description, $cardData, $user, $installments);
             }
 
             if (isset($result['errors'])) {

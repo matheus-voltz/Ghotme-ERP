@@ -73,7 +73,7 @@ class AsaasService
         return $response->json();
     }
 
-    public function createPayment($customerId, $method, $amount, $description, $cardData = null, $user = null)
+    public function createPayment($customerId, $method, $amount, $description, $cardData = null, $user = null, $installments = 1)
     {
         $payload = [
             'customer' => $customerId,
@@ -82,6 +82,11 @@ class AsaasService
             'dueDate' => now()->toDateString(),
             'description' => $description
         ];
+
+        if ($installments > 1) {
+            $payload['installmentCount'] = $installments;
+            $payload['installmentValue'] = round($amount / $installments, 2);
+        }
 
         if ($method === 'credit_card' && $cardData) {
             $payload['creditCard'] = $cardData;

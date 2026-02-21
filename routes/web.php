@@ -155,7 +155,7 @@ Route::middleware([
     Route::get('/clients/{id}/quick-view', [ClientsController::class, 'quickView'])->name('clients.quick-view');
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
-    
+
     // Maintenance Contracts
     Route::get('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'index'])->name('maintenance-contracts.index');
     Route::post('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'store'])->name('maintenance-contracts.store');
@@ -185,7 +185,7 @@ Route::middleware([
     Route::get('/inventory/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('inventory.purchase-orders');
     Route::post('/inventory/purchase-orders/automatic', [App\Http\Controllers\PurchaseOrderController::class, 'generateAutomaticOrders'])->name('inventory.purchase-orders.automatic');
     Route::post('/inventory/purchase-orders/{id}/receive', [App\Http\Controllers\PurchaseOrderController::class, 'receive'])->name('inventory.purchase-orders.receive');
-    
+
     Route::get('/inventory/items', [InventoryItemController::class, 'index'])->name('inventory.items');
     Route::get('/inventory/items-list', [InventoryItemController::class, 'dataBase'])->name('inventory.items-list');
     Route::post('/inventory/items', [InventoryItemController::class, 'store'])->name('inventory.items.store');
@@ -250,7 +250,7 @@ Route::middleware([
 
     // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
-    Route::post('/accounting/generate-token', function() {
+    Route::post('/accounting/generate-token', function () {
         $company = \App\Models\Company::find(auth()->user()->company_id);
         $company->update(['accountant_token' => \Illuminate\Support\Str::random(32)]);
         return response()->json(['success' => true]);
@@ -259,7 +259,7 @@ Route::middleware([
     Route::post('/accounting/conciliate', [App\Http\Controllers\AccountingController::class, 'conciliate'])->name('accounting.conciliate');
     Route::post('/accounting/audit/{id}', [App\Http\Controllers\AccountingController::class, 'auditTransaction'])->name('accounting.audit');
     Route::get('/fiscal/emit-invoice', [App\Http\Controllers\TaxInvoiceController::class, 'createFromOS'])->name('tax.invoice.create');
-    
+
     // Reports
     Route::get('/reports/profitability', [App\Http\Controllers\ProfitabilityReportController::class, 'index'])->name('reports.profitability');
     Route::get('/reports/os-status', [ReportController::class, 'osStatus'])->name('reports.os-status');
@@ -277,7 +277,7 @@ Route::middleware([
 
     // Custom Fields
     Route::get('/settings/custom-fields', [App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');
-    
+
     // Data Import
     Route::get('/settings/import', [App\Http\Controllers\ImportController::class, 'index'])->name('settings.import.index');
     Route::get('/settings/import/template/{type}', [App\Http\Controllers\ImportController::class, 'downloadTemplate'])->name('settings.import.template');
@@ -339,6 +339,7 @@ Route::middleware([
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::post('/settings/generate-payment', [SettingsController::class, 'generatePayment'])->name('settings.generate-payment');
     Route::post('/settings/select-plan', [SettingsController::class, 'selectPlan'])->name('settings.select-plan');
+    Route::post('/settings/cancel-plan', [SettingsController::class, 'cancelPlan'])->name('settings.cancel-plan');
     Route::post('/settings/update-profile', [SettingsController::class, 'updateProfile'])->name('settings.update-profile');
 
     // Support
@@ -375,11 +376,11 @@ Route::middleware([
     Route::post('/mechanic/complete/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'completeItem'])->name('mechanic.item.complete');
 
     // TESTE DE NOTIFICAÇÃO PUSH REAL
-    Route::get('/push-test/{token}', function(\Illuminate\Http\Request $request, $token) {
+    Route::get('/push-test/{token}', function (\Illuminate\Http\Request $request, $token) {
         $fullToken = "ExponentPushToken[" . $token . "]";
         $res = \App\Helpers\Helpers::sendExpoNotification(
-            $fullToken, 
-            "Ghotme ERP 🚀", 
+            $fullToken,
+            "Ghotme ERP 🚀",
             "Novo orçamento #1059 recebido agora mesmo!"
         );
         return response()->json([

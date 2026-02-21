@@ -44,32 +44,12 @@ export default function LoginScreen() {
     // Animações
     const formOpacity = useSharedValue(0);
     const formTranslateY = useSharedValue(50);
-    const logoScale = useSharedValue(0);
-    const logoTranslateY = useSharedValue(20);
+    const logoScale = useSharedValue(1);
+    const logoTranslateY = useSharedValue(0);
 
     useEffect(() => {
         formOpacity.value = withDelay(400, withTiming(1, { duration: 800 }));
         formTranslateY.value = withDelay(400, withSpring(0));
-
-        // Entrada Suave (Saindo do "trampolim")
-        logoScale.value = withTiming(1, {
-            duration: 1000,
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1)
-        });
-        logoTranslateY.value = withTiming(0, {
-            duration: 1000,
-            easing: Easing.out(Easing.exp)
-        });
-
-        // Flutuação sutil (Parallax) em vez de pulso
-        logoTranslateY.value = withDelay(1000, withRepeat(
-            withSequence(
-                withTiming(-6, { duration: 2500, easing: Easing.inOut(Easing.ease) }),
-                withTiming(0, { duration: 2500, easing: Easing.inOut(Easing.ease) })
-            ),
-            -1,
-            true
-        ));
 
         // Tenta biometria automática após carregar
         setTimeout(autoBiometrics, 1000);
@@ -196,10 +176,12 @@ export default function LoginScreen() {
                 style={styles.keyboardView}
             >
                 <View style={styles.contentContainer}>
-                    <Animated.View style={[styles.headerContainer, animatedLogoStyle]}>
+                    <View style={styles.headerContainer}>
                         <View style={styles.logoPlaceholder}>
                             {success ? (
-                                <Ionicons name="checkmark-circle" size={90} color="#7367F0" />
+                                <Animated.View style={animatedLogoStyle}>
+                                    <Ionicons name="checkmark-circle" size={90} color="#7367F0" />
+                                </Animated.View>
                             ) : (
                                 <Svg width="120" height="120" viewBox="0 0 32 24" fill="none">
                                     <Defs>
@@ -225,7 +207,7 @@ export default function LoginScreen() {
                                 {show2FA ? 'Segurança em Duas Etapas' : 'Gestão inteligente para sua empresa'}
                             </Text>
                         )}
-                    </Animated.View>
+                    </View>
 
                     {!success && (
                         <Animated.View style={[styles.formContainer, animatedFormStyle]}>
