@@ -77,7 +77,7 @@ export default function CreateOrderScreen() {
 
     const handleSubmit = async () => {
         if (!clientId || !vehicleId || !status) {
-            Alert.alert("Atenção", "Preencha os campos obrigatórios (Cliente, Veículo, Status).");
+            Alert.alert("Atenção", `Preencha os campos obrigatórios (Cliente, ${labels.entity}, Status).`);
             return;
         }
 
@@ -241,7 +241,7 @@ export default function CreateOrderScreen() {
                     <View style={styles.inputGroup}>
                         <View style={styles.labelRow}>
                             <Ionicons name="speedometer-outline" size={16} color={colors.subText} />
-                            <Text style={[styles.label, { color: colors.subText }]}>KM na Entrada</Text>
+                            <Text style={[styles.label, { color: colors.subText }]}>{labels.metric} na Entrada</Text>
                         </View>
                         <View style={[styles.inputContainer, { borderColor: colors.border, backgroundColor: colors.background }]}>
                             <TextInput
@@ -252,7 +252,7 @@ export default function CreateOrderScreen() {
                                 value={kmEntry}
                                 onChangeText={setKmEntry}
                             />
-                            <Text style={[styles.inputSuffix, { color: colors.subText }]}>km</Text>
+                            {labels.metric_unit && <Text style={[styles.inputSuffix, { color: colors.subText }]}>{labels.metric_unit}</Text>}
                         </View>
                     </View>
 
@@ -277,12 +277,12 @@ export default function CreateOrderScreen() {
                 </View >
 
                 {/* Info Box */}
-                < View style={[styles.infoBox, { backgroundColor: colors.primary + '15' }]} >
+                <View style={[styles.infoBox, { backgroundColor: colors.primary + '15' }]}>
                     <Ionicons name="information-circle-outline" size={24} color={colors.primary} />
                     <Text style={[styles.infoText, { color: colors.text }]}>
-                        A adição de serviços e peças poderá ser feita na tela de detalhes da OS após a criação.
+                        A adição de serviços e {(labels.inventory_items || 'peças').toLowerCase()} poderá ser feita na tela de detalhes da OS após a criação.
                     </Text>
-                </View >
+                </View>
 
             </ScrollView >
 

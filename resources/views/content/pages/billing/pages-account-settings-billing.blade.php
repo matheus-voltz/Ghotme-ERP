@@ -430,15 +430,22 @@
 <div class="row">
   <div class="col-md-12">
     <!-- Current Plan -->
-    <div class="card mb-6">
-      <h5 class="card-header">Plano atual</h5>
+    <div class="card mb-6 {{ $user->plan != 'free' ? 'border border-primary border-2 shadow-lg' : '' }}">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Plano atual</h5>
+        @if($user->plan != 'free')
+        <span class="badge bg-label-primary rounded-pill"><i class="ti tabler-star me-1"></i> VIP</span>
+        @endif
+      </div>
       <div class="card-body">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <h6>Seu plano é {{ $planDetails['name'] }}</h6>
+        <div class="row align-items-center {{ $user->plan != 'free' ? 'bg-label-primary p-4 rounded' : '' }}">
+          <div class="{{ $user->plan != 'free' ? 'col-md-8 text-center text-md-start' : 'col-md-6' }}">
+            <h6 class="{{ $user->plan != 'free' ? 'text-primary fs-4 mb-2' : '' }}">Seu plano é {{ $planDetails['name'] }}</h6>
             <p>{{ $planDetails['description'] }}</p>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pricingModal"><i class="ti tabler-rocket me-1"></i> Escolher um Plano</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#pricingModal"><i class="ti tabler-rocket me-1"></i> {{ $user->plan != 'free' ? 'Alterar Plano' : 'Escolher um Plano' }}</button>
           </div>
+
+          @if($user->plan === 'free')
           <div class="col-md-6">
             <div class="d-flex justify-content-between mb-1">
               <span>Dias de Uso</span>
@@ -448,6 +455,11 @@
               <div class="progress-bar" style="width: {{ ($daysUsed/30)*100 }}%"></div>
             </div>
           </div>
+          @else
+          <div class="col-md-4 d-none d-md-flex justify-content-end">
+            <i class="ti tabler-rosette-discount-check-filled text-primary" style="font-size: 5rem;"></i>
+          </div>
+          @endif
         </div>
 
         @if($selectedPlanDetails)
@@ -460,8 +472,9 @@
       </div>
     </div>
 
+    @if($user->plan === 'free' || isset($selectedPlanDetails))
     <!-- Payment Methods -->
-    <div class="card mb-6">
+    <div class="card mb-6" id="payment-methods-card">
       <h5 class="card-header">Métodos de Pagamento</h5>
       <div class="card-body">
 
@@ -575,6 +588,7 @@
         </div>
       </div>
     </div>
+    @endif
 
     <!-- Billing Address -->
     <div class="card mb-6">
