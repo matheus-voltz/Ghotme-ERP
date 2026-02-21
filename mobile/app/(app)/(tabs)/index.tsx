@@ -34,7 +34,7 @@ const statusTranslations: { [key: string]: string } = {
   'canceled': 'Cancelada',
 };
 
-// Helper for status colors (Vuexy Palette)
+// Helper for status colors (Platform Palette)
 const getStatusColor = (status: string) => {
   switch (status?.toLowerCase()) {
     case 'pending': return '#FF9F43'; // Warning
