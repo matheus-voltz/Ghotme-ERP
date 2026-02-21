@@ -26,6 +26,7 @@ class Company extends Model
         'logo_path',
         'slug',
         'is_active',
+        'accountant_token',
     ];
 
     /**

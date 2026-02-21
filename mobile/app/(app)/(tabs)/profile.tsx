@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, StatusBar, ActivityIndicator, Modal } from 'react-native';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,12 +8,26 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import api from '../../../services/api';
+import { useLanguage } from '../../../context/LanguageContext';
 
 export default function ProfileScreen() {
     const { user, signOut, updateUser } = useAuth();
     const { theme, setTheme, colors, activeTheme } = useTheme();
     const router = useRouter();
     const [uploading, setUploading] = useState(false);
+
+    // Language translations mapped via Context
+    const { language, setLanguage, t } = useLanguage();
+    const [languageModalVisible, setLanguageModalVisible] = useState(false);
+
+    const availableLanguages: { code: 'pt-BR' | 'en' | 'es' | 'fr', name: string }[] = [
+        { code: 'pt-BR', name: 'Português (Brasil)' },
+        { code: 'en', name: 'English' },
+        { code: 'es', name: 'Español' },
+        { code: 'fr', name: 'Français' },
+    ];
+
+    const currentLanguageName = availableLanguages.find(l => l.code === language)?.name || 'Português (Brasil)';
 
     const handleUpdatePhoto = async () => {
         try {
@@ -193,47 +207,79 @@ export default function ProfileScreen() {
                 <View style={styles.sectionContainer}>
                     <Text style={[styles.sectionHeader, { color: colors.text }]}>Conta</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
-                        {renderSettingItem("person-outline", "Dados Pessoais", "Alterar nome, telefone, cidade", () => router.push('/profile/details'))}
+                        {renderSettingItem("person-outline", t('personal_data'), "Alterar nome, telefone, cidade", () => router.push('/profile/details'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem(
                             "lock-closed-outline",
-                            "Segurança",
+                            t('security'),
                             user?.two_factor_enabled ? "2FA Ativado" : "2FA Desativado",
                             () => router.push('/profile/security')
                         )}
                     </View>
 
-                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Preferências</Text>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>{t('preferences')}</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
-                        {renderSettingItem("notifications-outline", "Notificações", "Gerenciar alertas")}
+                        {renderSettingItem("notifications-outline", t('notifications'), t('manage_alerts'), () => router.push('/screens/notification_settings'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("moon-outline", "Tema", getCurrentThemeLabel(theme), handleChangeTheme)}
+                        {renderSettingItem("moon-outline", t('theme'), getCurrentThemeLabel(theme, t), handleChangeTheme)}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("language-outline", "Idioma", "Português (Brasil)")}
+                        {renderSettingItem("language-outline", t('language'), currentLanguageName, () => setLanguageModalVisible(true))}
                     </View>
 
-                    <Text style={[styles.sectionHeader, { color: colors.text }]}>Suporte</Text>
+                    <Text style={[styles.sectionHeader, { color: colors.text }]}>{t('support')}</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
-                        {renderSettingItem("help-circle-outline", "Ajuda", "Perguntas frequentes")}
+                        {renderSettingItem("help-circle-outline", t('help'), "Perguntas frequentes")}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("chatbox-ellipses-outline", "Chat da Equipe", "Falar com o time", () => router.push('/chat/contacts'))}
+                        {renderSettingItem("chatbox-ellipses-outline", t('team_chat'), "Falar com o time", () => router.push('/chat/contacts'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
-                        {renderSettingItem("mail-outline", "Fale Conosco", "Enviar mensagem")}
+                        {renderSettingItem("mail-outline", t('contact_us'), "Enviar mensagem")}
                     </View>
 
                     <TouchableOpacity style={[styles.logoutButton, { backgroundColor: activeTheme === 'dark' ? '#2f2b3a' : '#ffebee' }]} onPress={handleSignOut}>
                         <Ionicons name="log-out-outline" size={20} color="#EA5455" style={{ marginRight: 8 }} />
-                        <Text style={styles.logoutText}>Sair da Conta</Text>
+                        <Text style={styles.logoutText}>{t('logout')}</Text>
                     </TouchableOpacity>
 
                     <Text style={styles.versionText}>Versão 1.0.0</Text>
                 </View>
             </ScrollView>
+
+            <Modal
+                visible={languageModalVisible}
+                animationType="fade"
+                transparent={true}
+                onRequestClose={() => setLanguageModalVisible(false)}
+            >
+                <TouchableOpacity
+                    style={styles.modalOverlay}
+                    activeOpacity={1}
+                    onPress={() => setLanguageModalVisible(false)}
+                >
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>Selecione o Idioma</Text>
+                        {availableLanguages.map((lang) => (
+                            <TouchableOpacity
+                                key={lang.code}
+                                style={styles.languageOption}
+                                onPress={() => {
+                                    setLanguage(lang.code);
+                                    setLanguageModalVisible(false);
+                                }}
+                            >
+                                <Text style={[styles.languageText, { color: colors.text }]}>{lang.name}</Text>
+                                {language === lang.code && (
+                                    <Ionicons name="checkmark-circle" size={24} color="#28C76F" />
+                                )}
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </TouchableOpacity>
+            </Modal>
         </View>
     );
 }
 
-function getCurrentThemeLabel(theme: string) {
+function getCurrentThemeLabel(theme: string, t: any) {
     if (theme === 'light') return 'Claro';
     if (theme === 'dark') return 'Escuro';
     return 'Sistema';
@@ -413,4 +459,32 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 20,
     },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-end',
+    },
+    modalContent: {
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        padding: 24,
+        paddingBottom: 40,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    languageOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(150, 150, 150, 0.1)',
+    },
+    languageText: {
+        fontSize: 16,
+    }
 });

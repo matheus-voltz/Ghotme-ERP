@@ -244,6 +244,12 @@ Route::middleware([
 
     // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');
+    Route::get('/portal-contador/{token}', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.public');
+    Route::post('/accounting/generate-token', function() {
+        $company = \App\Models\Company::find(auth()->user()->company_id);
+        $company->update(['accountant_token' => \Illuminate\Support\Str::random(32)]);
+        return response()->json(['success' => true]);
+    })->name('accounting.generate-token');
     Route::post('/accounting/import-ofx', [App\Http\Controllers\AccountingController::class, 'importOfx'])->name('accounting.import-ofx');
     Route::post('/accounting/conciliate', [App\Http\Controllers\AccountingController::class, 'conciliate'])->name('accounting.conciliate');
     Route::post('/accounting/audit/{id}', [App\Http\Controllers\AccountingController::class, 'auditTransaction'])->name('accounting.audit');

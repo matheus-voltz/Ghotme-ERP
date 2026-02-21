@@ -8,6 +8,7 @@ use App\Models\Budget;
 use App\Models\Clients;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Models\FinancialTransaction;
 
 class ApiOrdemServicoController extends Controller
 {
@@ -69,20 +70,43 @@ class ApiOrdemServicoController extends Controller
         };
 
         if ($user->role === 'admin') {
-            $monthlyRevenue = OrdemServico::where('status', 'finalized')
-                ->whereMonth('created_at', Carbon::now()->month)
-                ->with(['items', 'parts'])
-                ->get()
-                ->sum('total');
+            $today = Carbon::today();
+            $month = Carbon::now()->month;
+            $year = Carbon::now()->year;
+
+            // Current Month Revenue
+            $financialRevenue = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+                ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
+            $osRevenue = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+                ->whereMonth('updated_at', $month)->whereYear('updated_at', $year)
+                ->get()->sum('total');
+            $monthlyRevenue = $financialRevenue + $osRevenue;
+
+            // Last Month Revenue for Growth
+            $lastMonth = Carbon::now()->subMonth();
+            $financialRevenueLast = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+                ->whereMonth('paid_at', $lastMonth->month)->whereYear('paid_at', $lastMonth->year)->sum('amount');
+            $osRevenueLast = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+                ->whereMonth('updated_at', $lastMonth->month)->whereYear('updated_at', $lastMonth->year)
+                ->get()->sum('total');
+            $revenueLastMonth = $financialRevenueLast + $osRevenueLast;
+            $revenueGrowth = round($revenueLastMonth > 0 ? (($monthlyRevenue - $revenueLastMonth) / $revenueLastMonth) * 100 : ($monthlyRevenue > 0 ? 100 : 0), 1);
+
+            // Expenses for Profitability
+            $monthlyExpenses = FinancialTransaction::where('type', 'out')->where('status', 'paid')
+                ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
+            $monthlyProfitability = round($monthlyRevenue > 0 ? (($monthlyRevenue - $monthlyExpenses) / $monthlyRevenue) * 100 : 0, 1);
+
+
             $osStats = [
                 'pending' => OrdemServico::where('status', 'pending')->count(),
                 'running' => OrdemServico::where('status', 'running')->count(),
-                'finalized_today' => OrdemServico::where('status', 'finalized')->whereDate('updated_at', Carbon::today())->count(),
+                'finalized_today' => OrdemServico::where('status', 'finalized')->whereDate('updated_at', $today)->count(),
             ];
             return response()->json([
                 'monthlyRevenue' => $monthlyRevenue,
-                'revenueGrowth' => 15.5,
-                'monthlyProfitability' => 65,
+                'revenueGrowth' => $revenueGrowth,
+                'monthlyProfitability' => $monthlyProfitability,
                 'totalClients' => Clients::count(),
                 'osStats' => $osStats,
                 'lowStockCount' => 3,

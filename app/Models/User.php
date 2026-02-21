@@ -61,7 +61,8 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'telegram_chat_id',
         'telegram_username',
         'status',
-        'deleted_reason', // Add deleted_reason
+        'deleted_reason',
+        'notification_preferences',
     ];
 
     /**
@@ -175,6 +176,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'trial_ends_at' => 'datetime',
+            'notification_preferences' => 'json',
         ];
     }
 

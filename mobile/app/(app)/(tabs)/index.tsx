@@ -16,6 +16,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
 import { useChat } from '../../../context/ChatContext';
+import { useLanguage } from '../../../context/LanguageContext';
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -54,6 +55,7 @@ export default function DashboardScreen() {
   const { colors, activeTheme } = useTheme();
   const { labels, niche } = useNiche();
   const { unreadCount } = useChat();
+  const { t, language } = useLanguage();
   const [data, setData] = useState<any>(null);
 
   const getEstablishmentName = () => {
@@ -117,16 +119,16 @@ export default function DashboardScreen() {
 
           {/* Profitability Card */}
           <View style={[styles.statCard, { borderLeftColor: '#28C76F', backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.statLabel, { color: colors.subText }]}>Lucratividade</Text>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>{t('profitability')}</Text>
             <Text style={[styles.statValue, { color: colors.text }]}>{data.monthlyProfitability || 0}%</Text>
             <Text style={[styles.statSubLabel, { color: colors.subText }]}>Margem média do mês</Text>
           </View>
 
           {/* Clients Card */}
           <View style={[styles.statCard, { borderLeftColor: '#FF9F43', backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.statLabel, { color: colors.subText }]}>Novos Clientes</Text>
+            <Text style={[styles.statLabel, { color: colors.subText }]}>{t('new_clients')}</Text>
             <Text style={[styles.statValue, { color: colors.text }]}>{data.totalClients || 0}</Text>
-            <Text style={[styles.statSubLabel, { color: colors.subText }]}>Base ativa {getEstablishmentName().replace('do ', 'no ').replace('da ', 'na ')}</Text>
+            <Text style={[styles.statSubLabel, { color: colors.subText }]}>{t('active_base')} {getEstablishmentName().replace('do ', 'no ').replace('da ', 'na ')}</Text>
           </View>
         </ScrollView>
 
@@ -302,9 +304,9 @@ export default function DashboardScreen() {
       >
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.welcomeText}>Olá, {user?.name || 'Bem-vindo'}</Text>
+            <Text style={styles.welcomeText}>{t('hello')}, {user?.name || t('welcome')}</Text>
             <Text style={styles.subtitleText}>
-              {user?.role === 'admin' ? `Resumo ${getEstablishmentName()} hoje` : 'Seu portal de trabalho'}
+              {user?.role === 'admin' ? t('summary_today', { niche: getEstablishmentName() }) : t('portal')}
             </Text>
           </View>
 
@@ -335,15 +337,16 @@ export default function DashboardScreen() {
 
             <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
               <View style={styles.avatarPlaceholder}>
-                <Image
-                  source={{ uri: user.profile_photo_url }}
-                  style={{ width: '100%', height: '100%', borderRadius: 22.5 }}
-                  contentFit="cover"
-                />
+                {user?.profile_photo_url ? (
+                  <Image
+                    source={{ uri: user.profile_photo_url }}
+                    style={{ width: '100%', height: '100%', borderRadius: 22.5 }}
+                    contentFit="cover"
+                  />
                 ) : (
-                <Text style={styles.avatarText}>
-                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                </Text>
+                  <Text style={styles.avatarText}>
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                  </Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -437,10 +440,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   profileButton: {
-    padding: 2,
+    width: 49,
+    height: 49,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
-    borderRadius: 25,
+    borderRadius: 24.5,
     justifyContent: 'center',
     alignItems: 'center',
   },

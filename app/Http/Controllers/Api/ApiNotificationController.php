@@ -43,4 +43,36 @@ class ApiNotificationController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function preferences()
+    {
+        $user = Auth::user();
+
+        // Deafult settings if null
+        $prefs = $user->notification_preferences ?? [
+            'new_os' => true,
+            'chat_messages' => true,
+            'system_alerts' => true,
+            'budget_updates' => true,
+        ];
+
+        return response()->json($prefs);
+    }
+
+    public function updatePreferences(Request $request)
+    {
+        $user = Auth::user();
+
+        $prefs = $user->notification_preferences ?? [];
+        $key = $request->input('key');
+        $value = $request->input('value');
+
+        if ($key !== null && $value !== null) {
+            $prefs[$key] = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            $user->notification_preferences = $prefs;
+            $user->save();
+        }
+
+        return response()->json(['success' => true, 'preferences' => $user->notification_preferences]);
+    }
 }

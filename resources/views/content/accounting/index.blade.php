@@ -17,12 +17,18 @@
             <span class="text-muted fw-light">{{ __('Fiscal') }} /</span> {{ __('BPO Financeiro') }}
         </h4>
         <div class="d-flex gap-2">
+            @if(!$isPublic)
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ofxImportModal">
                 <i class="ti tabler-file-import me-1"></i> {{ __('Import OFX') }}
             </button>
             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#fiscalConfigModal">
                 <i class="ti tabler-settings me-1"></i> {{ __('Company data') }}
             </button>
+            @else
+            <a href="{{ route('login') }}" class="btn btn-label-secondary">
+                <i class="ti tabler-logout me-1"></i> {{ __('Sair do Portal') }}
+            </a>
+            @endif
             <select class="form-select w-auto" id="monthFilter" onchange="filterData()">
                 @php
                     $locale = app()->getLocale();
@@ -49,10 +55,48 @@
 
     <div class="nav-align-top mb-4">
         <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-rev">{{ __('Revenue & Invoices') }}</button></li>
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-dre">{{ __('DRE (Profit & Loss)') }}</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-rev">{{ __('Revenue & Invoices') }}</button></li>
             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-exp">{{ __('Expenses & Audit') }}</button></li>
         </ul>
         <div class="tab-content p-0">
+            <!-- ABA DRE -->
+            <div class="tab-pane fade show active" id="tab-dre" role="tabpanel">
+                <div class="p-4">
+                    <h5 class="fw-bold mb-4">Demonstrativo de Resultado ({{ $month }}/{{ $year }})</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr><th>Descrição</th><th class="text-end">Valor (R$)</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-success">
+                                    <td><strong>(+) RECEITA BRUTA (Vendas e Serviços)</strong></td>
+                                    <td class="text-end text-success"><strong>{{ number_format($totals['revenue'], 2, ',', '.') }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-4">Receitas de Ordens de Serviço</td>
+                                    <td class="text-end">{{ number_format($revenue->sum(fn($os) => $os->total), 2, ',', '.') }}</td>
+                                </tr>
+                                <tr class="table-danger">
+                                    <td><strong>(-) CUSTOS E DESPESAS OPERACIONAIS</strong></td>
+                                    <td class="text-end text-danger"><strong>{{ number_format($totals['expenses'], 2, ',', '.') }}</strong></td>
+                                </tr>
+                                @foreach($dreData as $category => $amount)
+                                <tr>
+                                    <td class="ps-4">{{ $category ?: 'Outras Despesas' }}</td>
+                                    <td class="text-end">{{ number_format($amount, 2, ',', '.') }}</td>
+                                </tr>
+                                @endforeach
+                                <tr class="table-primary">
+                                    <td><h5 class="mb-0">(=) RESULTADO LÍQUIDO DO PERÍODO</h5></td>
+                                    <td class="text-end"><h5 class="mb-0 {{ $totals['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <!-- ABA RECEITAS -->
             <div class="tab-pane fade show active" id="tab-rev" role="tabpanel">
                 <div class="table-responsive">
@@ -151,17 +195,60 @@
                             <input type="text" name="state" class="form-control" style="max-width: 80px;" value="{{ $company->state ?? '' }}" maxlength="2">
                         </div>
                     </div>
+                    <hr class="my-2">
+                    <div class="col-12" id="accountantLinkContainer">
+                        <label class="form-label text-primary fw-bold">Link de Acesso Direto para o Contador</label>
+                        @if($company->accountant_token)
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="accountantLink" value="{{ route('accounting.public', $company->accountant_token) }}" readonly>
+                            <button class="btn btn-outline-primary" type="button" onclick="copyAccountantLink()"><i class="ti tabler-copy"></i></button>
+                        </div>
+                        <small class="text-muted">Envie este link para seu contador. Ele terá acesso apenas a esta tela fiscal.</small>
+                        @else
+                        <div class="alert alert-warning p-2 small mb-0">Link ainda não gerado.</div>
+                        @endif
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer border-top">
-                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
-                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+            <div class="modal-footer border-top d-flex justify-content-between">
+                <button type="button" class="btn btn-label-primary {{ $company->accountant_token ? 'd-none' : '' }}" id="btnGenerateToken" onclick="generateAccountantToken()">Gerar Link de Acesso</button>
+                <div>
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
             </div>
         </form>
     </div>
 </div>
 
 <script>
+    function generateAccountantToken() {
+        const btn = document.getElementById('btnGenerateToken');
+        btn.disabled = true;
+        btn.innerHTML = 'Gerando...';
+
+        fetch("{{ route('accounting.generate-token') }}", {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({icon: 'success', title: 'Link Gerado!', timer: 1500, showConfirmButton: false})
+                .then(() => location.reload()); // Recarrega para mostrar o link
+            }
+        });
+    }
+    function copyAccountantLink() {
+        const copyText = document.getElementById("accountantLink");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+        Swal.fire({icon: 'success', title: 'Link Copiado!', showConfirmButton: false, timer: 1500});
+    }
     function filterData() {
         window.location.href = `{{ route('accounting.index') }}?month=${document.getElementById('monthFilter').value}&year=${document.getElementById('yearFilter').value}`;
     }

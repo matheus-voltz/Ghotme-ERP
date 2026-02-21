@@ -19,11 +19,18 @@ class AccountingController extends Controller
         $this->ofxService = $ofxService;
     }
 
-    public function index(Request $request)
+    public function index(Request $request, $token = null)
     {
-        $user = Auth::user();
-        $companyId = $user->company_id;
-        $company = Company::find($companyId) ?? Company::first();
+        // Se houver token, busca a empresa pelo token (acesso direto do contador)
+        if ($token) {
+            $company = Company::where('accountant_token', $token)->firstOrFail();
+        } else {
+            // Caso contrário, exige login
+            $user = Auth::user();
+            if (!$user) return redirect()->route('login');
+            $companyId = $user->company_id;
+            $company = Company::find($companyId) ?? Company::first();
+        }
 
         if (!$company) {
             return redirect()->route('dashboard')->with('error', 'Nenhuma empresa cadastrada.');
@@ -34,17 +41,22 @@ class AccountingController extends Controller
         
         // Receitas e Despesas do Mês
         $revenue = OrdemServico::where('company_id', $company->id)
-            ->whereIn('status', ['completed', 'finalized'])
+            ->whereIn('status', ['completed', 'finalized', 'paid'])
             ->whereMonth('updated_at', $month)
             ->whereYear('updated_at', $year)
             ->with(['client'])
             ->get();
 
         $expenses = FinancialTransaction::where('company_id', $company->id)
-            ->where('type', 'expense')
+            ->where('type', 'out') // Despesas
             ->whereMonth('due_date', $month)
             ->whereYear('due_date', $year)
             ->get();
+
+        // Lógica para o DRE (Agrupamento por Categoria)
+        $dreData = $expenses->groupBy('category')->map(function($items) {
+            return $items->sum('amount');
+        });
 
         $invoices = TaxInvoice::where('company_id', $company->id)
             ->whereMonth('issued_at', $month)
@@ -52,14 +64,28 @@ class AccountingController extends Controller
             ->get();
 
         $totals = [
-            'revenue' => $revenue->sum('total'),
+            'revenue' => $revenue->sum(fn($os) => $os->total),
             'expenses' => $expenses->sum('amount'),
-            'net_profit' => $revenue->sum('total') - $expenses->sum('amount'),
+            'net_profit' => $revenue->sum(fn($os) => $os->total) - $expenses->sum('amount'),
             'audited_count' => $expenses->where('audit_status', 'audited')->count(),
             'pending_audit' => $expenses->where('audit_status', 'pending')->count(),
         ];
 
-        return view('content.accounting.index', compact('revenue', 'expenses', 'invoices', 'totals', 'month', 'year', 'company'));
+        $isPublic = (bool) $token;
+
+        return view('content.accounting.index', [
+            'revenue' => $revenue,
+            'expenses' => $expenses,
+            'invoices' => $invoices,
+            'totals' => $totals,
+            'month' => $month,
+            'year' => $year,
+            'company' => $company,
+            'dreData' => $dreData,
+            'isPublic' => $isPublic,
+            'isMenu' => !$isPublic, // Oculta o menu se for público
+            'isNavbar' => true // Mantém a barra superior para mostrar o nome da oficina
+        ]);
     }
 
     public function importOfx(Request $request)

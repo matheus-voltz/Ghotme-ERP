@@ -71,6 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\Api\ApiNotificationController::class, 'index']);
     Route::post('/notifications/{id}/read', [\App\Http\Controllers\Api\ApiNotificationController::class, 'markAsRead']);
+    Route::get('/notifications/preferences', [\App\Http\Controllers\Api\ApiNotificationController::class, 'preferences']);
+    Route::post('/notifications/preferences', [\App\Http\Controllers\Api\ApiNotificationController::class, 'updatePreferences']);
 
     // Push Token
     Route::post('/user/push-token', [AuthController::class, 'updatePushToken']);
