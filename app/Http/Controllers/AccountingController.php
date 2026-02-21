@@ -164,6 +164,21 @@ class AccountingController extends Controller
         return back()->with('success', 'Auditoria realizada com sucesso!');
     }
 
+    public function updateTaxRegime(Request $request, $token)
+    {
+        $company = Company::where('accountant_token', $token)->firstOrFail();
+        
+        $request->validate([
+            'tax_regime' => 'required|string'
+        ]);
+
+        $company->update([
+            'tax_regime' => $request->tax_regime
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Regime tributário atualizado com sucesso!']);
+    }
+
     public function exportXml(Request $request)
     {
         $month = $request->get('month', date('m'));

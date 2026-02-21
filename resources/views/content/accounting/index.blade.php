@@ -48,10 +48,13 @@
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ofxImportModal">
                 <i class="ti tabler-file-import me-1"></i> {{ __('Import OFX') }}
             </button>
+            @endif
+            
             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#fiscalConfigModal">
                 <i class="ti tabler-settings me-1"></i> {{ __('Company data') }}
             </button>
-            @else
+
+            @if($isPublic)
             <a href="{{ route('login') }}" class="btn btn-label-secondary">
                 <i class="ti tabler-logout me-1"></i> {{ __('Exit Portal') }}
             </a>
@@ -191,25 +194,41 @@
 <!-- Modal Dados da Empresa (Fiscal) -->
 <div class="modal fade" id="fiscalConfigModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <form action="{{ route('settings.company-data.update') }}" method="POST" enctype="multipart/form-data" class="modal-content" id="formFiscalConfig">
+        <form action="{{ $isPublic ? route('accounting.public.update-regime', $company->accountant_token) : route('settings.company-data.update') }}" method="POST" enctype="multipart/form-data" class="modal-content" id="formFiscalConfig">
             @csrf
             <div class="modal-header border-bottom">
                 <h5 class="modal-title">{{ __('Company Fiscal Settings') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                @if($isPublic)
+                <div class="alert alert-info small mb-4">
+                    <i class="ti tabler-info-circle me-1"></i> {{ __('As an accountant, you can only update the tax regime.') }}
+                </div>
+                @endif
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label">{{ __('Corporate Name') }}</label>
-                        <input type="text" name="company_name" class="form-control" value="{{ $company->name }}" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ __('Trade Name') }}</label>
-                        <input type="text" name="trade_name" class="form-control" value="{{ $company->trade_name ?? '' }}">
+                        <input type="text" name="company_name" class="form-control" value="{{ $company->name }}" {{ $isPublic ? 'readonly' : 'required' }}>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">{{ __('CNPJ') }}</label>
-                        <input type="text" name="cnpj" class="form-control" value="{{ $company->document ?? '' }}" placeholder="00.000.000/0000-00">
+                        <input type="text" name="cnpj" class="form-control" value="{{ $company->document_number ?? '' }}" {{ $isPublic ? 'readonly' : '' }}>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold text-primary">{{ __('Tax Regime') }}</label>
+                        <select name="tax_regime" class="form-select border-primary" required>
+                            <option value="">{{ __('Select') }}...</option>
+                            <option value="Simples Nacional" {{ $company->tax_regime == 'Simples Nacional' ? 'selected' : '' }}>Simples Nacional</option>
+                            <option value="Lucro Presumido" {{ $company->tax_regime == 'Lucro Presumido' ? 'selected' : '' }}>Lucro Presumido</option>
+                            <option value="Lucro Real" {{ $company->tax_regime == 'Lucro Real' ? 'selected' : '' }}>Lucro Real</option>
+                            <option value="MEI" {{ $company->tax_regime == 'MEI' ? 'selected' : '' }}>MEI</option>
+                        </select>
+                    </div>
+                    @if(!$isPublic)
+                    <div class="col-md-6">
+                        <label class="form-label">{{ __('Trade Name') }}</label>
+                        <input type="text" name="trade_name" class="form-control" value="{{ $company->trade_name ?? '' }}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">{{ __('Contact Email') }}</label>
@@ -226,7 +245,9 @@
                             <input type="text" name="state" class="form-control" style="max-width: 80px;" value="{{ $company->state ?? '' }}" maxlength="2">
                         </div>
                     </div>
+                    @endif
                     <hr class="my-2">
+                    @if(!$isPublic)
                     <div class="col-12" id="accountantLinkContainer">
                         <label class="form-label text-primary fw-bold">{{ __('Direct Access Link for Accountant') }}</label>
                         @if($company->accountant_token)
@@ -239,6 +260,7 @@
                         <div class="alert alert-warning p-2 small mb-0">{{ __('Link not generated yet.') }}</div>
                         @endif
                     </div>
+                    @endif
                 </div>
             </div>
             <div class="modal-footer border-top d-flex justify-content-between">
@@ -303,15 +325,16 @@
 
     document.getElementById('formFiscalConfig').onsubmit = function(e) {
         e.preventDefault();
-        const submitBtn = this.querySelector('button[type="submit"]');
+        const form = this;
+        const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> {{ __("Saving...") }}';
 
-        const formData = new FormData(this);
+        const formData = new FormData(form);
         
-        fetch(this.action, {
+        fetch(form.getAttribute('action'), {
             method: 'POST',
             body: formData,
             headers: {

@@ -106,6 +106,7 @@ Route::get('/portal/os/{uuid}', [CustomerPortalController::class, 'showOrder'])-
 
 // Public Accountant Portal
 Route::get('/portal-contador/{token}', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.public');
+Route::post('/portal-contador/{token}/update-regime', [App\Http\Controllers\AccountingController::class, 'updateTaxRegime'])->name('accounting.public.update-regime');
 Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export-xml');
 Route::get('/accounting/export-pdf', [App\Http\Controllers\AccountingController::class, 'exportPdf'])->name('accounting.export-pdf');
 
