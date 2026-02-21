@@ -17,7 +17,7 @@ export default function ChecklistVisual() {
   const { user } = useAuth();
   const { osId } = useLocalSearchParams();
   const { colors } = useTheme();
-  const { labels } = useNiche();
+  const { labels, niche } = useNiche();
 
   const logoUrl = user?.company?.logo_url || (user?.company?.logo_path ? `${api.defaults.baseURL?.replace('/api', '')}/storage/${user?.company?.logo_path}` : null);
 
@@ -206,81 +206,120 @@ export default function ChecklistVisual() {
       </View>
 
       <View style={styles.carWrapper}>
-        <Svg width="300" height="600" viewBox="0 0 300 600">
-          {/* FRENTE */}
-          <G onPress={() => handlePartPress('Frente')}>
-            <Path d="M100,20 C120,10 180,10 200,20 L220,100 L80,100 Z"
-              fill={hasDamage('Frente') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+        {niche === 'automotive' && (
+          <Svg width="300" height="600" viewBox="0 0 300 600">
+            {/* FRENTE */}
+            <G onPress={() => handlePartPress('Frente')}>
+              <Path d="M100,20 C120,10 180,10 200,20 L220,100 L80,100 Z"
+                fill={hasDamage('Frente') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* CAPO */}
-          <G onPress={() => handlePartPress('Capô')}>
-            <Path d="M80,100 L220,100 L230,180 L70,180 Z"
-              fill={hasDamage('Capô') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* CAPO */}
+            <G onPress={() => handlePartPress('Capô')}>
+              <Path d="M80,100 L220,100 L230,180 L70,180 Z"
+                fill={hasDamage('Capô') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* PARA-BRISA */}
-          <G onPress={() => handlePartPress('Para-brisa')}>
-            <Path d="M75,185 L225,185 L235,220 L65,220 Z"
-              fill={hasDamage('Para-brisa') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* PARA-BRISA */}
+            <G onPress={() => handlePartPress('Para-brisa')}>
+              <Path d="M75,185 L225,185 L235,220 L65,220 Z"
+                fill={hasDamage('Para-brisa') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* TETO */}
-          <G onPress={() => handlePartPress('Teto')}>
-            <Rect x="70" y="225" width="160" height="200"
-              fill={hasDamage('Teto') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* TETO */}
+            <G onPress={() => handlePartPress('Teto')}>
+              <Rect x="70" y="225" width="160" height="200"
+                fill={hasDamage('Teto') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* PORTA ESQUERDA DIANTEIRA */}
-          <G onPress={() => handlePartPress('Porta Esq. Diant.')}>
-            <Path d="M50,225 L70,225 L70,325 L50,325 Z"
-              fill={hasDamage('Porta Esq. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* PORTAS DIANTEIRAS */}
+            <G onPress={() => handlePartPress('Porta Esq. Diant.')}>
+              <Path d="M50,225 L70,225 L70,325 L50,325 Z" fill={hasDamage('Porta Esq. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
+            <G onPress={() => handlePartPress('Porta Dir. Diant.')}>
+              <Path d="M230,225 L250,225 L250,325 L230,325 Z" fill={hasDamage('Porta Dir. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* PORTA DIREITA DIANTEIRA */}
-          <G onPress={() => handlePartPress('Porta Dir. Diant.')}>
-            <Path d="M230,225 L250,225 L250,325 L230,325 Z"
-              fill={hasDamage('Porta Dir. Diant.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* PORTAS TRASEIRAS */}
+            <G onPress={() => handlePartPress('Porta Esq. Tras.')}>
+              <Path d="M50,325 L70,325 L70,425 L50,425 Z" fill={hasDamage('Porta Esq. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
+            <G onPress={() => handlePartPress('Porta Dir. Tras.')}>
+              <Path d="M230,325 L250,325 L250,425 L230,425 Z" fill={hasDamage('Porta Dir. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* PORTA ESQUERDA TRASEIRA */}
-          <G onPress={() => handlePartPress('Porta Esq. Tras.')}>
-            <Path d="M50,325 L70,325 L70,425 L50,425 Z"
-              fill={hasDamage('Porta Esq. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* VIDRO TRASEIRO */}
+            <G onPress={() => handlePartPress('Vidro Traseiro')}>
+              <Path d="M75,430 L225,430 L235,480 L65,480 Z" fill={hasDamage('Vidro Traseiro') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* PORTA DIREITA TRASEIRA */}
-          <G onPress={() => handlePartPress('Porta Dir. Tras.')}>
-            <Path d="M230,325 L250,325 L250,425 L230,425 Z"
-              fill={hasDamage('Porta Dir. Tras.') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* PORTA MALAS */}
+            <G onPress={() => handlePartPress('Porta Malas')}>
+              <Path d="M60,480 L240,480 L250,510 C250,530 200,545 150,545 C100,545 50,530 50,510 L60,480" fill={hasDamage('Porta Malas') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
+            </G>
 
-          {/* VIDRO TRASEIRO */}
-          <G onPress={() => handlePartPress('Vidro Traseiro')}>
-            <Path d="M75,430 L225,430 L235,480 L65,480 Z"
-              fill={hasDamage('Vidro Traseiro') ? "#EA5455" : "#dbeafe"} stroke="#333" strokeWidth="1.5" />
-          </G>
+            {/* RODAS */}
+            <G onPress={() => handlePartPress('Roda Diant. Esq.')}><Rect x="30" y="130" width="20" height="40" rx="5" fill={hasDamage('Roda Diant. Esq.') ? "red" : "#333"} /></G>
+            <G onPress={() => handlePartPress('Roda Diant. Dir.')}><Rect x="250" y="130" width="20" height="40" rx="5" fill={hasDamage('Roda Diant. Dir.') ? "red" : "#333"} /></G>
+            <G onPress={() => handlePartPress('Roda Tras. Esq.')}><Rect x="30" y="430" width="20" height="40" rx="5" fill={hasDamage('Roda Tras. Esq.') ? "red" : "#333"} /></G>
+            <G onPress={() => handlePartPress('Roda Tras. Dir.')}><Rect x="250" y="430" width="20" height="40" rx="5" fill={hasDamage('Roda Tras. Dir.') ? "red" : "#333"} /></G>
+          </Svg>
+        )}
 
-          {/* PORTA MALAS */}
-          <G onPress={() => handlePartPress('Porta Malas')}>
-            <Path d="M60,480 L240,480 L250,510 C250,530 200,545 150,545 C100,545 50,530 50,510 L60,480"
-              fill={hasDamage('Porta Malas') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="1.5" />
-          </G>
+        {niche === 'electronics' && (
+          <Svg width="200" height="400" viewBox="0 0 200 400">
+            {/* CARCAÇA CELULAR/TABLET */}
+            <G onPress={() => handlePartPress('Carcaça/Traseira')}>
+              <Rect x="20" y="20" width="160" height="360" rx="20" fill={hasDamage('Carcaça/Traseira') ? "#EA5455" : "#eee"} stroke="#333" strokeWidth="2" />
+            </G>
+            {/* TELA INTERNA */}
+            <G onPress={() => handlePartPress('Tela/Display')}>
+              <Rect x="30" y="40" width="140" height="320" rx="10" fill={hasDamage('Tela/Display') ? "#EA5455" : "#fff"} stroke="#333" strokeWidth="1.5" />
+            </G>
+            {/* CAMERA DIANTEIRA */}
+            <G onPress={() => handlePartPress('Câmera Dianteira/Sensores')}>
+              <Rect x="85" y="25" width="30" height="8" rx="4" fill={hasDamage('Câmera Dianteira/Sensores') ? "red" : "#333"} />
+            </G>
+            {/* BOTOES LATERAL */}
+            <G onPress={() => handlePartPress('Botões Laterais')}>
+              <Rect x="180" y="100" width="5" height="40" rx="2" fill={hasDamage('Botões Laterais') ? "red" : "#888"} />
+              <Rect x="180" y="150" width="5" height="60" rx="2" fill={hasDamage('Botões Laterais') ? "red" : "#888"} />
+            </G>
+            {/* CONECTOR CARGA */}
+            <G onPress={() => handlePartPress('Conector de Carga / P2')}>
+              <Rect x="85" y="375" width="30" height="5" rx="2" fill={hasDamage('Conector de Carga / P2') ? "red" : "#333"} />
+            </G>
+          </Svg>
+        )}
 
-          {/* RODAS */}
-          <G onPress={() => handlePartPress('Roda Diant. Esq.')}>
-            <Rect x="30" y="130" width="20" height="40" rx="5" fill={hasDamage('Roda Diant. Esq.') ? "red" : "#333"} />
-          </G>
-          <G onPress={() => handlePartPress('Roda Diant. Dir.')}>
-            <Rect x="250" y="130" width="20" height="40" rx="5" fill={hasDamage('Roda Diant. Dir.') ? "red" : "#333"} />
-          </G>
-          <G onPress={() => handlePartPress('Roda Tras. Esq.')}>
-            <Rect x="30" y="430" width="20" height="40" rx="5" fill={hasDamage('Roda Tras. Esq.') ? "red" : "#333"} />
-          </G>
-          <G onPress={() => handlePartPress('Roda Tras. Dir.')}>
-            <Rect x="250" y="430" width="20" height="40" rx="5" fill={hasDamage('Roda Tras. Dir.') ? "red" : "#333"} />
-          </G>
-        </Svg>
+        {niche === 'pet' && (
+          <Svg width="300" height="300" viewBox="0 0 300 300">
+            {/* CORPO */}
+            <G onPress={() => handlePartPress('Dorso/Corpo/Pele')}>
+              <Rect x="80" y="100" width="140" height="80" rx="40" fill={hasDamage('Dorso/Corpo/Pele') ? "#EA5455" : "#f3e8e0"} stroke="#333" strokeWidth="2" />
+            </G>
+            {/* CABEÇA */}
+            <G onPress={() => handlePartPress('Cabeça/Focinho/Ouvido')}>
+              <Rect x="40" y="50" width="70" height="70" rx="35" fill={hasDamage('Cabeça/Focinho/Ouvido') ? "#EA5455" : "#f3e8e0"} stroke="#333" strokeWidth="2" />
+              <Rect x="30" y="60" width="15" height="35" rx="7" fill={hasDamage('Cabeça/Focinho/Ouvido') ? "#EA5455" : "#e0cfc1"} stroke="#333" strokeWidth="1" />
+            </G>
+            {/* PATAS DIANTEIRAS */}
+            <G onPress={() => handlePartPress('Patas Dianteiras/Unhas')}>
+              <Rect x="90" y="160" width="20" height="80" rx="10" fill={hasDamage('Patas Dianteiras/Unhas') ? "#EA5455" : "#e3d8d0"} stroke="#333" strokeWidth="1.5" />
+              <Rect x="120" y="150" width="20" height="80" rx="10" fill={hasDamage('Patas Dianteiras/Unhas') ? "#EA5455" : "#e3d8d0"} stroke="#333" strokeWidth="1.5" />
+            </G>
+            {/* PATAS TRASEIRAS */}
+            <G onPress={() => handlePartPress('Patas Traseiras')}>
+              <Rect x="160" y="160" width="20" height="80" rx="10" fill={hasDamage('Patas Traseiras') ? "#EA5455" : "#e3d8d0"} stroke="#333" strokeWidth="1.5" />
+              <Rect x="190" y="150" width="20" height="80" rx="10" fill={hasDamage('Patas Traseiras') ? "#EA5455" : "#e3d8d0"} stroke="#333" strokeWidth="1.5" />
+            </G>
+            {/* CAUDA */}
+            <G onPress={() => handlePartPress('Cauda/Traseira')}>
+              <Path d="M210,120 Q260,90 280,110 Q270,130 220,130 Z" fill={hasDamage('Cauda/Traseira') ? "#EA5455" : "#f3e8e0"} stroke="#333" strokeWidth="1.5" />
+            </G>
+          </Svg>
+        )}
+
       </View>
 
       <View style={styles.listContainer}>

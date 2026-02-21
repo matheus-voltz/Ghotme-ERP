@@ -1101,10 +1101,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-padrao-mensal"
-                  data-monthly-link="https://www.asaas.com/c/plano-padrao-mensal"
-                  data-yearly-link="https://www.asaas.com/c/plano-padrao-anual"
-                  target="_blank" class="btn btn-primary plan-action-btn">{{ __('Subscribe Now') }}</a>
+                <a href="{{ url('/register?plan=standard') }}"
+                  data-monthly-link="{{ url('/register?plan=standard') }}"
+                  data-yearly-link="{{ url('/register?plan=standard_yearly') }}"
+                  class="btn btn-primary plan-action-btn">{{ __('Subscribe Now') }}</a>
               </div>
             </div>
           </div>
@@ -1173,10 +1173,10 @@ $pageConfigs = [
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="https://www.asaas.com/c/plano-enterprise-mensal"
-                  data-monthly-link="https://www.asaas.com/c/plano-enterprise-mensal"
-                  data-yearly-link="https://www.asaas.com/c/plano-enterprise-anual"
-                  target="_blank" class="btn btn-label-primary plan-action-btn">{{ __('Subscribe Now') }}</a>
+                <a href="{{ url('/register?plan=enterprise') }}"
+                  data-monthly-link="{{ url('/register?plan=enterprise') }}"
+                  data-yearly-link="{{ url('/register?plan=enterprise_yearly') }}"
+                  class="btn btn-primary plan-action-btn">{{ __('Subscribe Now') }}</a>
               </div>
             </div>
           </div>
