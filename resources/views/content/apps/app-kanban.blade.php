@@ -93,8 +93,9 @@
               </select>
             </div>
             <div class="mb-5">
-              <label class="form-label">Atribuído a</label>
-              <div class="assigned d-flex flex-wrap"></div>
+              <label class="form-label" for="select2-users">Atribuído a</label>
+              <select class="select2 select2-users form-select" id="select2-users" multiple>
+              </select>
             </div>
             <div class="mb-5">
               <label class="form-label" for="attachments">Anexos</label>
@@ -127,117 +128,8 @@
         </div>
         <!-- Activities -->
         <div class="tab-pane fade text-heading" id="tab-activity" role="tabpanel">
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-success rounded-circle">HJ</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Jordan</span> Saiu do quadro.</p>
-              <small class="text-body-secondary">Hoje 11:00 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Dianna</span> mencionou <span class="text-primary">@bruce</span> em um comentário.</p>
-              <small class="text-body-secondary">Hoje 10:20 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/2.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Martian</span> moveu tarefa Gráficos & Mapas para o quadro feito.</p>
-              <small class="text-body-secondary">Hoje 10:00 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Barry</span> Comentou na tarefa de revisão do App.</p>
-              <small class="text-body-secondary">Hoje 8:32 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-dark rounded-circle">BW</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Bruce</span> foi designado para revisão de código.</p>
-              <small class="text-body-secondary">Hoje 8:30 PM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-danger rounded-circle">CK</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0">
-                <span>Clark</span> designou tarefa UX Research para
-                <span class="text-primary">@martian</span>
-              </p>
-              <small class="text-body-secondary">Hoje 8:00 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/4.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Ray</span> Moveu tarefa <span>Formulários & Tabelas</span> de em progresso para feito.
-              </p>
-              <small class="text-body-secondary">Hoje 7:45 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/1.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Barry</span> Completou todas as tarefas.</p>
-              <small class="text-body-secondary">Hoje 7:17 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-success rounded-circle">HJ</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Jordan</span> adicionou tarefa para atualizar imagens.</p>
-              <small class="text-body-secondary">Hoje 7:00 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <img src="{{ asset('assets/img/avatars/6.png') }}" alt="Avatar" class="rounded-circle" />
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Dianna</span> moveu tarefa <span>FAQ UX</span> de em progresso para feito.</p>
-              <small class="text-body-secondary">Hoje 7:00 AM</small>
-            </div>
-          </div>
-          <div class="media mb-4 d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-danger rounded-circle">CK</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Clark</span> adicionou novo quadro chamado <span>Feito</span>.</p>
-              <small class="text-body-secondary">Ontem 3:00 PM</small>
-            </div>
-          </div>
-          <div class="media d-flex align-items-center">
-            <div class="avatar me-3 flex-shrink-0">
-              <span class="avatar-initial bg-label-dark rounded-circle">BW</span>
-            </div>
-            <div class="media-body">
-              <p class="mb-0"><span>Bruce</span> adicionou nova tarefa em progresso.</p>
-              <small class="text-body-secondary">Ontem 12:00 PM</small>
-            </div>
+          <div class="activities-container">
+            <!-- Atividades serão carregadas aqui via JS -->
           </div>
         </div>
       </div>

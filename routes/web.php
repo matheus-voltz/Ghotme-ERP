@@ -349,6 +349,8 @@ Route::middleware([
     Route::get('/calendar', [App\Http\Controllers\CalendarController::class, 'index'])->name('calendar');
     Route::get('/kanban', [App\Http\Controllers\KanbanController::class, 'index'])->name('kanban');
     Route::get('/kanban/data', [App\Http\Controllers\KanbanController::class, 'fetch'])->name('kanban.fetch');
+    Route::get('/kanban/users', [App\Http\Controllers\KanbanController::class, 'getUsers'])->name('kanban.users');
+    Route::get('/kanban/item/{id}/activities', [App\Http\Controllers\KanbanController::class, 'fetchActivities'])->name('kanban.activities');
     Route::post('/kanban/add-board', [App\Http\Controllers\KanbanController::class, 'addBoard'])->name('kanban.add-board');
     Route::post('/kanban/add-item', [App\Http\Controllers\KanbanController::class, 'addItem'])->name('kanban.add-item');
     Route::post('/kanban/move-item', [App\Http\Controllers\KanbanController::class, 'moveItem'])->name('kanban.move-item');

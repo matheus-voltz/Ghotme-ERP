@@ -4,7 +4,7 @@
 
 'use strict';
 
-(async function () {
+document.addEventListener('DOMContentLoaded', async function () {
   let boards;
   const kanbanSidebar = document.querySelector('.kanban-update-item-sidebar'),
     kanbanWrapper = document.querySelector('.kanban-wrapper'),
@@ -15,6 +15,17 @@
     datePicker = document.querySelector('#due-date'),
     select2 = $('.select2'), // ! Using jquery vars due to select2 jQuery dependency
     assetsPath = document.querySelector('html').getAttribute('data-assets-path');
+
+  let allUsers = [];
+
+  // Fetch company users
+  const usersResponse = await fetch('/kanban/users');
+  if (usersResponse.ok) {
+    allUsers = await usersResponse.json();
+    console.log('Kanban Users Loaded:', allUsers);
+  } else {
+    console.error('Failed to fetch Kanban users:', usersResponse.status);
+  }
 
   // Init kanban Offcanvas
   const kanbanOffcanvas = new bootstrap.Offcanvas(kanbanSidebar);
@@ -49,13 +60,37 @@
       return $badge;
     }
 
+    function renderUsers(option) {
+      if (!option.id) {
+        return option.text;
+      }
+      var avatar = $(option.element).attr('data-avatar') || '';
+      var $user =
+        '<div class="d-flex align-items-center">' +
+        '<div class="avatar avatar-xs me-2">' +
+        '<img src="' + (avatar || assetsPath + 'img/avatars/1.png') + '" alt="Avatar" class="rounded-circle">' +
+        '</div>' +
+        '<span>' + option.text + '</span>' +
+        '</div>';
+      return $user;
+    }
+
+    // Populate Users Select
+    const userSelect = $('.select2-users');
+    if (userSelect.length) {
+      allUsers.forEach(user => {
+        const option = `<option value="${user.id}" data-avatar="${user.avatar}">${user.name}</option>`;
+        userSelect.append(option);
+      });
+    }
+
     select2.each(function () {
       var $this = $(this);
       $this.wrap("<div class='position-relative'></div>").select2({
-        placeholder: 'Select Label',
+        placeholder: 'Selecionar',
         dropdownParent: $this.parent(),
-        templateResult: renderLabels,
-        templateSelection: renderLabels,
+        templateResult: $this.hasClass('select2-users') ? renderUsers : renderLabels,
+        templateSelection: $this.hasClass('select2-users') ? renderUsers : renderLabels,
         escapeMarkup: function (es) {
           return es;
         }
@@ -64,12 +99,13 @@
   }
 
   // Comment editor
+  let quillEditor;
   if (commentEditor) {
-    new Quill(commentEditor, {
+    quillEditor = new Quill(commentEditor, {
       modules: {
         toolbar: '.comment-toolbar'
       },
-      placeholder: 'Write a Comment...',
+      placeholder: 'Escreva um comentário...',
       theme: 'snow'
     });
   }
@@ -127,30 +163,71 @@
 `;
 
   // Render avatar
-  const renderAvatar = (images = '', pullUp = false, size = '', margin = '', members = '') => {
+  const renderAvatar = (images = [], pullUp = false, size = '', margin = '', members = []) => {
     const transitionClass = pullUp ? ' pull-up' : '';
     const sizeClass = size ? `avatar-${size}` : '';
-    const memberList = members ? members.split(',') : [];
+    const memberList = Array.isArray(members) ? members : (members ? members.split(',') : []);
+    const imgList = Array.isArray(images) ? images : (images ? images.split(',') : []);
 
-    return images
-      ? images
-          .split(',')
-          .map((img, index, arr) => {
-            const marginClass = margin && index !== arr.length - 1 ? ` me-${margin}` : '';
-            const memberName = memberList[index] || '';
-            return `
+    return imgList.length > 0
+      ? imgList
+        .map((img, index, arr) => {
+          const marginClass = margin && index !== arr.length - 1 ? ` me-${margin}` : '';
+          const memberName = memberList[index] || '';
+          let imgSrc = img;
+          if (!img.startsWith('http') && !img.startsWith('/') && !img.startsWith('data:')) {
+            imgSrc = assetsPath + 'img/avatars/' + img;
+          }
+          return `
             <div class="avatar ${sizeClass}${marginClass} w-px-26 h-px-26"
                  data-bs-toggle="tooltip"
                  data-bs-placement="top"
                  title="${memberName}">
-                <img src="${assetsPath}img/avatars/${img}"
+                <img src="${imgSrc}"
                      alt="Avatar"
                      class="rounded-circle${transitionClass}">
             </div>
         `;
-          })
-          .join('')
+        })
+        .join('')
       : '';
+  };
+
+  // Load and Render Activities
+  const loadActivities = async (itemId) => {
+    const container = document.querySelector('.activities-container');
+    if (!container) return;
+
+    container.innerHTML = '<div class="text-center p-4"><span class="spinner-border spinner-border-sm text-primary" role="status"></span></div>';
+
+    console.log('Fetching activities for Item ID:', itemId);
+    try {
+      const response = await fetch(`/kanban/item/${itemId}/activities`);
+      if (!response.ok) throw new Error('Falha ao carregar histórico');
+
+      const activities = await response.json();
+
+      if (activities.length === 0) {
+        container.innerHTML = '<div class="text-center p-4 text-muted">Nenhuma atividade registrada ainda.</div>';
+        return;
+      }
+
+      container.innerHTML = activities.map(activity => `
+        <div class="media mb-4 d-flex align-items-center">
+          <div class="avatar me-3 flex-shrink-0">
+            <img src="${activity.user_avatar}" alt="Avatar" class="rounded-circle" />
+          </div>
+          <div class="media-body">
+            <p class="mb-0"><span>${activity.user_name}</span> ${activity.description}</p>
+            <small class="text-body-secondary">${activity.time_ago}</small>
+          </div>
+        </div>
+      `).join('');
+
+    } catch (error) {
+      console.error(error);
+      container.innerHTML = '<div class="text-center p-4 text-danger">Erro ao carregar histórico.</div>';
+    }
   };
 
   // Render footer
@@ -178,7 +255,14 @@
     gutter: '12px',
     widthBoard: '250px',
     dragItems: true,
-    boards: boards,
+    boards: boards.map(board => {
+      board.item = board.item.map(item => {
+        // Store assigned_ids in a data attribute for easier access
+        item['assigned-ids'] = item.assigned_ids ? item.assigned_ids.join(',') : '';
+        return item;
+      });
+      return board;
+    }),
     dragBoards: true,
     addItemButton: true,
     buttonContent: '+ Add Item',
@@ -204,39 +288,38 @@
       // Populate sidebar fields
       kanbanSidebar.querySelector('#title').value = title;
       if (date && kanbanSidebar.querySelector('#due-date')._flatpickr) {
-          kanbanSidebar.querySelector('#due-date')._flatpickr.setDate(date);
+        kanbanSidebar.querySelector('#due-date')._flatpickr.setDate(date);
       } else {
-          kanbanSidebar.querySelector('#due-date').value = date || '';
+        kanbanSidebar.querySelector('#due-date').value = date || '';
       }
 
       // Using jQuery for select2
-      $('.kanban-update-item-sidebar').find(select2).val(label).trigger('change');
+      $('.kanban-update-item-sidebar').find('#label').val(label).trigger('change');
 
-      // Remove and update assigned avatars
-      kanbanSidebar.querySelector('.assigned').innerHTML = '';
-      kanbanSidebar.querySelector('.assigned').insertAdjacentHTML(
-        'afterbegin',
-        `${renderAvatar(avatars, false, 'xs', '1', el.getAttribute('data-members'))}
-        <div class="avatar avatar-xs ms-1">
-            <span class="avatar-initial rounded-circle bg-label-secondary">
-                <i class="icon-base ti tabler-plus icon-xs text-heading"></i>
-            </span>
-        </div>`
-      );
+      // Populate assigned users in Select2
+      const assignedIds = element.getAttribute('data-assigned-ids');
+      if (assignedIds) {
+        $('#select2-users').val(assignedIds.split(',')).trigger('change');
+      } else {
+        $('#select2-users').val(null).trigger('change');
+      }
+
+      // Load activities
+      loadActivities(currentItemId);
     },
 
     dropEl: (el, target, source, sibling) => {
-        const itemId = el.getAttribute('data-eid');
-        const targetBoardId = target.closest('.kanban-board').getAttribute('data-id');
+      const itemId = el.getAttribute('data-eid');
+      const targetBoardId = target.closest('.kanban-board').getAttribute('data-id');
 
-        fetch('/kanban/move-item', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ itemId: itemId, targetBoardId: targetBoardId })
-        })
+      fetch('/kanban/move-item', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ itemId: itemId, targetBoardId: targetBoardId })
+      })
         .then(response => response.json())
         .catch(error => console.error('Error moving item:', error));
     },
@@ -263,15 +346,15 @@
 
         // API Call
         fetch('/kanban/add-item', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify({ boardId: boardId, title: titleText })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({ boardId: boardId, title: titleText })
         })
-        .then(response => response.json())
-        .then(data => {
+          .then(response => response.json())
+          .then(data => {
             kanban.addElement(boardId, {
               title: `<span class="kanban-text">${titleText}</span>`,
               id: data.id // Use ID from database
@@ -283,7 +366,7 @@
             );
             kanbanTextElements.forEach(textElem => {
               if (!textElem.previousElementSibling || !textElem.previousElementSibling.classList.contains('kanban-tasks-item-dropdown')) {
-                  textElem.insertAdjacentHTML('beforebegin', renderDropdown());
+                textElem.insertAdjacentHTML('beforebegin', renderDropdown());
               }
             });
 
@@ -305,7 +388,7 @@
             });
 
             addNewForm.remove();
-        });
+          });
       });
 
       // Remove form on clicking cancel button
@@ -321,51 +404,57 @@
   // Sidebar Update Button Logic
   const updateItemBtn = document.querySelector('.kanban-update-item-sidebar .btn-primary');
   if (updateItemBtn) {
-      updateItemBtn.addEventListener('click', () => {
-          const title = document.querySelector('#title').value;
-          const dueDate = document.querySelector('#due-date').value;
-          const label = $('#label').val();
-          const badgeColor = $('#label option:selected').data('color')?.replace('bg-label-', '') || 'success';
+    updateItemBtn.addEventListener('click', () => {
+      const title = document.querySelector('#title').value;
+      const dueDate = document.querySelector('#due-date').value;
+      const label = $('#label').val();
+      const badgeColor = $('#label option:selected').data('color')?.replace('bg-label-', '') || 'success';
+      const assignedTo = $('#select2-users').val(); // Array de IDs
+      const comment = quillEditor ? quillEditor.root.innerHTML : '';
+      const isCommentEmpty = quillEditor ? (quillEditor.getText().trim().length === 0) : true;
 
-          fetch('/kanban/update-item/' + currentItemId, {
-              method: 'PUT',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-              },
-              body: JSON.stringify({
-                  title: title,
-                  dueDate: dueDate,
-                  badgeText: label,
-                  badgeColor: badgeColor
-              })
-          })
-          .then(response => response.json())
-          .then(data => {
-              location.reload(); 
-          })
-          .catch(error => console.error('Error updating item:', error));
-      });
+      fetch('/kanban/update-item/' + currentItemId, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          title: title,
+          dueDate: dueDate,
+          badgeText: label,
+          badgeColor: badgeColor,
+          assignedTo: assignedTo,
+          comment: isCommentEmpty ? null : comment
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (quillEditor) quillEditor.setContents([]); // Clear editor
+          location.reload();
+        })
+        .catch(error => console.error('Error updating item:', error));
+    });
   }
 
   // Sidebar Delete Button Logic
   const deleteItemBtn = document.querySelector('.kanban-update-item-sidebar .btn-label-danger');
   if (deleteItemBtn) {
-      deleteItemBtn.addEventListener('click', () => {
-          if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
-              fetch('/kanban/delete-item/' + currentItemId, {
-                  method: 'DELETE',
-                  headers: {
-                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                  }
-              })
-              .then(response => {
-                  kanban.removeElement(currentItemId);
-                  kanbanOffcanvas.hide();
-              })
-              .catch(error => console.error('Error deleting item:', error));
+    deleteItemBtn.addEventListener('click', () => {
+      if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
+        fetch('/kanban/delete-item/' + currentItemId, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           }
-      });
+        })
+          .then(response => {
+            kanban.removeElement(currentItemId);
+            kanbanOffcanvas.hide();
+          })
+          .catch(error => console.error('Error deleting item:', error));
+      }
+    });
   }
 
   const kanbanContainer = document.querySelector('.kanban-container');
@@ -400,8 +489,8 @@
           renderFooter(
             el.getAttribute('data-attachments') || 0,
             el.getAttribute('data-comments') || 0,
-            el.getAttribute('data-assigned') || '',
-            el.getAttribute('data-members') || ''
+            el.getAttribute('data-assigned') ? el.getAttribute('data-assigned').split(',') : [],
+            el.getAttribute('data-members') ? el.getAttribute('data-members').split(',') : []
           )
         );
       }
@@ -484,24 +573,24 @@
     kanbanAddNewBoard.addEventListener('submit', e => {
       e.preventDefault();
       const value = e.target.querySelector('.form-control').value.trim();
-      
+
       // API Call
       fetch('/kanban/add-board', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
         body: JSON.stringify({ title: value })
       })
-      .then(response => response.json())
-      .then(data => {
+        .then(response => response.json())
+        .then(data => {
           const id = data.id;
           const title = data.title;
           kanban.addBoards([{ id, title }]);
-          
+
           // ... rest of the UI logic ...
-          
+
           // Add delete board option to new board and make title editable
           const newBoard = document.querySelector('.kanban-board:last-child');
           if (newBoard) {
@@ -522,7 +611,7 @@
               });
             }
           }
-      });
+        });
 
       // Hide input fields
       kanbanAddNewInput.forEach(el => {
@@ -551,4 +640,4 @@
       });
     });
   }
-})();
+});

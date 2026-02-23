@@ -32,4 +32,9 @@ class KanbanItem extends Model
     {
         return $this->belongsTo(KanbanBoard::class, 'kanban_board_id');
     }
+
+    public function activities()
+    {
+        return $this->hasMany(KanbanActivity::class, 'kanban_item_id')->orderBy('created_at', 'desc');
+    }
 }
