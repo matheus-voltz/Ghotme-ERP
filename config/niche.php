@@ -10,7 +10,7 @@ return [
     | Changing the 'current' value will update labels, validation rules,
     | and features across the system.
     |
-    | Supported niches: 'automotive', 'pet', 'clinic', 'electronics'
+    | Supported niches: 'automotive', 'pet', 'beauty_clinic', 'electronics', 'construction'
     |
     */
 

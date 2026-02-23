@@ -108,7 +108,7 @@
 @endsection
 
 @php
-$niche = auth()->user()->niche ?? 'workshop';
+$niche = auth()->user()->niche ?? 'automotive';
 $itemTerm = 'Veículo';
 $itemIcon = 'ti tabler-car';
 $identifierLabel = 'Placa';

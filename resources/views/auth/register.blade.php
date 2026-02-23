@@ -151,9 +151,11 @@ $customizerHidden = 'customizer-hide';
             <select class="form-select @error('niche') is-invalid @enderror" id="niche" name="niche">
               <option value="" disabled {{ old('niche') ? '' : 'selected' }}>Selecione o seu segmento</option>
               @foreach(config('niche.niches') as $key => $niche)
-                <option value="{{ $key }}" {{ old('niche') == $key ? 'selected' : '' }}>
-                   {{ $niche['labels']['entities'] ?? ucfirst($key) }}
-                </option>
+              @if($key !== 'workshop')
+              <option value="{{ $key }}" {{ old('niche') == $key ? 'selected' : '' }}>
+                {{ $niche['labels']['entities'] ?? ucfirst($key) }}
+              </option>
+              @endif
               @endforeach
             </select>
             @error('niche')
