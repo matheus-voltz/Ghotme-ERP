@@ -40,7 +40,7 @@
     </button>
   </div>
   <div class="card-datatable table-responsive">
-    <table class="datatables-clients table border-top">
+    <table class="datatables-clients table border-top" data-entities="{{ niche('entities') }}">
       <thead>
         <tr>
           <th></th>

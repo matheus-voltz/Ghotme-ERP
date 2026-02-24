@@ -99,9 +99,10 @@
                     switch($order->status) {
                         case 'pending': $statusClass = 'bg-label-secondary'; $statusText = 'Pendente'; break;
                         case 'approved': $statusClass = 'bg-label-success'; $statusText = 'Aprovado'; break;
-                        case 'in_progress': $statusClass = 'bg-label-primary'; $statusText = 'Em Andamento'; break;
+                        case 'in_progress': $statusClass = 'bg-label-primary'; $statusText = 'Em Execução'; break;
                         case 'testing': $statusClass = 'bg-label-info'; $statusText = 'Em Teste'; break;
                         case 'cleaning': $statusClass = 'bg-label-warning'; $statusText = (niche('current') == 'pet' ? 'Banho/Tosa' : 'Limpeza'); break;
+                        case 'canceled': $statusClass = 'bg-label-danger'; $statusText = 'Cancelada'; break;
                     }
                     @endphp
                     <span class="badge {{ $statusClass }} px-3 py-2 rounded-pill">{{ $statusText }}</span>

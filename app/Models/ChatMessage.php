@@ -11,12 +11,18 @@ class ChatMessage extends Model
 
     protected $fillable = [
         'company_id',
+        'client_id',
         'sender_id',
         'receiver_id',
         'message',
         'is_read',
         'attachment_path',
     ];
+
+    public function client()
+    {
+        return $this->belongsTo(Clients::class, 'client_id');
+    }
 
     public function sender()
     {

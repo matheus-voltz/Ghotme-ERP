@@ -22,7 +22,8 @@ class NavbarChatBadge extends Component
     public function updateCount()
     {
         if (Auth::check()) {
-            $this->unreadCount = ChatMessage::where('receiver_id', Auth::id())
+            $this->unreadCount = ChatMessage::withoutGlobalScopes()
+                ->where('receiver_id', Auth::id())
                 ->where('is_read', false)
                 ->count();
         }

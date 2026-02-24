@@ -31,7 +31,7 @@ class OrdemServicoController extends Controller
 
     public function dataBase(Request $request)
     {
-        $query = OrdemServico::with(['client', 'veiculo']);
+        $query = OrdemServico::with(['client', 'veiculo', 'user']);
 
         if (Auth::user()->role !== 'admin') {
             $query->where('user_id', Auth::id());

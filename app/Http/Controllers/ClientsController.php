@@ -316,19 +316,23 @@ class ClientsController extends Controller
 
         $html .= '</div>';
 
-        // Seção de Veículos
-        $html .= '<h6 class="px-3 mb-2 mt-4"><i class="ti tabler-car me-1"></i> Veículos Cadastrados</h6>';
+        // Seção Dinâmica (Veículos/Pets/etc)
+        $entitiesLabel = niche('entities');
+        $entityIcon = niche_icon('entity');
+        $identifierLabel = niche('identifier');
+
+        $html .= '<h6 class="px-3 mb-2 mt-4"><i class="ti ' . $entityIcon . ' me-1"></i> ' . $entitiesLabel . ' Cadastrados</h6>';
         if ($client->vehicles->count() > 0) {
             $html .= '<div class="table-responsive px-3">
                         <table class="table table-sm table-bordered">
-                            <thead class="table-light"><tr><th>Placa</th><th>Marca/Modelo</th></tr></thead>
+                            <thead class="table-light"><tr><th>' . $identifierLabel . '</th><th>Marca/Modelo</th></tr></thead>
                             <tbody>';
             foreach ($client->vehicles as $v) {
                 $html .= '<tr><td><strong>' . $v->placa . '</strong></td><td>' . $v->marca . ' ' . $v->modelo . '</td></tr>';
             }
             $html .= '</tbody></table></div>';
         } else {
-            $html .= '<p class="px-3 text-muted small">Nenhum veículo vinculado.</p>';
+            $html .= '<p class="px-3 text-muted small">Nenhum(a) ' . strtolower(niche('entity')) . ' vinculado(a).</p>';
         }
 
         return response($html);

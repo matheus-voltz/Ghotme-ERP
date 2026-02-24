@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PrintTemplate;
 
+use Illuminate\Support\Facades\Auth;
+
 class PrintTemplateController extends Controller
 {
     public function index()
     {
-        $templates = PrintTemplate::all();
+        $companyId = Auth::user()->company_id;
+        $templates = PrintTemplate::where('company_id', $companyId)->get();
         
-        // Se não houver templates, cria o padrão para OS
+        // Se não houver templates para esta empresa, cria o padrão
         if ($templates->isEmpty()) {
-            $this->seedDefaults();
-            $templates = PrintTemplate::all();
+            $this->seedDefaults($companyId);
+            $templates = PrintTemplate::where('company_id', $companyId)->get();
         }
 
         return view('content.settings.print-templates.index', compact('templates'));
@@ -22,15 +25,16 @@ class PrintTemplateController extends Controller
 
     public function edit($id)
     {
-        $template = PrintTemplate::findOrFail($id);
+        $template = PrintTemplate::where('company_id', Auth::user()->company_id)->findOrFail($id);
         return view('content.settings.print-templates.edit', compact('template'));
     }
 
     public function update(Request $request, $id)
     {
-        $template = PrintTemplate::findOrFail($id);
+        $template = PrintTemplate::where('company_id', Auth::user()->company_id)->findOrFail($id);
         
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'content' => 'required|string',
             'css' => 'nullable|string',
         ]);
@@ -40,9 +44,13 @@ class PrintTemplateController extends Controller
         return response()->json(['success' => true, 'message' => 'Modelo de impressão atualizado!']);
     }
 
-    private function seedDefaults()
+    private function seedDefaults($companyId)
     {
+        $entityLabel = niche('entity');
+        $workshopLabel = (get_current_niche() === 'construction') ? 'Canteiro' : 'Empresa';
+
         PrintTemplate::create([
+            'company_id' => $companyId,
             'name' => 'Ordem de Serviço Padrão',
             'slug' => 'os',
             'content' => '
@@ -72,16 +80,16 @@ class PrintTemplateController extends Controller
     </section>
 
     <section class="section">
-        <h3>Veículo</h3>
+        <h3>' . $entityLabel . '</h3>
         <div class="grid">
             <div><strong>Modelo:</strong> {{vehicle_model}} ({{vehicle_brand}})</div>
-            <div><strong>Placa:</strong> {{vehicle_plate}}</div>
-            <div><strong>KM:</strong> {{vehicle_km}}</div>
+            <div><strong>Identificador:</strong> {{vehicle_plate}}</div>
+            <div><strong>Métrica:</strong> {{vehicle_km}}</div>
         </div>
     </section>
 
     <section class="section">
-        <h3>Serviços e Peças</h3>
+        <h3>Serviços e Itens</h3>
         <table class="table">
             <thead>
                 <tr>
@@ -116,7 +124,7 @@ class PrintTemplateController extends Controller
             <p>{{os_terms}}</p>
         </div>
         <div class="signatures">
-            <div class="signature">___________________________<br>Assinatura Oficina</div>
+            <div class="signature">___________________________<br>Assinatura ' . $workshopLabel . '</div>
             <div class="signature">___________________________<br>Assinatura Cliente</div>
         </div>
     </footer>

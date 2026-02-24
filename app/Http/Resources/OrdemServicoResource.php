@@ -18,6 +18,7 @@ class OrdemServicoResource extends JsonResource
             'id' => $this->id,
             'client' => $this->client ? ($this->client->name ?? $this->client->company_name) : '-',
             'vehicle' => $this->veiculo ? "{$this->veiculo->placa} - {$this->veiculo->modelo}" : '-',
+            'opened_by' => $this->user->name ?? 'Sistema',
             'status' => $this->status,
             'status_label' => $this->getStatusLabel($this->status),
             'total' => (float) $this->total,

@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
     });
 
     if (dt_table) {
+        const entitiesName = dt_table.dataset.entities || 'Veículos';
         const dt_clients = new DataTable(dt_table, {
             processing: true,
             serverSide: true,
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 {
                     targets: 6,
-                    render: (data) => `<span class="badge rounded-pill bg-label-primary">${data} veículos</span>`
+                    render: (data) => `<span class="badge rounded-pill bg-label-primary">${data} ${entitiesName.toLowerCase()}</span>`
                 },
                 {
                     targets: 7,

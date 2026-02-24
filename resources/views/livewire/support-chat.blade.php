@@ -9,21 +9,27 @@
                         <input type="text" class="form-control" wire:model.live="search" placeholder="Buscar..." />
                     </div>
                 </div>
-                <div class="sidebar-body">
+                <div class="sidebar-body" wire:poll.5s>
                     <div class="d-flex justify-content-between px-3 py-2 border-bottom bg-light">
                         <button class="btn btn-sm {{ $activeTab == 'team' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('team')">Equipe</button>
                         <button class="btn btn-sm {{ $activeTab == 'support' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('support')">Suporte</button>
+                        <button class="btn btn-sm {{ $activeTab == 'clients' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('clients')">Clientes</button>
                     </div>
                     <ul class="list-unstyled chat-contact-list py-2 mb-0" style="max-height: 500px; overflow-y: auto;">
                         @foreach($contacts as $contact)
-                        <li class="chat-contact-list-item {{ $activeUserId == $contact->id ? 'active' : '' }} p-3 border-bottom" wire:click="selectUser({{ $contact->id }})" wire:key="user-{{ $contact->id }}" style="cursor: pointer;">
+                        @php
+                            $isSelected = ($chatType === 'user' && $activeUserId == $contact->id) || ($chatType === 'client' && $activeClientId == $contact->id);
+                            $clickAction = ($activeTab === 'clients') ? "selectClient({$contact->id})" : "selectUser({$contact->id})";
+                            $avatar = ($activeTab === 'clients') ? "https://ui-avatars.com/api/?name=" . urlencode($contact->name) . "&color=7367f0&background=f8f7fa" : $contact->profile_photo_url;
+                        @endphp
+                        <li class="chat-contact-list-item {{ $isSelected ? 'active' : '' }} p-3 border-bottom" wire:click="{{ $clickAction }}" wire:key="contact-{{ $activeTab }}-{{ $contact->id }}" style="cursor: pointer;">
                             <div class="d-flex align-items-center">
                                 <div class="avatar me-3">
-                                    <img src="{{ $contact->profile_photo_url }}" alt="Avatar" class="rounded-circle" width="40">
+                                    <img src="{{ $avatar }}" alt="Avatar" class="rounded-circle" width="40">
                                 </div>
                                 <div class="chat-contact-info flex-grow-1">
                                     <h6 class="m-0">{{ $contact->name }}</h6>
-                                    <small class="text-muted text-truncate d-block" style="max-width: 180px;">{{ $contact->email }}</small>
+                                    <small class="text-muted text-truncate d-block" style="max-width: 180px;">{{ $contact->email ?? $contact->whatsapp ?? 'Cliente' }}</small>
                                 </div>
                                 @if($contact->unread_count > 0)
                                     <span class="badge bg-danger rounded-pill">{{ $contact->unread_count }}</span>
@@ -37,20 +43,23 @@
 
             <!-- Chat Window (Direita) -->
             <div class="col app-chat-history bg-white d-flex flex-column" style="height: 600px;">
-                @if($activeUser)
+                @if($activeContact)
                     <!-- Header -->
                     <div class="chat-history-header border-bottom p-4">
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="d-flex align-items-center">
                                 <div class="avatar me-3">
-                                    <img src="{{ $activeUser->profile_photo_url }}" alt="Avatar" class="rounded-circle" width="40">
+                                    @php
+                                        $activeAvatar = ($chatType === 'client') ? "https://ui-avatars.com/api/?name=" . urlencode($activeContact->name) . "&color=7367f0&background=f8f7fa" : $activeContact->profile_photo_url;
+                                    @endphp
+                                    <img src="{{ $activeAvatar }}" alt="Avatar" class="rounded-circle" width="40">
                                 </div>
                                 <div>
-                                    <h6 class="m-0">{{ $activeUser->name }}</h6>
-                                    <span class="badge bg-label-success small">Online</span>
+                                    <h6 class="m-0">{{ $activeContact->name }}</h6>
+                                    <span class="badge bg-label-{{ $chatType === 'client' ? 'primary' : 'success' }} small">{{ $chatType === 'client' ? 'Portal do Cliente' : 'Equipe' }}</span>
                                 </div>
                             </div>
-                            @if($activeUser->email == 'suporte@ghotme.com.br')
+                            @if($chatType === 'user' && $activeContact->email == 'suporte@ghotme.com.br')
                                 <a href="https://api.whatsapp.com/send?phone=5541991391687&text=Olá! Preciso de ajuda." target="_blank" class="btn btn-success btn-sm">
                                     <i class="ti tabler-brand-whatsapp me-1"></i> WhatsApp
                                 </a>
@@ -62,9 +71,9 @@
                     <div class="chat-history-body flex-grow-1 p-4" id="chat-history-container" style="overflow-y: auto;" wire:poll.4s>
                         <ul class="list-unstyled chat-history">
                             @foreach($messages as $msg)
-                            <li class="chat-message {{ $msg->sender_id == auth()->id() ? 'chat-message-right' : '' }} mb-4 d-flex {{ $msg->sender_id == auth()->id() ? 'justify-content-end' : '' }}">
+                            <li class="chat-message {{ ($msg->sender_id == auth()->id()) ? 'chat-message-right' : '' }} mb-4 d-flex {{ ($msg->sender_id == auth()->id()) ? 'justify-content-end' : '' }}">
                                 <div class="chat-message-wrapper" style="max-width: 70%;">
-                                    <div class="chat-message-text p-3 rounded shadow-sm {{ $msg->sender_id == auth()->id() ? 'bg-primary text-white' : 'bg-light text-dark' }}">
+                                    <div class="chat-message-text p-3 rounded shadow-sm {{ ($msg->sender_id == auth()->id()) ? 'bg-primary text-white' : 'bg-light text-dark' }}">
                                         @if($msg->attachment_path)
                                             <div class="mb-2">
                                                 <a href="{{ asset('storage/' . $msg->attachment_path) }}" target="_blank">
@@ -76,7 +85,7 @@
                                             <p class="mb-0">{{ $msg->message }}</p>
                                         @endif
                                     </div>
-                                    <small class="text-muted d-block mt-1 {{ $msg->sender_id == auth()->id() ? 'text-end' : '' }}">
+                                    <small class="text-muted d-block mt-1 {{ ($msg->sender_id == auth()->id()) ? 'text-end' : '' }}">
                                         {{ $msg->created_at->format('H:i') }}
                                     </small>
                                 </div>

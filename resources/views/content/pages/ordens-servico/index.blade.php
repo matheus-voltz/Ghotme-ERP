@@ -26,6 +26,7 @@
                     <th>{{ __('Date') }}</th>
                     <th>{{ __('Customer') }}</th>
                     <th>{{ niche('entity') }}</th>
+                    <th>Aberto por</th>
                     <th>{{ __('Status') }}</th>
                     <th>Total (R$)</th>
                     <th>{{ __('Actions') }}</th>
@@ -46,37 +47,44 @@
                     { data: 'date' },
                     { data: 'client' },
                     { data: 'vehicle' },
+                    { data: 'opened_by' },
                     { data: 'status' },
                     { data: 'total' },
                     { data: 'id' }
                 ],
                 columnDefs: [
                     {
-                        targets: 4,
+                        targets: 5,
                         render: (data) => {
                             const colors = {
                                 pending: 'warning',
+                                in_progress: 'primary',
                                 finalized: 'success',
-                                running: 'info'
+                                completed: 'success',
+                                running: 'info',
+                                canceled: 'danger'
                             };
                             const statusTranslations = {
-                                pending: "{{ __('Pending') }}",
-                                finalized: "{{ __('Finalized') }}",
-                                running: "{{ __('Running') }}"
+                                pending: 'Pendente',
+                                in_progress: 'Em Execução',
+                                finalized: 'Finalizada',
+                                completed: 'Pronto p/ Retirada',
+                                running: 'Em Andamento',
+                                canceled: 'Cancelada'
                             };
                             return `<span class="badge bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
                         }
                     },
                     {
-                        targets: 5,
+                        targets: 6,
                         render: (data) => `R$ ${parseFloat(data).toFixed(2)}`
                     },
                     {
-                        targets: 6,
+                        targets: 7,
                         render: (data, type, full) => {
                             let html = `<div class="d-flex gap-2">`;
                             html += `<a href="/ordens-servico/${data}/edit" class="btn btn-sm btn-primary" title="{{ __('Edit') }}"><i class="ti tabler-edit"></i></a>`;
-                            if (full.status !== 'finalized') {
+                            if (full.status !== 'finalized' && full.status !== 'paid') {
                                 html += `<button class="btn btn-sm btn-success finalize-os" data-id="${data}" title="{{ __('Finalize') }}"><i class="ti tabler-check"></i></button>`;
                             }
                             html += `<a href="/ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="{{ __('Checklist') }}"><i class="ti tabler-clipboard-check"></i></a>`;

@@ -18,8 +18,8 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        // Get team members (same company) + Support Ghotme (Super Admins)
-        $contacts = User::where('id', '!=', $user->id)
+        // Equipe
+        $team = User::where('id', '!=', $user->id)
             ->where(function ($q) use ($user) {
                 $q->where('company_id', $user->company_id)
                     ->orWhere('role', 'super_admin');
@@ -30,48 +30,63 @@ class ChatController extends Controller
                     ->where('receiver_id', $user->id)
                     ->where('is_read', false)
                     ->count();
-
+                $contact->is_client = false;
                 return $contact;
             });
 
-        return response()->json($contacts);
+        // Clientes (que já mandaram mensagem ou estão vinculados à empresa)
+        $clients = \App\Models\Clients::where('company_id', $user->company_id)
+            ->get()
+            ->map(function ($client) use ($user) {
+                $client->unread_count = ChatMessage::where('client_id', $client->id)
+                    ->where('receiver_id', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+                $client->is_client = true;
+                return $client;
+            });
+
+        return response()->json([
+            'team' => $team,
+            'clients' => $clients
+        ]);
     }
 
     /**
-     * Get total unread count for the authenticated user
+     * Get messages between current user and specified user or client
      */
-    public function unreadCount()
-    {
-        $count = ChatMessage::where('receiver_id', Auth::id())
-            ->where('is_read', false)
-            ->count();
-
-        return response()->json(['count' => $count]);
-    }
-
-    /**
-     * Get messages between current user and specified user
-     */
-    public function messages($userId)
+    public function messages(Request $request, $id)
     {
         $authUserId = Auth::id();
+        $isClient = $request->query('is_client') === 'true';
 
-        $messages = ChatMessage::where(function ($q) use ($authUserId, $userId) {
-            $q->where('sender_id', $authUserId)
-                ->where('receiver_id', $userId);
-        })
-            ->orWhere(function ($q) use ($authUserId, $userId) {
-                $q->where('sender_id', $userId)
-                    ->where('receiver_id', $authUserId);
+        if ($isClient) {
+            $messages = ChatMessage::where('client_id', $id)
+                ->where(function($q) use ($authUserId) {
+                    $q->where('receiver_id', $authUserId)->orWhere('sender_id', $authUserId);
+                })
+                ->orderBy('created_at', 'asc')
+                ->get();
+
+            ChatMessage::where('client_id', $id)
+                ->where('receiver_id', $authUserId)
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        } else {
+            $messages = ChatMessage::where(function ($q) use ($authUserId, $id) {
+                $q->where('sender_id', $authUserId)->where('receiver_id', $id);
+            })
+            ->orWhere(function ($q) use ($authUserId, $id) {
+                $q->where('sender_id', $id)->where('receiver_id', $authUserId);
             })
             ->orderBy('created_at', 'asc')
             ->get();
 
-        // Mark as read
-        ChatMessage::where('sender_id', $userId)
-            ->where('receiver_id', $authUserId)
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ChatMessage::where('sender_id', $id)
+                ->where('receiver_id', $authUserId)
+                ->where('is_read', false)
+                ->update(['is_read' => true]);
+        }
 
         return response()->json($messages);
     }
@@ -82,9 +97,10 @@ class ChatController extends Controller
     public function send(Request $request)
     {
         $request->validate([
-            'receiver_id' => 'required|exists:users,id',
+            'receiver_id' => 'nullable|exists:users,id',
+            'client_id' => 'nullable|exists:clients,id',
             'message' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|max:10240', // Max 10MB
+            'image' => 'nullable|image|max:10240',
         ]);
 
         if (!$request->message && !$request->hasFile('image')) {
@@ -93,44 +109,23 @@ class ChatController extends Controller
 
         $attachmentPath = null;
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('chat_attachments', 'public');
-            $attachmentPath = $path;
+            $attachmentPath = $request->file('image')->store('chat_attachments', 'public');
         }
 
         $message = ChatMessage::create([
+            'company_id' => Auth::user()->company_id,
             'sender_id' => Auth::id(),
             'receiver_id' => $request->receiver_id,
+            'client_id' => $request->client_id,
             'message' => $request->message ?? '',
             'attachment_path' => $attachmentPath,
         ]);
 
-        // Load relationships for response if needed
-        $message->load('sender:id,name,profile_photo_path');
+        $message->load('sender:id,name');
 
         try {
             broadcast(new \App\Events\MessageReceived($message));
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning("Broadcasting failed: " . $e->getMessage());
-        }
-
-        // Send Database Notification
-        $receiver = User::find($request->receiver_id);
-        $receiver->notify(new \App\Notifications\ChatMessageNotification($message));
-
-        // Send Push Notification
-        $receiver = User::find($request->receiver_id);
-        if ($receiver && $receiver->expo_push_token) {
-            $senderName = Auth::user()->name;
-            $body = $message->message ? $message->message : '📷 Imagem';
-            $title = "Nova mensagem de {$senderName}";
-
-            \App\Helpers\Helpers::sendExpoNotification(
-                $receiver->expo_push_token,
-                $title,
-                $body,
-                ['type' => 'chat_message', 'sender_id' => Auth::id()]
-            );
-        }
+        } catch (\Exception $e) {}
 
         return response()->json($message, 201);
     }

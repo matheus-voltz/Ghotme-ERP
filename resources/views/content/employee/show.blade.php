@@ -110,11 +110,12 @@
             $statusTranslated = $order->status;
             switch(strtolower($order->status)) {
                 case 'approved': $statusClass = 'bg-label-success'; $statusTranslated = 'Aprovado'; break;
-                case 'in_progress': $statusClass = 'bg-label-primary'; $statusTranslated = 'Em Andamento'; break;
+                case 'in_progress': $statusClass = 'bg-label-primary'; $statusTranslated = 'Em Execução'; break;
                 case 'testing': $statusClass = 'bg-label-info'; $statusTranslated = 'Em Teste'; break;
                 case 'pending': $statusClass = 'bg-label-warning'; $statusTranslated = 'Pendente'; break;
                 case 'completed': $statusClass = 'bg-label-success'; $statusTranslated = 'Concluído'; break;
                 case 'cleaning': $statusClass = 'bg-label-warning'; $statusTranslated = (niche('current') == 'pet' ? 'Banho/Tosa' : 'Limpeza'); break;
+                case 'canceled': $statusClass = 'bg-label-danger'; $statusTranslated = 'Cancelada'; break;
             }
         @endphp
         <span class="badge {{ $statusClass }} rounded-pill px-3 py-2 fw-bold">{{ $statusTranslated }}</span>
@@ -169,7 +170,7 @@
                                 {{ $item->status == 'in_progress' ? 'bg-label-info' : 
                                   ($item->status == 'completed' ? 'bg-success' : 
                                   ($item->status == 'paused' ? 'bg-label-warning' : 'bg-label-secondary')) }}">
-                                {{ $item->status == 'in_progress' ? 'Em Andamento' : 
+                                {{ $item->status == 'in_progress' ? 'Em Execução' : 
                                   ($item->status == 'completed' ? 'Concluído' : 
                                   ($item->status == 'paused' ? 'Pausado' : 'Pendente')) }}
                             </span>

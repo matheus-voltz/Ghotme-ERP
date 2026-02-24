@@ -129,6 +129,98 @@ $customizerHidden = 'customizer-hide';
         color: white;
     }
 
+    /* Chat Widget Styles */
+    .chat-widget {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .chat-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--portal-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 25px rgba(115, 103, 240, 0.4);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .chat-window {
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 1.5rem;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+        margin-bottom: 1rem;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    .chat-header {
+        background: var(--portal-primary);
+        color: white;
+        padding: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chat-body {
+        flex-grow: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        background: #fdfdff;
+    }
+
+    .chat-msg {
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        max-width: 85%;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .chat-msg-received {
+        background: #f1f1f2;
+        color: #444;
+        align-self: flex-start;
+        border-bottom-left-radius: 0.2rem;
+    }
+
+    .chat-msg-sent {
+        background: var(--portal-primary);
+        color: white;
+        align-self: flex-end;
+        border-bottom-right-radius: 0.2rem;
+    }
+
+    .chat-footer {
+        padding: 1rem;
+        border-top: 1px solid #eee;
+        display: flex;
+        gap: 0.5rem;
+    }
+
     .animate-up {
         animation: fadeInUp 0.6s both;
     }
@@ -360,9 +452,14 @@ $customizerHidden = 'customizer-hide';
                     <i class="ti tabler-help fs-1 text-white opacity-10" style="position: absolute; right: 10px; top: 10px;"></i>
                     <h5 class="text-white mb-3">Precisa de Ajuda?</h5>
                     <p class="text-white opacity-75 small mb-4">Sua empresa de confiança está sempre à disposição para esclarecer dúvidas.</p>
-                    <a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}" target="_blank" class="btn btn-primary w-100 rounded-pill">
-                        Falar com Atendente
-                    </a>
+                    <div class="d-flex flex-column gap-2">
+                        <button type="button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#chatModal">
+                            <i class="ti tabler-message me-1"></i> Falar com Atendente
+                        </button>
+                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}?text={{ urlencode('Olá, sou ' . $client->name . ' e gostaria de informações sobre meu serviço no portal.') }}" target="_blank" class="btn btn-label-success w-100 rounded-pill text-white">
+                            <i class="ti tabler-brand-whatsapp me-1"></i> Chamar no WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -412,8 +509,132 @@ $customizerHidden = 'customizer-hide';
     </div>
 </div>
 
-<!-- WhatsApp Floating Button -->
-<a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}" target="_blank" class="whatsapp-fab animate-up">
-    <i class="ti tabler-brand-whatsapp"></i>
-</a>
+<!-- Chat Widget -->
+<div class="chat-widget">
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="d-flex align-items-center">
+                <div class="avatar avatar-sm me-2">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($responsible->name ?? 'Suporte') }}&color=7367f0&background=fff" class="rounded-circle" width="30">
+                </div>
+                <div>
+                    <h6 class="mb-0 text-white">{{ $responsible->name ?? 'Suporte' }}</h6>
+                    <small style="font-size: 0.7rem; opacity: 0.8;">Atendimento Online</small>
+                </div>
+            </div>
+            <button class="btn-close btn-close-white" onclick="toggleChat()"></button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg chat-msg-received">
+                Olá! Como podemos ajudar você hoje?
+            </div>
+            @foreach($messages as $msg)
+                <div class="chat-msg {{ $msg->sender_id ? 'chat-msg-received' : 'chat-msg-sent' }}">
+                    {{ $msg->message }}
+                </div>
+            @endforeach
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="portalChatMessage" class="form-control border-0 bg-light" placeholder="Digite sua mensagem...">
+            <button class="btn btn-primary btn-icon rounded-circle" id="btnPortalSend">
+                <i class="ti tabler-send"></i>
+            </button>
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}" target="_blank" class="chat-button bg-success shadow-none" style="width: 50px; height: 50px;">
+            <i class="ti tabler-brand-whatsapp fs-3"></i>
+        </a>
+        <button class="chat-button" onclick="toggleChat()">
+            <i class="ti tabler-message fs-2" id="chatIcon"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    function toggleChat() {
+        const win = document.getElementById('chatWindow');
+        const icon = document.getElementById('chatIcon');
+        if(win.style.display === 'flex') {
+            win.style.display = 'none';
+            icon.className = 'ti tabler-message fs-2';
+        } else {
+            win.style.display = 'flex';
+            icon.className = 'ti tabler-x fs-2';
+            const body = document.getElementById('chatBody');
+            body.scrollTop = body.scrollHeight;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnSend = document.getElementById('btnPortalSend');
+        const input = document.getElementById('portalChatMessage');
+        const chatBody = document.getElementById('chatBody');
+
+        function appendMessage(msg, type) {
+            const div = document.createElement('div');
+            div.className = `chat-msg chat-msg-${type}`;
+            div.textContent = msg;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function send() {
+            const message = input.value.trim();
+            if(!message) return;
+
+            input.value = '';
+            appendMessage(message, 'sent');
+
+            try {
+                const response = await fetch("{{ route('customer.portal.send-message', $client->uuid) }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+            } catch (err) {
+                console.error('Erro ao enviar mensagem');
+            }
+        }
+
+        btnSend.onclick = send;
+        input.onkeypress = (e) => { if(e.key === 'Enter') send(); };
+
+        // Polling de mensagens a cada 5 segundos
+        async function fetchMessages() {
+            try {
+                const response = await fetch("{{ route('customer.portal.fetch-messages', $client->uuid) }}");
+                const messages = await response.json();
+                
+                // Limpa e reconstrói para garantir ordem e novos itens (incluindo respostas)
+                const currentCount = chatBody.querySelectorAll('.chat-msg').length - 1; // -1 por causa da msg fixa de boas vindas
+                
+                if (messages.length > currentCount) {
+                    const welcomeMsg = chatBody.firstElementChild.outerHTML;
+                    chatBody.innerHTML = welcomeMsg;
+                    
+                    messages.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = `chat-msg ${msg.sender_id ? 'chat-msg-received' : 'chat-msg-sent'}`;
+                        div.textContent = msg.message;
+                        chatBody.appendChild(div);
+                    });
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
+            } catch (err) {
+                console.error('Erro ao buscar mensagens');
+            }
+        }
+
+        setInterval(fetchMessages, 5000);
+
+        // Scroll ao carregar
+        chatBody.scrollTop = chatBody.scrollHeight;
+    });
+</script>
 @endsection

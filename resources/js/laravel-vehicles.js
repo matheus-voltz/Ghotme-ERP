@@ -87,10 +87,14 @@ document.addEventListener('DOMContentLoaded', function (e) {
     }
 
     if (dt_table) {
+        // Detect current entity path from URL (e.g., /pets or /veiculos)
+        const currentPath = window.location.pathname.split('/').pop();
+        const apiPath = currentPath + '-list';
+
         const dt_vehicles = new DataTable(dt_table, {
             processing: true,
             serverSide: true,
-            ajax: { url: baseUrl + 'vehicles-list' },
+            ajax: { url: baseUrl + apiPath },
             columns: [
                 { data: 'id' },
                 { data: 'id' },
@@ -140,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 $('#viewDossierModal').modal('show');
                 $('#dossierModalContent').html('<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>');
 
-                fetch(`${baseUrl}vehicles/${id}/dossier`)
+                fetch(`${baseUrl}${currentPath}/${id}/dossier`)
                     .then(res => res.text())
                     .then(html => {
                         $('#dossierModalContent').html(html);
@@ -153,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             if (e.target.closest('.delete-record')) {
                 const id = e.target.closest('.delete-record').dataset.id;
                 Swal.fire({
-                    title: 'Remover veículo?',
+                    title: 'Remover?',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Sim, excluir',
@@ -161,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     buttonsStyling: false
                 }).then(result => {
                     if (result.isConfirmed) {
-                        fetch(`${baseUrl}vehicles-list/${id}`, {
+                        fetch(`${baseUrl}${apiPath}/${id}`, {
                             method: 'DELETE',
                             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
                         }).then(() => dt_vehicles.ajax.reload());
@@ -174,8 +178,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
         document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
-                document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Editar Veículo';
-                fetch(`${baseUrl}vehicles-list/${id}/edit`)
+                // document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Editar';
+                fetch(`${baseUrl}${apiPath}/${id}/edit`)
                     .then(res => res.json())
                     .then(data => {
                         const vehicle = data.vehicle;
@@ -200,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 document.getElementById('vehicle_id').value = '';
                 formVehicle.reset();
                 $('#vehicle-cliente').val('').trigger('change');
-                document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Cadastrar Veículo';
+                // document.getElementById('offcanvasAddVehiclesLabel').innerHTML = 'Cadastrar';
 
                 // Carregar campos personalizados vazios para novo veículo
                 fetch(`${baseUrl}settings/custom-fields?entity=Vehicles`)
@@ -212,73 +216,73 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     });
             });
         }
-    }
 
-    // Submit
-    if (formVehicle) {
-        formVehicle.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(formVehicle);
+        // Submit
+        if (formVehicle) {
+            formVehicle.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(formVehicle);
 
-            fetch(`${baseUrl}vehicles-list`, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                    'Accept': 'application/json'
-                }
-            })
-                .then(async res => {
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Sucesso!',
-                            text: data.message,
-                            customClass: { confirmButton: 'btn btn-primary' },
-                            buttonsStyling: false
-                        }).then(() => {
-                            location.reload();
-                        });
-                    } else {
-                        // Limpar erros anteriores
-                        formVehicle.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                        formVehicle.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-                        if (data.errors) {
-                            Object.keys(data.errors).forEach(key => {
-                                const input = formVehicle.querySelector(`[name="${key}"]`);
-                                if (input) {
-                                    input.classList.add('is-invalid');
-
-                                    // Criar div de erro
-                                    const feedback = document.createElement('div');
-                                    feedback.className = 'invalid-feedback';
-                                    feedback.innerText = data.errors[key][0];
-
-                                    // Inserir após o input (ou após o container do input se for um grupo)
-                                    if (input.closest('.input-group')) {
-                                        input.closest('.input-group').after(feedback);
-                                    } else if (input.classList.contains('select2-hidden-accessible')) {
-                                        // Para Select2
-                                        const select2Container = input.nextElementSibling;
-                                        if (select2Container && select2Container.classList.contains('select2-container')) {
-                                            select2Container.after(feedback);
-                                        }
-                                    } else {
-                                        input.after(feedback);
-                                    }
-                                }
-                            });
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Erro!', text: data.message || 'Erro inesperado' });
-                        }
+                fetch(`${baseUrl}${apiPath}`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Accept': 'application/json'
                     }
                 })
-                .catch(err => {
-                    Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
-                });
-        });
+                    .then(async res => {
+                        const data = await res.json();
+                        if (res.ok && data.success) {
+                            bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: data.message,
+                                customClass: { confirmButton: 'btn btn-primary' },
+                                buttonsStyling: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            // Limpar erros anteriores
+                            formVehicle.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            formVehicle.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+
+                            if (data.errors) {
+                                Object.keys(data.errors).forEach(key => {
+                                    const input = formVehicle.querySelector(`[name="${key}"]`);
+                                    if (input) {
+                                        input.classList.add('is-invalid');
+
+                                        // Criar div de erro
+                                        const feedback = document.createElement('div');
+                                        feedback.className = 'invalid-feedback';
+                                        feedback.innerText = data.errors[key][0];
+
+                                        // Inserir após o input (ou após o container do input se for um grupo)
+                                        if (input.closest('.input-group')) {
+                                            input.closest('.input-group').after(feedback);
+                                        } else if (input.classList.contains('select2-hidden-accessible')) {
+                                            // Para Select2
+                                            const select2Container = input.nextElementSibling;
+                                            if (select2Container && select2Container.classList.contains('select2-container')) {
+                                                select2Container.after(feedback);
+                                            }
+                                        } else {
+                                            input.after(feedback);
+                                        }
+                                    }
+                                });
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'Erro!', text: data.message || 'Erro inesperado' });
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire({ icon: 'error', title: 'Erro!', text: 'Ocorreu um erro ao processar a requisição.' });
+                    });
+            });
+        }
     }
 });

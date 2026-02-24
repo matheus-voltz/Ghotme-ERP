@@ -103,6 +103,8 @@ Route::post('/ordens-servico/checklist/{id}/send-email', [VehicleChecklistContro
 // Customer Portal
 Route::get('/portal/{uuid}', [CustomerPortalController::class, 'index'])->name('customer.portal.index');
 Route::get('/portal/os/{uuid}', [CustomerPortalController::class, 'showOrder'])->name('customer.portal.order');
+Route::post('/portal/{uuid}/send-message', [CustomerPortalController::class, 'sendMessage'])->name('customer.portal.send-message');
+Route::get('/portal/{uuid}/messages', [CustomerPortalController::class, 'fetchMessages'])->name('customer.portal.fetch-messages');
 
 // Public Accountant Portal
 Route::get('/portal-contador/{token}', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.public');
@@ -151,22 +153,26 @@ Route::middleware([
     Route::post('/budgets/{id}/convert', [BudgetController::class, 'convertToOS'])->name('budgets.convert');
     Route::get('/budgets/{id}/whatsapp', [BudgetController::class, 'sendWhatsApp'])->name('budgets.whatsapp');
 
-    // Dynamic Main Entities & Clients based on Niche slugs
+    // Dynamic Main Entities & Clients based on ALL available Niche slugs
     $allNiches = config('niche.niches', []);
-    foreach ($allNiches as $slug => $nConfig) {
+    $registeredEntsSlugs = [];
+    $registeredClsSlugs = [];
+
+    foreach ($allNiches as $nSlug => $nConfig) {
         $entsSlug = $nConfig['labels']['url_entities_slug'] ?? null;
         $clsSlug = $nConfig['labels']['url_clients_slug'] ?? null;
 
-        if ($entsSlug) {
+        if ($entsSlug && !in_array($entsSlug, $registeredEntsSlugs)) {
             Route::get("/{$entsSlug}/{id}/dossier", [VehiclesController::class, 'getDossier'])->name($entsSlug . '.dossier');
             Route::get("/{$entsSlug}", [VehiclesController::class, 'index'])->name($entsSlug . '.index');
             Route::get("/{$entsSlug}-list", [VehiclesController::class, 'dataBase'])->name($entsSlug . '-list.data');
             Route::get("/{$entsSlug}-list/{id}/edit", [VehiclesController::class, 'edit'])->name($entsSlug . '-list.edit');
             Route::post("/{$entsSlug}-list", [VehiclesController::class, 'store'])->name($entsSlug . '-list.store');
             Route::delete("/{$entsSlug}-list/{id}", [VehiclesController::class, 'destroy'])->name($entsSlug . '-list.destroy');
+            $registeredEntsSlugs[] = $entsSlug;
         }
 
-        if ($clsSlug) {
+        if ($clsSlug && !in_array($clsSlug, $registeredClsSlugs)) {
             Route::get("/{$clsSlug}/{id}/quick-view", [ClientsController::class, 'quickView'])->name($clsSlug . '.quick-view');
             Route::get("/{$clsSlug}", [ClientsController::class, 'index'])->name($clsSlug . '.index');
             Route::get("/{$clsSlug}-list", [ClientsController::class, 'dataBase'])->name($clsSlug . '-list.data');
@@ -174,6 +180,7 @@ Route::middleware([
             Route::get("/{$clsSlug}-list/{id}/edit", [ClientsController::class, 'edit'])->name($clsSlug . '-list.edit');
             Route::put("/{$clsSlug}-list/{id}", [ClientsController::class, 'update'])->name($clsSlug . '-list.update');
             Route::delete("/{$clsSlug}-list/{id}", [ClientsController::class, 'destroy'])->name($clsSlug . '-list.destroy');
+            $registeredClsSlugs[] = $clsSlug;
         }
     }
 
@@ -194,15 +201,17 @@ Route::middleware([
     Route::delete('/vehicles-list/{id}', [VehiclesController::class, 'destroy'])->name('vehicles-list.destroy');
     Route::get('/api/vehicle-lookup/{placa}', [VehicleLookupController::class, 'lookup'])->name('vehicles.lookup');
 
-    // Dynamic Entity History based on Niche
+    // Dynamic Entity History based on ALL Niches
     $allNiches = config('niche.niches', []);
+    $registeredHistSlugs = [];
     foreach ($allNiches as $slug => $nConfig) {
         $uSlug = $nConfig['labels']['url_slug'] ?? null;
-        if ($uSlug) {
+        if ($uSlug && !in_array($uSlug, $registeredHistSlugs)) {
             Route::get("/{$uSlug}-history", [VehicleHistoryController::class, 'index']);
             Route::get("/{$uSlug}-history/search", [VehicleHistoryController::class, 'search']);
             Route::get("/{$uSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline']);
             Route::post("/{$uSlug}-history", [VehicleHistoryController::class, 'store']);
+            $registeredHistSlugs[] = $uSlug;
         }
     }
 
