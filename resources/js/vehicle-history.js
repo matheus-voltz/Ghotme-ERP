@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             placeholder: placeholder,
             allowClear: true,
             ajax: {
-                url: baseUrl + 'vehicle-history/search',
+                url: window.historySearchUrl || (baseUrl + 'vehicle-history/search'),
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -59,8 +59,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
         // Fill Info Card
         document.getElementById('info-plate').textContent = v.placa;
         document.getElementById('info-brand-model').textContent = `${v.marca} ${v.modelo}`;
+        document.getElementById('timeline-entity-name').textContent = `- ${v.placa}`; // Título dinâmico
         document.getElementById('info-owner').textContent = data.client_name;
-        document.getElementById('info-km').textContent = (v.km_atual || 0).toLocaleString() + ' KM';
+        document.getElementById('info-km').textContent = (v.km_atual || 0).toLocaleString() + ' ' + (configNiche?.metric_unit || 'anos');
         document.getElementById('info-chassis').textContent = v.chassi || '-';
         document.getElementById('info-color').textContent = v.cor || '-';
         document.getElementById('info-year').textContent = v.ano_modelo || v.ano_fabricacao || '-';
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
     function fetchTimeline(vehicleId) {
         vehicleTimeline.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
 
-        fetch(baseUrl + 'vehicle-history/timeline/' + vehicleId)
+        fetch((window.historyTimelineUrl || (baseUrl + 'vehicle-history/timeline/')) + vehicleId)
             .then(response => response.json())
             .then(data => {
                 renderTimeline(data);
@@ -97,26 +98,26 @@ document.addEventListener('DOMContentLoaded', function (e) {
             let typeLabel = 'Registro Manual';
 
             if (item.event_type === 'os_finalizada') {
-                iconClass = 'ti-file-check text-success';
+                iconClass = 'ti-paws text-success';
                 badgeColor = 'success';
-                typeLabel = 'Ordem de Serviço';
+                typeLabel = 'Atendimento Realizado';
             } else if (item.event_type === 'entrada_oficina') {
-                iconClass = 'ti-home-check text-warning';
+                iconClass = 'ti-dog text-warning';
                 badgeColor = 'warning';
-                typeLabel = 'Entrada';
+                typeLabel = 'Entrada no Pet';
             }
 
             html += `
                 <div class="timeline-item">
                     <div class="timeline-point"></div>
-                    <div class="timeline-date">${date} • ${item.km.toLocaleString()} KM</div>
+                    <div class="timeline-date">${date} • ${item.km.toLocaleString()} ${configNiche?.metric_unit || 'anos'}</div>
                     <div class="timeline-title d-flex justify-content-between">
                         <span>${item.title}</span>
                         <span class="badge bg-label-${badgeColor} ms-2" style="font-size: 0.7rem">${typeLabel}</span>
                     </div>
                     <div class="timeline-desc text-muted mb-2">${item.description || ''}</div>
                     <div class="timeline-footer d-flex justify-content-between align-items-center">
-                        <small>Realizado por: <strong>${item.performer || 'Oficina'}</strong></small>
+                        <small>Realizado por: <strong>${item.performer || 'Pet Shop'}</strong></small>
                         ${item.cost ? `<small class="fw-medium text-heading">R$ ${parseFloat(item.cost).toFixed(2)}</small>` : ''}
                     </div>
                 </div>
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             e.preventDefault();
             const formData = new FormData(formAddHistory);
 
-            fetch(baseUrl + 'vehicle-history', {
+            fetch(window.historyStoreUrl || (baseUrl + 'vehicle-history'), {
                 method: 'POST',
                 body: new URLSearchParams(formData),
                 headers: {
@@ -161,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         // Reload timeline and update KM
                         const vehicleId = document.getElementById('modal-vehicle-id').value;
                         fetchTimeline(vehicleId);
-                        document.getElementById('info-km').textContent = parseInt(formData.get('km')).toLocaleString() + ' KM';
+                        document.getElementById('info-km').textContent = parseInt(formData.get('km')).toLocaleString() + ' ' + (configNiche?.metric_unit || 'anos');
                     }
                 });
         });

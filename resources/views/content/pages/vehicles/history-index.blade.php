@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Histórico do Veículo')
+@section('title', 'Histórico do ' . niche('entity'))
 
 @section('vendor-style')
 @vite([
@@ -60,6 +60,13 @@
 @endsection
 
 @section('page-script')
+<script>
+    @php $nSlug = niche('url_slug', 'veiculo');
+    @endphp
+    window.historySearchUrl = "{{ url($nSlug . '-history/search') }}";
+    window.historyTimelineUrl = "{{ url($nSlug . '-history/timeline') }}/";
+    window.historyStoreUrl = "{{ url($nSlug . '-history') }}";
+</script>
 @vite(['resources/js/vehicle-history.js'])
 @endsection
 
@@ -94,7 +101,7 @@
                 <div class="user-avatar-section mb-6">
                     <div class="d-flex align-items-center flex-column">
                         <div class="bg-label-primary p-4 rounded mb-4">
-                            <i class="ti {{ niche_config('icons.entity') }} icon-32px"></i>
+                            <i class="ti {{ niche_icon('entity') }} icon-32px"></i>
                         </div>
                         <div class="user-info text-center">
                             <h4 id="info-plate">---</h4>
@@ -120,7 +127,7 @@
     <div class="col-md-8 d-none" id="timeline-card">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Linha do Tempo de Manutenções</h5>
+                <h5 class="mb-0">Linha do Tempo do {{ niche('entity') }} <span id="timeline-entity-name" class="text-primary"></span></h5>
             </div>
             <div class="card-body">
                 <div id="vehicle-timeline" class="timeline">
@@ -177,7 +184,7 @@
                 </div>
                 <div class="modal-footer pb-0">
                     <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Registro</button>
+                    <button type="submit" class="btn btn-primary">Salvar no Histórico</button>
                 </div>
             </form>
         </div>

@@ -77,21 +77,21 @@
       "name": "Customers & Entities",
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": [
-        "clients",
-        "vehicles",
-        "vehicle-history",
+        "{niche_clients_slug}",
+        "{niche_entities_slug}",
+        "{niche_slug}-history",
         "fleet"
       ],
       "submenu": [
         {
-          "url": "/clients",
+          "url": "/{niche_clients_slug}",
           "name": "Customers",
-          "slug": "clients"
+          "slug": "{niche_clients_slug}"
         },
         {
-          "url": "/vehicles",
+          "url": "/{niche_entities_slug}",
           "name": "Vehicles",
-          "slug": "vehicles"
+          "slug": "{niche_entities_slug}"
         },
         {
           "url": "/fleet-management",
@@ -106,9 +106,9 @@
           "feature": "maintenance_contracts"
         },
         {
-          "url": "/vehicle-history",
+          "url": "/{niche_slug}-history",
           "name": "Vehicle history",
-          "slug": "vehicle-history"
+          "slug": "{niche_slug}-history"
         }
       ]
     },
@@ -208,11 +208,6 @@
           "url": "/finance/cash-flow",
           "name": "Fluxo de caixa",
           "slug": "finance.cash-flow"
-        },
-        {
-          "url": "/finance/kanban",
-          "name": "Kanban de Recebíveis",
-          "slug": "finance.kanban"
         },
         {
           "url": "/finance/payment-methods",

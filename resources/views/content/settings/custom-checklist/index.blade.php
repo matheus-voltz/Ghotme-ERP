@@ -4,63 +4,75 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('page-script')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dt_table = document.querySelector('.datatables-checklist');
-    if (dt_table) {
-        const dt = new DataTable(dt_table, {
-            ajax: baseUrl + 'settings/custom-checklist-list',
-            columns: [
-                { data: 'category' },
-                { data: 'name' },
-                { data: 'order' },
-                { data: 'id' }
-            ],
-            columnDefs: [
-                {
+    document.addEventListener('DOMContentLoaded', function() {
+        const dt_table = document.querySelector('.datatables-checklist');
+        if (dt_table) {
+            const dt = new DataTable(dt_table, {
+                ajax: baseUrl + 'settings/custom-checklist-list',
+                columns: [{
+                        data: 'category'
+                    },
+                    {
+                        data: 'name'
+                    },
+                    {
+                        data: 'order'
+                    },
+                    {
+                        data: 'id'
+                    }
+                ],
+                columnDefs: [{
                     targets: 3,
                     render: (data) => `<button class="btn btn-sm btn-icon delete-record" data-id="${data}"><i class="ti tabler-trash"></i></button>`
-                }
-            ],
-            order: [[0, 'asc'], [2, 'asc']]
-        });
-
-        document.getElementById('formChecklist').onsubmit = function(e) {
-            e.preventDefault();
-            fetch("{{ route('settings.custom-checklist.store') }}", {
-                method: 'POST',
-                body: new URLSearchParams(new FormData(this)),
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-            }).then(() => {
-                this.reset();
-                dt.ajax.reload();
+                }],
+                order: [
+                    [0, 'asc'],
+                    [2, 'asc']
+                ]
             });
-        };
 
-        document.addEventListener('click', function(e) {
-            if (e.target.closest('.delete-record')) {
-                const id = e.target.closest('.delete-record').dataset.id;
-                fetch(`${baseUrl}settings/custom-checklist/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') }
-                }).then(() => dt.ajax.reload());
-            }
-        });
-    }
-});
+            document.getElementById('formChecklist').onsubmit = function(e) {
+                e.preventDefault();
+                fetch("{{ route('settings.custom-checklist.store') }}", {
+                    method: 'POST',
+                    body: new URLSearchParams(new FormData(this)),
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                }).then(() => {
+                    this.reset();
+                    dt.ajax.reload();
+                });
+            };
+
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.delete-record')) {
+                    const id = e.target.closest('.delete-record').dataset.id;
+                    fetch(`${baseUrl}settings/custom-checklist/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    }).then(() => dt.ajax.reload());
+                }
+            });
+        }
+    });
 </script>
 @endsection
 
@@ -77,11 +89,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="mb-4">
                         <label class="form-label">Categoria</label>
                         <select name="category" class="form-select" required>
-                            <option value="Motor">Motor</option>
-                            <option value="Suspensão">Suspensão</option>
-                            <option value="Freios">Freios</option>
-                            <option value="Elétrica">Elétrica</option>
-                            <option value="Estética">Estética / Exterior</option>
+                            @php $nicheCategories = niche('checklist_categories') ?? []; @endphp
+                            @foreach(array_keys($nicheCategories) as $cat)
+                            <option value="{{ $cat }}">{{ $cat }}</option>
+                            @endforeach
                             <option value="Geral">Geral</option>
                         </select>
                     </div>

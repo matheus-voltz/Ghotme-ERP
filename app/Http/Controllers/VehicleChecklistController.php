@@ -26,7 +26,21 @@ class VehicleChecklistController extends Controller
     public function create(Request $request)
     {
         $vehicles = Vehicles::all();
-        $checklistItems = ChecklistItem::all();
+
+        // Filter checklist items by current niche categories
+        $nicheCategories = array_keys(niche('checklist_categories') ?? []);
+        $nicheCategories[] = 'Geral'; // Always include General
+
+        $checklistItems = ChecklistItem::whereIn('category', $nicheCategories)
+            ->orderBy('category')
+            ->orderBy('order')
+            ->get();
+
+        // If no items found for this niche, fallback to all (to not break everything)
+        if ($checklistItems->isEmpty()) {
+            $checklistItems = ChecklistItem::all();
+        }
+
         $osId = $request->query('os_id');
         $selectedOs = null;
 

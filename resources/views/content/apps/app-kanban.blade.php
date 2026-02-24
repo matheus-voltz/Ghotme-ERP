@@ -100,7 +100,7 @@
             <div class="mb-5">
               <label class="form-label" for="attachments">Anexos</label>
               <div>
-                <input type="file" class="form-control" id="attachments" />
+                <input type="file" class="form-control" id="attachments" multiple />
               </div>
             </div>
             <div class="mb-5">

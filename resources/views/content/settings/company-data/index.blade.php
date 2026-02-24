@@ -49,8 +49,10 @@
               <label class="form-label">Tipo de Negócio (Nicho)</label>
               <select name="niche" class="form-select">
                 <option value="workshop" {{ $userNiche == 'workshop' ? 'selected' : '' }}>Oficina Mecânica (Veículos)</option>
-                <option value="tech_assistance" {{ $userNiche == 'tech_assistance' ? 'selected' : '' }}>Assistência Técnica (Eletrônicos/Dispositivos)</option>
-                <option value="pet_shop" {{ $userNiche == 'pet_shop' ? 'selected' : '' }}>Pet Shop / Veerinária (Pets/Banho e Tosa)</option>
+                <option value="electronics" {{ $userNiche == 'electronics' ? 'selected' : '' }}>Assistência Técnica (Eletrônicos/Dispositivos)</option>
+                <option value="pet" {{ $userNiche == 'pet' ? 'selected' : '' }}>Pet Shop / Veterinária (Pets/Banho e Tosa)</option>
+                <option value="beauty_clinic" {{ $userNiche == 'beauty_clinic' ? 'selected' : '' }}>Clínica de Estética / Saúde (Pacientes)</option>
+                <option value="construction" {{ $userNiche == 'construction' ? 'selected' : '' }}>Construção Civil / Empreiteira (Obras/Projetos)</option>
               </select>
               <small class="text-muted">Isso adapta os termos do menu (ex: 'Veículos' muda para 'Pets').</small>
             </div>

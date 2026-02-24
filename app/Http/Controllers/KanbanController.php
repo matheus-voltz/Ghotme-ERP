@@ -38,8 +38,8 @@ class KanbanController extends Controller
                             "badge" => "success",
                             "due-date" => "5 de Abril",
                             "attachments" => "4",
-                            "assigned" => ["12.png", "5.png"],
-                            "members" => ["Bruce", "Clark"]
+                            "assigned" => [],
+                            "members" => []
                         ],
                         [
                             "id" => "in-progress-2",
@@ -49,8 +49,8 @@ class KanbanController extends Controller
                             "badge" => "danger",
                             "attachments" => "2",
                             "due-date" => "10 de Abril",
-                            "assigned" => ["3.png", "8.png"],
-                            "members" => ["Helena", "Iris"]
+                            "assigned" => [],
+                            "members" => []
                         ]
                     ]
                 ],
@@ -66,8 +66,8 @@ class KanbanController extends Controller
                             "badge" => "info",
                             "due-date" => "8 de Abril",
                             "attachments" => "8",
-                            "assigned" => ["11.png", "6.png"],
-                            "members" => ["Laurel", "Harley"]
+                            "assigned" => [],
+                            "members" => []
                         ],
                         [
                             "id" => "in-review-2",
@@ -77,8 +77,8 @@ class KanbanController extends Controller
                             "badge" => "warning",
                             "due-date" => "2 de Abril",
                             "attachments" => "10",
-                            "assigned" => ["9.png", "2.png", "3.png", "12.png"],
-                            "members" => ["Dianna", "Jordan", "Vinnie", "Lasa"]
+                            "assigned" => [],
+                            "members" => []
                         ]
                     ]
                 ],
@@ -94,8 +94,8 @@ class KanbanController extends Controller
                             "badge" => "secondary",
                             "due-date" => "7 de Abril",
                             "attachments" => "1",
-                            "assigned" => ["2.png", "9.png", "10.png"],
-                            "members" => ["Kara", "Nyssa", "Darcey"]
+                            "assigned" => [],
+                            "members" => []
                         ],
                         [
                             "id" => "done-2",
@@ -105,8 +105,8 @@ class KanbanController extends Controller
                             "badge" => "primary",
                             "due-date" => "7 de Abril",
                             "attachments" => "6",
-                            "assigned" => ["1.png"],
-                            "members" => ["Sarah"]
+                            "assigned" => [],
+                            "members" => []
                         ]
                     ]
                 ]
@@ -140,8 +140,8 @@ class KanbanController extends Controller
                         'assigned' => $assignedPhotos,
                         'members' => $membersNames,
                         'assigned_ids' => $assignedToIds,
-                        'comments' => (string) ($item->comments_count ?? "0"),
-                        'attachments' => (string) ($item->attachments_count ?? "0")
+                        'comments' => (string) count($item->comments ?? []),
+                        'attachments' => (string) count($item->attachments ?? [])
                     ];
                 })
             ];
@@ -170,6 +170,7 @@ class KanbanController extends Controller
                     'user_avatar' => $activity->user ? $activity->user->profile_photo_url : asset('assets/img/avatars/1.png'),
                     'type' => $activity->type,
                     'description' => $activity->description,
+                    'extra_data' => $activity->data,
                     'created_at' => $activity->created_at ? $activity->created_at->format('d/m/Y H:i') : '',
                     'time_ago' => $activity->created_at ? $activity->created_at->diffForHumans() : ''
                 ];
@@ -212,33 +213,43 @@ class KanbanController extends Controller
 
     public function addBoard(Request $request)
     {
-        $request->validate(['title' => 'required']);
+        try {
+            $request->validate(['title' => 'required']);
 
-        $board = KanbanBoard::create([
-            'company_id' => Auth::user()->company_id,
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'order' => KanbanBoard::where('company_id', Auth::user()->company_id)->count()
-        ]);
+            $board = KanbanBoard::create([
+                'company_id' => Auth::user()->company_id,
+                'title' => $request->title,
+                'slug' => Str::slug($request->title),
+                'order' => KanbanBoard::where('company_id', Auth::user()->company_id)->count()
+            ]);
 
-        return response()->json(['id' => 'board-' . $board->id, 'title' => $board->title]);
+            return response()->json(['id' => 'board-' . $board->id, 'title' => $board->title]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in addBoard: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function addItem(Request $request)
     {
-        // boardId vem como "board-1", precisamos limpar
-        $boardId = str_replace('board-', '', $request->boardId);
+        try {
+            // boardId vem como "board-1", precisamos limpar
+            $boardId = str_replace('board-', '', $request->boardId);
 
-        $item = KanbanItem::create([
-            'kanban_board_id' => $boardId,
-            'title' => $request->title,
-            'badge_text' => 'Novo',
-            'badge_color' => 'success'
-        ]);
+            $item = KanbanItem::create([
+                'kanban_board_id' => $boardId,
+                'title' => $request->title,
+                'badge_text' => 'Novo',
+                'badge_color' => 'success'
+            ]);
 
-        $this->logActivity($item->id, 'creation', 'Criou a tarefa: ' . $item->title);
+            $this->logActivity($item->id, 'creation', 'Criou a tarefa: ' . $item->title);
 
-        return response()->json($item);
+            return response()->json($item);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in addItem: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function moveItem(Request $request)
@@ -260,26 +271,64 @@ class KanbanController extends Controller
 
     public function updateItem(Request $request, $id)
     {
-        $item = KanbanItem::findOrFail($id);
-        $oldTitle = $item->title;
+        try {
+            if (!is_numeric($id)) {
+                return response()->json(['error' => 'Cards de demonstração não podem ser editados. Por favor, crie um novo card real.'], 400);
+            }
 
-        $item->update([
-            'title' => $request->title,
-            'due_date' => $request->dueDate,
-            'badge_text' => $request->badgeText,
-            'badge_color' => $request->badgeColor,
-            'assigned_to' => $request->assignedTo, // Espera array de IDs
-        ]);
+            $item = KanbanItem::findOrFail($id);
+            $oldTitle = $item->title;
 
-        if ($oldTitle !== $request->title) {
-            $this->logActivity($item->id, 'update', "Renomeou a tarefa de '{$oldTitle}' para '{$request->title}'");
+            $item->update([
+                'title' => $request->title,
+                'due_date' => $request->dueDate,
+                'badge_text' => $request->badgeText,
+                'badge_color' => $request->badgeColor,
+                'assigned_to' => $request->assignedTo, // Espera array de IDs
+            ]);
+
+            if ($oldTitle !== $request->title) {
+                $this->logActivity($item->id, 'update', "Renomeou a tarefa de '{$oldTitle}' para '{$request->title}'");
+            }
+
+            if ($request->comment) {
+                $comments = $item->comments ?? [];
+                $comments[] = [
+                    'user_id' => Auth::id(),
+                    'text' => $request->comment,
+                    'created_at' => now()->toISOString()
+                ];
+                $item->comments = $comments;
+                $item->save();
+
+                $this->logActivity($item->id, 'comment', "Adicionou um comentário", ['text' => $request->comment]);
+            }
+
+            if ($request->hasFile('attachments')) {
+                $newAttachments = [];
+                $attachments = $item->attachments ?? [];
+                foreach ($request->file('attachments') as $file) {
+                    $path = $file->store('kanban/attachments', 'public');
+                    $fileData = [
+                        'name' => $file->getClientOriginalName(),
+                        'path' => $path,
+                        'user_id' => Auth::id(),
+                        'created_at' => now()->toISOString()
+                    ];
+                    $attachments[] = $fileData;
+                    $newAttachments[] = $fileData;
+                }
+                $item->attachments = $attachments;
+                $item->save();
+
+                $this->logActivity($item->id, 'attachment', "Adicionou " . count($request->file('attachments')) . " anexo(s)", ['files' => $newAttachments]);
+            }
+
+            return response()->json($item);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in updateItem: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        if ($request->comment) {
-            $this->logActivity($item->id, 'comment', "Adicionou um comentário: " . strip_tags($request->comment));
-        }
-
-        return response()->json($item);
     }
 
     public function deleteItem($id)

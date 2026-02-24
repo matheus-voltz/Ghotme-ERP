@@ -14,7 +14,14 @@ class ChecklistController extends Controller
 
     public function dataBase()
     {
-        $items = ChecklistItem::orderBy('category')->orderBy('order')->get();
+        $nicheCategories = array_keys(niche('checklist_categories') ?? []);
+        $nicheCategories[] = 'Geral';
+
+        $items = ChecklistItem::whereIn('category', $nicheCategories)
+            ->orderBy('category')
+            ->orderBy('order')
+            ->get();
+
         return response()->json(['data' => $items]);
     }
 

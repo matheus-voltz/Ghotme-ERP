@@ -164,11 +164,13 @@ isset($configData['contentLayout']) && $configData['contentLayout'] === 'compact
     <div class="drag-target"></div>
 
     <!-- Ghotme Academy Floating Button -->
+    @if(!isset($isPublic) || !$isPublic)
     <button class="btn btn-primary btn-icon rounded-pill shadow-lg position-fixed"
       style="bottom: 25px; right: 25px; width: 50px; height: 50px; z-index: 9999;"
       data-bs-toggle="modal" data-bs-target="#academyModal" title="Ghotme Academy">
       <i class="ti tabler-help fs-2"></i>
     </button>
+    @endif
 
     <!-- Academy Modal -->
     <div class="modal fade" id="academyModal" tabindex="-1" aria-hidden="true">

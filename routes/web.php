@@ -151,22 +151,41 @@ Route::middleware([
     Route::post('/budgets/{id}/convert', [BudgetController::class, 'convertToOS'])->name('budgets.convert');
     Route::get('/budgets/{id}/whatsapp', [BudgetController::class, 'sendWhatsApp'])->name('budgets.whatsapp');
 
-    // Clients
+    // Dynamic Main Entities & Clients based on Niche slugs
+    $allNiches = config('niche.niches', []);
+    foreach ($allNiches as $slug => $nConfig) {
+        $entsSlug = $nConfig['labels']['url_entities_slug'] ?? null;
+        $clsSlug = $nConfig['labels']['url_clients_slug'] ?? null;
+
+        if ($entsSlug) {
+            Route::get("/{$entsSlug}/{id}/dossier", [VehiclesController::class, 'getDossier'])->name($entsSlug . '.dossier');
+            Route::get("/{$entsSlug}", [VehiclesController::class, 'index'])->name($entsSlug . '.index');
+            Route::get("/{$entsSlug}-list", [VehiclesController::class, 'dataBase'])->name($entsSlug . '-list.data');
+            Route::get("/{$entsSlug}-list/{id}/edit", [VehiclesController::class, 'edit'])->name($entsSlug . '-list.edit');
+            Route::post("/{$entsSlug}-list", [VehiclesController::class, 'store'])->name($entsSlug . '-list.store');
+            Route::delete("/{$entsSlug}-list/{id}", [VehiclesController::class, 'destroy'])->name($entsSlug . '-list.destroy');
+        }
+
+        if ($clsSlug) {
+            Route::get("/{$clsSlug}/{id}/quick-view", [ClientsController::class, 'quickView'])->name($clsSlug . '.quick-view');
+            Route::get("/{$clsSlug}", [ClientsController::class, 'index'])->name($clsSlug . '.index');
+            Route::get("/{$clsSlug}-list", [ClientsController::class, 'dataBase'])->name($clsSlug . '-list.data');
+            Route::post("/{$clsSlug}-list", [ClientsController::class, 'store'])->name($clsSlug . '-list.store');
+            Route::get("/{$clsSlug}-list/{id}/edit", [ClientsController::class, 'edit'])->name($clsSlug . '-list.edit');
+            Route::put("/{$clsSlug}-list/{id}", [ClientsController::class, 'update'])->name($clsSlug . '-list.update');
+            Route::delete("/{$clsSlug}-list/{id}", [ClientsController::class, 'destroy'])->name($clsSlug . '-list.destroy');
+        }
+    }
+
+    // Default static routes for compatibility
     Route::get('/clients/{id}/quick-view', [ClientsController::class, 'quickView'])->name('clients.quick-view');
     Route::get('/clients', [ClientsController::class, 'index'])->name('clients');
     Route::get('/clients-list', [ClientsController::class, 'dataBase'])->name('clients-list');
-
-    // Maintenance Contracts
-    Route::get('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'index'])->name('maintenance-contracts.index');
-    Route::post('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'store'])->name('maintenance-contracts.store');
-    Route::delete('/maintenance-contracts/{id}', [App\Http\Controllers\MaintenanceContractController::class, 'destroy'])->name('maintenance-contracts.destroy');
-
     Route::post('/clients-list', [ClientsController::class, 'store'])->name('clients-list.store');
     Route::get('/clients-list/{id}/edit', [ClientsController::class, 'edit'])->name('clients-list.edit');
     Route::put('/clients-list/{id}', [ClientsController::class, 'update'])->name('clients-list.update');
     Route::delete('/clients-list/{id}', [ClientsController::class, 'destroy'])->name('clients-list.destroy');
 
-    // Vehicles
     Route::get('/vehicles/{id}/dossier', [VehiclesController::class, 'getDossier'])->name('vehicles.dossier');
     Route::get('/vehicles', [VehiclesController::class, 'index'])->name('vehicles');
     Route::get('/vehicles-list', [VehiclesController::class, 'dataBase'])->name('vehicles-list');
@@ -175,11 +194,38 @@ Route::middleware([
     Route::delete('/vehicles-list/{id}', [VehiclesController::class, 'destroy'])->name('vehicles-list.destroy');
     Route::get('/api/vehicle-lookup/{placa}', [VehicleLookupController::class, 'lookup'])->name('vehicles.lookup');
 
-    // Vehicle History
-    Route::get('/vehicle-history', [VehicleHistoryController::class, 'index'])->name('vehicle-history');
-    Route::get('/vehicle-history/search', [VehicleHistoryController::class, 'search'])->name('vehicle-history.search');
-    Route::get('/vehicle-history/timeline/{vehicleId}', [VehicleHistoryController::class, 'getTimeline'])->name('vehicle-history.timeline');
-    Route::post('/vehicle-history', [VehicleHistoryController::class, 'store'])->name('vehicle-history.store');
+    // Dynamic Entity History based on Niche
+    $allNiches = config('niche.niches', []);
+    foreach ($allNiches as $slug => $nConfig) {
+        $uSlug = $nConfig['labels']['url_slug'] ?? null;
+        if ($uSlug) {
+            Route::get("/{$uSlug}-history", [VehicleHistoryController::class, 'index']);
+            Route::get("/{$uSlug}-history/search", [VehicleHistoryController::class, 'search']);
+            Route::get("/{$uSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline']);
+            Route::post("/{$uSlug}-history", [VehicleHistoryController::class, 'store']);
+        }
+    }
+
+    // Named routes (defaults to current niche for route() helper)
+    $curSlug = niche('url_slug', 'vehicle');
+    Route::get("/{$curSlug}-history", [VehicleHistoryController::class, 'index'])->name('vehicle-history');
+    Route::get("/{$curSlug}-history/search", [VehicleHistoryController::class, 'search'])->name('vehicle-history.search');
+    Route::get("/{$curSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline'])->name('vehicle-history.timeline');
+    Route::post("/{$curSlug}-history", [VehicleHistoryController::class, 'store'])->name('vehicle-history.store');
+
+    // Static fallbacks to prevent 404s if JS uses fixed strings
+    Route::get('/vehicle-history/search', [VehicleHistoryController::class, 'search']);
+    Route::get('/vehicle-history/timeline/{vehicleId}', [VehicleHistoryController::class, 'getTimeline']);
+    Route::post('/vehicle-history', [VehicleHistoryController::class, 'store']);
+    Route::get('/vehicle-history', [VehicleHistoryController::class, 'index']);
+
+    // Maintenance Contracts
+    Route::get('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'index'])->name('maintenance-contracts');
+    Route::post('/maintenance-contracts', [App\Http\Controllers\MaintenanceContractController::class, 'store'])->name('maintenance-contracts.store');
+    Route::delete('/maintenance-contracts/{id}', [App\Http\Controllers\MaintenanceContractController::class, 'destroy'])->name('maintenance-contracts.destroy');
+
+    // Dynamic Maintenance Contracts based on Niche
+    Route::get("/{maintenance_contracts_slug}", [App\Http\Controllers\MaintenanceContractController::class, 'index']);
 
     // Inventory
     Route::get('/inventory/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('inventory.purchase-orders');
@@ -226,10 +272,6 @@ Route::middleware([
     Route::delete('/services/packages/{id}', [ServicePackageController::class, 'destroy'])->name('services.packages.destroy');
 
     // Finance
-    Route::get('/finance/kanban', [App\Http\Controllers\FinancialKanbanController::class, 'index'])->name('finance.kanban');
-    Route::get('/finance/kanban/data', [App\Http\Controllers\FinancialKanbanController::class, 'fetch'])->name('finance.kanban.data');
-    Route::post('/finance/kanban/update', [App\Http\Controllers\FinancialKanbanController::class, 'updateStatus'])->name('finance.kanban.update');
-
     Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
     Route::get('/finance/accounts-payable', [FinanceController::class, 'payables'])->name('finance.payables');
     Route::get('/finance/data', [FinanceController::class, 'dataBase'])->name('finance.data');

@@ -55,4 +55,9 @@ class FinancialTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function related()
+    {
+        return $this->morphTo();
+    }
 }

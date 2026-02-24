@@ -30,19 +30,19 @@ $configData = Helper::appClasses();
 
     {{-- plan and trial check --}}
     @php
-        $user = auth()->user();
-        $isExpired = $user->isTrialExpired();
-        $isAllowedInExpired = in_array($menu->slug, ['dashboard', 'settings']);
-        
-        // Se expirou e não for Dashboard ou Configurações, pula a renderização
-        if ($isExpired && !$isAllowedInAllowedList = in_array($menu->slug, ['dashboard', 'settings'])) {
-            continue;
-        }
+    $user = auth()->user();
+    $isExpired = $user->isTrialExpired();
+    $isAllowedInExpired = in_array($menu->slug, ['dashboard', 'settings']);
 
-        // Feature check normal
-        if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
-            continue;
-        }
+    // Se expirou e não for Dashboard ou Configurações, pula a renderização
+    if ($isExpired && !$isAllowedInAllowedList = in_array($menu->slug, ['dashboard', 'settings'])) {
+    continue;
+    }
+
+    // Feature check normal
+    if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
+    continue;
+    }
     @endphp
 
     {{-- menu headers --}}
@@ -61,6 +61,7 @@ $configData = Helper::appClasses();
     } elseif (isset($menu->submenu)) {
     if (gettype($menu->slug) === 'array') {
     foreach ($menu->slug as $slug) {
+    $slug = niche_translate($slug);
     if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
     $activeClass = 'active open';
     }
@@ -76,9 +77,13 @@ $configData = Helper::appClasses();
     }
     @endphp
 
-    {{-- main menu --}}
     <li class="menu-item {{ $activeClass }}">
-      <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
+      @php
+      $rawUrl = isset($menu->url) ? $menu->url : 'javascript:void(0);';
+      $translatedUrl = niche_translate($rawUrl);
+      $menuUrl = ($rawUrl !== 'javascript:void(0);') ? url($translatedUrl) : $translatedUrl;
+      @endphp
+      <a href="{{ $menuUrl }}"
         class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}" @if (isset($menu->target) and
         !empty($menu->target)) target="_blank" @endif>
         @isset($menu->icon)

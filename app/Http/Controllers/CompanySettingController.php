@@ -34,7 +34,7 @@ class CompanySettingController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:2',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'niche' => 'nullable|string|in:workshop,tech_assistance,pet_shop',
+            'niche' => 'nullable|string|in:workshop,automotive,electronics,pet,beauty_clinic,construction',
         ]);
 
         if ($request->hasFile('logo')) {

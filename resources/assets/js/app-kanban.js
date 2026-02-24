@@ -122,15 +122,15 @@ document.addEventListener('DOMContentLoaded', async function () {
       <div class="dropdown-menu dropdown-menu-end" aria-labelledby="board-dropdown">
           <a class="dropdown-item delete-board" href="javascript:void(0)">
               <i class="icon-base ti tabler-trash icon-xs"></i>
-              <span class="align-middle">Delete</span>
+              <span class="align-middle">Excluir</span>
           </a>
           <a class="dropdown-item" href="javascript:void(0)">
               <i class="icon-base ti tabler-edit icon-xs"></i>
-              <span class="align-middle">Rename</span>
+              <span class="align-middle">Renomear</span>
           </a>
           <a class="dropdown-item" href="javascript:void(0)">
               <i class="icon-base ti tabler-archive icon-xs"></i>
-              <span class="align-middle">Archive</span>
+              <span class="align-middle">Arquivar</span>
           </a>
       </div>
   </div>
@@ -145,9 +145,9 @@ document.addEventListener('DOMContentLoaded', async function () {
        aria-expanded="false">
     </i>
     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="kanban-tasks-item-dropdown">
-        <a class="dropdown-item" href="javascript:void(0)">Copy task link</a>
-        <a class="dropdown-item" href="javascript:void(0)">Duplicate task</a>
-        <a class="dropdown-item delete-task" href="javascript:void(0)">Delete</a>
+        <a class="dropdown-item" href="javascript:void(0)">Copiar link da tarefa</a>
+        <a class="dropdown-item" href="javascript:void(0)">Duplicar tarefa</a>
+        <a class="dropdown-item delete-task" href="javascript:void(0)">Excluir</a>
     </div>
 </div>
 `;
@@ -212,17 +212,33 @@ document.addEventListener('DOMContentLoaded', async function () {
         return;
       }
 
-      container.innerHTML = activities.map(activity => `
-        <div class="media mb-4 d-flex align-items-center">
-          <div class="avatar me-3 flex-shrink-0">
-            <img src="${activity.user_avatar}" alt="Avatar" class="rounded-circle" />
+      container.innerHTML = activities.map(activity => {
+        let details = '';
+        if (activity.type === 'comment' && activity.extra_data?.text) {
+          details = `<div class="mt-2 p-2 bg-light rounded text-body">${activity.extra_data.text}</div>`;
+        } else if (activity.type === 'attachment' && activity.extra_data?.files) {
+          details = `<div class="mt-2">
+            ${activity.extra_data.files.map(file => `
+              <a href="/storage/${file.path}" target="_blank" class="d-block text-primary mb-1">
+                <i class="ti tabler-file-download me-1"></i>${file.name}
+              </a>
+            `).join('')}
+          </div>`;
+        }
+
+        return `
+          <div class="media mb-4 d-flex align-items-start">
+            <div class="avatar me-3 flex-shrink-0">
+              <img src="${activity.user_avatar}" alt="Avatar" class="rounded-circle" />
+            </div>
+            <div class="media-body w-100">
+              <p class="mb-0 pt-1"><span>${activity.user_name}</span> ${activity.description}</p>
+              ${details}
+              <small class="text-body-secondary">${activity.time_ago}</small>
+            </div>
           </div>
-          <div class="media-body">
-            <p class="mb-0"><span>${activity.user_name}</span> ${activity.description}</p>
-            <small class="text-body-secondary">${activity.time_ago}</small>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
     } catch (error) {
       console.error(error);
@@ -265,10 +281,10 @@ document.addEventListener('DOMContentLoaded', async function () {
     }),
     dragBoards: true,
     addItemButton: true,
-    buttonContent: '+ Add Item',
+    buttonContent: '+ Adicionar Item',
     itemAddOptions: {
       enabled: true,
-      content: '+ Add New Item',
+      content: '+ Adicionar Novo Item',
       class: 'kanban-title-button btn btn-default border-none',
       footer: false
     },
@@ -329,11 +345,11 @@ document.addEventListener('DOMContentLoaded', async function () {
       addNewForm.setAttribute('class', 'new-item-form');
       addNewForm.innerHTML = `
         <div class="mb-4">
-            <textarea class="form-control add-new-item" rows="2" placeholder="Add Content" autofocus required></textarea>
+            <textarea class="form-control add-new-item" rows="2" placeholder="Adicionar Conteúdo" autofocus required></textarea>
         </div>
         <div class="mb-4">
-            <button type="submit" class="btn btn-primary btn-sm me-3 waves-effect waves-light">Add</button>
-            <button type="button" class="btn btn-label-secondary btn-sm cancel-add-item waves-effect waves-light">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm me-3 waves-effect waves-light">Adicionar</button>
+            <button type="button" class="btn btn-label-secondary btn-sm cancel-add-item waves-effect waves-light">Cancelar</button>
         </div>
       `;
 
@@ -413,27 +429,47 @@ document.addEventListener('DOMContentLoaded', async function () {
       const comment = quillEditor ? quillEditor.root.innerHTML : '';
       const isCommentEmpty = quillEditor ? (quillEditor.getText().trim().length === 0) : true;
 
+      const formData = new FormData();
+      formData.append('_method', 'PUT');
+      formData.append('title', title);
+      formData.append('dueDate', dueDate);
+      formData.append('badgeText', label || '');
+      formData.append('badgeColor', badgeColor);
+      formData.append('comment', isCommentEmpty ? '' : comment);
+
+      if (assignedTo) {
+        assignedTo.forEach(id => formData.append('assignedTo[]', id));
+      }
+
+      const fileInput = document.querySelector('#attachments');
+      if (fileInput && fileInput.files.length > 0) {
+        for (let i = 0; i < fileInput.files.length; i++) {
+          formData.append('attachments[]', fileInput.files[i]);
+        }
+      }
+
       fetch('/kanban/update-item/' + currentItemId, {
-        method: 'PUT',
+        method: 'POST', // Usamos POST com _method=PUT para suporte a arquivos
         headers: {
-          'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        body: JSON.stringify({
-          title: title,
-          dueDate: dueDate,
-          badgeText: label,
-          badgeColor: badgeColor,
-          assignedTo: assignedTo,
-          comment: isCommentEmpty ? null : comment
-        })
+        body: formData
       })
-        .then(response => response.json())
+        .then(async response => {
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro ao atualizar item');
+          }
+          return response.json();
+        })
         .then(data => {
           if (quillEditor) quillEditor.setContents([]); // Clear editor
           location.reload();
         })
-        .catch(error => console.error('Error updating item:', error));
+        .catch(error => {
+          alert(error.message);
+          console.error('Error updating item:', error);
+        });
     });
   }
 
