@@ -65,21 +65,42 @@ class CustomerPortalController extends Controller
         
         $client = Clients::withoutGlobalScope('company')->where('uuid', $uuid)->firstOrFail();
         
-        $lastOrder = OrdemServico::withoutGlobalScope('company')
+        // Localiza o melhor destinatário (quem falou por último ou quem abriu a OS)
+        $lastResponse = \App\Models\ChatMessage::withoutGlobalScopes()
             ->where('client_id', $client->id)
+            ->whereNotNull('sender_id')
             ->latest()
             ->first();
-            
-        $receiverId = $lastOrder->user_id ?? \App\Models\User::where('company_id', $client->company_id)->where('role', 'admin')->first()->id;
 
-        $msg = \App\Models\ChatMessage::create([
-            'company_id' => $client->company_id,
+        if ($lastResponse) {
+            $receiverId = $lastResponse->sender_id;
+        } else {
+            $lastOrder = OrdemServico::withoutGlobalScope('company')
+                ->where('client_id', $client->id)
+                ->latest()
+                ->first();
+            
+            // Fallback: busca qualquer admin da empresa se não houver OS
+            $admin = \App\Models\User::where('company_id', $client->company_id)->where('role', 'admin')->first();
+            $receiverId = $lastOrder->user_id ?? ($admin->id ?? null);
+        }
+
+        // DEBUG: Log the values before creating
+        \Illuminate\Support\Facades\Log::info("Portal Chat Debug:", [
             'client_id' => $client->id,
-            'sender_id' => null, // Externo
             'receiver_id' => $receiverId,
-            'message' => $request->message,
-            'is_read' => false
+            'company_id' => $client->company_id,
+            'message' => $request->message
         ]);
+
+        $msg = new \App\Models\ChatMessage();
+        $msg->company_id = $client->company_id;
+        $msg->client_id = $client->id;
+        $msg->sender_id = null; // GARANTE que é externo
+        $msg->receiver_id = $receiverId;
+        $msg->message = $request->message;
+        $msg->is_read = false;
+        $msg->save();
 
         return response()->json(['success' => true]);
     }

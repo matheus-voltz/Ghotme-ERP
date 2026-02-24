@@ -21,10 +21,16 @@ class SupportChat extends Component
     public $search = '';
     public $activeTab = 'team'; 
     public $userStatus;
+    public $onlyMyClients = false; // Novo filtro
 
     public function mount()
     {
         $this->userStatus = Auth::user()->chat_status ?? 'online';
+    }
+
+    public function toggleMyClients()
+    {
+        $this->onlyMyClients = !$this->onlyMyClients;
     }
 
     public function setTab($tab)
@@ -55,9 +61,10 @@ class SupportChat extends Component
         $this->activeUserId = null;
         $this->chatType = 'client';
 
+        // Marcar TODAS as mensagens deste cliente enviadas para a empresa como lidas
         ChatMessage::withoutGlobalScopes()
             ->where('client_id', $this->activeClientId)
-            ->where('receiver_id', Auth::id())
+            ->whereNull('sender_id') 
             ->where('is_read', false)
             ->update(['is_read' => true]);
             
@@ -79,15 +86,28 @@ class SupportChat extends Component
             $attachmentPath = $this->attachment->store('chat_attachments', 'public');
         }
 
-        ChatMessage::create([
-            'company_id' => Auth::user()->company_id,
-            'client_id' => $this->activeClientId,
-            'sender_id' => Auth::id(),
-            'receiver_id' => $this->activeUserId, // Pode ser null se for para cliente
-            'message' => $this->message ?? '',
-            'attachment_path' => $attachmentPath,
-            'is_read' => false
-        ]);
+        if ($this->chatType === 'client') {
+            // Mensagem para o cliente
+            ChatMessage::create([
+                'company_id' => Auth::user()->company_id,
+                'client_id' => $this->activeClientId,
+                'sender_id' => Auth::id(),
+                'receiver_id' => null, // O "receptor" é o cliente (identificado pelo client_id)
+                'message' => $this->message ?? '',
+                'attachment_path' => $attachmentPath,
+                'is_read' => false
+            ]);
+        } else {
+            // Mensagem interna (equipe ou suporte)
+            ChatMessage::create([
+                'company_id' => Auth::user()->company_id,
+                'sender_id' => Auth::id(),
+                'receiver_id' => $this->activeUserId,
+                'message' => $this->message ?? '',
+                'attachment_path' => $attachmentPath,
+                'is_read' => false
+            ]);
+        }
 
         $this->reset(['message', 'attachment']);
         $this->dispatch('message-sent');
@@ -113,9 +133,15 @@ class SupportChat extends Component
             ->get();
 
         // 3. Clientes
-        $clientContacts = \App\Models\Clients::where('company_id', $user->company_id)
-            ->where('name', 'like', '%' . $this->search . '%')
-            ->get();
+        $clientQuery = \App\Models\Clients::where('company_id', $user->company_id);
+        
+        if ($this->onlyMyClients) {
+            $clientQuery->whereHas('vehicles.ordensServico', function($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        }
+
+        $clientContacts = $clientQuery->where('name', 'like', '%' . $this->search . '%')->get();
 
         $contacts = match ($this->activeTab) {
             'team' => $teamContacts,
@@ -127,9 +153,10 @@ class SupportChat extends Component
         // Unread counts
         $contacts->map(function ($contact) use ($user) {
             if ($this->activeTab === 'clients') {
+                // Conta mensagens não lidas desse cliente para QUALQUER UM da empresa
                 $contact->unread_count = ChatMessage::withoutGlobalScopes()
                     ->where('client_id', $contact->id)
-                    ->where('receiver_id', $user->id)
+                    ->whereNull('sender_id') 
                     ->where('is_read', false)
                     ->count();
             } else {
@@ -156,7 +183,7 @@ class SupportChat extends Component
                 })
                 ->orderBy('created_at', 'asc')->get();
         } elseif ($this->chatType === 'client' && $this->activeClientId) {
-            $activeContact = \App\Models\Clients::find($this->activeClientId);
+            $activeContact = \App\Models\Clients::withoutGlobalScopes()->find($this->activeClientId);
             // Mostra todas as mensagens do cliente para a empresa, não apenas para um atendente
             $messages = ChatMessage::withoutGlobalScopes()
                 ->where('client_id', $this->activeClientId)

@@ -159,12 +159,13 @@ Route::middleware([
     $registeredClsSlugs = [];
 
     foreach ($allNiches as $nSlug => $nConfig) {
-        $entsSlug = $nConfig['labels']['url_entities_slug'] ?? null;
-        $clsSlug = $nConfig['labels']['url_clients_slug'] ?? null;
+        $entsSlug = strtolower($nConfig['labels']['url_entities_slug'] ?? '');
+        $clsSlug = strtolower($nConfig['labels']['url_clients_slug'] ?? '');
 
         if ($entsSlug && !in_array($entsSlug, $registeredEntsSlugs)) {
-            Route::get("/{$entsSlug}/{id}/dossier", [VehiclesController::class, 'getDossier'])->name($entsSlug . '.dossier');
+            // Rotas Estáticas para Entidades (Pets, Veículos, etc)
             Route::get("/{$entsSlug}", [VehiclesController::class, 'index'])->name($entsSlug . '.index');
+            Route::get("/{$entsSlug}/{id}/dossier", [VehiclesController::class, 'getDossier'])->name($entsSlug . '.dossier');
             Route::get("/{$entsSlug}-list", [VehiclesController::class, 'dataBase'])->name($entsSlug . '-list.data');
             Route::get("/{$entsSlug}-list/{id}/edit", [VehiclesController::class, 'edit'])->name($entsSlug . '-list.edit');
             Route::post("/{$entsSlug}-list", [VehiclesController::class, 'store'])->name($entsSlug . '-list.store');
@@ -173,8 +174,9 @@ Route::middleware([
         }
 
         if ($clsSlug && !in_array($clsSlug, $registeredClsSlugs)) {
-            Route::get("/{$clsSlug}/{id}/quick-view", [ClientsController::class, 'quickView'])->name($clsSlug . '.quick-view');
+            // Rotas Estáticas para Clientes
             Route::get("/{$clsSlug}", [ClientsController::class, 'index'])->name($clsSlug . '.index');
+            Route::get("/{$clsSlug}/{id}/quick-view", [ClientsController::class, 'quickView'])->name($clsSlug . '.quick-view');
             Route::get("/{$clsSlug}-list", [ClientsController::class, 'dataBase'])->name($clsSlug . '-list.data');
             Route::post("/{$clsSlug}-list", [ClientsController::class, 'store'])->name($clsSlug . '-list.store');
             Route::get("/{$clsSlug}-list/{id}/edit", [ClientsController::class, 'edit'])->name($clsSlug . '-list.edit');
@@ -205,7 +207,7 @@ Route::middleware([
     $allNiches = config('niche.niches', []);
     $registeredHistSlugs = [];
     foreach ($allNiches as $slug => $nConfig) {
-        $uSlug = $nConfig['labels']['url_slug'] ?? null;
+        $uSlug = strtolower($nConfig['labels']['url_slug'] ?? '');
         if ($uSlug && !in_array($uSlug, $registeredHistSlugs)) {
             Route::get("/{$uSlug}-history", [VehicleHistoryController::class, 'index']);
             Route::get("/{$uSlug}-history/search", [VehicleHistoryController::class, 'search']);

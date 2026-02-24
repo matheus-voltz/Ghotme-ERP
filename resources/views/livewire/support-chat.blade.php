@@ -9,12 +9,21 @@
                         <input type="text" class="form-control" wire:model.live="search" placeholder="Buscar..." />
                     </div>
                 </div>
-                <div class="sidebar-body" wire:poll.5s>
+                <div class="sidebar-body" wire:poll.3s>
                     <div class="d-flex justify-content-between px-3 py-2 border-bottom bg-light">
                         <button class="btn btn-sm {{ $activeTab == 'team' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('team')">Equipe</button>
                         <button class="btn btn-sm {{ $activeTab == 'support' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('support')">Suporte</button>
                         <button class="btn btn-sm {{ $activeTab == 'clients' ? 'btn-primary' : 'btn-label-secondary' }}" wire:click="setTab('clients')">Clientes</button>
                     </div>
+                    
+                    @if($activeTab === 'clients')
+                    <div class="px-4 py-2 border-bottom d-flex align-items-center justify-content-between bg-lighter">
+                        <small class="text-muted fw-bold">Somente meus clientes</small>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" wire:click="toggleMyClients" {{ $onlyMyClients ? 'checked' : '' }}>
+                        </div>
+                    </div>
+                    @endif
                     <ul class="list-unstyled chat-contact-list py-2 mb-0" style="max-height: 500px; overflow-y: auto;">
                         @foreach($contacts as $contact)
                         @php
@@ -68,7 +77,7 @@
                     </div>
 
                     <!-- Messages -->
-                    <div class="chat-history-body flex-grow-1 p-4" id="chat-history-container" style="overflow-y: auto;" wire:poll.4s>
+                    <div class="chat-history-body flex-grow-1 p-4" id="chat-history-container" style="overflow-y: auto;" wire:poll.3s>
                         <ul class="list-unstyled chat-history">
                             @foreach($messages as $msg)
                             <li class="chat-message {{ ($msg->sender_id == auth()->id()) ? 'chat-message-right' : '' }} mb-4 d-flex {{ ($msg->sender_id == auth()->id()) ? 'justify-content-end' : '' }}">

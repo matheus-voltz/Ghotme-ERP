@@ -46,4 +46,9 @@ class Vehicles extends Model implements Auditable
     {
         return $this->hasMany(VehicleHistory::class, 'veiculo_id');
     }
+
+    public function ordensServico()
+    {
+        return $this->hasMany(OrdemServico::class, 'veiculo_id');
+    }
 }

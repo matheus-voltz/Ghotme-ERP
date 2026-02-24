@@ -81,19 +81,19 @@
       "slug": "clients-vehicles",
       "submenu": [
       {
-        "url": "/clients",
+        "url": "/{niche_clients_slug}",
         "name": "Clientes",
-        "slug": "clients"
+        "slug": "{niche_clients_slug}"
       },
       {
-        "url": "/vehicles",
+        "url": "/{niche_entities_slug}",
         "name": "Veículos",
-        "slug": "vehicles"
+        "slug": "{niche_entities_slug}"
       },
       {
-        "url": "/vehicle-history",
+        "url": "/{niche_slug}-history",
         "name": "Histórico do veículo",
-        "slug": "vehicle-history"
+        "slug": "{niche_slug}-history"
       }
       ]
     },

@@ -76,10 +76,10 @@ if (!function_exists('niche_translate')) {
         $string = str_ireplace($search, $replace, $string);
 
         // placeholders
-        $urlSlug = niche('url_slug', 'vehicle', $company);
-        $entitiesSlug = niche('url_entities_slug', 'vehicles', $company);
-        $clientSlug = niche('url_client_slug', 'client', $company);
-        $clientsSlug = niche('url_clients_slug', 'clients', $company);
+        $urlSlug = strtolower(niche('url_slug', 'vehicle', $company));
+        $entitiesSlug = strtolower(niche('url_entities_slug', 'vehicles', $company));
+        $clientSlug = strtolower(niche('url_client_slug', 'client', $company));
+        $clientsSlug = strtolower(niche('url_clients_slug', 'clients', $company));
 
         $string = str_replace('{niche_slug}', $urlSlug, $string);
         $string = str_replace('{niche_entities_slug}', $entitiesSlug, $string);

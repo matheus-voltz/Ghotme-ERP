@@ -141,8 +141,8 @@ $customizerHidden = 'customizer-hide';
     }
 
     .chat-button {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
         border-radius: 50%;
         background: var(--portal-primary);
         color: white;
@@ -446,23 +446,6 @@ $customizerHidden = 'customizer-hide';
                 @endforelse
             </div>
 
-            <!-- Card de Apoio -->
-            <div class="card bg-dark border-0 rounded-4 overflow-hidden mt-5">
-                <div class="card-body p-4 position-relative">
-                    <i class="ti tabler-help fs-1 text-white opacity-10" style="position: absolute; right: 10px; top: 10px;"></i>
-                    <h5 class="text-white mb-3">Precisa de Ajuda?</h5>
-                    <p class="text-white opacity-75 small mb-4">Sua empresa de confiança está sempre à disposição para esclarecer dúvidas.</p>
-                    <div class="d-flex flex-column gap-2">
-                        <button type="button" class="btn btn-primary w-100 rounded-pill" data-bs-toggle="modal" data-bs-target="#chatModal">
-                            <i class="ti tabler-message me-1"></i> Falar com Atendente
-                        </button>
-                        <a href="https://wa.me/{{ preg_replace('/\D/', '', $client->company->phone ?? '') }}?text={{ urlencode('Olá, sou ' . $client->name . ' e gostaria de informações sobre meu serviço no portal.') }}" target="_blank" class="btn btn-label-success w-100 rounded-pill text-white">
-                            <i class="ti tabler-brand-whatsapp me-1"></i> Chamar no WhatsApp
-                        </a>
-                    </div>
-                </div>
-            </div>
-
             <!-- FAQ Section -->
             <div class="mt-5">
                 <h5 class="fw-bold mb-4">Perguntas Frequentes</h5>
@@ -499,7 +482,7 @@ $customizerHidden = 'customizer-hide';
                         </h2>
                         <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#portalFaq">
                             <div class="accordion-body bg-white text-muted small pt-0">
-                                Aceitamos cartões de crédito, débito, PIX e dinheiro. O pagamento pode ser realizado presencialmente na retirada do veículo ou conforme combinado com o consultor.
+                                Aceitamos cartões de crédito, débito, PIX e dinheiro. O pagamento pode ser realizado presencialmente na retirada do seu {{ strtolower(niche('entity', 'item', $client->company)) }} ou conforme combinado com o consultor.
                             </div>
                         </div>
                     </div>
@@ -547,21 +530,33 @@ $customizerHidden = 'customizer-hide';
             <i class="ti tabler-brand-whatsapp fs-3"></i>
         </a>
         <button class="chat-button" onclick="toggleChat()">
-            <i class="ti tabler-message fs-2" id="chatIcon"></i>
+            <div class="position-relative">
+                <i class="ti tabler-message fs-2" id="chatIcon"></i>
+                <span id="chatBadge" class="badge rounded-pill bg-danger position-absolute top-0 start-100 translate-middle p-1 d-none" style="border: 2px solid white;">
+                    <span class="visually-hidden">Nova mensagem</span>
+                </span>
+            </div>
         </button>
     </div>
 </div>
 
+<audio id="chatSound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+
 <script>
+    let lastMsgCount = 0;
+
     function toggleChat() {
         const win = document.getElementById('chatWindow');
         const icon = document.getElementById('chatIcon');
+        const badge = document.getElementById('chatBadge');
+
         if(win.style.display === 'flex') {
             win.style.display = 'none';
             icon.className = 'ti tabler-message fs-2';
         } else {
             win.style.display = 'flex';
             icon.className = 'ti tabler-x fs-2';
+            badge.classList.add('d-none'); // Limpa badge ao abrir
             const body = document.getElementById('chatBody');
             body.scrollTop = body.scrollHeight;
         }
@@ -571,6 +566,11 @@ $customizerHidden = 'customizer-hide';
         const btnSend = document.getElementById('btnPortalSend');
         const input = document.getElementById('portalChatMessage');
         const chatBody = document.getElementById('chatBody');
+        const chatWindow = document.getElementById('chatWindow');
+        const badge = document.getElementById('chatBadge');
+        const sound = document.getElementById('chatSound');
+
+        lastMsgCount = chatBody.querySelectorAll('.chat-msg').length - 1;
 
         function appendMessage(msg, type) {
             const div = document.createElement('div');
@@ -586,6 +586,7 @@ $customizerHidden = 'customizer-hide';
 
             input.value = '';
             appendMessage(message, 'sent');
+            lastMsgCount++;
 
             try {
                 const response = await fetch("{{ route('customer.portal.send-message', $client->uuid) }}", {
@@ -611,29 +612,38 @@ $customizerHidden = 'customizer-hide';
                 const response = await fetch("{{ route('customer.portal.fetch-messages', $client->uuid) }}");
                 const messages = await response.json();
                 
-                // Limpa e reconstrói para garantir ordem e novos itens (incluindo respostas)
-                const currentCount = chatBody.querySelectorAll('.chat-msg').length - 1; // -1 por causa da msg fixa de boas vindas
+                const serverCount = messages.length;
+                console.log('Messages from server:', serverCount, 'Current local count:', lastMsgCount);
                 
-                if (messages.length > currentCount) {
-                    const welcomeMsg = chatBody.firstElementChild.outerHTML;
-                    chatBody.innerHTML = welcomeMsg;
+                if (serverCount > lastMsgCount) {
+                    const welcomeMsgHtml = chatBody.querySelector('.chat-msg-received').outerHTML;
+                    chatBody.innerHTML = welcomeMsgHtml;
                     
                     messages.forEach(msg => {
                         const div = document.createElement('div');
+                        // Se tem sender_id, significa que veio da EQUIPE
                         div.className = `chat-msg ${msg.sender_id ? 'chat-msg-received' : 'chat-msg-sent'}`;
                         div.textContent = msg.message;
                         chatBody.appendChild(div);
                     });
+
+                    // Notifica se não estiver com chat aberto e a última msg for da EQUIPE
+                    const lastMsg = messages[messages.length - 1];
+                    if (chatWindow.style.display !== 'flex' && lastMsg.sender_id) {
+                        console.log('New message from staff! Notifying...');
+                        badge.classList.remove('d-none');
+                        sound.play().catch(e => console.error('Sound error:', e));
+                    }
+
                     chatBody.scrollTop = chatBody.scrollHeight;
+                    lastMsgCount = serverCount;
                 }
             } catch (err) {
-                console.error('Erro ao buscar mensagens');
+                console.error('Erro ao buscar mensagens:', err);
             }
         }
 
         setInterval(fetchMessages, 5000);
-
-        // Scroll ao carregar
         chatBody.scrollTop = chatBody.scrollHeight;
     });
 </script>
