@@ -84,7 +84,7 @@
     <!-- Role -->
     <div class="mb-6">
       <x-label class="form-label" for="role" value="{{ __('Cargo') }}" />
-      <x-input id="role" type="text" class="{{ $errors->has('role') ? 'is-invalid' : '' }}" wire:model="state.role" />
+      <x-input id="role" type="text" class="{{ $errors->has('role') ? 'is-invalid' : '' }}" wire:model="state.role" disabled />
       <x-input-error for="role" />
     </div>
   </x-slot>

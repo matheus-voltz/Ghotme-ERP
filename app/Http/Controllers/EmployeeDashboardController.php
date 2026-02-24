@@ -13,14 +13,49 @@ class EmployeeDashboardController extends Controller
     {
         $employee = Auth::user();
 
-        // Fetch orders assigned to the employee or all active orders
+        // 1. Ordens Ativas (que estão no pátio/oficina)
         $orders = OrdemServico::where('company_id', $employee->company_id)
             ->whereIn('status', ['approved', 'in_progress', 'testing', 'cleaning'])
-            ->with(['client', 'veiculo', 'items'])
+            ->with(['client', 'veiculo', 'items.service'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('content.employee.dashboard', compact('orders'));
+        // 2. Ordens Finalizadas (Total Acumulado)
+        $finalizedCount = OrdemServico::where('company_id', $employee->company_id)
+            ->whereIn('status', ['completed', 'paid'])
+            ->count();
+
+        // 3. Ordens Pausadas (tem pelo menos um item pausado nas OS ativas)
+        $pausedCount = OrdemServico::where('company_id', $employee->company_id)
+            ->whereHas('items', function($q) {
+                $q->where('status', 'paused');
+            })
+            ->whereIn('status', ['approved', 'in_progress', 'testing', 'cleaning'])
+            ->count();
+
+        // 4. Tempo de Produção Total (Soma de tudo + tempo rodando agora)
+        $totalSeconds = OrdemServicoItem::whereHas('ordemServico', function($q) use ($employee) {
+                $q->where('company_id', $employee->company_id);
+            })
+            ->sum('duration_seconds');
+
+        // Adiciona o tempo dos itens que estão com o cronômetro ligado agora
+        $activeItems = OrdemServicoItem::whereHas('ordemServico', function($q) use ($employee) {
+                $q->where('company_id', $employee->company_id);
+            })
+            ->where('status', 'in_progress')
+            ->whereNotNull('started_at')
+            ->get();
+
+        foreach($activeItems as $ai) {
+            $totalSeconds += $ai->started_at->diffInSeconds(now());
+        }
+
+        $hours = floor($totalSeconds / 3600);
+        $minutes = floor(($totalSeconds % 3600) / 60);
+        $productionTime = "{$hours}h {$minutes}m";
+
+        return view('content.employee.dashboard', compact('orders', 'finalizedCount', 'pausedCount', 'productionTime'));
     }
 
     public function show($uuid)

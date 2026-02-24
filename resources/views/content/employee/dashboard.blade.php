@@ -46,7 +46,7 @@
                         <i class="icon-base ti tabler-circle-check fs-2 text-success"></i>
                     </div>
                     <div class="card-info">
-                        <h4 class="mb-0 fw-bold">0</h4>
+                        <h4 class="mb-0 fw-bold">{{ $finalizedCount }}</h4>
                         <small class="text-muted">Finalizadas</small>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                         <i class="icon-base ti tabler-player-play fs-2 text-info"></i>
                     </div>
                     <div class="card-info">
-                        <h4 class="mb-0 fw-bold">0h 0m</h4>
+                        <h4 class="mb-0 fw-bold">{{ $productionTime }}</h4>
                         <small class="text-muted">Produção</small>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                         <i class="icon-base ti tabler-clock-pause fs-2 text-warning"></i>
                     </div>
                     <div class="card-info">
-                        <h4 class="mb-0 fw-bold">0</h4>
+                        <h4 class="mb-0 fw-bold">{{ $pausedCount }}</h4>
                         <small class="text-muted">Pausadas</small>
                     </div>
                 </div>
