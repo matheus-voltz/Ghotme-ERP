@@ -63,7 +63,7 @@ export default defineConfig({
         'resources/js/laravel-user-management.js', // Processing Laravel User Management CRUD JS File
         'resources/js/laravel-clients.js',
         'resources/js/laravel-vehicles.js',
-        'resources/js/financial-kanban.js',
+        // 'resources/js/financial-kanban.js',
         'resources/js/cep-lookup.js',
         'resources/js/inventory-items.js',
         'resources/js/inventory-suppliers.js',

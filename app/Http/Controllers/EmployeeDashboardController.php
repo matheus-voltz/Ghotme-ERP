@@ -7,36 +7,32 @@ use App\Models\OrdemServicoItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class MechanicDashboardController extends Controller
+class EmployeeDashboardController extends Controller
 {
     public function index()
     {
-        $mechanic = Auth::user();
+        $employee = Auth::user();
 
-        // Fetch orders assigned to the mechanic or all active orders if no assignment logic is strict yet
-        // Assuming 'user_id' on OrdemServico means the responsible mechanic/advisor
-        $orders = OrdemServico::where('company_id', $mechanic->company_id)
+        // Fetch orders assigned to the employee or all active orders
+        $orders = OrdemServico::where('company_id', $employee->company_id)
             ->whereIn('status', ['approved', 'in_progress', 'testing', 'cleaning'])
             ->with(['client', 'veiculo', 'items'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('content.mechanic.dashboard', compact('orders'));
+        return view('content.employee.dashboard', compact('orders'));
     }
 
     public function show($uuid)
     {
         $order = OrdemServico::where('uuid', $uuid)
-            ->with(['client', 'veiculo']) // Removed items.service form here to load manually
+            ->with(['client', 'veiculo']) 
             ->firstOrFail();
 
-        // Explicitly load items to ensure they are retrieved
-        // Bypass any global scope issues on the relation by querying manually
         $items = OrdemServicoItem::where('ordem_servico_id', $order->id)->with('service')->get();
-        // Manually set relation to avoid refactoring view
         $order->setRelation('items', $items);
 
-        return view('content.mechanic.show', compact('order'));
+        return view('content.employee.show', compact('order'));
     }
 
     public function toggleTimer($itemId)

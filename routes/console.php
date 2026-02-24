@@ -12,3 +12,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('billing:send-reminders')->dailyAt('09:00');
+Schedule::command('support:check-emails')->everyMinute();

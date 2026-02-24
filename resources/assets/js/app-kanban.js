@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async function () {
               <i class="icon-base ti tabler-trash icon-xs"></i>
               <span class="align-middle">Excluir</span>
           </a>
-          <a class="dropdown-item" href="javascript:void(0)">
+          <a class="dropdown-item rename-board" href="javascript:void(0)">
               <i class="icon-base ti tabler-edit icon-xs"></i>
               <span class="align-middle">Renomear</span>
           </a>
@@ -513,22 +513,28 @@ document.addEventListener('DOMContentLoaded', async function () {
       el.textContent = '';
 
       if (el.getAttribute('data-badge') && el.getAttribute('data-badge-text')) {
-        el.insertAdjacentHTML(
-          'afterbegin',
-          `${renderHeader(el.getAttribute('data-badge'), el.getAttribute('data-badge-text'))}${img}${element}`
-        );
+        // Check if header already exists to prevent duplicates
+        if (!el.querySelector('.kanban-tasks-item-dropdown')) {
+          el.insertAdjacentHTML(
+            'afterbegin',
+            `${renderHeader(el.getAttribute('data-badge'), el.getAttribute('data-badge-text'))}${img}${element}`
+          );
+        }
       }
 
       if (el.getAttribute('data-comments') || el.getAttribute('data-due-date') || el.getAttribute('data-assigned')) {
-        el.insertAdjacentHTML(
-          'beforeend',
-          renderFooter(
-            el.getAttribute('data-attachments') || 0,
-            el.getAttribute('data-comments') || 0,
-            el.getAttribute('data-assigned') ? el.getAttribute('data-assigned').split(',') : [],
-            el.getAttribute('data-members') ? el.getAttribute('data-members').split(',') : []
-          )
-        );
+        // Check if footer already exists to prevent duplicates
+        if (!el.querySelector('.assigned-avatar')) {
+          el.insertAdjacentHTML(
+            'beforeend',
+            renderFooter(
+              el.getAttribute('data-attachments') || 0,
+              el.getAttribute('data-comments') || 0,
+              el.getAttribute('data-assigned') ? el.getAttribute('data-assigned').split(',') : [],
+              el.getAttribute('data-members') ? el.getAttribute('data-members').split(',') : []
+            )
+          );
+        }
       }
     });
   }
@@ -571,6 +577,25 @@ document.addEventListener('DOMContentLoaded', async function () {
         elem.contentEditable = 'true';
       });
 
+      elem.addEventListener('blur', e => {
+        const boardId = elem.closest('.kanban-board').getAttribute('data-id');
+        const newTitle = e.target.textContent.trim();
+
+        fetch('/kanban/update-board', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({ id: boardId, title: newTitle })
+        })
+          .then(response => response.json())
+          .then(data => {
+            console.log('Board renamed:', data);
+          })
+          .catch(error => console.error('Error renaming board:', error));
+      });
+
       // Appends delete icon with title
       elem.insertAdjacentHTML('afterend', renderBoardDropdown());
     });
@@ -581,7 +606,29 @@ document.addEventListener('DOMContentLoaded', async function () {
   deleteBoards.forEach(elem => {
     elem.addEventListener('click', () => {
       const id = elem.closest('.kanban-board').getAttribute('data-id');
-      kanban.removeBoard(id);
+      if (confirm('Tem certeza que deseja excluir este quadro? Todas as tarefas dele serão removidas.')) {
+        fetch('/kanban/delete-board/' + id, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          }
+        })
+          .then(response => response.json())
+          .then(() => {
+            kanban.removeBoard(id);
+          })
+          .catch(error => console.error('Error deleting board:', error));
+      }
+    });
+  });
+
+  // Rename Board from dropdown
+  const renameBoards = Array.from(document.querySelectorAll('.rename-board'));
+  renameBoards.forEach(elem => {
+    elem.addEventListener('click', () => {
+      const header = elem.closest('.kanban-board-header').querySelector('.kanban-title-board');
+      header.contentEditable = 'true';
+      header.focus();
     });
   });
 
@@ -638,12 +685,48 @@ document.addEventListener('DOMContentLoaded', async function () {
               header.contentEditable = 'true';
             });
 
-            // Add delete functionality to new board
-            const deleteNewBoard = newBoard.querySelector('.delete-board');
-            if (deleteNewBoard) {
-              deleteNewBoard.addEventListener('click', () => {
-                const id = deleteNewBoard.closest('.kanban-board').getAttribute('data-id');
-                kanban.removeBoard(id);
+            header.addEventListener('blur', e => {
+              const boardId = newBoard.getAttribute('data-id');
+              const newTitle = e.target.textContent.trim();
+
+              fetch('/kanban/update-board', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ id: boardId, title: newTitle })
+              })
+                .then(response => response.json())
+                .then(data => console.log('Board renamed:', data))
+                .catch(error => console.error('Error renaming board:', error));
+            });
+
+            // Add functionality to new board dropdown items
+            const dropdown = newBoard.querySelector('.dropdown-menu');
+            const deleteBtn = dropdown.querySelector('.delete-board');
+            const renameBtn = dropdown.querySelector('.rename-board');
+
+            if (deleteBtn) {
+              deleteBtn.addEventListener('click', () => {
+                const id = newBoard.getAttribute('data-id');
+                if (confirm('Tem certeza que deseja excluir este quadro? Todas as tarefas dele serão removidas.')) {
+                  fetch('/kanban/delete-board/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                  })
+                    .then(() => kanban.removeBoard(id))
+                    .catch(error => console.error('Error deleting board:', error));
+                }
+              });
+            }
+
+            if (renameBtn) {
+              renameBtn.addEventListener('click', () => {
+                header.contentEditable = 'true';
+                header.focus();
               });
             }
           }

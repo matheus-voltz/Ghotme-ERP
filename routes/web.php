@@ -225,7 +225,15 @@ Route::middleware([
     Route::delete('/maintenance-contracts/{id}', [App\Http\Controllers\MaintenanceContractController::class, 'destroy'])->name('maintenance-contracts.destroy');
 
     // Dynamic Maintenance Contracts based on Niche
-    Route::get("/{maintenance_contracts_slug}", [App\Http\Controllers\MaintenanceContractController::class, 'index']);
+    $allNiches = config('niche.niches', []);
+    $registeredSlugs = [];
+    foreach ($allNiches as $nSlug => $nConfig) {
+        $mCSlug = ($nSlug === 'pet' ? 'planos' : 'contratos');
+        if (!in_array($mCSlug, $registeredSlugs)) {
+            Route::get("/{$mCSlug}", [App\Http\Controllers\MaintenanceContractController::class, 'index']);
+            $registeredSlugs[] = $mCSlug;
+        }
+    }
 
     // Inventory
     Route::get('/inventory/purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'index'])->name('inventory.purchase-orders');
@@ -394,6 +402,8 @@ Route::middleware([
     Route::get('/kanban/users', [App\Http\Controllers\KanbanController::class, 'getUsers'])->name('kanban.users');
     Route::get('/kanban/item/{id}/activities', [App\Http\Controllers\KanbanController::class, 'fetchActivities'])->name('kanban.activities');
     Route::post('/kanban/add-board', [App\Http\Controllers\KanbanController::class, 'addBoard'])->name('kanban.add-board');
+    Route::put('/kanban/update-board', [App\Http\Controllers\KanbanController::class, 'updateBoard'])->name('kanban.update-board');
+    Route::delete('/kanban/delete-board/{id}', [App\Http\Controllers\KanbanController::class, 'deleteBoard'])->name('kanban.delete-board');
     Route::post('/kanban/add-item', [App\Http\Controllers\KanbanController::class, 'addItem'])->name('kanban.add-item');
     Route::post('/kanban/move-item', [App\Http\Controllers\KanbanController::class, 'moveItem'])->name('kanban.move-item');
     Route::put('/kanban/update-item/{id}', [App\Http\Controllers\KanbanController::class, 'updateItem'])->name('kanban.update-item');
@@ -414,11 +424,11 @@ Route::middleware([
     Route::post('/notifications/mark-as-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-as-read');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.individual.mark-as-read');
 
-    // Mechanic Dashboard
-    Route::get('/mechanic', [App\Http\Controllers\MechanicDashboardController::class, 'index'])->name('mechanic.dashboard');
-    Route::get('/mechanic/os/{uuid}', [App\Http\Controllers\MechanicDashboardController::class, 'show'])->name('mechanic.os.show');
-    Route::post('/mechanic/timer/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'toggleTimer'])->name('mechanic.timer.toggle');
-    Route::post('/mechanic/complete/{itemId}', [App\Http\Controllers\MechanicDashboardController::class, 'completeItem'])->name('mechanic.item.complete');
+    // Employee Dashboard
+    Route::get('/employee', [App\Http\Controllers\EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+    Route::get('/employee/os/{uuid}', [App\Http\Controllers\EmployeeDashboardController::class, 'show'])->name('employee.os.show');
+    Route::post('/employee/timer/{itemId}', [App\Http\Controllers\EmployeeDashboardController::class, 'toggleTimer'])->name('employee.timer.toggle');
+    Route::post('/employee/complete/{itemId}', [App\Http\Controllers\EmployeeDashboardController::class, 'completeItem'])->name('employee.item.complete');
 
     // TESTE DE NOTIFICAÇÃO PUSH REAL
     Route::get('/push-test/{token}', function (\Illuminate\Http\Request $request, $token) {

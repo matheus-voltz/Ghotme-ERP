@@ -230,6 +230,38 @@ class KanbanController extends Controller
         }
     }
 
+    public function updateBoard(Request $request)
+    {
+        try {
+            $request->validate(['title' => 'required']);
+            $id = str_replace('board-', '', $request->id);
+            $board = KanbanBoard::where('company_id', Auth::user()->company_id)->findOrFail($id);
+            $board->update([
+                'title' => $request->title,
+                'slug' => Str::slug($request->title)
+            ]);
+
+            return response()->json(['success' => true, 'title' => $board->title]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in updateBoard: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteBoard($id)
+    {
+        try {
+            $id = str_replace('board-', '', $id);
+            $board = KanbanBoard::where('company_id', Auth::user()->company_id)->findOrFail($id);
+            $board->delete();
+
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error in deleteBoard: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
     public function addItem(Request $request)
     {
         try {

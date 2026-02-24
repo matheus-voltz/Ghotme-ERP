@@ -43,9 +43,14 @@ class SupportController extends Controller
 
         $user = Auth::user();
         
-        // Aqui poderíamos enviar um e-mail real ou salvar no banco
-        // Por enquanto, vamos simular o sucesso
-        
-        return back()->with('success', 'Seu chamado foi enviado com sucesso! Retornaremos em breve.');
+        try {
+            // Envia o e-mail para o suporte
+            Mail::to('suporte@ghotme.com.br')->send(new \App\Mail\SupportTicketMail($validated, $user));
+            
+            return back()->with('success', 'Seu chamado foi enviado com sucesso! Nossa equipe entrará em contato em breve.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Erro ao enviar chamado de suporte: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Ocorreu um erro ao enviar seu chamado. Por favor, tente novamente mais tarde ou use o WhatsApp.');
+        }
     }
 }

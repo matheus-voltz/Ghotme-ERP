@@ -1,10 +1,10 @@
 {
     "menu": [
         {
-            "url": "/dashboard",
-            "name": "Home",
-            "icon": "menu-icon icon-base ti tabler-smart-home",
-            "slug": "dashboard"
+            "url": "/employee",
+            "name": "Portal do Funcionário",
+            "icon": "menu-icon icon-base ti tabler-layout-dashboard",
+            "slug": "employee.dashboard"
         },
         {
             "url": "/calendar",

@@ -18,10 +18,10 @@
             <div class="col-md-4">
               <label class="form-label" for="entity_type">Módulo</label>
               <select id="entity_type" name="entity_type" class="form-select" required>
-                <option value="Clients">Clientes</option>
-                <option value="Vehicles">Veículos / Ativos</option>
+                <option value="Clients">{{ niche_translate('Clientes') }}</option>
+                <option value="Vehicles">{{ niche_translate('Veículos') }} / Ativos</option>
                 <option value="OrdemServico">Ordens de Serviço</option>
-                <option value="InventoryItem">Produtos / Estoque</option>
+                <option value="InventoryItem">{{ niche_translate('Peças') }} / Estoque</option>
               </select>
             </div>
             <div class="col-md-4">
@@ -79,7 +79,17 @@
           <tbody class="table-border-bottom-0">
             @forelse($fields as $field)
             <tr>
-              <td><span class="badge bg-label-info">{{ $field->entity_type }}</span></td>
+              <td>
+                <span class="badge bg-label-info">
+                  @switch($field->entity_type)
+                    @case('Clients') {{ niche_translate('Clientes') }} @break
+                    @case('Vehicles') {{ niche_translate('Veículos') }} @break
+                    @case('OrdemServico') Ordens de Serviço @break
+                    @case('InventoryItem') {{ niche_translate('Peças') }} @break
+                    @default {{ $field->entity_type }}
+                  @endswitch
+                </span>
+              </td>
               <td><strong>{{ $field->name }}</strong></td>
               <td>{{ $field->type }}</td>
               <td>{{ $field->required ? 'Sim' : 'Não' }}</td>
