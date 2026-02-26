@@ -29,4 +29,13 @@ class NotificationController extends Controller
             'read_at' => $notification->read_at->format('d/m/Y H:i')
         ]);
     }
+
+    public function unreadCount()
+    {
+        $unread = Auth::user()->unreadNotifications;
+        return response()->json([
+            'count' => $unread->count(),
+            'latest' => $unread->first()
+        ]);
+    }
 }

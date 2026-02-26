@@ -72,6 +72,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function isTrialExpired()
     {
+        // Dono do sistema nunca expira
+        if ($this->is_master) {
+            return false;
+        }
+
         // Se já tiver um plano ativo que não seja 'free', não expirou
         if (!empty($this->plan) && $this->plan !== self::PLAN_STANDARD && $this->plan !== 'free') {
             return false;
@@ -85,6 +90,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function isPaymentOverdue()
     {
+        if ($this->is_master) return false;
         return !is_null($this->payment_overdue_since);
     }
 
@@ -93,6 +99,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function getOverdueDays()
     {
+        if ($this->is_master) return 0;
         if (!$this->isPaymentOverdue()) {
             return 0;
         }
@@ -104,6 +111,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function isLockedDueToOverdue()
     {
+        if ($this->is_master) return false;
         return $this->isPaymentOverdue() && $this->getOverdueDays() >= 3;
     }
 
@@ -112,6 +120,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
      */
     public function hasFeature($feature)
     {
+        // Dono do sistema tem acesso a TUDO
+        if ($this->is_master) {
+            return true;
+        }
+
         // Se o teste expirou, bloqueia todas as funcionalidades operacionais
         if ($this->isTrialExpired()) {
             return false;

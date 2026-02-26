@@ -44,6 +44,15 @@ return Application::configure(basePath: dirname(__DIR__))
                         'stack_trace' => $e->getTraceAsString(),
                         'request_data' => request()->all(),
                     ]);
+
+                    // Notifica o MASTER sobre o erro crítico
+                    $master = \App\Models\User::where('is_master', true)->first();
+                    if ($master) {
+                        $master->notify(new \App\Notifications\SystemAlertNotification(
+                            "🚨 Erro Crítico de SQL!",
+                            "Um erro de banco de dados ocorreu na URL: " . request()->path()
+                        ));
+                    }
                 } catch (\Exception $logException) {
                     // Se falhar ao salvar no banco, apenas segue o fluxo padrão (logs de arquivo)
                 }

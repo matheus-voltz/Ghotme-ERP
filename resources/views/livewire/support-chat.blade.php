@@ -1,4 +1,30 @@
 <div>
+    <style>
+        /* Correção de visibilidade do Chat */
+        .app-chat .app-chat-history .chat-history-body {
+            height: 100% !important;
+            min-height: 400px !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .chat-history {
+            display: flex !important;
+            flex-direction: column !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .chat-message {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            margin-bottom: 1.5rem !important;
+        }
+        .chat-message-text {
+            display: block !important;
+            word-break: break-word !important;
+        }
+    </style>
     <div class="app-chat card overflow-hidden">
         <div class="row g-0">
             <!-- Contacts (Esquerda) -->
@@ -10,6 +36,7 @@
                     </div>
                 </div>
                 <div class="sidebar-body" wire:poll.3s>
+                    @if(!auth()->user()->is_master)
                     <div class="d-flex justify-content-between px-3 py-2 border-bottom bg-light">
                         <button class="btn btn-sm {{ $activeTab == 'team' ? 'btn-primary' : 'btn-label-secondary' }} position-relative me-1" wire:click="setTab('team')">
                             Equipe
@@ -30,6 +57,11 @@
                             @endif
                         </button>
                     </div>
+                    @else
+                    <div class="px-5 py-3 border-bottom bg-label-primary">
+                        <h6 class="mb-0 fw-bold"><i class="ti tabler-ticket me-1"></i> Tickets de Suporte (Central)</h6>
+                    </div>
+                    @endif
 
 
                     <ul class="list-unstyled chat-contact-list py-2 mb-0" style="max-height: 500px; overflow-y: auto;">
@@ -46,7 +78,11 @@
                                 </div>
                                 <div class="chat-contact-info flex-grow-1">
                                     <h6 class="m-0">{{ $contact->name }}</h6>
+                                    @if(auth()->user()->is_master)
+                                    <small class="text-primary fw-bold d-block">{{ $contact->company->name ?? 'Empresa N/A' }}</small>
+                                    @else
                                     <small class="text-muted text-truncate d-block" style="max-width: 180px;">{{ $contact->email ?? $contact->whatsapp ?? 'Cliente' }}</small>
+                                    @endif
                                 </div>
                                 @if($contact->unread_count > 0)
                                 <span class="badge bg-danger rounded-pill">{{ $contact->unread_count }}</span>
@@ -73,7 +109,11 @@
                             </div>
                             <div>
                                 <h6 class="m-0">{{ $activeContact->name }}</h6>
+                                @if(auth()->user()->is_master)
+                                <span class="badge bg-label-primary small">{{ $activeContact->company->name ?? 'Suporte Ghotme' }}</span>
+                                @else
                                 <span class="badge bg-label-{{ $chatType === 'client' ? 'primary' : 'success' }} small">{{ $chatType === 'client' ? 'Portal do Cliente' : 'Equipe' }}</span>
+                                @endif
                             </div>
                         </div>
                         @if($chatType === 'user' && $activeContact->email == 'suporte@ghotme.com.br')
@@ -85,30 +125,33 @@
                 </div>
 
                 <!-- Messages -->
-                <div class="chat-history-body flex-grow-1 p-4" id="chat-history-container" style="overflow-y: auto;" wire:poll.3s>
-                    <ul class="list-unstyled chat-history">
+                <div class="chat-history-body flex-grow-1 p-4" id="chat-history-container" style="overflow-y: auto; background-color: #f4f4f7 !important; min-height: 400px;" wire:poll.3s>
+                    
+                    <div class="d-flex flex-column">
                         @foreach($messages as $msg)
-                        <li class="chat-message {{ ($msg->sender_id == auth()->id()) ? 'chat-message-right' : '' }} mb-4 d-flex {{ ($msg->sender_id == auth()->id()) ? 'justify-content-end' : '' }}">
-                            <div class="chat-message-wrapper" style="max-width: 70%;">
-                                <div class="chat-message-text p-3 rounded shadow-sm {{ ($msg->sender_id == auth()->id()) ? 'bg-primary text-white' : 'bg-light text-dark' }}">
+                            @php
+                                $isMe = (int)$msg->sender_id === (int)auth()->id();
+                            @endphp
+                            <div class="mb-4 d-flex {{ $isMe ? 'justify-content-end' : 'justify-content-start' }}" style="width: 100%;">
+                                <div style="max-width: 80%; padding: 12px 16px; border-radius: 12px; position: relative; 
+                                    {{ $isMe ? 'background-color: #7367f0; color: white; border-bottom-right-radius: 2px;' : 'background-color: white; color: #333; border-bottom-left-radius: 2px; border: 1px solid #ddd;' }}">
+                                    
                                     @if($msg->attachment_path)
-                                    <div class="mb-2">
-                                        <a href="{{ asset('storage/' . $msg->attachment_path) }}" target="_blank">
-                                            <img src="{{ asset('storage/' . $msg->attachment_path) }}" class="img-fluid rounded" style="max-height: 250px;">
-                                        </a>
-                                    </div>
+                                        <div class="mb-2">
+                                            <a href="{{ asset('storage/' . $msg->attachment_path) }}" target="_blank">
+                                                <img src="{{ asset('storage/' . $msg->attachment_path) }}" class="img-fluid rounded" style="max-height: 200px;">
+                                            </a>
+                                        </div>
                                     @endif
-                                    @if($msg->message)
-                                    <p class="mb-0">{{ $msg->message }}</p>
-                                    @endif
+
+                                    <p class="mb-1" style="margin: 0; font-size: 0.95rem;">{{ $msg->message }}</p>
+                                    <small style="font-size: 0.7rem; opacity: 0.8; display: block; text-align: right;">
+                                        {{ $msg->created_at->format('H:i') }}
+                                    </small>
                                 </div>
-                                <small class="text-muted d-block mt-1 {{ ($msg->sender_id == auth()->id()) ? 'text-end' : '' }}">
-                                    {{ $msg->created_at->format('H:i') }}
-                                </small>
                             </div>
-                        </li>
                         @endforeach
-                    </ul>
+                    </div>
                 </div>
 
                 <!-- Footer / Input -->
