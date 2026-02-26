@@ -305,6 +305,7 @@
       "name": "Newsletter",
       "icon": "menu-icon icon-base ti tabler-mail-fast",
       "slug": "newsletter",
+      "master_only": true,
       "submenu": [
         {
           "url": "/admin/newsletter",

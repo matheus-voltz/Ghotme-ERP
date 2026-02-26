@@ -11,6 +11,7 @@ use App\Models\InventoryItem;
 use App\Models\Budget;
 use App\Models\OrdemServicoItem;
 use App\Models\OrdemServicoPart;
+use App\Models\SystemUpdate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -211,6 +212,7 @@ class HomePage extends Controller
       'topServiceLabels' => $topServices->pluck('name')->map(fn($item) => str($item)->limit(15))->toArray(),
       'topServiceData' => $topServices->pluck('total')->toArray(),
       'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
+      'lastUpdate' => SystemUpdate::latest()->first(),
     ];
   }
 }

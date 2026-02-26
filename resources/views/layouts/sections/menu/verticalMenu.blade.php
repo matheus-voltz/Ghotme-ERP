@@ -48,9 +48,17 @@ $configData = Helper::appClasses();
     continue;
     }
 
-    // Master check
-    if (isset($menu->master_only) && $menu->master_only && !$user->is_master) {
-    continue;
+    // Master check (REGRAS DE SEPARAÇÃO TOTAL)
+    if ($user->is_master) {
+        // Se eu sou MASTER, eu SÓ vejo o que for master_only
+        if (!isset($menu->master_only) || !$menu->master_only) {
+            continue;
+        }
+    } else {
+        // Se eu NÃO SOU master, eu NUNCA vejo o que for master_only
+        if (isset($menu->master_only) && $menu->master_only) {
+            continue;
+        }
     }
     }
     @endphp

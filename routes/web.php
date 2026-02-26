@@ -165,8 +165,9 @@ Route::middleware([
     Route::post('/appointments/{id}/confirm', [App\Http\Controllers\AppointmentController::class, 'confirm'])->name('appointments.confirm');
     Route::post('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
 
-    // Main Page Route
+    // Dashboard e Novidades
     Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
+    Route::get('/whats-new', [App\Http\Controllers\SystemUpdateController::class, 'index'])->name('whats-new');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
     Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');
     Route::get('/ordens-servico/data', [OrdemServicoController::class, 'dataBase'])->name('ordens-servico.data');

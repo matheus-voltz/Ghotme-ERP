@@ -44,6 +44,27 @@ $configData = Helper::appClasses();
 @endsection
 
 @section('content')
+@if(isset($lastUpdate))
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-none bg-label-primary">
+      <div class="card-body d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center">
+          <div class="avatar avatar-sm me-3">
+            <span class="avatar-initial rounded bg-primary"><i class="ti tabler-rocket fs-5"></i></span>
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold text-primary">Novidade: {{ $lastUpdate->title }}</h6>
+            <small class="text-muted d-none d-md-inline">{{ str($lastUpdate->description)->limit(80) }}</small>
+          </div>
+        </div>
+        <a href="{{ route('whats-new') }}" class="btn btn-sm btn-primary">Ver Tudo</a>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
+
 <div class="row g-4">
   <!-- Welcome & Highlights -->
   <div class="col-xl-8 col-lg-7 col-md-12">

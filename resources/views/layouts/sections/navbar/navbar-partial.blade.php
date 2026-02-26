@@ -116,6 +116,25 @@ if ($user && ($user->plan === 'free' || empty($user->plan)) && $user->trial_ends
     <!--/ Language -->
 
     @if(Auth::check())
+    <!-- What's New (Rocket) -->
+    <li class="nav-item me-2 me-xl-0">
+      <a class="nav-link" href="{{ route('whats-new') }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="O que há de novo?">
+        <i class="icon-base ti tabler-rocket icon-md animate-bounce-slow"></i>
+      </a>
+    </li>
+    <style>
+      @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+      .animate-bounce-slow {
+        animation: bounce-slow 2s infinite ease-in-out;
+      }
+    </style>
+    <!--/ What's New -->
+    @endif
+
+    @if(Auth::check())
       @livewire('navbar-chat-badge')
     @endif
 

@@ -887,10 +887,10 @@ $pageConfigs = [
         </div>
 
         <div class="mt-8 d-flex gap-3">
-          <a href="#" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
+          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
             <i class="ti tabler-brand-apple icon-md me-2"></i> {{ __('App Store') }}
           </a>
-          <a href="#" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
+          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
             <i class="ti tabler-brand-google-play icon-md me-2"></i> {{ __('Google Play') }}
           </a>
         </div>
@@ -1454,11 +1454,11 @@ $pageConfigs = [
               </form>
             </div>
           </div>
-          
+
           <!-- Elementos Decorativos de Vidro -->
           <div class="position-absolute top-0 end-0 mt-n10 me-n10 bg-white opacity-1 rounded-circle d-none d-md-block" style="width: 300px; height: 300px; filter: blur(80px);"></div>
           <div class="position-absolute bottom-0 start-0 mb-n10 ms-n10 bg-white opacity-1 rounded-circle d-none d-md-block" style="width: 200px; height: 200px; filter: blur(60px);"></div>
-          
+
           <!-- Ícones Flutuantes -->
           <div class="position-absolute top-0 start-0 p-6 opacity-25 d-none d-xl-block animate-float">
             <i class="ti tabler-mail-fast text-white" style="font-size: 5rem;"></i>
@@ -1583,6 +1583,31 @@ $pageConfigs = [
     </div>
   </section>
   <!-- Contact Us: End -->
+
+  <!-- App Coming Soon Modal -->
+  <div class="modal fade" id="appComingSoonModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered p-4">
+      <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem;">
+        <div class="modal-body p-sm-8 p-6 text-center">
+          <div class="avatar avatar-xl bg-label-primary mx-auto mb-6 rounded-circle shadow-sm" style="width: 80px; height: 80px;">
+            <i class="ti tabler-device-mobile-bolt fs-1"></i>
+          </div>
+          <h4 class="fw-extrabold mb-4">{{ __('App Ghotme: Em Breve!') }}</h4>
+          <p class="mb-8 fs-5 text-muted">
+            {{ __('Nosso aplicativo oficial está em fase final de homologação nas lojas da Apple e Google.') }}
+            <br><br>
+            {{ __('Gostaria de ser um dos primeiros a testar a versão Beta e ser avisado do lançamento oficial?') }}
+          </p>
+          <div class="d-grid gap-3">
+            <button type="button" class="btn btn-primary btn-lg rounded-3 py-3" data-bs-dismiss="modal" onclick="document.getElementById('landingContact').scrollIntoView({behavior: 'smooth'}); setTimeout(() => { document.getElementById('contact-form-fullname').focus(); }, 800);">
+              <i class="ti tabler-mail-fast me-2"></i> {{ __('Quero ser avisado!') }}
+            </button>
+            <button type="button" class="btn btn-label-secondary btn-lg rounded-3 py-3" data-bs-dismiss="modal">{{ __('Voltar') }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   </div>
   @section('page-script')
   @vite(['resources/assets/js/front-page-landing.js'])
