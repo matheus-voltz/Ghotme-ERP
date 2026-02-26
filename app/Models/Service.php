@@ -16,6 +16,7 @@ class Service extends Model
         'description',
         'price',
         'estimated_time',
+        'follow_up_days',
         'is_active',
     ];
 

@@ -44,7 +44,16 @@ $customizerHidden = 'customizer-hide';
         <p class="mb-6"><span class="fw-medium">Sua nova senha deve ser diferente das senhas anteriormente usadas</span></p>
         <form id="formAuthentication" class="mb-6" action="{{ route('password.update') }}" method="POST">
           @csrf
-          <input type="hidden" name="token" value="{{ $request->route('token') }}">
+          <div class="mb-6">
+            <label for="token" class="form-label">Código de Segurança (6 dígitos)</label>
+            <input type="text" class="form-control text-center @error('token') is-invalid @enderror" id="token" name="token"
+              placeholder="000000" maxlength="6" value="{{ $request->route('token') }}" autocomplete="off" style="font-size: 24px; letter-spacing: 8px; font-weight: bold;" />
+            @error('token')
+            <span class="invalid-feedback" role="alert">
+              <span class="fw-medium">{{ $message }}</span>
+            </span>
+            @enderror
+          </div>
           <div class="mb-6">
             <label for="email" class="form-label">Email</label>
             <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"

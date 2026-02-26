@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Auth\Notifications\ResetPassword as BaseResetPassword;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -41,18 +43,30 @@ class ResetPasswordCustom extends BaseResetPassword
             ? $notifiable->getEmailForPasswordReset()
             : (property_exists($notifiable, 'email') ? $notifiable->email : null);
 
+        // Gera um código de 6 dígitos
+        $otp = (string) rand(100000, 999999);
+
+        // Atualiza o token no banco de dados com o hash do código de 6 dígitos
+        // Isso permite que o Laravel valide o código como se fosse o token original
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $email],
+            [
+                'token' => Hash::make($otp),
+                'created_at' => now()
+            ]
+        );
+
         $url = url(route('password.reset', [
-            'token' => $this->token,
+            'token' => $otp,
             'email' => $email,
         ], false));
 
         return (new MailMessage)
             ->subject('🔐 Redefinição de senha - Ghotme')
-            ->greeting('Olá!')
-            ->line('Recebemos uma solicitação para redefinir sua senha.')
-            ->action('Redefinir senha', $url)
-            ->line('Este link expira em 60 minutos.')
-            ->salutation('Atenciosamente, equipe Ghotme');
+            ->view('emails.reset-password', [
+                'url' => $url,
+                'otp' => $otp,
+            ]);
     }
 
     /**

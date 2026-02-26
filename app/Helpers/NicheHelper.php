@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('niche_translate')) {
     /**
@@ -17,6 +18,11 @@ if (!function_exists('niche_translate')) {
             'Clientes & Veículos',
             'Clientes & Veiculos',
             'Customers & Vehicles',
+            'Customers & Entities',
+            'Clientes & Entidades',
+            'Customers',
+            'Entities',
+            'Entidades',
             'Veículos',
             'Veiculos',
             'Vehicles',
@@ -36,6 +42,7 @@ if (!function_exists('niche_translate')) {
             'Workshop',
             'Sua oficina',
             'da oficina',
+            'Logotipo da Oficina',
             'Contratos de Manutenção',
             'Maintenance Contracts',
             'Serviço',
@@ -48,6 +55,11 @@ if (!function_exists('niche_translate')) {
             __('Clientes') . ' & ' . $entities,
             __('Clientes') . ' & ' . $entities,
             __('Customers') . ' & ' . $entities,
+            __('Customers') . ' & ' . $entities,
+            __('Clientes') . ' & ' . $entities,
+            __('Clientes'),
+            $entities,
+            $entities,
             $entities,
             $entities,
             $entities,
@@ -67,10 +79,11 @@ if (!function_exists('niche_translate')) {
             __('Business'),
             'Sua ' . strtolower($workshopReplacement),
             'da ' . strtolower($workshopReplacement),
+            'Logotipo da ' . $workshopReplacement,
             __('Contratos de') . ' ' . $entities,
             'Maintenance Contracts',
-            $entity === 'Pet' ? 'Atendimento' : 'Serviço',
-            $entities === 'Pets' ? 'Atendimentos' : 'Serviços'
+            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimento' : 'Serviço',
+            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimentos' : 'Serviços'
         ];
 
         $string = str_ireplace($search, $replace, $string);
@@ -102,9 +115,17 @@ if (!function_exists('get_current_niche')) {
             return $company->niche;
         }
 
-        // 2. Try from the authenticated user's company, if they are logged in and it's not empty
-        if (auth()->check() && auth()->user()->company && !empty(trim(auth()->user()->company->niche))) {
-            return auth()->user()->company->niche;
+        // 2. Try from the authenticated user
+        if (Auth::check()) {
+            $user = Auth::user();
+            // Try user preference first
+            if (!empty(trim($user->niche))) {
+                return $user->niche;
+            }
+            // Fallback to user's company niche
+            if ($user->company && !empty(trim($user->company->niche))) {
+                return $user->company->niche;
+            }
         }
 
         // 3. Fallback to the .env configuration

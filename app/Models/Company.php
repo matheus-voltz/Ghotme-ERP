@@ -25,6 +25,7 @@ class Company extends Model
         'zip_code',
         'logo_path',
         'slug',
+        'niche',
         'is_active',
         'accountant_token',
     ];

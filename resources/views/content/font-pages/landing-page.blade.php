@@ -1428,28 +1428,41 @@ $pageConfigs = [
   <!-- Newsletter: Start -->
   <section id="landingNewsletter" class="section-py landing-newsletter">
     <div class="container">
-      <div class="card bg-primary border-0 shadow-lg overflow-hidden">
-        <div class="card-body p-sm-12 p-6 position-relative z-1">
-          <div class="row align-items-center gy-6">
+      <div class="card border-0 shadow-lg overflow-hidden position-relative" style="background: var(--ghotme-gradient); border-radius: 2rem;">
+        <div class="card-body p-sm-12 p-8 position-relative z-1">
+          <div class="row align-items-center gy-8">
             <div class="col-lg-6 text-center text-lg-start">
-              <h3 class="text-white fw-extrabold mb-2 display-6">{{ __('Newsletter Ghotme') }}</h3>
-              <p class="text-white opacity-75 mb-0 fs-5">
-                {{ __('Receba dicas exclusivas de gestão e novidades do sistema direto no seu e-mail.') }}
+              <div class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold">🚀 Newsletter</div>
+              <h3 class="text-white fw-extrabold mb-4 display-5">{{ __('Fique por dentro do futuro da gestão') }}</h3>
+              <p class="text-white opacity-90 mb-0 fs-5">
+                {{ __('Receba pílulas semanais de inteligência de negócio e atualizações exclusivas do ecossistema Ghotme.') }}
               </p>
             </div>
             <div class="col-lg-6">
-              <form id="newsletterForm" action="{{ route('newsletter.subscribe') }}" method="POST">
+              <form id="newsletterForm" action="{{ route('newsletter.subscribe') }}" method="POST" class="position-relative z-2">
                 @csrf
-                <div class="d-flex flex-column flex-sm-row gap-3 bg-white p-2 rounded-3 shadow-sm">
-                  <input type="email" name="email" class="form-control border-0 shadow-none ps-3" placeholder="seu@email.com" required>
-                  <button type="submit" class="btn btn-primary px-6">{{ __('Inscrever') }}</button>
+                <div class="d-flex flex-column flex-sm-row gap-3 bg-white p-3 rounded-4 shadow-lg">
+                  <div class="flex-grow-1 d-flex align-items-center ps-2">
+                    <i class="ti tabler-mail text-muted fs-4 me-2"></i>
+                    <input type="email" name="email" class="form-control border-0 shadow-none p-0 fs-5" placeholder="seu@melhor-email.com" required style="background: transparent;">
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-lg px-8 rounded-3 shadow-sm">{{ __('Inscrever Agora') }}</button>
                 </div>
+                <p class="text-white opacity-75 small mt-3 text-center text-lg-start">
+                  <i class="ti tabler-shield-check me-1"></i> Respeitamos sua privacidade. Sem spam, nunca.
+                </p>
               </form>
             </div>
           </div>
-          <!-- Decorativos -->
-          <div class="position-absolute top-0 end-0 mt-n10 me-n10 bg-white opacity-1 rounded-circle" style="width: 250px; height: 250px;"></div>
-          <div class="position-absolute bottom-0 start-0 mb-n10 ms-n10 bg-white opacity-1 rounded-circle" style="width: 150px; height: 150px;"></div>
+          
+          <!-- Elementos Decorativos de Vidro -->
+          <div class="position-absolute top-0 end-0 mt-n10 me-n10 bg-white opacity-1 rounded-circle d-none d-md-block" style="width: 300px; height: 300px; filter: blur(80px);"></div>
+          <div class="position-absolute bottom-0 start-0 mb-n10 ms-n10 bg-white opacity-1 rounded-circle d-none d-md-block" style="width: 200px; height: 200px; filter: blur(60px);"></div>
+          
+          <!-- Ícones Flutuantes -->
+          <div class="position-absolute top-0 start-0 p-6 opacity-25 d-none d-xl-block animate-float">
+            <i class="ti tabler-mail-fast text-white" style="font-size: 5rem;"></i>
+          </div>
         </div>
       </div>
     </div>

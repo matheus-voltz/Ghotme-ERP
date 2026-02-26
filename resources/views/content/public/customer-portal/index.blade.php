@@ -128,8 +128,12 @@ $customizerHidden = 'customizer-hide';
         transform: scale(1.1) rotate(10deg);
         color: white;
     }
+</style>
 
-    @include('content.public.customer-portal.chat-widget-css') .animate-up {
+@include('content.public.customer-portal.chat-widget-css')
+
+<style>
+    .animate-up {
         animation: fadeInUp 0.6s both;
     }
 

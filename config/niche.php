@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'current' => env('APP_NICHE', 'automotive'),
+    'current' => get_current_niche(),
 
     'niches' => [
         'workshop' => [

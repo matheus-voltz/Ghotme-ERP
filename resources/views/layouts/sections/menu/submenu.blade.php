@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Route;
   $activeClass = null;
   $active = $configData["layout"] === 'vertical' ? 'active open':'active';
   $currentRouteName = Route::currentRouteName();
+  $translatedSlug = niche_translate($submenu->slug);
 
-  if ($currentRouteName === $submenu->slug) {
+  if ($currentRouteName === $translatedSlug || $currentRouteName === $translatedSlug . '.index') {
   $activeClass = 'active';
   }
   elseif (isset($submenu->submenu)) {

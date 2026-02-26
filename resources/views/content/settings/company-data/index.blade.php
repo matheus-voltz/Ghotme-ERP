@@ -15,7 +15,7 @@
   <div class="col-12">
     <div class="card mb-6">
       <div class="card-header border-bottom">
-        <h5 class="card-title mb-0">Configurações da Oficina</h5>
+        <h5 class="card-title mb-0">{{ niche_translate('Configurações da Oficina') }}</h5>
       </div>
       <div class="card-body pt-6">
         <form id="formCompanyData" enctype="multipart/form-data">
@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-6 mb-4">
               <label class="form-label">Nome Fantasia</label>
-              <input type="text" name="trade_name" class="form-control" value="{{ $settings->trade_name }}" placeholder="Minha Oficina" />
+              <input type="text" name="trade_name" class="form-control" value="{{ $settings->trade_name }}" placeholder="{{ niche_translate('Minha Oficina') }}" />
             </div>
             <div class="col-md-4 mb-4">
               <label class="form-label">CNPJ</label>
@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-4 mb-4">
               <label class="form-label">E-mail</label>
-              <input type="email" name="email" class="form-control" value="{{ $settings->email }}" placeholder="contato@oficina.com" />
+              <input type="email" name="email" class="form-control" value="{{ $settings->email }}" placeholder="{{ niche_translate('contato@oficina.com') }}" />
             </div>
             <div class="col-md-2 mb-4">
               <label class="form-label">Telefone</label>
@@ -90,13 +90,19 @@
           <hr class="my-4">
           <div class="row align-items-center">
             <div class="col-md-6 mb-4">
-              <label class="form-label">Logotipo da Oficina</label>
+              <label class="form-label">{{ niche_translate('Logotipo da Oficina') }}</label>
               <input type="file" name="logo" class="form-control" accept="image/*" />
+              <input type="hidden" name="remove_logo" id="remove_logo" value="0">
               <small class="text-muted">Formatos aceitos: JPG, PNG. Tamanho máx: 2MB.</small>
             </div>
             <div class="col-md-6 text-center">
               @if($settings->logo_path)
-              <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="Logo" class="img-fluid rounded border p-2" style="max-height: 100px;">
+              <div class="position-relative d-inline-block">
+                <img src="{{ asset('storage/' . $settings->logo_path) }}" alt="Logo" class="img-fluid rounded border p-2" style="max-height: 100px;">
+                <button type="button" class="btn btn-sm btn-icon btn-danger position-absolute top-0 end-0 m-n2 rounded-pill" onclick="removeLogo()" title="Remover Logo">
+                  <i class="ti tabler-x"></i>
+                </button>
+              </div>
               @else
               <div class="p-4 border rounded bg-light text-muted">Sem Logotipo</div>
               @endif
@@ -119,6 +125,26 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('formCompanyData');
+
+    window.removeLogo = function() {
+      Swal.fire({
+        title: 'Remover logotipo?',
+        text: "O logotipo atual será excluído permanentemente.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim, remover!',
+        cancelButtonText: 'Cancelar'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          document.getElementById('remove_logo').value = '1';
+          // Trigger form submit immediately
+          form.dispatchEvent(new Event('submit'));
+        }
+      });
+    };
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       const formData = new FormData(form);

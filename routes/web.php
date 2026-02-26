@@ -140,6 +140,18 @@ Route::middleware([
     App\Http\Middleware\CheckTrialStatus::class,
 ])->group(function () {
 
+    // Newsletter Admin
+    Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterAdminController::class, 'index'])->name('newsletter.admin.index');
+    Route::get('/admin/newsletter/create', [App\Http\Controllers\NewsletterAdminController::class, 'create'])->name('newsletter.admin.create');
+    Route::post('/admin/newsletter/generate-ai', [App\Http\Controllers\NewsletterAdminController::class, 'generateContent'])->name('newsletter.admin.generate-ai');
+    Route::post('/admin/newsletter', [App\Http\Controllers\NewsletterAdminController::class, 'store'])->name('newsletter.admin.store');
+    Route::delete('/admin/newsletter/subscriber/{id}', [App\Http\Controllers\NewsletterAdminController::class, 'destroySubscriber'])->name('newsletter.admin.subscriber.destroy');
+
+    // Sales Hub Admin
+    Route::get('/admin/sales-hub', [App\Http\Controllers\SalesHubController::class, 'index'])->name('sales-hub.index');
+    Route::post('/admin/sales-hub/ai-insight', [App\Http\Controllers\SalesHubController::class, 'getAiInsight'])->name('sales-hub.ai-insight');
+    Route::post('/admin/sales-hub/follow-up-insight', [App\Http\Controllers\SalesHubController::class, 'getFollowUpAiInsight'])->name('sales-hub.follow-up-insight');
+
     // Appointments Management
     Route::get('/appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
     Route::post('/appointments/{id}/confirm', [App\Http\Controllers\AppointmentController::class, 'confirm'])->name('appointments.confirm');
@@ -230,20 +242,16 @@ Route::middleware([
     foreach ($allNiches as $slug => $nConfig) {
         $uSlug = strtolower($nConfig['labels']['url_slug'] ?? '');
         if ($uSlug && !in_array($uSlug, $registeredHistSlugs)) {
-            Route::get("/{$uSlug}-history", [VehicleHistoryController::class, 'index']);
-            Route::get("/{$uSlug}-history/search", [VehicleHistoryController::class, 'search']);
-            Route::get("/{$uSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline']);
-            Route::post("/{$uSlug}-history", [VehicleHistoryController::class, 'store']);
+            Route::get("/{$uSlug}-history", [VehicleHistoryController::class, 'index'])->name("{$uSlug}-history.index");
+            Route::get("/{$uSlug}-history/search", [VehicleHistoryController::class, 'search'])->name("{$uSlug}-history.search");
+            Route::get("/{$uSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline'])->name("{$uSlug}-history.timeline");
+            Route::post("/{$uSlug}-history", [VehicleHistoryController::class, 'store'])->name("{$uSlug}-history.store");
             $registeredHistSlugs[] = $uSlug;
         }
     }
 
-    // Named routes (defaults to current niche for route() helper)
-    $curSlug = niche('url_slug', 'vehicle');
-    Route::get("/{$curSlug}-history", [VehicleHistoryController::class, 'index'])->name('vehicle-history');
-    Route::get("/{$curSlug}-history/search", [VehicleHistoryController::class, 'search'])->name('vehicle-history.search');
-    Route::get("/{$curSlug}-history/timeline/{vehicleId}", [VehicleHistoryController::class, 'getTimeline'])->name('vehicle-history.timeline');
-    Route::post("/{$curSlug}-history", [VehicleHistoryController::class, 'store'])->name('vehicle-history.store');
+    // Default named routes for global usage
+    Route::get("/history", [VehicleHistoryController::class, 'index'])->name('vehicle-history');
 
     // Static fallbacks to prevent 404s if JS uses fixed strings
     Route::get('/vehicle-history/search', [VehicleHistoryController::class, 'search']);

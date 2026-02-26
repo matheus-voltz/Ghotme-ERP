@@ -80,7 +80,8 @@
         "{niche_clients_slug}",
         "{niche_entities_slug}",
         "{niche_slug}-history",
-        "fleet"
+        "fleet",
+        "maintenance-contracts"
       ],
       "submenu": [
         {
@@ -111,6 +112,12 @@
           "slug": "{niche_slug}-history"
         }
       ]
+    },
+    {
+      "url": "/admin/sales-hub",
+      "name": "Portal de Atendimento",
+      "icon": "menu-icon icon-base ti tabler-message-2-code",
+      "slug": "sales-hub"
     },
     {
       "name": "Equipe",
@@ -284,6 +291,23 @@
           "url": "/reports/average-time-per-service",
           "name": "Tempo médio por serviço",
           "slug": "reports.average-time"
+        }
+      ]
+    },
+    {
+      "name": "Newsletter",
+      "icon": "menu-icon icon-base ti tabler-mail-fast",
+      "slug": "newsletter",
+      "submenu": [
+        {
+          "url": "/admin/newsletter",
+          "name": "Assinantes e Campanhas",
+          "slug": "newsletter.admin.index"
+        },
+        {
+          "url": "/admin/newsletter/create",
+          "name": "Nova Campanha",
+          "slug": "newsletter.admin.create"
         }
       ]
     },
