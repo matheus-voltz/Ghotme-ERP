@@ -31,17 +31,22 @@ $configData = Helper::appClasses();
     {{-- plan and trial check --}}
     @php
     $user = auth()->user();
+
+    // Se não houver usuário logado, não fazemos as checagens de trial/feature
+    if (!$user) {
+    $isExpired = false;
+    } else {
     $isExpired = $user->isTrialExpired();
-    $isAllowedInExpired = in_array($menu->slug, ['dashboard', 'settings']);
 
     // Se expirou e não for Dashboard ou Configurações, pula a renderização
-    if ($isExpired && !$isAllowedInAllowedList = in_array($menu->slug, ['dashboard', 'settings'])) {
+    if ($isExpired && !in_array($menu->slug, ['dashboard', 'settings'])) {
     continue;
     }
 
     // Feature check normal
     if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
     continue;
+    }
     }
     @endphp
 

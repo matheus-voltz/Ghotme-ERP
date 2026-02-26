@@ -85,7 +85,8 @@ class AccountingController extends Controller
             'dreData' => $dreData,
             'isPublic' => $isPublic,
             'isMenu' => !$isPublic,
-            'isNavbar' => !$isPublic
+            'isNavbar' => !$isPublic,
+            'customizerHidden' => $isPublic ? 'customizer-hide' : ''
         ]);
     }
 

@@ -60,7 +60,26 @@ Route::get('/', function () {
     return view('content.font-pages.landing-page');
 })->name('welcome');
 
+Route::get('/terms', function () {
+    return view('content.pages.terms-of-service', [
+        'isMenu' => false,
+        'isNavbar' => false,
+        'isPublic' => true,
+        'customizerHidden' => 'customizer-hide'
+    ]);
+})->name('terms');
+
+Route::get('/privacy', function () {
+    return view('content.pages.privacy-policy', [
+        'isMenu' => false,
+        'isNavbar' => false,
+        'isPublic' => true,
+        'customizerHidden' => 'customizer-hide'
+    ]);
+})->name('privacy');
+
 Route::post('/lead', [App\Http\Controllers\LeadController::class, 'store'])->name('lead.store');
+Route::post('/newsletter-subscribe', [App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 
 Route::get('/email/verify', function () {

@@ -29,7 +29,17 @@ class PublicBudgetController extends Controller
         // Identifica o atendente responsável
         $responsible = $budget->company->users()->where('role', 'admin')->first();
 
-        return view('content.public.budget-approval', compact('budget', 'paymentMethodsCount', 'client', 'messages', 'responsible'));
+        return view('content.public.budget-approval', [
+            'budget' => $budget,
+            'paymentMethodsCount' => $paymentMethodsCount ?? 0,
+            'client' => $client,
+            'messages' => $messages,
+            'responsible' => $responsible,
+            'isPublic' => true,
+            'isMenu' => false,
+            'isNavbar' => false,
+            'customizerHidden' => 'customizer-hide'
+        ]);
     }
 
     public function checkout($uuid)
@@ -48,7 +58,14 @@ class PublicBudgetController extends Controller
             ->where('is_active', true)
             ->get();
 
-        return view('content.public.budget-checkout', compact('budget', 'paymentMethods'));
+        return view('content.public.budget-checkout', [
+            'budget' => $budget,
+            'paymentMethods' => $paymentMethods,
+            'isPublic' => true,
+            'isMenu' => false,
+            'isNavbar' => false,
+            'customizerHidden' => 'customizer-hide'
+        ]);
     }
 
     public function approve(Request $request, $uuid)

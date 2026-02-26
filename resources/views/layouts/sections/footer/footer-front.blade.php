@@ -44,10 +44,10 @@
           <h6 class="footer-title mb-6">Legal & Ajuda</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="{{ url('/pages/misc-under-maintenance') }}" class="footer-link">Termos de Uso</a>
+              <a href="{{ route('terms') }}" class="footer-link">Termos de Uso</a>
             </li>
             <li class="mb-4">
-              <a href="{{ url('/pages/misc-under-maintenance') }}" class="footer-link">Política de Privacidade</a>
+              <a href="{{ route('privacy') }}" class="footer-link">Política de Privacidade</a>
             </li>
             <li class="mb-4">
               <a href="mailto:suporte@ghotme.com.br" class="footer-link">Suporte</a>

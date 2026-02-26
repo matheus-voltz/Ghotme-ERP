@@ -6,9 +6,15 @@ use Illuminate\Support\Facades\Route;
   @if (isset($menu))
   @foreach ($menu as $submenu)
 
+  @php
+  $user = auth()->user();
+  @endphp
+
   {{-- feature plan check --}}
-  @if (isset($submenu->feature) && !auth()->user()->hasFeature($submenu->feature))
+  @if (isset($submenu->feature))
+  @if (!$user || !$user->hasFeature($submenu->feature))
   @continue
+  @endif
   @endif
 
   {{-- active menu method --}}

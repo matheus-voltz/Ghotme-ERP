@@ -797,7 +797,7 @@ $pageConfigs = [
       <div class="col-lg-6 text-center text-lg-start position-relative">
         <style>
           .mobile-hero-img {
-            max-width: 320px;
+            max-width: 240px;
             animation: floatingMobileReal 4s ease-in-out infinite;
             filter: drop-shadow(-20px 20px 40px rgba(var(--bs-primary-rgb), 0.3));
           }
@@ -818,7 +818,7 @@ $pageConfigs = [
         </style>
         <div class="d-inline-block position-relative pt-5">
           <!-- Blob background behind phone -->
-          <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-label-primary" style="width: 350px; height: 350px; opacity: 0.5; filter: blur(40px); z-index: 0;"></div>
+          <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-label-primary" style="width: 280px; height: 280px; opacity: 0.5; filter: blur(40px); z-index: 0;"></div>
           <img src="{{ asset('assets/img/front-pages/landing-page/meu-mobile.png') }}" alt="Ghotme Mobile App Dashboard" class="img-fluid mobile-hero-img position-relative z-1" />
         </div>
       </div>
@@ -1320,16 +1320,17 @@ $pageConfigs = [
   <section id="landingFAQ" class="section-py bg-body landing-faq">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">{{ __('Frequently Asked Questions') }}</span>
+        <span class="badge bg-label-primary">{{ __('Perguntas Frequentes') }}</span>
       </div>
       <h4 class="text-center mb-1">
-        {{ __('Common') }}
-        <span class="position-relative fw-extrabold z-1">{{ __('Questions') }}
+        {{ __('Dúvidas') }}
+        <span class="position-relative fw-extrabold z-1">{{ __('Comuns') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
       </h4>
-      <p class="text-center mb-12 pb-md-4">{{ __('Find answers to the main questions about Ghotme.') }}</p>
+      <p class="text-center mb-12 pb-md-4">{{ __('Encontre respostas para as principais dúvidas sobre o Ghotme.') }}</p>
+
       <div class="row gy-12 align-items-center">
         <div class="col-lg-5">
           <div class="text-center">
@@ -1423,6 +1424,37 @@ $pageConfigs = [
     </div>
   </section>
   <!-- FAQ: End -->
+
+  <!-- Newsletter: Start -->
+  <section id="landingNewsletter" class="section-py landing-newsletter">
+    <div class="container">
+      <div class="card bg-primary border-0 shadow-lg overflow-hidden">
+        <div class="card-body p-sm-12 p-6 position-relative z-1">
+          <div class="row align-items-center gy-6">
+            <div class="col-lg-6 text-center text-lg-start">
+              <h3 class="text-white fw-extrabold mb-2 display-6">{{ __('Newsletter Ghotme') }}</h3>
+              <p class="text-white opacity-75 mb-0 fs-5">
+                {{ __('Receba dicas exclusivas de gestão e novidades do sistema direto no seu e-mail.') }}
+              </p>
+            </div>
+            <div class="col-lg-6">
+              <form id="newsletterForm" action="{{ route('newsletter.subscribe') }}" method="POST">
+                @csrf
+                <div class="d-flex flex-column flex-sm-row gap-3 bg-white p-2 rounded-3 shadow-sm">
+                  <input type="email" name="email" class="form-control border-0 shadow-none ps-3" placeholder="seu@email.com" required>
+                  <button type="submit" class="btn btn-primary px-6">{{ __('Inscrever') }}</button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- Decorativos -->
+          <div class="position-absolute top-0 end-0 mt-n10 me-n10 bg-white opacity-1 rounded-circle" style="width: 250px; height: 250px;"></div>
+          <div class="position-absolute bottom-0 start-0 mb-n10 ms-n10 bg-white opacity-1 rounded-circle" style="width: 150px; height: 150px;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Newsletter: End -->
 
   <!-- CTA: Start -->
   <section id="landingCTA" class="section-py landing-cta position-relative p-lg-0 pb-0 overflow-hidden">
@@ -1613,6 +1645,61 @@ $pageConfigs = [
                 icon: 'error',
                 title: 'Erro de Conexão',
                 text: 'Não foi possível enviar sua mensagem no momento.',
+                confirmButtonColor: '#7367f0'
+              });
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+            });
+        });
+      }
+
+      // Newsletter Form
+      const newsletterForm = document.getElementById('newsletterForm');
+      if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const btn = newsletterForm.querySelector('button[type="submit"]');
+          const originalText = btn.innerHTML;
+
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+
+          const formData = new FormData(newsletterForm);
+
+          fetch(newsletterForm.getAttribute('action'), {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+              }
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Bem-vindo(a)!',
+                  text: data.message,
+                  confirmButtonColor: '#7367f0'
+                });
+                newsletterForm.reset();
+              } else {
+                Swal.fire({
+                  icon: 'warning',
+                  title: 'Atenção',
+                  text: data.message || 'Erro ao se inscrever.',
+                  confirmButtonColor: '#7367f0'
+                });
+              }
+            })
+            .catch(err => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Não foi possível processar sua inscrição.',
                 confirmButtonColor: '#7367f0'
               });
             })

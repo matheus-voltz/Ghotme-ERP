@@ -56,7 +56,18 @@ class CustomerPortalController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return view('content.public.customer-portal.index', compact('client', 'orders', 'budgets', 'unifiedHistory', 'responsible', 'messages'));
+        return view('content.public.customer-portal.index', [
+            'client' => $client,
+            'orders' => $orders,
+            'budgets' => $budgets,
+            'unifiedHistory' => $unifiedHistory,
+            'responsible' => $responsible,
+            'messages' => $messages,
+            'isPublic' => true,
+            'isMenu' => false,
+            'isNavbar' => false,
+            'customizerHidden' => 'customizer-hide'
+        ]);
     }
 
     public function sendMessage(Request $request, $uuid)
@@ -144,6 +155,15 @@ class CustomerPortalController extends Controller
         // Identifica o atendente responsável
         $responsible = $order->user ?? $client->company->users()->where('role', 'admin')->first();
 
-        return view('content.public.customer-portal.order-details', compact('order', 'client', 'messages', 'responsible'));
+        return view('content.public.customer-portal.order-details', [
+            'order' => $order,
+            'client' => $client,
+            'messages' => $messages,
+            'responsible' => $responsible,
+            'isPublic' => true,
+            'isMenu' => false,
+            'isNavbar' => false,
+            'customizerHidden' => 'customizer-hide'
+        ]);
     }
 }
