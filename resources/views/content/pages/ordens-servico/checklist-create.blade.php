@@ -160,20 +160,19 @@
         </tr>
       </template>
 
-      <div class="card mb-4">
+      <div class="card mb-4 @if(niche('current') === 'pet') d-none @endif">
         <div class="card-header">
           <h5 class="mb-0">{{ niche('visual_inspection_title') }}</h5>
           <small class="text-muted">{{ niche('visual_inspection_help') }}</small>
         </div>
         <div class="card-body text-center">
-          @php $inspectionComponent = niche_config('components.visual_inspection'); @endphp
+          @php 
+            $inspectionComponent = niche_config('components.visual_inspection');
+          @endphp
           
-          @if($inspectionComponent)
+          @if($inspectionComponent && view()->exists($inspectionComponent))
           <div id="vehicle-visual-inspection" style="position: relative; display: inline-block; cursor: crosshair;">
-            <!-- Car Blueprint Component -->
-            @include($inspectionComponent)
-
-            <!-- Markers Container -->
+            @include($inspectionComponent, ['petType' => $petType ?? 'dog'])
             <div id="markers-container"></div>
           </div>
           @else

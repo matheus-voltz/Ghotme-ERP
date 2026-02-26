@@ -122,6 +122,8 @@ $customizerHidden = 'customizer-hide';
         box-shadow: 0 10px 30px rgba(37, 211, 102, 0.3);
         z-index: 1000;
     }
+
+    @include('content.public.customer-portal.chat-widget-css')
 </style>
 @endsection
 
@@ -280,4 +282,5 @@ $customizerHidden = 'customizer-hide';
     <a href="https://wa.me/{{ preg_replace('/\D/', '', $order->company->phone ?? '') }}" target="_blank" class="whatsapp-fab">
         <i class="ti tabler-brand-whatsapp"></i>
     </a>
+    @include('content.public.customer-portal.chat-widget')
     @endsection

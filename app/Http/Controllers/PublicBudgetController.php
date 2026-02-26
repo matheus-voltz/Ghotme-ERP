@@ -19,11 +19,17 @@ class PublicBudgetController extends Controller
             ->where('uuid', $uuid)
             ->firstOrFail();
 
-        $paymentMethodsCount = \App\Models\PaymentMethod::where('company_id', $budget->company_id)
-            ->where('is_active', true)
-            ->count();
+        // Buscar mensagens do chat
+        $client = $budget->client;
+        $messages = \App\Models\ChatMessage::withoutGlobalScope('company')
+            ->where('client_id', $client->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
 
-        return view('content.public.budget-approval', compact('budget', 'paymentMethodsCount'));
+        // Identifica o atendente responsável
+        $responsible = $budget->company->users()->where('role', 'admin')->first();
+
+        return view('content.public.budget-approval', compact('budget', 'paymentMethodsCount', 'client', 'messages', 'responsible'));
     }
 
     public function checkout($uuid)

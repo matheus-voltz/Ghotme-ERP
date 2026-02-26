@@ -49,6 +49,8 @@
           <th>Nome</th>
           <th>Documento</th>
           <th>Email</th>
+          <th>Cadastrado por</th>
+          <th>Atendentes</th>
           <th>{{ niche('entities') }}</th>
           <th>Ações</th>
         </tr>
@@ -114,6 +116,16 @@
               <label class="form-label">E-mail</label>
               <input type="email" class="form-control" name="email" placeholder="cliente@email.com" />
             </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="form-label">Atendentes Responsáveis</label>
+          <select id="attendants_select" name="attendants[]" class="select2 form-select" multiple>
+            @foreach($users as $user)
+              <option value="{{ $user->id }}">{{ $user->name }}</option>
+            @endforeach
+          </select>
+          <small class="text-muted">Selecione um ou mais usuários para atender este cliente.</small>
         </div>
 
         <hr class="my-4">

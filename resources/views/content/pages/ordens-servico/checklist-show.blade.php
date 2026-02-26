@@ -256,12 +256,11 @@
           <!-- Mapa Visual com Marcadores -->
           @php $inspectionComponent = niche_config('components.visual_inspection'); @endphp
           
-          @if($inspectionComponent)
+          @if($inspectionComponent && view()->exists($inspectionComponent))
           <div class="text-center mb-5">
             <div id="vehicle-visual-display" style="position: relative; display: inline-block; width: 100%; max-width: 900px;">
-              <!-- Car Blueprint Component -->
               <div style="width: 100%;">
-                @include($inspectionComponent)
+                @include($inspectionComponent, ['petType' => $petType ?? 'dog'])
               </div>
 
               <!-- Markers Layer (Overlay) -->

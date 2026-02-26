@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Clients;
 use App\Models\Vehicles;
 use App\Models\VehicleHistory;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
@@ -19,7 +20,8 @@ class ClientsController extends Controller
      */
     public function index()
     {
-        return view('content.pages.clients.clients-index');
+        $users = User::where('company_id', Auth::user()->company_id)->orderBy('name')->get();
+        return view('content.pages.clients.clients-index', compact('users'));
     }
 
     /**
@@ -40,14 +42,16 @@ class ClientsController extends Controller
             3 => 'name',
             4 => 'cpf',
             5 => 'email',
-            6 => 'id',
-            7 => 'id'
+            6 => 'created_by',
+            7 => 'id', // Atendentes (virtual)
+            8 => 'id', // Veículos
+            9 => 'id'  // Ações
         ];
         $orderColumnIndex = $request->input('order.0.column');
         $order = $columns[$orderColumnIndex] ?? 'id';
         $dir = $request->input('order.0.dir') ?? 'desc';
 
-        $query = Clients::withCount('vehicles');
+        $query = Clients::with(['creator', 'attendants'])->withCount('vehicles');
 
         if (!empty($request->input('search.value'))) {
             $search = $request->input('search.value');
@@ -81,6 +85,8 @@ class ClientsController extends Controller
             $nestedData['document'] = $client->type === 'PF' ? $client->cpf : $client->cnpj;
             $nestedData['vehicles_count'] = $client->vehicles_count;
             $nestedData['uuid'] = $client->uuid;
+            $nestedData['creator_name'] = $client->creator->name ?? 'Sistema';
+            $nestedData['attendants'] = $client->attendants->pluck('name')->toArray();
             $nestedData['is_active'] = true;
             $nestedData['action'] = '';
 
@@ -134,6 +140,9 @@ class ClientsController extends Controller
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
+            // Atendentes
+            'attendants' => 'nullable|array',
+            'attendants.*' => 'exists:users,id',
             // Veículo
             'veiculo_placa' => 'nullable|string|max:10|unique:veiculos,placa',
             'veiculo_marca' => 'required_with:veiculo_placa|nullable|string|max:50',
@@ -163,6 +172,11 @@ class ClientsController extends Controller
         return DB::transaction(function () use ($request, $validated) {
             // Cria o cliente
             $client = Clients::create($validated);
+
+            // Sincroniza atendentes
+            if ($request->has('attendants')) {
+                $client->attendants()->sync($request->attendants);
+            }
 
             // Salva campos personalizados
             if ($request->has('custom_fields')) {
@@ -200,12 +214,13 @@ class ClientsController extends Controller
      */
     public function edit($id)
     {
-        $client = Clients::with('vehicles')->findOrFail($id);
+        $client = Clients::with(['vehicles', 'attendants'])->findOrFail($id);
         $customFields = $client->getCustomFieldsWithValues();
         
         return response()->json([
             'client' => $client,
-            'custom_fields' => $customFields
+            'custom_fields' => $customFields,
+            'attendants' => $client->attendants->pluck('id')->toArray()
         ]);
     }
 
@@ -250,6 +265,9 @@ class ClientsController extends Controller
             'bairro' => 'nullable|string|max:255',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:2',
+            // Atendentes
+            'attendants' => 'nullable|array',
+            'attendants.*' => 'exists:users,id',
         ], [
             'name.required_if' => 'O nome é obrigatório para pessoa física.',
             'cpf.required_if' => 'O CPF é obrigatório para pessoa física.',
@@ -264,6 +282,11 @@ class ClientsController extends Controller
 
         return DB::transaction(function () use ($client, $validated, $request) {
             $client->update($validated);
+
+            // Sincroniza atendentes
+            if ($request->has('attendants')) {
+                $client->attendants()->sync($request->attendants);
+            }
 
             // Salva campos personalizados
             if ($request->has('custom_fields')) {
@@ -286,7 +309,9 @@ class ClientsController extends Controller
 
     public function quickView($id)
     {
-        $client = Clients::with('vehicles')->findOrFail($id);
+        $client = Clients::with(['vehicles', 'creator', 'attendants'])->findOrFail($id);
+
+        $attendantsNames = $client->attendants->pluck('name')->implode(', ') ?: 'Nenhum';
 
         $html = '<div class="list-group list-group-flush mb-4">
                     <div class="list-group-item d-flex justify-content-between align-items-center">
@@ -304,6 +329,14 @@ class ClientsController extends Controller
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <span><strong>WhatsApp:</strong></span>
                         <span class="text-success"><i class="ti tabler-brand-whatsapp"></i> ' . $client->whatsapp . '</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>Cadastrado por:</strong></span>
+                        <span class="badge bg-label-secondary">' . ($client->creator->name ?? 'Sistema') . '</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><strong>Atendentes:</strong></span>
+                        <span class="text-end">' . $attendantsNames . '</span>
                     </div>';
 
         if ($client->rua) {

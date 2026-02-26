@@ -40,7 +40,7 @@ class AccountingController extends Controller
         // Filtro por Intervalo de Datas
         $startDate = $request->get('start_date', Carbon::now()->startOfMonth()->toDateString());
         $endDate = $request->get('end_date', Carbon::now()->endOfMonth()->toDateString());
-        
+
         // Receitas (OS finalizadas no período)
         $revenue = OrdemServico::where('company_id', $company->id)
             ->whereIn('status', ['completed', 'finalized', 'paid'])
@@ -55,7 +55,7 @@ class AccountingController extends Controller
             ->get();
 
         // Lógica para o DRE (Agrupamento por Categoria)
-        $dreData = $expenses->groupBy('category')->map(function($items) {
+        $dreData = $expenses->groupBy('category')->map(function ($items) {
             return $items->sum('amount');
         });
 
@@ -85,7 +85,7 @@ class AccountingController extends Controller
             'dreData' => $dreData,
             'isPublic' => $isPublic,
             'isMenu' => !$isPublic,
-            'isNavbar' => true
+            'isNavbar' => !$isPublic
         ]);
     }
 
@@ -150,9 +150,9 @@ class AccountingController extends Controller
     public function auditTransaction(Request $request, $id)
     {
         $transaction = FinancialTransaction::findOrFail($id);
-        
+
         if ($transaction->company_id !== Auth::user()->company_id && !Auth::user()->is_admin) {
-             return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $transaction->update([
@@ -167,7 +167,7 @@ class AccountingController extends Controller
     public function updateTaxRegime(Request $request, $token)
     {
         $company = Company::where('accountant_token', $token)->firstOrFail();
-        
+
         $request->validate([
             'tax_regime' => 'required|string'
         ]);
@@ -184,7 +184,7 @@ class AccountingController extends Controller
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
         $token = $request->get('token');
-        
+
         if ($token) {
             $company = Company::where('accountant_token', $token)->firstOrFail();
         } else {
@@ -223,7 +223,7 @@ class AccountingController extends Controller
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
         $token = $request->get('token');
-        
+
         if ($token) {
             $company = Company::where('accountant_token', $token)->firstOrFail();
         } else {

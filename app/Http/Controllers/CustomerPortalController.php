@@ -62,9 +62,9 @@ class CustomerPortalController extends Controller
     public function sendMessage(Request $request, $uuid)
     {
         $request->validate(['message' => 'required|string']);
-        
+
         $client = Clients::withoutGlobalScope('company')->where('uuid', $uuid)->firstOrFail();
-        
+
         // Localiza o melhor destinatário (quem falou por último ou quem abriu a OS)
         $lastResponse = \App\Models\ChatMessage::withoutGlobalScopes()
             ->where('client_id', $client->id)
@@ -79,10 +79,10 @@ class CustomerPortalController extends Controller
                 ->where('client_id', $client->id)
                 ->latest()
                 ->first();
-            
+
             // Fallback: busca qualquer admin da empresa se não houver OS
             $admin = \App\Models\User::where('company_id', $client->company_id)->where('role', 'admin')->first();
-            $receiverId = $lastOrder->user_id ?? ($admin->id ?? null);
+            $receiverId = $lastOrder?->user_id ?? ($admin->id ?? null);
         }
 
         // DEBUG: Log the values before creating
@@ -108,7 +108,7 @@ class CustomerPortalController extends Controller
     public function fetchMessages($uuid)
     {
         $client = Clients::withoutGlobalScope('company')->where('uuid', $uuid)->firstOrFail();
-        
+
         $messages = \App\Models\ChatMessage::withoutGlobalScope('company')
             ->where('client_id', $client->id)
             ->orderBy('created_at', 'asc')
@@ -134,6 +134,16 @@ class CustomerPortalController extends Controller
             $order->status = 'awaiting_approval';
         }
 
-        return view('content.public.customer-portal.order-details', compact('order'));
+        // Buscar mensagens do chat
+        $client = $order->client;
+        $messages = \App\Models\ChatMessage::withoutGlobalScope('company')
+            ->where('client_id', $client->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // Identifica o atendente responsável
+        $responsible = $order->user ?? $client->company->users()->where('role', 'admin')->first();
+
+        return view('content.public.customer-portal.order-details', compact('order', 'client', 'messages', 'responsible'));
     }
 }

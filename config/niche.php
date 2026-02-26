@@ -185,6 +185,9 @@ return [
                 'entity' => 'ti-dog',
                 'identifier' => 'ti-paws',
             ],
+            'components' => [
+                'visual_inspection' => 'components.visual-inspection.pet',
+            ]
         ],
         'beauty_clinic' => [
             'labels' => [

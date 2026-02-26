@@ -27,15 +27,15 @@
 
     @if(session('success'))
     <div class="alert alert-success alert-dismissible" role="alert">
-      {{ session('success') }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible" role="alert">
-      {{ session('error') }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
@@ -49,15 +49,11 @@
                 <i class="ti tabler-file-import me-1"></i> {{ __('Import OFX') }}
             </button>
             @endif
-            
+
+            @if(!$isPublic)
             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#fiscalConfigModal">
                 <i class="ti tabler-settings me-1"></i> {{ __('Company data') }}
             </button>
-
-            @if($isPublic)
-            <a href="{{ route('login') }}" class="btn btn-label-secondary">
-                <i class="ti tabler-logout me-1"></i> {{ __('Exit Portal') }}
-            </a>
             @endif
             <div class="input-group w-auto">
                 <span class="input-group-text">{{ __('From') }}</span>
@@ -70,10 +66,26 @@
 
     <!-- KPI Cards BPO -->
     <div class="row mb-4">
-        <div class="col-md-3"><div class="card bg-success text-white p-3"><h5>{{ __('Revenue') }} R$ {{ number_format($totals['revenue'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-danger text-white p-3"><h5>{{ __('Expenses') }} R$ {{ number_format($totals['expenses'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-primary text-white p-3"><h5>{{ __('Balance') }} R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5></div></div>
-        <div class="col-md-3"><div class="card bg-info text-white p-3"><h5>{{ __('Audit') }} {{ $totals['audited_count'] }}/{{ max(1, $expenses->count()) }}</h5></div></div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white p-3">
+                <h5>{{ __('Revenue') }} R$ {{ number_format($totals['revenue'], 2, ',', '.') }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white p-3">
+                <h5>{{ __('Expenses') }} R$ {{ number_format($totals['expenses'], 2, ',', '.') }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white p-3">
+                <h5>{{ __('Balance') }} R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white p-3">
+                <h5>{{ __('Audit') }} {{ $totals['audited_count'] }}/{{ max(1, $expenses->count()) }}</h5>
+            </div>
+        </div>
     </div>
 
     <div class="nav-align-top mb-4">
@@ -90,7 +102,10 @@
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="table-light">
-                                <tr><th>{{ __('Description') }}</th><th class="text-end">{{ __('Value') }} (R$)</th></tr>
+                                <tr>
+                                    <th>{{ __('Description') }}</th>
+                                    <th class="text-end">{{ __('Value') }} (R$)</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 <tr class="table-success">
@@ -112,8 +127,12 @@
                                 </tr>
                                 @endforeach
                                 <tr class="table-primary">
-                                    <td><h5 class="mb-0">(=) {{ __('NET RESULT FOR THE PERIOD') }}</h5></td>
-                                    <td class="text-end"><h5 class="mb-0 {{ $totals['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5></td>
+                                    <td>
+                                        <h5 class="mb-0">(=) {{ __('NET RESULT FOR THE PERIOD') }}</h5>
+                                    </td>
+                                    <td class="text-end">
+                                        <h5 class="mb-0 {{ $totals['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">R$ {{ number_format($totals['net_profit'], 2, ',', '.') }}</h5>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -135,7 +154,15 @@
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th>{{ __('Date') }}</th><th>{{ __('OS #') }}</th><th>{{ __('Customer') }}</th><th>{{ __('Value') }}</th><th>{{ __('Action') }}</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('OS #') }}</th>
+                                <th>{{ __('Customer') }}</th>
+                                <th>{{ __('Value') }}</th>
+                                <th>{{ __('Action') }}</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             @foreach($revenue as $order)
                             <tr>
@@ -154,7 +181,15 @@
             <div class="tab-pane fade" id="tab-exp" role="tabpanel">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
-                        <thead><tr><th>{{ __('Date') }}</th><th>{{ __('Description') }}</th><th>{{ __('Value') }}</th><th>{{ __('Audit') }}</th><th>{{ __('Action') }}</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Value') }}</th>
+                                <th>{{ __('Audit') }}</th>
+                                <th>{{ __('Action') }}</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             @foreach($expenses as $expense)
                             <tr>
@@ -178,7 +213,9 @@
     <div class="modal-dialog modal-dialog-centered">
         <form action="{{ route('accounting.import-ofx') }}" method="POST" enctype="multipart/form-data" class="modal-content">
             @csrf
-            <div class="modal-header"><h5 class="modal-title">{{ __('Bank Reconciliation') }} (OFX)</h5></div>
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('Bank Reconciliation') }} (OFX)</h5>
+            </div>
             <div class="modal-body">
                 <p>{{ __('Select the .ofx file exported by your bank.') }}</p>
                 <input type="file" name="ofx_file" class="form-control" accept=".ofx" required>
@@ -280,9 +317,9 @@
         const end = document.getElementById('endDate').value;
         const isPublic = @json($isPublic);
         const token = "{{ $company->accountant_token ?? '' }}";
-        
+
         let url = "";
-        
+
         if (isPublic && token) {
             // Se for acesso público, mantém na rota do portal com o token
             url = `{{ url('portal-contador') }}/${token}?start_date=${start}&end_date=${end}`;
@@ -290,7 +327,7 @@
             // Se for acesso logado, usa a rota padrão
             url = `{{ route('accounting.index') }}?start_date=${start}&end_date=${end}`;
         }
-        
+
         window.location.href = url;
     }
 
@@ -300,19 +337,24 @@
         btn.innerHTML = '{{ __("Generating...") }}';
 
         fetch("{{ route('accounting.generate-token') }}", {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({icon: 'success', title: '{{ __("Link Generated!") }}', timer: 1500, showConfirmButton: false})
-                .then(() => location.reload());
-            }
-        });
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                            icon: 'success',
+                            title: '{{ __("Link Generated!") }}',
+                            timer: 1500,
+                            showConfirmButton: false
+                        })
+                        .then(() => location.reload());
+                }
+            });
     }
 
     function copyAccountantLink() {
@@ -320,7 +362,12 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
-        Swal.fire({icon: 'success', title: '{{ __("Link Copied!") }}', showConfirmButton: false, timer: 1500});
+        Swal.fire({
+            icon: 'success',
+            title: '{{ __("Link Copied!") }}',
+            showConfirmButton: false,
+            timer: 1500
+        });
     }
 
     document.getElementById('formFiscalConfig').onsubmit = function(e) {
@@ -328,50 +375,50 @@
         const form = this;
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        
+
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> {{ __("Saving...") }}';
 
         const formData = new FormData(form);
-        
+
         fetch(form.getAttribute('action'), {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({
-                    icon: 'success',
-                    title: '{{ __("Success!") }}',
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => location.reload());
-            } else {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Success!") }}',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '{{ __("Save Error") }}',
+                        text: data.message || '{{ __("Check the information provided.") }}'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
                 Swal.fire({
                     icon: 'error',
-                    title: '{{ __("Save Error") }}',
-                    text: data.message || '{{ __("Check the information provided.") }}'
+                    title: '{{ __("Connection Error") }}',
+                    text: '{{ __("Could not communicate with the server.") }}'
                 });
-            }
-        })
-        .catch(err => {
-            console.error('Fetch error:', err);
-            Swal.fire({
-                icon: 'error',
-                title: '{{ __("Connection Error") }}',
-                text: '{{ __("Could not communicate with the server.") }}'
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             });
-        })
-        .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = originalText;
-        });
     };
 </script>
 @endsection

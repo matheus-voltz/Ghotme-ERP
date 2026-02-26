@@ -25,6 +25,9 @@ class VehicleChecklistController extends Controller
 
     public function create(Request $request)
     {
+        // DEBUGGING
+        \Illuminate\Support\Facades\Log::info('--- Checklist Create Start ---');
+
         $vehicles = Vehicles::all();
 
         // Filter checklist items by current niche categories
@@ -43,12 +46,29 @@ class VehicleChecklistController extends Controller
 
         $osId = $request->query('os_id');
         $selectedOs = null;
+        $petType = 'dog';
 
         if ($osId) {
             $selectedOs = OrdemServico::with('veiculo')->find($osId);
+            
+            if ($selectedOs && $selectedOs->veiculo) {
+                $breed = strtolower($selectedOs->veiculo->modelo . ' ' . $selectedOs->veiculo->marca);
+                $catKeywords = ['gato', 'felino', 'siames', 'persa', 'maine', 'angora', 'bengal', 'sphynx'];
+                foreach ($catKeywords as $keyword) {
+                    if (str_contains($breed, $keyword)) {
+                        $petType = 'cat';
+                        break;
+                    }
+                }
+            }
         }
+        
+        $inspectionComponent = niche_config('components.visual_inspection');
+        \Illuminate\Support\Facades\Log::info('Checklist Niche: ' . niche('current'));
+        \Illuminate\Support\Facades\Log::info('Pet Type Determined: ' . $petType);
+        \Illuminate\Support\Facades\Log::info('Inspection Component Path: ' . ($inspectionComponent ?? 'NULL'));
 
-        return view('content.pages.ordens-servico.checklist-create', compact('vehicles', 'checklistItems', 'selectedOs'));
+        return view('content.pages.ordens-servico.checklist-create', compact('vehicles', 'checklistItems', 'selectedOs', 'petType'));
     }
 
     public function store(Request $request)
@@ -143,10 +163,23 @@ class VehicleChecklistController extends Controller
 
         $inspection = $query->findOrFail($id);
 
+        $petType = 'dog';
+        if ($inspection->veiculo) {
+            $breed = strtolower($inspection->veiculo->modelo . ' ' . $inspection->veiculo->marca);
+            $catKeywords = ['gato', 'felino', 'siames', 'persa', 'maine', 'angora', 'bengal', 'sphynx'];
+            foreach ($catKeywords as $keyword) {
+                if (str_contains($breed, $keyword)) {
+                    $petType = 'cat';
+                    break;
+                }
+            }
+        }
+
         return view('content.pages.ordens-servico.checklist-show', [
             'inspection' => $inspection,
             'isPublic' => false,
-            'layout' => 'layouts/layoutMaster'
+            'layout' => 'layouts/layoutMaster',
+            'petType' => $petType
         ]);
     }
 

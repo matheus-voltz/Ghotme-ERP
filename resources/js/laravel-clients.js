@@ -19,7 +19,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
         sectionPF = document.getElementById('sectionPF'),
         sectionPJ = document.getElementById('sectionPJ'),
         customFieldsContainer = document.getElementById('custom-fields-container'),
-        customFieldsList = document.getElementById('custom-fields-list');
+        customFieldsList = document.getElementById('custom-fields-list'),
+        attendantsSelect = $('#attendants_select');
+
+    // Initialize Select2
+    if (attendantsSelect.length) {
+        attendantsSelect.wrap('<div class="position-relative"></div>').select2({
+            placeholder: 'Selecione os atendentes',
+            dropdownParent: attendantsSelect.parent()
+        });
+    }
 
     // Fix for baseUrl issues
     const fetchUrl = (path) => {
@@ -88,6 +97,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 { data: 'name' },
                 { data: 'document' },
                 { data: 'email' },
+                { data: 'creator_name' },
+                { data: 'attendants' },
                 { data: 'vehicles_count' },
                 { data: 'action' }
             ],
@@ -112,10 +123,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 },
                 {
                     targets: 6,
-                    render: (data) => `<span class="badge rounded-pill bg-label-primary">${data} ${entitiesName.toLowerCase()}</span>`
+                    render: (data) => `<span class="badge bg-label-secondary">${data}</span>`
                 },
                 {
                     targets: 7,
+                    render: (data) => {
+                        if (!data || data.length === 0) return '<small class="text-muted">Nenhum</small>';
+                        return data.map(name => `<span class="badge bg-label-info me-1" style="font-size: 0.7rem;">${name}</span>`).join('');
+                    }
+                },
+                {
+                    targets: 8,
+                    render: (data) => `<span class="badge rounded-pill bg-label-primary">${data} ${entitiesName.toLowerCase()}</span>`
+                },
+                {
+                    targets: 9,
                     title: 'Ações',
                     orderable: false,
                     render: (data, type, full) => {
@@ -266,6 +288,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         document.querySelector('[name="cidade"]').value = client.cidade || '';
                         document.querySelector('[name="estado"]').value = client.estado || '';
 
+                        // Atendentes
+                        if (attendantsSelect.length && data.attendants) {
+                            attendantsSelect.val(data.attendants).trigger('change');
+                        }
+
                         // Renderizar campos personalizados
                         renderCustomFields(data.custom_fields);
 
@@ -316,6 +343,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 document.getElementById('client_id').value = '';
                 document.getElementById('offcanvasAddClientsLabel').innerHTML = 'Cadastrar Cliente';
                 formClient.reset();
+                if (attendantsSelect.length) {
+                    attendantsSelect.val([]).trigger('change');
+                }
                 document.getElementById('typePF').checked = true;
                 sectionPF.classList.remove('d-none'); sectionPJ.classList.add('d-none');
 

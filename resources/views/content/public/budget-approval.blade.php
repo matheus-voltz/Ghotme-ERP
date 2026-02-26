@@ -121,6 +121,8 @@ $customizerHidden = 'customizer-hide';
             transform: translateY(0);
         }
     }
+
+    @include('content.public.customer-portal.chat-widget-css')
 </style>
 @endsection
 
@@ -328,4 +330,5 @@ $customizerHidden = 'customizer-hide';
     <i class="ti tabler-brand-whatsapp"></i>
 </a>
 
+@include('content.public.customer-portal.chat-widget')
 @endsection

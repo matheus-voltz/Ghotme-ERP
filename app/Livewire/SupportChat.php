@@ -19,7 +19,7 @@ class SupportChat extends Component
     public $message = '';
     public $attachment;
     public $search = '';
-    public $activeTab = 'team'; 
+    public $activeTab = 'team';
     public $userStatus;
     public $onlyMyClients = false; // Novo filtro
 
@@ -28,15 +28,10 @@ class SupportChat extends Component
         $this->userStatus = Auth::user()->chat_status ?? 'online';
     }
 
-    public function toggleMyClients()
-    {
-        $this->onlyMyClients = !$this->onlyMyClients;
-    }
-
     public function setTab($tab)
     {
         $this->activeTab = $tab;
-        $this->activeUserId = null; 
+        $this->activeUserId = null;
         $this->activeClientId = null;
     }
 
@@ -51,8 +46,8 @@ class SupportChat extends Component
             ->where('receiver_id', Auth::id())
             ->where('is_read', false)
             ->update(['is_read' => true]);
-            
-        $this->dispatch('message-sent'); 
+
+        $this->dispatch('message-sent');
     }
 
     public function selectClient($clientId)
@@ -64,10 +59,10 @@ class SupportChat extends Component
         // Marcar TODAS as mensagens deste cliente enviadas para a empresa como lidas
         ChatMessage::withoutGlobalScopes()
             ->where('client_id', $this->activeClientId)
-            ->whereNull('sender_id') 
+            ->whereNull('sender_id')
             ->where('is_read', false)
             ->update(['is_read' => true]);
-            
+
         $this->dispatch('message-sent');
     }
 
@@ -132,16 +127,22 @@ class SupportChat extends Component
             ->where('name', 'like', '%' . $this->search . '%')
             ->get();
 
-        // 3. Clientes
-        $clientQuery = \App\Models\Clients::where('company_id', $user->company_id);
-        
-        if ($this->onlyMyClients) {
-            $clientQuery->whereHas('vehicles.ordensServico', function($q) use ($user) {
-                $q->where('user_id', $user->id);
-            });
-        }
+        // 3. Clientes - Mostra APENAS os do atendente e prioriza os recentes
+        $clientQuery = \App\Models\Clients::where('clients.company_id', $user->company_id)
+            ->select('clients.*')
+            ->leftJoin('chat_messages', function ($join) {
+                $join->on('clients.id', '=', 'chat_messages.client_id');
+            })
+            ->selectRaw('MAX(chat_messages.created_at) as last_message_at')
+            ->whereHas('attendants', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })
+            ->groupBy('clients.id');
 
-        $clientContacts = $clientQuery->where('name', 'like', '%' . $this->search . '%')->get();
+        $clientContacts = $clientQuery->where('clients.name', 'like', '%' . $this->search . '%')
+            ->orderByRaw('last_message_at IS NULL, last_message_at DESC')
+            ->orderBy('clients.name', 'asc')
+            ->get();
 
         $contacts = match ($this->activeTab) {
             'team' => $teamContacts,
@@ -156,7 +157,7 @@ class SupportChat extends Component
                 // Conta mensagens não lidas desse cliente para QUALQUER UM da empresa
                 $contact->unread_count = ChatMessage::withoutGlobalScopes()
                     ->where('client_id', $contact->id)
-                    ->whereNull('sender_id') 
+                    ->whereNull('sender_id')
                     ->where('is_read', false)
                     ->count();
             } else {
@@ -190,6 +191,26 @@ class SupportChat extends Component
                 ->orderBy('created_at', 'asc')->get();
         }
 
+        // Calcular totais de não lidas para as abas (chamativo)
+        $unreadTeam = ChatMessage::withoutGlobalScopes()
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->whereIn('sender_id', $teamContacts->pluck('id'))
+            ->count();
+
+        $unreadSupport = ChatMessage::withoutGlobalScopes()
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->whereIn('sender_id', $supportContacts->pluck('id'))
+            ->count();
+
+        $unreadClients = ChatMessage::withoutGlobalScopes()
+            ->whereNull('sender_id')
+            ->where('is_read', false)
+            ->where('company_id', $user->company_id)
+            ->whereIn('client_id', $clientContacts->pluck('id')) // Apenas clientes visíveis para este atendente
+            ->count();
+
         return view('livewire.support-chat', [
             'contacts' => $contacts,
             'messages' => $messages,
@@ -197,6 +218,9 @@ class SupportChat extends Component
             'teamCount' => $teamContacts->count(),
             'supportCount' => $supportContacts->count(),
             'clientCount' => $clientContacts->count(),
+            'unreadTeam' => $unreadTeam,
+            'unreadSupport' => $unreadSupport,
+            'unreadClients' => $unreadClients,
         ]);
     }
 }

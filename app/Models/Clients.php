@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
 use App\Traits\HasCustomFields;
+use App\Traits\HasCreator;
 use OwenIt\Auditing\Contracts\Auditable;
 use OwenIt\Auditing\Auditable as AuditableTrait;
 
@@ -12,12 +13,13 @@ use Illuminate\Support\Str;
 
 class Clients extends Model implements Auditable
 {
-    use BelongsToCompany, AuditableTrait, HasCustomFields;
+    use BelongsToCompany, AuditableTrait, HasCustomFields, HasCreator;
 
     protected $table = 'clients';
 
     protected $fillable = [
         'company_id',
+        'created_by',
         'uuid',
         'type',
         'name',
@@ -59,5 +61,10 @@ class Clients extends Model implements Auditable
     public function vehicles()
     {
         return $this->hasMany(Vehicles::class, 'cliente_id');
+    }
+
+    public function attendants()
+    {
+        return $this->belongsToMany(User::class, 'client_user', 'client_id', 'user_id')->withTimestamps();
     }
 }

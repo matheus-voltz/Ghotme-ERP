@@ -24,6 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // FORÇA O NICHO PARA 'PET' COMO MEDIDA DE CORREÇÃO
+        config(['niche.current' => 'pet']);
+
         // Forçar URL dinâmico se acessado via IP/Host diferente (importante para Mobile)
         if (!app()->runningInConsole() && request()->getHost()) {
             config(['app.url' => request()->getSchemeAndHttpHost()]);

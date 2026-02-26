@@ -93,19 +93,28 @@ if (!function_exists('niche_translate')) {
 
 if (!function_exists('get_current_niche')) {
     /**
-     * Get the current niche name.
+     * Get the current niche name, ensuring a valid fallback.
      */
     function get_current_niche($company = null)
     {
-        if ($company && !empty($company->niche)) {
+        // 1. Try from a provided company object, if it's not empty
+        if ($company && !empty(trim($company->niche))) {
             return $company->niche;
         }
 
-        if (auth()->check() && !empty(auth()->user()->niche)) {
-            return auth()->user()->niche;
+        // 2. Try from the authenticated user's company, if they are logged in and it's not empty
+        if (auth()->check() && auth()->user()->company && !empty(trim(auth()->user()->company->niche))) {
+            return auth()->user()->company->niche;
         }
 
-        return Config::get('niche.current', 'automotive');
+        // 3. Fallback to the .env configuration
+        $envNiche = Config::get('niche.current');
+        if (!empty(trim($envNiche))) {
+            return $envNiche;
+        }
+
+        // 4. Final, absolute fallback if everything else fails
+        return 'automotive';
     }
 }
 
