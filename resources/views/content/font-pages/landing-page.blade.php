@@ -15,7 +15,7 @@ $pageConfigs = [
 
 <!-- Vendor Styles -->
 @section('vendor-style')
-@vite(['resources/assets/vendor/libs/nouislider/nouislider.scss', 'resources/assets/vendor/libs/swiper/swiper.scss'])
+@vite(['resources/assets/vendor/libs/nouislider/nouislider.scss', 'resources/assets/vendor/libs/swiper/swiper.scss', 'resources/assets/vendor/libs/animate-css/animate.scss', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'])
 @endsection
 
 <!-- Page Styles -->
@@ -148,54 +148,90 @@ $pageConfigs = [
   .animate-rocket {
     animation: rocketLaunch 3s ease-in-out infinite;
   }
+
+  /* Custom Cursor */
+  .cursor-dot,
+  .cursor-outline {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  }
+
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--ghotme-primary);
+  }
+
+  .cursor-outline {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(115, 103, 240, 0.5);
+  }
+
+  .cursor-trail {
+    pointer-events: none;
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: var(--ghotme-primary);
+    border-radius: 50%;
+    z-index: 9998;
+    opacity: 0.5;
+  }
+
+  body:hover .cursor-dot,
+  body:hover .cursor-outline {
+    opacity: 1;
+  }
+
+  @media (max-width: 991px) {
+
+    .cursor-dot,
+    .cursor-outline,
+    .cursor-trail {
+      display: none;
+    }
+  }
+
+  /* Interaction Hover */
+  a:hover~.cursor-outline,
+  button:hover~.cursor-outline {
+    transform: translate(-50%, -50%) scale(1.5);
+    background-color: rgba(115, 103, 240, 0.1);
+    border-color: var(--ghotme-primary);
+  }
+
+  @media (min-width: 992px) {
+
+    html,
+    body,
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    .card {
+      cursor: none !important;
+    }
+  }
 </style>
 @endsection
 
 <!-- Vendor Scripts -->
 @section('vendor-script')
-@vite(['resources/assets/vendor/libs/nouislider/nouislider.js', 'resources/assets/vendor/libs/swiper/swiper.js'])
+@vite(['resources/assets/vendor/libs/nouislider/nouislider.js', 'resources/assets/vendor/libs/swiper/swiper.js', 'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'])
 @endsection
 
-<!-- Page Scripts -->
-@section('page-script')
-@vite(['resources/assets/js/front-page-landing.js'])
-<script>
-  // Script de emergência injetado diretamente
-  (function() {
-    function init() {
-      const toggler = document.querySelector('.price-duration-toggler');
-      const menuBtn = document.querySelector('.navbar-toggler');
-      const menuCollapse = document.getElementById('navbarSupportedContent');
 
-      // Troca de Preços
-      if (toggler) {
-        toggler.addEventListener('change', function() {
-          const isYearly = this.checked;
-          document.querySelectorAll('.price-monthly').forEach(el => el.classList.toggle('d-none', isYearly));
-          document.querySelectorAll('.price-yearly').forEach(el => el.classList.toggle('d-none', !isYearly));
-          document.querySelectorAll('.plan-action-btn').forEach(btn => {
-            const link = isYearly ? btn.getAttribute('data-yearly-link') : btn.getAttribute('data-monthly-link');
-            if (link) btn.setAttribute('href', link);
-          });
-        });
-      }
 
-      // Menu Mobile (Correção para o erro de travamento)
-      if (menuBtn && menuCollapse) {
-        menuBtn.addEventListener('click', function() {
-          menuCollapse.classList.toggle('show');
-        });
-      }
-    }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  })();
-</script>
-@endsection
+
 
 
 @section('content')
@@ -1460,34 +1496,35 @@ $pageConfigs = [
               <p class="mb-6">
                 {{ __('Still have questions about plans, features or want a personalized demonstration? Fill in the fields below.') }}
               </p>
-              <form>
+              <form id="landingContactForm" action="{{ route('lead.store') }}" method="POST">
+                @csrf
                 <div class="row g-4">
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-fullname">{{ __('Full Name') }}</label>
-                    <input type="text" class="form-control" id="contact-form-fullname" placeholder="{{ __('Your name') }}" />
+                    <input type="text" name="name" class="form-control" id="contact-form-fullname" placeholder="{{ __('Your name') }}" required />
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-email">{{ __('Email') }}</label>
-                    <input type="text" id="contact-form-email" class="form-control" placeholder="seu@email.com" />
+                    <input type="email" name="email" id="contact-form-email" class="form-control" placeholder="seu@email.com" required />
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-phone">{{ __('WhatsApp / Phone') }}</label>
-                    <input type="text" id="contact-form-phone" class="form-control" placeholder="(00) 00000-0000" />
+                    <input type="text" name="whatsapp" id="contact-form-phone" class="form-control" placeholder="(00) 00000-0000" />
                   </div>
                   <div class="col-md-6">
                     <label class="form-label" for="contact-form-subject">{{ __('Subject') }}</label>
-                    <select id="contact-form-subject" class="form-select">
+                    <select name="subject" id="contact-form-subject" class="form-select">
                       <option selected disabled value="">{{ __('Select...') }}</option>
-                      <option value="sales">{{ __('Commercial / Sales') }}</option>
-                      <option value="support">{{ __('Technical Support') }}</option>
-                      <option value="partnership">{{ __('Partnership') }}</option>
-                      <option value="other">{{ __('Others') }}</option>
+                      <option value="Comercial / Vendas">{{ __('Commercial / Sales') }}</option>
+                      <option value="Suporte Técnico">{{ __('Technical Support') }}</option>
+                      <option value="Parceria">{{ __('Partnership') }}</option>
+                      <option value="Outros">{{ __('Others') }}</option>
                     </select>
                   </div>
                   <div class="col-12">
                     <label class="form-label" for="contact-form-message">{{ __('Message') }}</label>
-                    <textarea id="contact-form-message" class="form-control" rows="5"
-                      placeholder="{{ __('Hello, I would like to know more about the Enterprise plan...') }}"></textarea>
+                    <textarea name="message" id="contact-form-message" class="form-control" rows="5"
+                      placeholder="{{ __('Hello, I would like to know more about the Enterprise plan...') }}" required></textarea>
                   </div>
                   <div class="col-12">
                     <button type="submit" class="btn btn-primary">{{ __('Send Message') }}</button>
@@ -1502,4 +1539,147 @@ $pageConfigs = [
   </section>
   <!-- Contact Us: End -->
   </div>
+  @section('page-script')
+  @vite(['resources/assets/js/front-page-landing.js'])
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggler = document.querySelector('.price-duration-toggler');
+      const menuBtn = document.querySelector('.navbar-toggler');
+      const menuCollapse = document.getElementById('navbarSupportedContent');
+
+      // Troca de Preços
+      if (toggler) {
+        toggler.addEventListener('change', function() {
+          const isYearly = this.checked;
+          document.querySelectorAll('.price-monthly').forEach(el => el.classList.toggle('d-none', isYearly));
+          document.querySelectorAll('.price-yearly').forEach(el => el.classList.toggle('d-none', !isYearly));
+          document.querySelectorAll('.plan-action-btn').forEach(btn => {
+            const link = isYearly ? btn.getAttribute('data-yearly-link') : btn.getAttribute('data-monthly-link');
+            if (link) btn.setAttribute('href', link);
+          });
+        });
+      }
+
+      // Menu Mobile (Correção para o erro de travamento)
+      if (menuBtn && menuCollapse) {
+        menuBtn.addEventListener('click', function() {
+          menuCollapse.classList.toggle('show');
+        });
+      }
+
+      // Form de Contato
+      const contactForm = document.getElementById('landingContactForm');
+      if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const btn = contactForm.querySelector('button[type="submit"]');
+          const originalText = btn.innerHTML;
+
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+
+          const formData = new FormData(contactForm);
+
+          fetch(contactForm.getAttribute('action'), {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+              }
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Sucesso!',
+                  text: data.message,
+                  confirmButtonColor: '#7367f0'
+                });
+                contactForm.reset();
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Ops!',
+                  text: data.message || 'Erro ao enviar mensagem.',
+                  confirmButtonColor: '#7367f0'
+                });
+              }
+            })
+            .catch(err => {
+              console.error('Erro:', err);
+              Swal.fire({
+                icon: 'error',
+                title: 'Erro de Conexão',
+                text: 'Não foi possível enviar sua mensagem no momento.',
+                confirmButtonColor: '#7367f0'
+              });
+            })
+            .finally(() => {
+              btn.disabled = false;
+              btn.innerHTML = originalText;
+            });
+        });
+      }
+
+      // Custom Mouse Effect
+      const dot = document.createElement('div');
+      const outline = document.createElement('div');
+      dot.className = 'cursor-dot';
+      outline.className = 'cursor-outline';
+      document.body.appendChild(dot);
+      document.body.appendChild(outline);
+
+      let mouseX = 0,
+        mouseY = 0;
+      let outlineX = 0,
+        outlineY = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        dot.style.left = mouseX + 'px';
+        dot.style.top = mouseY + 'px';
+
+        // Create trail
+        if (Math.random() > 0.8) {
+          const trail = document.createElement('div');
+          trail.className = 'cursor-trail';
+          trail.style.left = mouseX + 'px';
+          trail.style.top = mouseY + 'px';
+          document.body.appendChild(trail);
+          setTimeout(() => {
+            trail.style.opacity = '0';
+            trail.style.transform = 'scale(0.2)';
+            setTimeout(() => trail.remove(), 300);
+          }, 50);
+        }
+      });
+
+      // Smooth outline follow
+      const animateCursor = () => {
+        let distX = mouseX - outlineX;
+        let distY = mouseY - outlineY;
+        outlineX = outlineX + (distX * 0.15);
+        outlineY = outlineY + (distY * 0.15);
+        outline.style.left = outlineX + 'px';
+        outline.style.top = outlineY + 'px';
+        requestAnimationFrame(animateCursor);
+      };
+      animateCursor();
+
+      // Hover effects
+      document.querySelectorAll('a, button, select, input, .card').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          outline.style.transform = 'translate(-50%, -50%) scale(1.5)';
+          outline.style.backgroundColor = 'rgba(115, 103, 240, 0.1)';
+        });
+        el.addEventListener('mouseleave', () => {
+          outline.style.transform = 'translate(-50%, -50%) scale(1)';
+          outline.style.backgroundColor = 'transparent';
+        });
+      });
+    });
+  </script>
   @endsection

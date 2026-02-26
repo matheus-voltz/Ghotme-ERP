@@ -60,6 +60,8 @@ Route::get('/', function () {
     return view('content.font-pages.landing-page');
 })->name('welcome');
 
+Route::post('/lead', [App\Http\Controllers\LeadController::class, 'store'])->name('lead.store');
+
 
 Route::get('/email/verify', function () {
     return view('content.authentications.auth-verify-email-basic');
