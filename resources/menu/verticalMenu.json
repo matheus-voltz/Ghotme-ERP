@@ -1,6 +1,13 @@
 {
   "menu": [
     {
+      "url": "/master/dashboard",
+      "name": "Master Control",
+      "icon": "menu-icon icon-base ti tabler-shield-lock",
+      "slug": "master.dashboard",
+      "master_only": true
+    },
+    {
       "url": "/dashboard",
       "name": "Dashboard",
       "icon": "menu-icon icon-base ti tabler-smart-home",

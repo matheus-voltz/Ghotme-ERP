@@ -147,6 +147,14 @@ Route::middleware([
     Route::post('/admin/newsletter', [App\Http\Controllers\NewsletterAdminController::class, 'store'])->name('newsletter.admin.store');
     Route::delete('/admin/newsletter/subscriber/{id}', [App\Http\Controllers\NewsletterAdminController::class, 'destroySubscriber'])->name('newsletter.admin.subscriber.destroy');
 
+    // Master Portal (Proprietário do Sistema)
+    Route::middleware(['master'])->group(function () {
+        Route::get('/master/dashboard', [App\Http\Controllers\MasterPortalController::class, 'index'])->name('master.dashboard');
+        Route::get('/master/newsletter/create', [App\Http\Controllers\MasterPortalController::class, 'createNewsletter'])->name('master.newsletter.create');
+        Route::post('/master/newsletter/send', [App\Http\Controllers\MasterPortalController::class, 'sendNewsletter'])->name('master.newsletter.send');
+        Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
+    });
+
     // Sales Hub Admin
     Route::get('/admin/sales-hub', [App\Http\Controllers\SalesHubController::class, 'index'])->name('sales-hub.index');
     Route::post('/admin/sales-hub/ai-insight', [App\Http\Controllers\SalesHubController::class, 'getAiInsight'])->name('sales-hub.ai-insight');

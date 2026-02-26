@@ -47,6 +47,11 @@ $configData = Helper::appClasses();
     if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
     continue;
     }
+
+    // Master check
+    if (isset($menu->master_only) && $menu->master_only && !$user->is_master) {
+    continue;
+    }
     }
     @endphp
 

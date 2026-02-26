@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     })
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'master' => \App\Http\Middleware\MasterAdminMiddleware::class,
+        ]);
         $middleware->trustProxies(at: '*');
         $middleware->web(LocaleMiddleware::class);
         $middleware->validateCsrfTokens(except: [

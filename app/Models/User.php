@@ -64,6 +64,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         'status',
         'deleted_reason',
         'notification_preferences',
+        'is_master',
     ];
 
     /**
@@ -206,6 +207,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'trial_ends_at' => 'datetime',
             'payment_overdue_since' => 'datetime',
             'notification_preferences' => 'json',
+            'is_master' => 'boolean',
         ];
     }
 
