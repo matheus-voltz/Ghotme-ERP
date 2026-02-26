@@ -8,6 +8,8 @@ use App\Models\Clients;
 use App\Models\NewsletterSubscriber;
 use App\Models\NewsletterCampaign;
 use App\Models\SystemUpdate;
+use App\Models\SystemError;
+use App\Models\BillingHistory;
 use App\Jobs\SendNewsletterJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +23,9 @@ class MasterPortalController extends Controller
             'total_users' => User::count(),
             'total_clients' => Clients::count(),
             'total_subscribers' => NewsletterSubscriber::count(),
+            'total_errors' => SystemError::count(),
+            'global_revenue' => BillingHistory::where('status', 'paid')->sum('amount'),
+            'pending_revenue' => BillingHistory::where('status', 'pending')->sum('amount'),
             'recent_subscribers' => NewsletterSubscriber::latest()->limit(5)->get(),
             'recent_companies' => Company::latest()->limit(5)->get(),
         ];
@@ -28,6 +33,69 @@ class MasterPortalController extends Controller
         $campaigns = NewsletterCampaign::latest()->get();
 
         return view('content.pages.master.dashboard', compact('stats', 'campaigns'));
+    }
+
+    public function errors()
+    {
+        $errors = SystemError::with(['user.company'])->latest()->paginate(20);
+        return view('content.pages.master.errors', compact('errors'));
+    }
+
+    public function destroyError($id)
+    {
+        SystemError::findOrFail($id)->delete();
+        return back()->with('success', 'Log de erro removido.');
+    }
+
+    public function clearErrors()
+    {
+        SystemError::truncate();
+        return back()->with('success', 'Todos os logs foram limpos com sucesso!');
+    }
+
+    public function companies()
+    {
+        $companies = Company::withCount('users')->latest()->paginate(20);
+        return view('content.pages.master.companies', compact('companies'));
+    }
+
+    public function aiAnalysis()
+    {
+        $apiKey = env('GEMINI_API_KEY');
+        if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
+
+        $totalCompanies = Company::count();
+        $nicheStats = Company::select('niche', DB::raw('count(*) as count'))->groupBy('niche')->get();
+        $totalClients = Clients::count();
+        $totalSubscribers = NewsletterSubscriber::count();
+
+        $prompt = "Aja como o conselheiro estratégico do Matheus, dono do sistema ERP Ghotme.
+        DADOS ATUAIS DO ECOSSISTEMA:
+        - Total de Empresas: {$totalCompanies}
+        - Nichos mais populares: {$nicheStats}
+        - Total de Clientes atendidos no sistema: {$totalClients}
+        - Leads na Newsletter: {$totalSubscribers}
+
+        Com base nesses números, gere um relatório ultra-curto (máximo 3 parágrafos) com:
+        1. Uma análise do crescimento.
+        2. Uma sugestão de qual nicho focar o marketing agora.
+        3. Uma ideia de funcionalidade 'matadora' para aumentar o faturamento.";
+
+        try {
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
+            $response = \Illuminate\Support\Facades\Http::post($url, [
+                'contents' => [['parts' => [['text' => $prompt]]]]
+            ]);
+
+            if ($response->successful()) {
+                $insight = $response->json('candidates.0.content.parts.0.text');
+                return response()->json(['success' => true, 'insight' => trim($insight)]);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Erro ao gerar análise']);
     }
 
     public function createNewsletter()

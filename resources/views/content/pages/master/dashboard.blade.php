@@ -4,6 +4,21 @@
 
 @section('content')
 <div class="row g-6">
+  <!-- Cabeçalho com IA -->
+  <div class="col-12">
+    <div class="card bg-label-primary border-0 shadow-none">
+      <div class="card-body d-flex align-items-center justify-content-between py-4">
+        <div>
+            <h4 class="mb-1 fw-bold text-primary">Bem-vindo ao Comando Central, Matheus! 🚀</h4>
+            <p class="mb-0">Aqui você tem o controle total sobre o ecossistema Ghotme.</p>
+        </div>
+        <button class="btn btn-primary" id="btn-master-ai">
+            <i class="ti tabler-robot me-1"></i> IA Master Analyst
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Estatísticas Globais -->
   <div class="col-lg-3 col-sm-6">
     <div class="card h-100 shadow-sm border-start border-primary" style="border-left-width: 5px !important;">
@@ -57,6 +72,39 @@
           <h4 class="mb-0">{{ $stats['total_clients'] }}</h4>
         </div>
         <p class="mb-0">Clientes dos Inquilinos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faturamento Ghotme Master -->
+  <div class="col-lg-6 col-md-12">
+    <div class="card h-100 shadow-sm border-0 bg-primary text-white">
+      <div class="card-body d-flex align-items-center justify-content-between p-6">
+        <div>
+            <h5 class="text-white opacity-75 mb-1">Faturamento Total em Assinaturas</h5>
+            <h2 class="text-white fw-extrabold mb-0">R$ {{ number_format($stats['global_revenue'], 2, ',', '.') }}</h2>
+        </div>
+        <div class="text-end">
+            <span class="badge bg-white text-primary mb-1">Pendentes: R$ {{ number_format($stats['pending_revenue'], 2, ',', '.') }}</span>
+            <p class="small mb-0 opacity-75">Baseado em faturas processadas</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6 col-md-12">
+    <div class="card h-100 shadow-sm border-0 bg-label-danger">
+      <div class="card-body d-flex align-items-center justify-content-between p-6">
+        <div class="d-flex align-items-center">
+            <div class="avatar avatar-lg me-4">
+                <span class="avatar-initial rounded bg-danger"><i class="ti tabler-alert-triangle fs-2"></i></span>
+            </div>
+            <div>
+                <h5 class="text-danger fw-bold mb-1">Radar de Saúde Técnica</h5>
+                <p class="text-muted mb-0">Foram detectados <span class="fw-bold">{{ $stats['total_errors'] }} erros</span> no sistema.</p>
+            </div>
+        </div>
+        <a href="{{ route('master.errors') }}" class="btn btn-danger">Inspecionar Falhas</a>
       </div>
     </div>
   </div>
@@ -159,4 +207,49 @@
     </div>
   </div>
 </div>
+<!-- Modal IA Analysis -->
+<div class="modal fade" id="aiMasterModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title">Estratégia Ghotme (IA Insight)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="ai-insight-content" class="p-2" style="white-space: pre-wrap;">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 text-muted">Processando dados do ecossistema...</p>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAi = document.getElementById('btn-master-ai');
+    const modal = new bootstrap.Modal(document.getElementById('aiMasterModal'));
+    const content = document.getElementById('ai-insight-content');
+
+    btnAi.addEventListener('click', function() {
+        modal.show();
+        content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">Analisando o crescimento global...</p></div>';
+
+        fetch('{{ route("master.ai-analysis") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+            } else {
+                content.innerHTML = '<p class="text-danger">Erro ao obter análise.</p>';
+            }
+        });
+    });
+});
+</script>
 @endsection

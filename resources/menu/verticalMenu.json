@@ -5,7 +5,24 @@
       "name": "Master Control",
       "icon": "menu-icon icon-base ti tabler-shield-lock",
       "slug": "master.dashboard",
-      "master_only": true
+      "master_only": true,
+      "submenu": [
+        {
+          "url": "/master/dashboard",
+          "name": "Estatísticas Globais",
+          "slug": "master.dashboard"
+        },
+        {
+          "url": "/master/errors",
+          "name": "Monitor de Erros",
+          "slug": "master.errors"
+        },
+        {
+          "url": "/master/companies",
+          "name": "Gestão de Empresas",
+          "slug": "master.companies"
+        }
+      ]
     },
     {
       "url": "/dashboard",

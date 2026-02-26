@@ -19,4 +19,9 @@ class SystemError extends Model
     protected $casts = [
         'request_data' => 'array'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

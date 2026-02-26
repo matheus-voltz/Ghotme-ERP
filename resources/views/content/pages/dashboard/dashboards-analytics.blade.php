@@ -74,6 +74,12 @@ $configData = Helper::appClasses();
           <div class="col-md-8 col-12">
             <h4 class="text-white mb-2 fw-bold">{{ __('Welcome back') }}, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h4>
             <p class="text-white mb-4 opacity-75">{{ __('Your workshop has') }} <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> {{ __('orders running now.') }}</p>
+            
+            @if(auth()->user()->role === 'admin')
+            <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis">
+                <i class="ti tabler-robot me-1"></i> Análise de Negócio IA
+            </button>
+            @endif
 
             <div class="row g-3 mt-4">
               <div class="col-sm-6 col-auto">
@@ -709,7 +715,60 @@ $configData = Helper::appClasses();
         labels: ['Lucratividade'],
       };
     if (profitabilityChartEl) new ApexCharts(profitabilityChartEl, profitabilityChartConfig).render();
+
+    // IA Client Analysis Logic
+    const btnAi = document.getElementById('btn-client-ai-analysis');
+    if (btnAi) {
+        const modal = new bootstrap.Modal(document.getElementById('aiClientModal'));
+        const content = document.getElementById('client-ai-content');
+
+        btnAi.addEventListener('click', function() {
+            modal.show();
+            content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">A IA está processando seus dados financeiros e operacionais...</p></div>';
+
+            fetch('{{ route("dashboard.ai-analysis") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+                } else {
+                    content.innerHTML = `<p class="text-danger">${data.message || 'Erro ao obter análise.'}</p>`;
+                }
+            })
+            .catch(err => {
+                content.innerHTML = '<p class="text-danger">Erro de conexão com o servidor de IA.</p>';
+            });
+        });
+    }
   });
 </script>
 @endpush
+
+@if(auth()->user()->role === 'admin')
+<!-- Modal IA Client Analysis -->
+<div class="modal fade" id="aiClientModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title">Consultor Estratégico Ghotme</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="client-ai-content" class="p-2" style="white-space: pre-wrap; line-height: 1.6;">
+            <div class="text-center p-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 text-muted">Analisando os números do seu negócio...</p>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+@endif
 @endsection

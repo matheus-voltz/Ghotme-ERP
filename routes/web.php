@@ -150,6 +150,13 @@ Route::middleware([
     // Master Portal (Proprietário do Sistema)
     Route::middleware(['master'])->group(function () {
         Route::get('/master/dashboard', [App\Http\Controllers\MasterPortalController::class, 'index'])->name('master.dashboard');
+        Route::post('/master/ai-analysis', [App\Http\Controllers\MasterPortalController::class, 'aiAnalysis'])->name('master.ai-analysis');
+        Route::get('/master/errors', [App\Http\Controllers\MasterPortalController::class, 'errors'])->name('master.errors');
+        Route::delete('/master/errors/{id}', [App\Http\Controllers\MasterPortalController::class, 'destroyError'])->name('master.errors.destroy');
+        Route::post('/master/errors/clear', [App\Http\Controllers\MasterPortalController::class, 'clearErrors'])->name('master.errors.clear');
+        Route::get('/master/companies', [App\Http\Controllers\MasterPortalController::class, 'companies'])->name('master.companies');
+        Route::post('/master/companies/{id}', [App\Http\Controllers\MasterPortalController::class, 'updateCompany'])->name('master.companies.update');
+        Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
         Route::get('/master/newsletter/create', [App\Http\Controllers\MasterPortalController::class, 'createNewsletter'])->name('master.newsletter.create');
         Route::post('/master/newsletter/send', [App\Http\Controllers\MasterPortalController::class, 'sendNewsletter'])->name('master.newsletter.send');
         Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
@@ -167,6 +174,7 @@ Route::middleware([
 
     // Dashboard e Novidades
     Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/ai-analysis', [HomePage::class, 'aiAnalysis'])->name('dashboard.ai-analysis');
     Route::get('/whats-new', [App\Http\Controllers\SystemUpdateController::class, 'index'])->name('whats-new');
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
     Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');

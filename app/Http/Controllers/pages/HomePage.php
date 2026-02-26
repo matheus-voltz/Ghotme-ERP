@@ -16,9 +16,71 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class HomePage extends Controller
 {
+  public function aiAnalysis()
+  {
+    $user = Auth::user();
+    $company = $user->company;
+    $companyId = $user->company_id;
+    $apiKey = env('GEMINI_API_KEY');
+
+    if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
+
+    // Tradução manual de slugs para nomes amigáveis para a IA
+    $nicheKey = get_current_niche();
+    $nichesNames = [
+        'workshop' => 'Oficina Mecânica',
+        'automotive' => 'Centro Automotivo',
+        'electronics' => 'Assistência Técnica de Eletrônicos',
+        'pet' => 'Pet Shop e Clínica Veterinária',
+        'beauty_clinic' => 'Clínica de Estética',
+        'construction' => 'Construtora e Empreiteira'
+    ];
+    $nicheName = $nichesNames[$nicheKey] ?? $nicheKey;
+    $companyName = $company->name ?? 'sua empresa';
+    
+    $revenue = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')->whereMonth('paid_at', now()->month)->sum('amount');
+    $pendingOS = OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count();
+    $completedOS = OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->whereMonth('created_at', now()->month)->count();
+
+    $prompt = "Aja como um consultor de negócios sênior especialista em {$nicheName}.
+    A empresa que você está analisando se chama {$companyName}. 
+
+    DADOS DO MÊS:
+    - Receita: R$ " . number_format($revenue, 2, ',', '.') . "
+    - Serviços em Aberto: {$pendingOS}
+    - Serviços Concluídos: {$completedOS}
+
+    Gere um insight estratégico para o dono da {$companyName}.
+    
+    REGRAS OBRIGATÓRIAS:
+    1. JAMAIS use placeholders como '[Nicho]' ou '[Exemplo]'. Use termos REAIS de {$nicheName}.
+    2. Se for Pet Shop, fale de banho, tosa, ração ou vacinas.
+    3. Se for Estética, fale de procedimentos, Botox, drenagem ou pacotes.
+    4. Seja direto. Comece falando da {$companyName} e como ela pode lucrar mais com os {$pendingOS} serviços parados.
+    5. Retorne APENAS o texto do insight, sem saudações como 'Entendi a situação'.";
+
+    try {
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
+        $response = Http::post($url, [
+            'contents' => [['parts' => [['text' => $prompt]]]]
+        ]);
+
+        if ($response->successful()) {
+            $insight = $response->json('candidates.0.content.parts.0.text');
+            $insight = preg_replace('/^```html|```$/m', '', $insight);
+            return response()->json(['success' => true, 'insight' => trim($insight)]);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+    }
+
+    return response()->json(['success' => false, 'message' => 'Erro ao gerar análise']);
+  }
+
   public function index()
   {
     $user = Auth::user();
