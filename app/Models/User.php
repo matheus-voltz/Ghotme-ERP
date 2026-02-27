@@ -141,6 +141,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'unlimited_invoices', // Emissão ilimitada
             'fleet_management',  // Gestão de frotas
             'advanced_b2b',      // B2B avançado
+            'api_access',        // Acesso via API Tokens
+            'bank_automation',   // Conciliação Bancária OFX
+            'ai_unlimited',      // IA Analista Ilimitada
             'max_users_10'       // Até 10 usuários
         ];
 

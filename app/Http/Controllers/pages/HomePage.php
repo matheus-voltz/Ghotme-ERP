@@ -29,19 +29,35 @@ class HomePage extends Controller
 
     if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
 
+    // Limites de Plano
+    if (!$user->hasFeature('ai_unlimited')) {
+      $monthKey = now()->format('Y-m');
+      $usageKey = "ai_usage_{$companyId}_{$monthKey}";
+      $usageCount = Cache::get($usageKey, 0);
+
+      if ($usageCount >= 5) {
+        return response()->json([
+          'success' => false,
+          'message' => 'Você atingiu o limite de 5 análises mensais do plano Padrão. Faça o upgrade para o Enterprise para análises ilimitadas!',
+          'limit_reached' => true
+        ]);
+      }
+      Cache::put($usageKey, $usageCount + 1, now()->addMonth());
+    }
+
     // Tradução manual de slugs para nomes amigáveis para a IA
     $nicheKey = get_current_niche();
     $nichesNames = [
-        'workshop' => 'Oficina Mecânica',
-        'automotive' => 'Centro Automotivo',
-        'electronics' => 'Assistência Técnica de Eletrônicos',
-        'pet' => 'Pet Shop e Clínica Veterinária',
-        'beauty_clinic' => 'Clínica de Estética',
-        'construction' => 'Construtora e Empreiteira'
+      'workshop' => 'Oficina Mecânica',
+      'automotive' => 'Centro Automotivo',
+      'electronics' => 'Assistência Técnica de Eletrônicos',
+      'pet' => 'Pet Shop e Clínica Veterinária',
+      'beauty_clinic' => 'Clínica de Estética',
+      'construction' => 'Construtora e Empreiteira'
     ];
     $nicheName = $nichesNames[$nicheKey] ?? $nicheKey;
     $companyName = $company->name ?? 'sua empresa';
-    
+
     $revenue = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')->whereMonth('paid_at', now()->month)->sum('amount');
     $pendingOS = OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count();
     $completedOS = OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->whereMonth('created_at', now()->month)->count();
@@ -64,18 +80,18 @@ class HomePage extends Controller
     5. Retorne APENAS o texto do insight, sem saudações como 'Entendi a situação'.";
 
     try {
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
-        $response = Http::post($url, [
-            'contents' => [['parts' => [['text' => $prompt]]]]
-        ]);
+      $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
+      $response = Http::post($url, [
+        'contents' => [['parts' => [['text' => $prompt]]]]
+      ]);
 
-        if ($response->successful()) {
-            $insight = $response->json('candidates.0.content.parts.0.text');
-            $insight = preg_replace('/^```html|```$/m', '', $insight);
-            return response()->json(['success' => true, 'insight' => trim($insight)]);
-        }
+      if ($response->successful()) {
+        $insight = $response->json('candidates.0.content.parts.0.text');
+        $insight = preg_replace('/^```html|```$/m', '', $insight);
+        return response()->json(['success' => true, 'insight' => trim($insight)]);
+      }
     } catch (\Exception $e) {
-        return response()->json(['success' => false, 'message' => $e->getMessage()]);
+      return response()->json(['success' => false, 'message' => $e->getMessage()]);
     }
 
     return response()->json(['success' => false, 'message' => 'Erro ao gerar análise']);
@@ -275,6 +291,7 @@ class HomePage extends Controller
       'topServiceData' => $topServices->pluck('total')->toArray(),
       'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
       'lastUpdate' => SystemUpdate::latest()->first(),
+      'aiUsageCount' => Cache::get("ai_usage_{$companyId}_" . now()->format('Y-m'), 0),
     ];
   }
 }

@@ -45,11 +45,11 @@ $configData = Helper::appClasses();
 
 @section('content')
 @if(isset($lastUpdate))
-<div class="row mb-4">
+<div class="row mb-4 d-none" id="banner-novidade">
   <div class="col-12">
     <div class="card border-0 shadow-none bg-label-primary">
       <div class="card-body d-flex align-items-center justify-content-between py-3">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center flex-grow-1">
           <div class="avatar avatar-sm me-3">
             <span class="avatar-initial rounded bg-primary"><i class="ti tabler-rocket fs-5"></i></span>
           </div>
@@ -58,11 +58,33 @@ $configData = Helper::appClasses();
             <small class="text-muted d-none d-md-inline">{{ str($lastUpdate->description)->limit(80) }}</small>
           </div>
         </div>
-        <a href="{{ route('whats-new') }}" class="btn btn-sm btn-primary">Ver Tudo</a>
+        <div class="d-flex align-items-center">
+          <a href="{{ route('whats-new') }}" class="btn btn-sm btn-primary me-3 btn-dismiss-banner">Ver Tudo</a>
+          <button type="button" class="btn-close btn-dismiss-banner" aria-label="Close"></button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  (function() {
+    const updateId = "{{ $lastUpdate->id }}";
+    const storageKey = 'dismissed_update_' + updateId;
+    const banner = document.getElementById('banner-novidade');
+
+    if (!localStorage.getItem(storageKey)) {
+      banner.classList.remove('d-none');
+    }
+
+    document.querySelectorAll('.btn-dismiss-banner').forEach(btn => {
+      btn.addEventListener('click', function() {
+        localStorage.setItem(storageKey, 'true');
+        banner.classList.add('d-none');
+      });
+    });
+  })();
+</script>
 @endif
 
 <div class="row g-4">
@@ -74,11 +96,22 @@ $configData = Helper::appClasses();
           <div class="col-md-8 col-12">
             <h4 class="text-white mb-2 fw-bold">{{ __('Welcome back') }}, {{ explode(' ', auth()->user()->name)[0] }}! 👋</h4>
             <p class="text-white mb-4 opacity-75">{{ __('Your workshop has') }} <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> {{ __('orders running now.') }}</p>
-            
+
             @if(auth()->user()->role === 'admin')
-            <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis">
+            <div class="d-flex align-items-center gap-3">
+              <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis">
                 <i class="ti tabler-robot me-1"></i> Análise de Negócio IA
-            </button>
+              </button>
+              @if(!auth()->user()->hasFeature('ai_unlimited'))
+              <div class="badge bg-glass text-white px-3 py-2 rounded-2">
+                <small>{{ $aiUsageCount ?? 0 }}/5 consultas</small>
+              </div>
+              @else
+              <div class="badge bg-glass text-white px-3 py-2 rounded-2 border border-white">
+                <i class="ti tabler-crown text-warning me-1"></i> <small>Enterprise</small>
+              </div>
+              @endif
+            </div>
             @endif
 
             <div class="row g-3 mt-4">
@@ -719,29 +752,47 @@ $configData = Helper::appClasses();
     // IA Client Analysis Logic
     const btnAi = document.getElementById('btn-client-ai-analysis');
     if (btnAi) {
-        const modal = new bootstrap.Modal(document.getElementById('aiClientModal'));
-        const content = document.getElementById('client-ai-content');
+      const modal = new bootstrap.Modal(document.getElementById('aiClientModal'));
+      const content = document.getElementById('client-ai-content');
 
-        btnAi.addEventListener('click', function() {
-            modal.show();
-            content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">A IA está processando seus dados financeiros e operacionais...</p></div>';
+      btnAi.addEventListener('click', function() {
+        modal.show();
+        content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">A IA está processando seus dados financeiros e operacionais...</p></div>';
 
-            fetch('{{ route("dashboard.ai-analysis") }}', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
-                } else {
-                    content.innerHTML = `<p class="text-danger">${data.message || 'Erro ao obter análise.'}</p>`;
+        fetch('{{ route("dashboard.ai-analysis") }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+            } else if (data.limit_reached) {
+              modal.hide();
+              Swal.fire({
+                title: 'Limite Atingido!',
+                text: data.message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ver Planos',
+                cancelButtonText: 'Depois',
+                confirmButtonColor: '#7367f0'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = '#'; // Link para página de planos futuramente
                 }
-            })
-            .catch(err => {
-                content.innerHTML = '<p class="text-danger">Erro de conexão com o servidor de IA.</p>';
-            });
-        });
+              });
+            } else {
+              content.innerHTML = `<p class="text-danger">${data.message || 'Erro ao obter análise.'}</p>`;
+            }
+          })
+          .catch(err => {
+            content.innerHTML = '<p class="text-danger">Erro de conexão com o servidor de IA.</p>';
+          });
+      });
     }
   });
 </script>
@@ -758,10 +809,10 @@ $configData = Helper::appClasses();
       </div>
       <div class="modal-body">
         <div id="client-ai-content" class="p-2" style="white-space: pre-wrap; line-height: 1.6;">
-            <div class="text-center p-5">
-                <div class="spinner-border text-primary"></div>
-                <p class="mt-2 text-muted">Analisando os números do seu negócio...</p>
-            </div>
+          <div class="text-center p-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2 text-muted">Analisando os números do seu negócio...</p>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
