@@ -38,13 +38,27 @@ class SettingsController extends Controller
         $selectedPlanDetails = null;
         if ($user->selected_plan && $user->selected_plan !== 'free') {
             $plans = [
-                'padrao' => ['monthly' => '149,00', 'yearly' => '1.490,00'],
-                'enterprise' => ['monthly' => '279,00', 'yearly' => '2.790,00'],
+                'padrao' => ['monthly' => 149.00, 'yearly' => 1490.00],
+                'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
             ];
-            $amount = $plans[$user->selected_plan][$user->plan_type] ?? '0,00';
+            $amount = $plans[$user->selected_plan][$user->plan_type] ?? 0;
+
+            // Lógica de Diferença para Upgrade
+            $isUpgrade = false;
+            $originalAmount = $amount;
+            if ($user->plan !== 'free' && $user->plan !== $user->selected_plan) {
+                $currentPlanPrice = $plans[$user->plan][$user->plan_type] ?? 0;
+                if ($amount > $currentPlanPrice) {
+                    $amount = $amount - $currentPlanPrice;
+                    $isUpgrade = true;
+                }
+            }
+
             $selectedPlanDetails = [
                 'name' => ucfirst($user->selected_plan),
-                'amount' => $amount,
+                'amount' => number_format($amount, 2, ',', '.'),
+                'is_upgrade' => $isUpgrade,
+                'original_amount' => number_format($originalAmount, 2, ',', '.'),
                 'type' => $user->plan_type === 'yearly' ? 'Anual' : 'Mensal'
             ];
         }
@@ -100,8 +114,26 @@ class SettingsController extends Controller
             'plan_type' => $type
         ]);
 
+        // Calcula valores para retorno dinâmico
+        $plans = [
+            'padrao' => ['monthly' => 149.00, 'yearly' => 1490.00],
+            'enterprise' => ['monthly' => 279.00, 'yearly' => 2790.00],
+        ];
+
+        $amount = $plans[$plan][$type] ?? 0;
+        $isUpgrade = false;
+        if ($user->plan !== 'free' && $user->plan !== $plan) {
+            $currentPlanPrice = $plans[$user->plan][$user->plan_type] ?? 0;
+            if ($amount > $currentPlanPrice) {
+                $amount = $amount - $currentPlanPrice;
+                $isUpgrade = true;
+            }
+        }
+
         return response()->json([
             'success' => true,
+            'amount' => $amount,
+            'is_upgrade' => $isUpgrade,
             'message' => 'Plano selecionado com sucesso! Agora escolha o método de pagamento abaixo.'
         ]);
     }
@@ -137,7 +169,21 @@ class SettingsController extends Controller
         ];
 
         $amount = $plans[$planToCharge][$user->plan_type ?? 'monthly'] ?? 149.00;
+
+        // Lógica de Diferença para Upgrade
+        $isUpgrade = false;
+        if ($user->plan !== 'free' && $user->plan !== $planToCharge) {
+            $currentPlanPrice = $plans[$user->plan][$user->plan_type ?? 'monthly'] ?? 0;
+            if ($amount > $currentPlanPrice) {
+                $amount = $amount - $currentPlanPrice;
+                $isUpgrade = true;
+            }
+        }
+
         $description = "Assinatura Plano " . ucfirst($planToCharge) . " - Ghotme (" . ($user->plan_type === 'yearly' ? 'Anual' : 'Mensal') . ")";
+        if ($isUpgrade) {
+            $description = "Upgrade para Plano " . ucfirst($planToCharge) . " (Diferença de Valores)";
+        }
 
         if (!$user->cpf_cnpj) {
             return response()->json(['success' => false, 'message' => 'Por favor, preencha seu CPF ou CNPJ no perfil antes de gerar a cobrança.']);

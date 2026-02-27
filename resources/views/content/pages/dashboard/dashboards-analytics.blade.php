@@ -11,11 +11,16 @@ $configData = Helper::appClasses();
 'resources/assets/vendor/libs/apex-charts/apex-charts.scss',
 'resources/assets/vendor/libs/swiper/swiper.scss',
 'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/animate-css/animate.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss',
 ])
 @endsection
 
 @section('vendor-script')
-@vite(['resources/assets/vendor/libs/apex-charts/apexcharts.js'])
+@vite([
+'resources/assets/vendor/libs/apex-charts/apexcharts.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js',
+])
 @endsection
 
 @section('page-style')
@@ -99,7 +104,8 @@ $configData = Helper::appClasses();
 
             @if(auth()->user()->role === 'admin')
             <div class="d-flex align-items-center gap-3">
-              <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis">
+              <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis"
+                data-limit-reached="{{ (!auth()->user()->hasFeature('ai_analysis') || (!auth()->user()->hasFeature('ai_unlimited') && ($aiUsageCount ?? 0) >= 5)) ? 'true' : 'false' }}">
                 <i class="ti tabler-robot me-1"></i> Análise de Negócio IA
               </button>
               @if(!auth()->user()->hasFeature('ai_unlimited'))
@@ -413,9 +419,115 @@ $configData = Helper::appClasses();
 @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Combined Performance Chart
-    const performanceChartEl = document.querySelector('#performanceCombinedChart'),
-      performanceChartConfig = {
+    // 1. IA Client Analysis Logic (Prioridade)
+    try {
+      const btnAi = document.getElementById('btn-client-ai-analysis');
+      const aiModalEl = document.getElementById('aiClientModal');
+
+      if (btnAi && aiModalEl) {
+        const localLimitReached = btnAi.getAttribute('data-limit-reached') === 'true';
+        if (btnAi.tagName === 'BUTTON') btnAi.type = 'button';
+
+        const content = document.getElementById('client-ai-content');
+
+        const showUpgradeAlert = (message) => {
+          btnAi.disabled = false;
+          if (typeof Swal === 'undefined') {
+            alert(message || 'Funcionalidade exclusiva Enterprise.');
+            return;
+          }
+          Swal.fire({
+            title: 'Funcionalidade Enterprise',
+            text: message || 'A Análise de Negócio com IA é exclusiva para clientes do plano Enterprise.',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Ver Planos',
+            cancelButtonText: 'Depois',
+            customClass: {
+              confirmButton: 'btn btn-primary me-3',
+              cancelButton: 'btn btn-label-secondary'
+            },
+            buttonsStyling: false
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const pricingModalEl = document.getElementById('pricingModal');
+              if (pricingModalEl && typeof bootstrap !== 'undefined') {
+                const pricingModal = bootstrap.Modal.getOrCreateInstance(pricingModalEl);
+                pricingModal.show();
+              }
+            }
+          });
+        };
+
+        btnAi.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (localLimitReached) {
+            showUpgradeAlert('A Análise de Negócio com IA é exclusiva para o plano Enterprise. Faça o upgrade agora para transformar seus dados em lucros!');
+            return;
+          }
+
+          if (typeof bootstrap === 'undefined') {
+            alert('Erro: Sistema de interface não carregado corretamente.');
+            return;
+          }
+
+          const modal = bootstrap.Modal.getOrCreateInstance(aiModalEl);
+          btnAi.disabled = true;
+          modal.show();
+          content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">O Analista está processando seus dados financeiros...</p></div>';
+
+          fetch('{{ route("dashboard.ai-analysis") }}', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+              }
+            })
+            .then(res => {
+              if (res.status === 403) {
+                return res.json().then(data => {
+                  modal.hide();
+                  setTimeout(() => showUpgradeAlert(data.message), 400);
+                  throw new Error('Upgrade required');
+                });
+              }
+              return res.json();
+            })
+            .then(data => {
+              btnAi.disabled = false;
+              if (data.success) {
+                content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+              } else {
+                content.innerHTML = `<div class="text-center p-4"><i class="ti tabler-alert-circle text-danger fs-1"></i><p class="text-danger mt-2">${data.message || 'Erro ao obter análise.'}</p></div>`;
+              }
+            })
+            .catch(err => {
+              btnAi.disabled = false;
+              if (err.message !== 'Upgrade required') {
+                content.innerHTML = '<div class="text-center p-4"><i class="ti tabler-circle-x text-danger fs-1"></i><p class="text-danger mt-2">Erro de conexão com o servidor de IA.</p></div>';
+              }
+            });
+        });
+      }
+    } catch (aiErr) {
+      console.error('AI Logic Error:', aiErr);
+    }
+
+    // 2. Chart Management Logic
+    try {
+      const chartInstances = {};
+      const renderChart = (id, config) => {
+        if (typeof ApexCharts === 'undefined') return;
+        if (chartInstances[id]) chartInstances[id].destroy();
+        const el = document.querySelector('#' + id);
+        if (el) {
+          chartInstances[id] = new ApexCharts(el, config);
+          chartInstances[id].render();
+        }
+      };
+
+      // Combined Performance Chart
+      renderChart('performanceCombinedChart', {
         series: [{
             name: 'Receita',
             type: 'area',
@@ -449,25 +561,13 @@ $configData = Helper::appClasses();
         plotOptions: {
           bar: {
             columnWidth: '20%',
-            borderRadius: 6,
-            colors: {
-              backgroundBarOpacity: 1,
-            }
+            borderRadius: 6
           }
         },
         colors: ['#28c76f', '#ea5455', '#7367f0'],
         fill: {
           opacity: [0.1, 0.1, 1],
-          type: ['gradient', 'gradient', 'solid'],
-          gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.4,
-            opacityTo: 0.1,
-            stops: [0, 90, 100]
-          }
-        },
-        dataLabels: {
-          enabled: false
+          type: ['gradient', 'gradient', 'solid']
         },
         xaxis: {
           categories: @json($months),
@@ -476,63 +576,34 @@ $configData = Helper::appClasses();
           },
           axisTicks: {
             show: false
-          },
-          labels: {
-            style: {
-              colors: '#aab3c3',
-              fontSize: '12px'
-            }
           }
         },
         yaxis: [{
-            labels: {
-              style: {
-                colors: '#aab3c3',
-                fontSize: '12px'
-              },
-              formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR', {
-                notation: "compact",
-                compactDisplay: "short"
-              })
-            }
-          },
-          {
-            opposite: true,
-            show: false
+          labels: {
+            style: {
+              colors: '#aab3c3'
+            },
+            formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR', {
+              notation: "compact"
+            })
           }
-        ],
+        }],
         grid: {
           borderColor: '#e7e7e7',
-          strokeDashArray: 5,
-          padding: {
-            top: -20,
-            bottom: 0,
-            left: 10,
-            right: 10
-          }
+          strokeDashArray: 5
         },
         tooltip: {
           shared: true,
-          intersect: false,
-          theme: 'light',
-          y: {
-            formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
-          }
+          theme: 'light'
         },
         legend: {
           position: 'top',
-          horizontalAlign: 'left',
-          fontFamily: 'inherit',
-          labels: {
-            colors: '#5d596c'
-          }
+          horizontalAlign: 'left'
         }
-      };
-    if (performanceChartEl) new ApexCharts(performanceChartEl, performanceChartConfig).render();
+      });
 
-    // OS Distribution Chart
-    const osChartEl = document.querySelector('#osDistributionChart'),
-      osChartConfig = {
+      // OS Distribution Donut
+      renderChart('osDistributionChart', {
         series: [@json($osDistribution['pending']), @json($osDistribution['running']), @json($osDistribution['finalized'])],
         chart: {
           type: 'donut',
@@ -541,50 +612,28 @@ $configData = Helper::appClasses();
         },
         labels: ['Pendentes', 'Execução', 'Finalizadas'],
         colors: ['#ff9f43', '#00cfe8', '#28c76f'],
-        stroke: {
-          width: 4,
-          colors: ['#fff']
-        },
-        dataLabels: {
-          enabled: false
-        },
-        legend: {
-          show: false
-        },
         plotOptions: {
           pie: {
             donut: {
               size: '72%',
               labels: {
                 show: true,
-                value: {
-                  fontSize: '1.5rem',
-                  fontWeight: '600',
-                  color: '#5d596c',
-                  offsetY: -15,
-                  formatter: (val) => val
-                },
-                name: {
-                  offsetY: 20,
-                  fontFamily: 'inherit'
-                },
                 total: {
                   show: true,
                   label: 'Total',
-                  fontSize: '0.8rem',
-                  color: '#aab3c3',
                   formatter: () => @json(array_sum($osDistribution))
                 }
               }
             }
           }
+        },
+        legend: {
+          show: false
         }
-      };
-    if (osChartEl) new ApexCharts(osChartEl, osChartConfig).render();
+      });
 
-    // Top Services Chart
-    const topServicesEl = document.querySelector('#topServicesChart'),
-      topServicesConfig = {
+      // Top Services Bar
+      renderChart('topServicesChart', {
         series: [{
           name: 'Receita Total',
           data: @json($topServiceData)
@@ -594,205 +643,62 @@ $configData = Helper::appClasses();
           height: 300,
           toolbar: {
             show: false
-          },
-          fontFamily: 'inherit'
+          }
         },
         plotOptions: {
           bar: {
             borderRadius: 6,
             horizontal: true,
             distributed: true,
-            barHeight: '55%',
-            dataLabels: {
-              position: 'bottom'
-            }
+            barHeight: '55%'
           }
         },
         colors: ['#7367f0', '#28c76f', '#00cfe8', '#ff9f43', '#ea5455'],
-        dataLabels: {
-          enabled: true,
-          textAnchor: 'start',
-          style: {
-            colors: ['#5d596c'],
-            fontSize: '11px',
-            fontWeight: '600'
-          },
-          formatter: (val, opt) => opt.w.globals.labels[opt.dataPointIndex] + ": R$ " + val.toLocaleString('pt-BR'),
-          offsetX: 0,
-          dropShadow: {
-            enabled: false
-          }
-        },
         xaxis: {
-          categories: @json($topServiceLabels),
-          labels: {
-            show: false
-          },
-          axisBorder: {
-            show: false
-          },
-          axisTicks: {
-            show: false
-          }
-        },
-        yaxis: {
-          labels: {
-            show: false
-          }
-        },
-        grid: {
-          show: false,
-          padding: {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0
-          }
+          categories: @json($topServiceLabels)
         },
         legend: {
           show: false
-        },
-        tooltip: {
-          theme: 'light',
-          y: {
-            formatter: (val) => 'R$ ' + val.toLocaleString('pt-BR')
-          }
-        },
-        states: {
-          hover: {
-            filter: {
-              type: 'none'
-            }
-          },
-          active: {
-            filter: {
-              type: 'none'
-            }
-          }
         }
-      };
-    if (topServicesEl) new ApexCharts(topServicesEl, topServicesConfig).render();
+      });
 
-    // Profitability Radial Chart
-    const profitabilityChartEl = document.querySelector('#profitabilityRadialChart'),
-      profitabilityChartConfig = {
+      // Profitability Radial
+      renderChart('profitabilityRadialChart', {
         series: [@json(abs(round($monthlyProfitability, 1)))],
         chart: {
           height: 240,
-          type: 'radialBar',
-          fontFamily: 'inherit'
+          type: 'radialBar'
         },
         plotOptions: {
           radialBar: {
             startAngle: -135,
             endAngle: 135,
             hollow: {
-              margin: 10,
-              size: '65%',
-              image: undefined,
-              imageOffsetX: 0,
-              imageOffsetY: 0,
-              position: 'front',
-              dropShadow: {
-                enabled: true,
-                top: 3,
-                left: 0,
-                blur: 4,
-                opacity: 0.1
-              }
+              size: '65%'
             },
             track: {
-              background: '#f0f2f4',
-              strokeWidth: '100%',
-              margin: 0,
+              background: '#f0f2f4'
             },
             dataLabels: {
               show: true,
-              name: {
-                offsetY: 20,
-                show: true,
-                color: '#888ea8',
-                fontSize: '13px'
-              },
               value: {
-                offsetY: -10,
-                color: '#111',
-                fontSize: '24px',
-                fontWeight: 700,
-                show: true,
-                formatter: function(val) {
-                  return val + "%";
-                }
+                formatter: (val) => val + "%"
               }
             }
-          },
+          }
         },
         fill: {
           type: 'gradient',
           gradient: {
-            shade: 'dark',
-            type: 'horizontal',
-            shadeIntensity: 0.5,
-            gradientToColors: ['{{ $monthlyProfitability >= 0 ? "#40CD88" : "#FF6B6B" }}'],
-            inverseColors: true,
-            opacityFrom: 1,
-            opacityTo: 1,
-            stops: [0, 100]
+            gradientToColors: ['{{ $monthlyProfitability >= 0 ? "#40CD88" : "#FF6B6B" }}']
           }
         },
         colors: ['{{ $monthlyProfitability >= 0 ? "#28c76f" : "#ea5455" }}'],
-        stroke: {
-          lineCap: 'round',
-          dashArray: 4
-        },
-        labels: ['Lucratividade'],
-      };
-    if (profitabilityChartEl) new ApexCharts(profitabilityChartEl, profitabilityChartConfig).render();
-
-    // IA Client Analysis Logic
-    const btnAi = document.getElementById('btn-client-ai-analysis');
-    if (btnAi) {
-      const modal = new bootstrap.Modal(document.getElementById('aiClientModal'));
-      const content = document.getElementById('client-ai-content');
-
-      btnAi.addEventListener('click', function() {
-        modal.show();
-        content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">A IA está processando seus dados financeiros e operacionais...</p></div>';
-
-        fetch('{{ route("dashboard.ai-analysis") }}', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            }
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
-            } else if (data.limit_reached) {
-              modal.hide();
-              Swal.fire({
-                title: 'Limite Atingido!',
-                text: data.message,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Ver Planos',
-                cancelButtonText: 'Depois',
-                confirmButtonColor: '#7367f0'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href = '#'; // Link para página de planos futuramente
-                }
-              });
-            } else {
-              content.innerHTML = `<p class="text-danger">${data.message || 'Erro ao obter análise.'}</p>`;
-            }
-          })
-          .catch(err => {
-            content.innerHTML = '<p class="text-danger">Erro de conexão com o servidor de IA.</p>';
-          });
+        labels: ['Lucratividade']
       });
+
+    } catch (chartErr) {
+      console.error('Charts Error:', chartErr);
     }
   });
 </script>
@@ -821,5 +727,8 @@ $configData = Helper::appClasses();
     </div>
   </div>
 </div>
+
+<!-- Modal Pricing para Upgrade -->
+@include('_partials/_modals/modal-pricing')
 @endif
 @endsection

@@ -272,6 +272,84 @@ $pageConfigs = [
   </section>
   <!-- Hero: End -->
 
+  <!-- Nichos: Start -->
+  <section id="landingNichos" class="section-py bg-body landing-nichos">
+    <div class="container">
+      <div class="text-center mb-10">
+        <span class="badge bg-label-primary mb-3">Ecossistema Ghotme</span>
+        <h2 class="fw-extrabold mb-2">Um sistema, <span class="hero-title">infinitas possibilidades</span></h2>
+        <p class="text-muted fs-5">Escolha o seu nicho e veja como o Ghotme se adapta perfeitamente ao seu negócio.</p>
+      </div>
+      <div class="row g-6 justify-content-center">
+        <!-- Oficina -->
+        <div class="col-lg-3 col-md-6">
+          <a href="{{ route('solutions.show', 'workshop') }}" class="text-decoration-none">
+            <div class="card h-100 niche-card text-center p-6">
+              <div class="card-body">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                  <span class="avatar-initial rounded-circle bg-label-primary" style="border-radius: 50% !important;">
+                    <i class="ti tabler-car fs-1"></i>
+                  </span>
+                </div>
+                <h5 class="fw-bold text-heading mb-2">Oficina Mecânica</h5>
+                <p class="text-muted small mb-0">Gestão de OS, estoque de peças e histórico de veículos.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <!-- Pet Shop -->
+        <div class="col-lg-3 col-md-6">
+          <a href="{{ route('solutions.show', 'pet') }}" class="text-decoration-none">
+            <div class="card h-100 niche-card text-center p-6">
+              <div class="card-body">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                  <span class="avatar-initial rounded-circle bg-label-success" style="border-radius: 50% !important;">
+                    <i class="ti tabler-dog-bowl fs-1"></i>
+                  </span>
+                </div>
+                <h5 class="fw-bold text-heading mb-2">Pet Shop</h5>
+                <p class="text-muted small mb-0">Agenda de banho e tosa, prontuário pet e vacinas.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <!-- Estética -->
+        <div class="col-lg-3 col-md-6">
+          <a href="{{ route('solutions.show', 'beauty_clinic') }}" class="text-decoration-none">
+            <div class="card h-100 niche-card text-center p-6">
+              <div class="card-body">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                  <span class="avatar-initial rounded-circle bg-label-info" style="border-radius: 50% !important;">
+                    <i class="ti tabler-sparkles fs-1"></i>
+                  </span>
+                </div>
+                <h5 class="fw-bold text-heading mb-2">Clínica de Estética</h5>
+                <p class="text-muted small mb-0">Ficha de anamnese, protocolos e controle de sessões.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <!-- Assistência -->
+        <div class="col-lg-3 col-md-6">
+          <a href="{{ route('solutions.show', 'electronics') }}" class="text-decoration-none">
+            <div class="card h-100 niche-card text-center p-6">
+              <div class="card-body">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                  <span class="avatar-initial rounded-circle bg-label-warning" style="border-radius: 50% !important;">
+                    <i class="ti tabler-device-mobile-cog fs-1"></i>
+                  </span>
+                </div>
+                <h5 class="fw-bold text-heading mb-2">Assistência Técnica</h5>
+                <p class="text-muted small mb-0">Laudos técnicos, garantia e controle de números de série.</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Nichos: End -->
+
   <!-- Useful features: Start -->
   <section id="landingFeatures" class="section-py landing-features">
     <div class="container">

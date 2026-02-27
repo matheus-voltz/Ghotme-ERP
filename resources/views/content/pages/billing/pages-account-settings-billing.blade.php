@@ -295,8 +295,6 @@
         success: function(data) {
           $btn.prop('disabled', false).html(originalText);
           if (data.success) {
-            $('#pricingModal').modal('hide');
-
             // Update UI dynamically
             const planNameMap = {
               'padrao': 'Padrão',
@@ -305,14 +303,40 @@
             const planNameDisplay = planNameMap[planId] || planId;
             const typeDisplay = isYearly ? 'Anual' : 'Mensal';
 
-            // Populating Installments correctly
+            // Show alert in payment methods section
+            let alertHtml = '';
+            const amountFormatted = data.amount.toLocaleString('pt-BR', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            });
+
+            if (data.is_upgrade) {
+              alertHtml = `<div class="alert alert-warning alert-dismissible d-flex align-items-center mb-4" role="alert">
+                  <i class="ti tabler-trending-up me-2"></i>
+                  <div>Você está fazendo um <strong>Upgrade</strong> para o plano <strong>${planNameDisplay}</strong>. Como você já é assinante, pagará apenas a <strong>diferença de R$ ${amountFormatted}</strong>.</div>
+                  <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            } else if (isYearly) {
+              alertHtml = `<div class="alert alert-info alert-dismissible d-flex align-items-center mb-4" role="alert">
+                  <i class="ti tabler-info-circle me-2"></i>
+                  <div>Você selecionou o plano <strong>${planNameDisplay}</strong> no formato <strong>${typeDisplay}</strong>. O valor é <strong>R$ ${amountFormatted}</strong> (Pagamento Único).</div>
+                  <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            } else {
+              alertHtml = `<div class="alert alert-primary alert-dismissible d-flex align-items-center mb-4" role="alert">
+                  <i class="ti tabler-calendar me-2"></i>
+                  <div>Você selecionou o plano <strong>${planNameDisplay}</strong> no formato <strong>${typeDisplay}</strong>. A assinatura mensal é de <strong>R$ ${amountFormatted}</strong>.</div>
+                  <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+            }
+
+            // Populating Installments correctly based on calculated amount
             const instContainer = $('#installments-container');
             if (isYearly) {
               instContainer.removeClass('d-none');
-              let planValue = planId === 'enterprise' ? 2790 : 1490; // Assuming these are the yearly prices in cents/smallest unit
               let instOptions = '';
               for (let i = 1; i <= 12; i++) {
-                let val = (planValue / i).toLocaleString('pt-BR', {
+                let val = (data.amount / i).toLocaleString('pt-BR', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 });
@@ -321,22 +345,6 @@
               $('#paymentInstallments').html(instOptions);
             } else {
               instContainer.addClass('d-none');
-            }
-
-            // Show alert in payment methods section
-            let alertHtml = '';
-            if (isYearly) {
-              alertHtml = `<div class="alert alert-info alert-dismissible d-flex align-items-center mb-4" role="alert">
-                  <i class="ti tabler-info-circle me-2"></i>
-                  <div>Você selecionou o plano <strong>${planNameDisplay}</strong> no formato <strong>${typeDisplay}</strong>. A cobrança será <strong>À Vista</strong> (Pagamento Único).</div>
-                  <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
-            } else {
-              alertHtml = `<div class="alert alert-primary alert-dismissible d-flex align-items-center mb-4" role="alert">
-                  <i class="ti tabler-calendar me-2"></i>
-                  <div>Você selecionou o plano <strong>${planNameDisplay}</strong> no formato <strong>${typeDisplay}</strong>. A cobrança funciona via <strong>Assinatura Recorrente Mensal</strong>.</div>
-                  <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>`;
             }
 
             // Remove previous alerts if exist, then prepend
@@ -465,8 +473,16 @@
         @if($selectedPlanDetails)
         <div class="alert alert-warning alert-dismissible mt-4 mb-0" role="alert">
           <button type="button" class="btn-close btn-cancel-plan" data-bs-dismiss="alert" aria-label="Close"></button>
-          <h6 class="alert-heading mb-1"><i class="ti tabler-alert-circle me-1"></i> Finalize a contratação!</h6>
-          <p class="mb-0">Você escolheu o plano <strong>{{ $selectedPlanDetails['name'] }} ({{ $selectedPlanDetails['type'] }})</strong> por <strong>R$ {{ $selectedPlanDetails['amount'] }}</strong>. Escolha um método de pagamento abaixo para ativar.</p>
+          <h6 class="alert-heading mb-2"><i class="ti tabler-trending-up me-1"></i> Finalize seu Upgrade!</h6>
+          <p class="mb-0">
+            @if($selectedPlanDetails['is_upgrade'])
+            Você está migrando para o plano <strong>{{ $selectedPlanDetails['name'] }}</strong>.
+            Como você já possui o plano Padrão, pagará apenas a <strong>diferença de R$ {{ $selectedPlanDetails['amount'] }}</strong> (em vez de R$ {{ $selectedPlanDetails['original_amount'] }}).
+            @else
+            Você escolheu o plano <strong>{{ $selectedPlanDetails['name'] }} ({{ $selectedPlanDetails['type'] }})</strong> por <strong>R$ {{ $selectedPlanDetails['amount'] }}</strong>.
+            @endif
+            Escolha um método de pagamento abaixo para ativar.
+          </p>
         </div>
         @endif
       </div>

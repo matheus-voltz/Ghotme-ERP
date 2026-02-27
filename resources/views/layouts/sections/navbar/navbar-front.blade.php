@@ -15,7 +15,7 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
           <i class="icon-base ti tabler-menu-2 icon-lg align-middle text-heading fw-medium"></i>
         </button>
         <!-- Mobile menu toggle: End-->
-        <a href="javascript:;" class="app-brand-link">
+        <a href="{{ url('/') }}" class="app-brand-link">
           <span class="app-brand-logo demo">@include('_partials.macros')</span>
           <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1">{{ config('variables.templateName') }}</span>
         </a>
@@ -29,6 +29,28 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#landingFeatures">{{ __('Features') }}</a>
+          </li>
+          <!-- Solutions Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle fw-medium" href="javascript:void(0)" id="navbarSolutions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Soluções</a>
+            <div class="dropdown-menu dropdown-menu-start shadow-lg border-0 rounded-3 mt-2" aria-labelledby="navbarSolutions">
+              <a class="dropdown-item py-2" href="{{ route('solutions.show', 'workshop') }}">
+                <i class="ti tabler-settings me-2 text-primary"></i> Oficina Mecânica
+              </a>
+              <a class="dropdown-item py-2" href="{{ route('solutions.show', 'pet') }}">
+                <i class="ti tabler-dog me-2 text-success"></i> Pet Shop
+              </a>
+              <a class="dropdown-item py-2" href="{{ route('solutions.show', 'beauty_clinic') }}">
+                <i class="ti tabler-sparkles me-2 text-info"></i> Clínica de Estética
+              </a>
+              <a class="dropdown-item py-2" href="{{ route('solutions.show', 'electronics') }}">
+                <i class="ti tabler-device-laptop me-2 text-warning"></i> Assistência Técnica
+              </a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item py-2" href="{{ route('solutions.show', 'construction') }}">
+                <i class="ti tabler-building-skyscraper me-2 text-secondary"></i> Construtoras
+              </a>
+            </div>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#landingPricing">{{ __('Pricing') }}</a>

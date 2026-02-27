@@ -23,6 +23,16 @@ class HomePage extends Controller
   public function aiAnalysis()
   {
     $user = Auth::user();
+
+    // Verificação de Plano
+    if (!$user->hasFeature('ai_analysis')) {
+        return response()->json([
+            'success' => false, 
+            'need_upgrade' => true,
+            'message' => 'A Análise de Negócio com IA é exclusiva para o plano Enterprise. Deseja fazer o upgrade agora?'
+        ], 403);
+    }
+
     $company = $user->company;
     $companyId = $user->company_id;
     $apiKey = env('GEMINI_API_KEY');
@@ -43,6 +53,10 @@ class HomePage extends Controller
         ]);
       }
       Cache::put($usageKey, $usageCount + 1, now()->addMonth());
+
+      // Limpa o cache do dashboard para forçar atualização do contador
+      $cacheKey = "dashboard_stats_{$companyId}_admin";
+      Cache::forget($cacheKey);
     }
 
     // Tradução manual de slugs para nomes amigáveis para a IA
@@ -113,8 +127,12 @@ class HomePage extends Controller
     });
 
     $view = ($user && $user->role !== 'admin') ? 'content.pages.dashboard.dashboards-employee' : 'content.pages.dashboard.dashboards-analytics';
+    $aiUsageCount = Cache::get("ai_usage_{$companyId}_" . now()->format('Y-m'), 0);
 
-    return view($view, array_merge($data, ['user' => $user]));
+    return view($view, array_merge($data, [
+      'user' => $user,
+      'aiUsageCount' => $aiUsageCount
+    ]));
   }
 
   /**
@@ -291,7 +309,6 @@ class HomePage extends Controller
       'topServiceData' => $topServices->pluck('total')->toArray(),
       'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
       'lastUpdate' => SystemUpdate::latest()->first(),
-      'aiUsageCount' => Cache::get("ai_usage_{$companyId}_" . now()->format('Y-m'), 0),
     ];
   }
 }

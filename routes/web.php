@@ -133,6 +133,9 @@ Route::post('/portal-contador/{token}/update-regime', [App\Http\Controllers\Acco
 Route::get('/accounting/export-xml', [App\Http\Controllers\AccountingController::class, 'exportXml'])->name('accounting.export-xml');
 Route::get('/accounting/export-pdf', [App\Http\Controllers\AccountingController::class, 'exportPdf'])->name('accounting.export-pdf');
 
+// Soluções por Nicho
+Route::get('/solucoes/{slug}', [App\Http\Controllers\SolutionController::class, 'show'])->name('solutions.show');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
