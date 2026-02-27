@@ -144,7 +144,6 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'api_access',        // Acesso via API Tokens
             'bank_automation',   // Conciliação Bancária OFX
             'ai_unlimited',      // IA Analista Ilimitada
-            'ai_analysis',       // Análise de Negócio IA (Novo)
             'max_users_10'       // Até 10 usuários
         ];
 
@@ -152,7 +151,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             return $plan === self::PLAN_ENTERPRISE;
         }
 
-        // Funcionalidades comuns a todos ou ao plano Padrão
+        // Funcionalidades comuns a todos ou ao plano Padrão (incluindo Análise IA limitada)
         return true;
     }
 

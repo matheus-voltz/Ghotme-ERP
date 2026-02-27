@@ -26,11 +26,11 @@ class HomePage extends Controller
 
     // Verificação de Plano
     if (!$user->hasFeature('ai_analysis')) {
-        return response()->json([
-            'success' => false, 
-            'need_upgrade' => true,
-            'message' => 'A Análise de Negócio com IA é exclusiva para o plano Enterprise. Deseja fazer o upgrade agora?'
-        ], 403);
+      return response()->json([
+        'success' => false,
+        'need_upgrade' => true,
+        'message' => 'A Análise de Negócio com IA é exclusiva para o plano Enterprise. Deseja fazer o upgrade agora?'
+      ], 403);
     }
 
     $company = $user->company;
@@ -45,10 +45,10 @@ class HomePage extends Controller
       $usageKey = "ai_usage_{$companyId}_{$monthKey}";
       $usageCount = Cache::get($usageKey, 0);
 
-      if ($usageCount >= 5) {
+      if ($usageCount >= 10) {
         return response()->json([
           'success' => false,
-          'message' => 'Você atingiu o limite de 5 análises mensais do plano Padrão. Faça o upgrade para o Enterprise para análises ilimitadas!',
+          'message' => 'Você atingiu o limite de 10 análises mensais do plano Padrão. Faça o upgrade para o Enterprise para análises ilimitadas!',
           'limit_reached' => true
         ]);
       }

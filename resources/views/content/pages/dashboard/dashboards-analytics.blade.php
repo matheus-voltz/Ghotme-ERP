@@ -103,14 +103,14 @@ $configData = Helper::appClasses();
             <p class="text-white mb-4 opacity-75">{{ __('Your workshop has') }} <strong class="fs-5 text-white">{{ $osStats['running'] }}</strong> {{ __('orders running now.') }}</p>
 
             @if(auth()->user()->role === 'admin')
-            <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3 mb-4">
               <button class="btn btn-white text-primary fw-bold shadow-sm" id="btn-client-ai-analysis"
-                data-limit-reached="{{ (!auth()->user()->hasFeature('ai_analysis') || (!auth()->user()->hasFeature('ai_unlimited') && ($aiUsageCount ?? 0) >= 5)) ? 'true' : 'false' }}">
+                data-limit-reached="{{ (!auth()->user()->hasFeature('ai_analysis') || (!auth()->user()->hasFeature('ai_unlimited') && ($aiUsageCount ?? 0) >= 10)) ? 'true' : 'false' }}">
                 <i class="ti tabler-robot me-1"></i> Análise de Negócio IA
               </button>
               @if(!auth()->user()->hasFeature('ai_unlimited'))
               <div class="badge bg-glass text-white px-3 py-2 rounded-2">
-                <small>{{ $aiUsageCount ?? 0 }}/5 consultas</small>
+                <small>{{ $aiUsageCount ?? 0 }}/10 consultas</small>
               </div>
               @else
               <div class="badge bg-glass text-white px-3 py-2 rounded-2 border border-white">
@@ -160,10 +160,10 @@ $configData = Helper::appClasses();
 
   <!-- Quick Stats Column -->
   <div class="col-xl-4 col-lg-5 col-md-12">
-    <div class="row g-4">
+    <div class="row g-4 h-100">
       <!-- Receita Mensal -->
-      <div class="col-12 col-sm-6 col-md-12">
-        <div class="card shadow-sm border-0">
+      <div class="col-12 col-sm-6 col-md-12 flex-grow-1">
+        <div class="card h-100 shadow-sm border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
@@ -188,8 +188,8 @@ $configData = Helper::appClasses();
       </div>
 
       <!-- Conversão -->
-      <div class="col-12 col-sm-6 col-md-12">
-        <div class="card shadow-sm border-0">
+      <div class="col-12 col-sm-6 col-md-12 flex-grow-1">
+        <div class="card h-100 shadow-sm border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
@@ -233,10 +233,10 @@ $configData = Helper::appClasses();
 
   <!-- Status & Profitability Column -->
   <div class="col-xl-4 col-lg-12 mt-4">
-    <div class="row g-4">
-      <!-- Ticket Médio -->
+    <div class="row g-4 h-100">
+      <!-- Métrica Rápida 1: Ticket Médio -->
       <div class="col-xl-12 col-md-6">
-        <div class="card shadow-sm border-0 bg-label-primary bg-opacity-10">
+        <div class="card h-100 shadow-sm border-0 bg-label-primary bg-opacity-10">
           <div class="card-body d-flex align-items-center">
             <div class="avatar avatar-md bg-label-primary rounded p-1 me-3">
               <i class="ti tabler-receipt-2 fs-2"></i>
@@ -248,9 +248,9 @@ $configData = Helper::appClasses();
           </div>
         </div>
       </div>
-      <!-- Taxa de Retenção -->
+      <!-- Métrica Rápida 2: Taxa de Retenção -->
       <div class="col-xl-12 col-md-6">
-        <div class="card shadow-sm border-0 bg-label-info bg-opacity-10">
+        <div class="card h-100 shadow-sm border-0 bg-label-info bg-opacity-10">
           <div class="card-body d-flex align-items-center">
             <div class="avatar avatar-md bg-label-info rounded p-1 me-3">
               <i class="ti tabler-users-group fs-2"></i>
@@ -264,11 +264,11 @@ $configData = Helper::appClasses();
       </div>
       <!-- Status OS -->
       <div class="col-xl-12 col-md-12">
-        <div class="card shadow-sm border-0">
+        <div class="card h-100 shadow-sm border-0">
           <div class="card-header py-3 bg-transparent border-bottom">
             <h5 class="mb-0 fw-bold">{{ __('OS Status') }}</h5>
           </div>
-          <div class="card-body d-flex align-items-center justify-content-center p-2">
+          <div class="card-body d-flex align-items-center justify-content-center p-4">
             <div class="w-100">
               <div id="osDistributionChart"></div>
             </div>
@@ -348,13 +348,10 @@ $configData = Helper::appClasses();
           <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-bold">{{ __('Profitability') }}</h5>
           </div>
-          <div class="card-body d-flex flex-column align-items-center justify-content-center py-2">
+          <div class="card-body d-flex flex-column align-items-center justify-content-center py-4">
             <div id="profitabilityRadialChart"></div>
-            <div class="text-center mt-n2">
-              <h2 class="mb-0 {{ $monthlyProfitability >= 0 ? 'text-success' : 'text-danger' }} fw-bolder">
-                {{ $monthlyProfitability >= 0 ? '+' : '' }}{{ number_format($monthlyProfitability, 1, ',', '.') }}%
-              </h2>
-              <span class="text-muted fw-medium">{{ __('Net Margin') }}</span>
+            <div class="text-center mt-n3">
+              <p class="text-muted fw-medium mb-0">{{ __('Net Margin') }}</p>
             </div>
           </div>
         </div>
@@ -419,6 +416,10 @@ $configData = Helper::appClasses();
 @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Flag global para evitar dupla inicialização de eventos em navegações do Livewire/SPA
+    if (window.aiLogicInitialized) return;
+    window.aiLogicInitialized = true;
+
     // 1. IA Client Analysis Logic (Prioridade)
     try {
       const btnAi = document.getElementById('btn-client-ai-analysis');
@@ -496,7 +497,12 @@ $configData = Helper::appClasses();
             .then(data => {
               btnAi.disabled = false;
               if (data.success) {
-                content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+                // Função simples para converter Markdown básico (Negrito e Itálico) em HTML
+                const formattedInsight = data.insight
+                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
+                  .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                content.innerHTML = `<div class="animate__animated animate__fadeIn">${formattedInsight}</div>`;
               } else {
                 content.innerHTML = `<div class="text-center p-4"><i class="ti tabler-alert-circle text-danger fs-1"></i><p class="text-danger mt-2">${data.message || 'Erro ao obter análise.'}</p></div>`;
               }
@@ -607,11 +613,20 @@ $configData = Helper::appClasses();
         series: [@json($osDistribution['pending']), @json($osDistribution['running']), @json($osDistribution['finalized'])],
         chart: {
           type: 'donut',
-          height: 220,
+          height: 380,
           fontFamily: 'inherit'
         },
         labels: ['Pendentes', 'Execução', 'Finalizadas'],
         colors: ['#ff9f43', '#00cfe8', '#28c76f'],
+        noData: {
+          text: 'Sem dados para o período',
+          align: 'center',
+          verticalAlign: 'middle',
+          style: {
+            color: '#aab3c3',
+            fontSize: '14px'
+          }
+        },
         plotOptions: {
           pie: {
             donut: {
@@ -628,7 +643,7 @@ $configData = Helper::appClasses();
           }
         },
         legend: {
-          show: false
+          position: 'bottom'
         }
       });
 
@@ -645,6 +660,13 @@ $configData = Helper::appClasses();
             show: false
           }
         },
+        noData: {
+          text: 'Nenhum serviço registrado',
+          style: {
+            color: '#aab3c3',
+            fontSize: '14px'
+          }
+        },
         plotOptions: {
           bar: {
             borderRadius: 6,
@@ -655,7 +677,19 @@ $configData = Helper::appClasses();
         },
         colors: ['#7367f0', '#28c76f', '#00cfe8', '#ff9f43', '#ea5455'],
         xaxis: {
-          categories: @json($topServiceLabels)
+          categories: @json($topServiceLabels).length > 0 ? @json($topServiceLabels) : ['Sem dados'],
+          labels: {
+            style: {
+              colors: '#aab3c3'
+            }
+          }
+        },
+        yaxis: {
+          labels: {
+            style: {
+              colors: '#aab3c3'
+            }
+          }
         },
         legend: {
           show: false
@@ -666,7 +700,7 @@ $configData = Helper::appClasses();
       renderChart('profitabilityRadialChart', {
         series: [@json(abs(round($monthlyProfitability, 1)))],
         chart: {
-          height: 240,
+          height: 280,
           type: 'radialBar'
         },
         plotOptions: {
@@ -681,7 +715,17 @@ $configData = Helper::appClasses();
             },
             dataLabels: {
               show: true,
+              name: {
+                show: true,
+                fontSize: '16px',
+                color: '#aab3c3',
+                offsetY: 80,
+                label: 'Lucratividade'
+              },
               value: {
+                offsetY: 40,
+                fontSize: '22px',
+                fontWeight: '600',
                 formatter: (val) => val + "%"
               }
             }
