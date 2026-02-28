@@ -16,16 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
         __DIR__ . '/../routes/channels.php',
         ['middleware' => ['web', 'auth']],
     )
-    ->booted(function () {
-        // Fallback para evitar erro se as chaves do Reverb não existirem (ex: Deploy na Hostinger sem .env pronto)
-        if (config('broadcasting.default') === 'reverb' && !env('REVERB_APP_KEY')) {
-            config(['broadcasting.default' => 'log']);
-        }
-        
-        if (config('broadcasting.default') === 'log' && env('REVERB_APP_KEY')) {
-            config(['broadcasting.default' => 'reverb']);
-        }
-    })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'master' => \App\Http\Middleware\MasterAdminMiddleware::class,
