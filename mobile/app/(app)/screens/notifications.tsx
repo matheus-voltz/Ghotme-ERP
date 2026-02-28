@@ -31,6 +31,9 @@ type NotificationType = {
 function formatRelativeDate(dateStr: string): string {
     try {
         const date = new Date(dateStr);
+        // Se a API mandar string pronta (diffForHumans) que não é ISO Date
+        if (isNaN(date.getTime())) return dateStr;
+
         const now = new Date();
         const diffMs = now.getTime() - date.getTime();
         const diffMin = Math.floor(diffMs / 60000);

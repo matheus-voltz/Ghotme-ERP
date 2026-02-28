@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
+import { useAuth } from '../../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 
@@ -43,6 +44,12 @@ export default function OSDetailScreen() {
     const { id } = useLocalSearchParams();
     const { colors } = useTheme();
     const { labels, niche } = useNiche();
+    const { user } = useAuth();
+
+    // Roles do sistema: 'admin' = dono/gestor | 'subscriber'/'editor' = funcionário
+    // is_master = super admin (dono do plano)
+    const isAdmin = user?.role === 'admin' || user?.is_master === true;
+
     const [os, setOs] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -333,185 +340,212 @@ export default function OSDetailScreen() {
                     <Text style={[styles.descriptionText, { color: colors.subText }]}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
                 </Animated.View>
 
-                {/* Action Buttons for Mechanic */}
-                <Animated.View
-                    style={styles.actionContainer}
-                    entering={FadeInDown.delay(400).duration(500).springify()}
-                >
-                    <Text style={[styles.actionTitle, { color: colors.text }]}>Ações Rápidas</Text>
-                    <View style={styles.buttonRow}>
-                        {os.status === 'pending' && (
+                {/* ── Banner somente-leitura (pending / canceled) ───────────── */}
+                {(os.status === 'pending' || os.status === 'canceled') && (
+                    <Animated.View
+                        entering={FadeInDown.delay(400).duration(400).springify()}
+                        style={[
+                            styles.readOnlyBanner,
+                            {
+                                backgroundColor: os.status === 'canceled' ? '#EA545515' : '#FF9F4315',
+                                borderColor: os.status === 'canceled' ? '#EA5455' : '#FF9F43',
+                            }
+                        ]}
+                    >
+                        <Ionicons
+                            name={os.status === 'canceled' ? 'close-circle-outline' : 'time-outline'}
+                            size={22}
+                            color={os.status === 'canceled' ? '#EA5455' : '#FF9F43'}
+                        />
+                        <View style={{ flex: 1 }}>
+                            <Text style={[styles.readOnlyTitle, { color: os.status === 'canceled' ? '#EA5455' : '#FF9F43' }]}>
+                                {os.status === 'canceled' ? 'Ordem Cancelada' : 'Aguardando Aprovação'}
+                            </Text>
+                            <Text style={[styles.readOnlySubtitle, { color: colors.subText }]}>
+                                {os.status === 'canceled'
+                                    ? 'Esta OS foi cancelada e não pode ser editada.'
+                                    : 'Somente visualização. As ações serão liberadas após a aprovação pelo gestor no painel web.'}
+                            </Text>
+                        </View>
+                    </Animated.View>
+                )}
+
+                {/* ── Ações Rápidas (approved ou running) ─────────────────── */}
+                {(os.status === 'approved' || os.status === 'running') && (
+                    <Animated.View
+                        style={styles.actionContainer}
+                        entering={FadeInDown.delay(400).duration(500).springify()}
+                    >
+                        <Text style={[styles.actionTitle, { color: colors.text }]}>Ações Rápidas</Text>
+                        <View style={styles.buttonRow}>
+                            {/* Iniciar OS — só aparece quando approved */}
+                            {os.status === 'approved' && (
+                                <TouchableOpacity
+                                    style={[styles.actionButton, { backgroundColor: '#00CFE8' }]}
+                                    onPress={() => handleUpdateStatus('running')}
+                                    disabled={updating}
+                                >
+                                    {updating
+                                        ? <ActivityIndicator size="small" color="#fff" />
+                                        : <Ionicons name="play" size={18} color="#fff" />}
+                                    <Text style={styles.buttonText}>Iniciar OS</Text>
+                                </TouchableOpacity>
+                            )}
+
+                            {/* Fotos e Checklist — disponíveis em approved e running */}
                             <TouchableOpacity
-                                style={[styles.actionButton, { backgroundColor: '#00CFE8' }]}
-                                onPress={() => handleUpdateStatus('running')}
-                                disabled={updating}
+                                style={[styles.actionButton, { backgroundColor: '#7367F0' }]}
+                                onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
                             >
-                                <Ionicons name="play" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Iniciar OS</Text>
+                                <Ionicons name="camera" size={18} color="#fff" />
+                                <Text style={styles.buttonText}>Fotos</Text>
                             </TouchableOpacity>
-                        )}
 
-                        {os.status === 'running' && (
                             <TouchableOpacity
-                                style={[styles.actionButton, { backgroundColor: '#28C76F' }]}
-                                onPress={() => handleUpdateStatus('finalized')}
-                                disabled={updating}
+                                style={[styles.actionButton, { backgroundColor: '#FF9F43' }]}
+                                onPress={() => router.push({ pathname: '/os/technical_checklist', params: { osId: os.id } })}
                             >
-                                <Ionicons name="checkmark-done" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Finalizar OS</Text>
+                                <Ionicons name="clipboard" size={18} color="#fff" />
+                                <Text style={styles.buttonText}>Checklist</Text>
                             </TouchableOpacity>
-                        )}
+                        </View>
+                    </Animated.View>
+                )}
 
-                        <TouchableOpacity
-                            style={[styles.actionButton, { backgroundColor: '#7367F0' }]}
-                            onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
-                        >
-                            <Ionicons name="camera" size={18} color="#fff" />
-                            <Text style={styles.buttonText}>Fotos</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.actionButton, { backgroundColor: '#FF9F43' }]}
-                            onPress={() => router.push({ pathname: '/os/technical_checklist', params: { osId: os.id } })}
-                        >
-                            <Ionicons name="clipboard" size={18} color="#fff" />
-                            <Text style={styles.buttonText}>Checklist</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Animated.View>
-
-                {/* Services Timer Section */}
-                <Animated.View
-                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    entering={FadeInDown.delay(500).duration(500).springify()}
-                >
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="timer" size={20} color={colors.primary} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Cronômetro de Serviços</Text>
-                        {/* Tempo total */}
-                        {os.items?.some((i: any) => (timers[i.id] ?? 0) > 0) && (
-                            <View style={styles.totalTimeBadge}>
-                                <Text style={styles.totalTimeText}>
-                                    ⏱ {formatTime(os.items?.reduce((acc: number, i: any) => acc + (timers[i.id] ?? 0), 0))}
-                                </Text>
-                            </View>
-                        )}
-                    </View>
-
-                    {os.items?.map((item: any) => {
-                        const elapsed = timers[item.id] ?? 0;
-                        const isRunning = item.status === 'in_progress';
-                        const isDone = item.status === 'completed';
-                        const isToggling = togglingItem === item.id;
-
-                        return (
-                            <View
-                                key={`item-${item.id}`}
-                                style={[
-                                    styles.timerCard,
-                                    { borderColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) },
-                                    isDone && { opacity: 0.75 },
-                                ]}
-                            >
-                                {/* Header do item */}
-                                <View style={styles.timerCardHeader}>
-                                    <View style={[
-                                        styles.timerStatusDot,
-                                        { backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) }
-                                    ]} />
-                                    <Text style={[styles.timerItemName, { color: colors.text }]} numberOfLines={1}>
-                                        {item.service?.name || 'Serviço'}
+                {/* ── Timer — só aparece quando em execução ou finalizada ── */}
+                {(os.status === 'running' || os.status === 'finalized') && (
+                    <Animated.View
+                        style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                        entering={FadeInDown.delay(500).duration(500).springify()}
+                    >
+                        <View style={styles.sectionHeader}>
+                            <Ionicons name="timer" size={20} color={colors.primary} />
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Cronômetro de Serviços</Text>
+                            {/* Tempo total */}
+                            {os.items?.some((i: any) => (timers[i.id] ?? 0) > 0) && (
+                                <View style={styles.totalTimeBadge}>
+                                    <Text style={styles.totalTimeText}>
+                                        ⏱ {formatTime(os.items?.reduce((acc: number, i: any) => acc + (timers[i.id] ?? 0), 0))}
                                     </Text>
-                                    {isDone && (
-                                        <View style={styles.donePill}>
-                                            <Ionicons name="checkmark-circle" size={14} color="#28C76F" />
-                                            <Text style={styles.donePillText}>Concluído</Text>
-                                        </View>
-                                    )}
                                 </View>
+                            )}
+                        </View>
 
-                                {/* Display digital do tempo */}
-                                <View style={styles.timerDisplayRow}>
-                                    {isRunning ? (
-                                        <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                                            <View style={[styles.timerDisplay, { backgroundColor: '#00CFE820', borderColor: '#00CFE8' }]}>
-                                                <Text style={[styles.timerDigits, { color: '#00CFE8' }]}>
+                        {os.items?.map((item: any) => {
+                            const elapsed = timers[item.id] ?? 0;
+                            const isRunning = item.status === 'in_progress';
+                            const isDone = item.status === 'completed';
+                            const isToggling = togglingItem === item.id;
+
+                            return (
+                                <View
+                                    key={`item-${item.id}`}
+                                    style={[
+                                        styles.timerCard,
+                                        { borderColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) },
+                                        isDone && { opacity: 0.75 },
+                                    ]}
+                                >
+                                    {/* Header do item */}
+                                    <View style={styles.timerCardHeader}>
+                                        <View style={[
+                                            styles.timerStatusDot,
+                                            { backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) }
+                                        ]} />
+                                        <Text style={[styles.timerItemName, { color: colors.text }]} numberOfLines={1}>
+                                            {item.service?.name || 'Serviço'}
+                                        </Text>
+                                        {isDone && (
+                                            <View style={styles.donePill}>
+                                                <Ionicons name="checkmark-circle" size={14} color="#28C76F" />
+                                                <Text style={styles.donePillText}>Concluído</Text>
+                                            </View>
+                                        )}
+                                    </View>
+
+                                    {/* Display digital do tempo */}
+                                    <View style={styles.timerDisplayRow}>
+                                        {isRunning ? (
+                                            <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                                                <View style={[styles.timerDisplay, { backgroundColor: '#00CFE820', borderColor: '#00CFE8' }]}>
+                                                    <Text style={[styles.timerDigits, { color: '#00CFE8' }]}>
+                                                        {formatTime(elapsed)}
+                                                    </Text>
+                                                    <View style={styles.runningDot} />
+                                                </View>
+                                            </RNAnimated.View>
+                                        ) : (
+                                            <View style={[styles.timerDisplay, {
+                                                backgroundColor: isDone ? '#28C76F15' : colors.background,
+                                                borderColor: isDone ? '#28C76F' : colors.border,
+                                            }]}>
+                                                <Text style={[styles.timerDigits, {
+                                                    color: isDone ? '#28C76F' : colors.subText,
+                                                }]}>
                                                     {formatTime(elapsed)}
                                                 </Text>
-                                                <View style={styles.runningDot} />
                                             </View>
-                                        </RNAnimated.View>
-                                    ) : (
-                                        <View style={[styles.timerDisplay, {
-                                            backgroundColor: isDone ? '#28C76F15' : colors.background,
-                                            borderColor: isDone ? '#28C76F' : colors.border,
-                                        }]}>
-                                            <Text style={[styles.timerDigits, {
-                                                color: isDone ? '#28C76F' : colors.subText,
-                                            }]}>
-                                                {formatTime(elapsed)}
-                                            </Text>
-                                        </View>
-                                    )}
+                                        )}
 
-                                    {/* Botões de ação */}
-                                    {!isDone && (
-                                        <View style={styles.timerBtns}>
-                                            <TouchableOpacity
-                                                style={[
-                                                    styles.timerMainBtn,
-                                                    { backgroundColor: isRunning ? '#FF9F43' : '#00CFE8' }
-                                                ]}
-                                                onPress={() => toggleItemTimer(item.id)}
-                                                disabled={isToggling}
-                                                activeOpacity={0.85}
-                                            >
-                                                {isToggling ? (
-                                                    <ActivityIndicator size="small" color="#fff" />
-                                                ) : (
-                                                    <Ionicons
-                                                        name={isRunning ? 'pause' : 'play'}
-                                                        size={20}
-                                                        color="#fff"
-                                                    />
-                                                )}
-                                            </TouchableOpacity>
+                                        {/* Botões de ação */}
+                                        {!isDone && (
+                                            <View style={styles.timerBtns}>
+                                                <TouchableOpacity
+                                                    style={[
+                                                        styles.timerMainBtn,
+                                                        { backgroundColor: isRunning ? '#FF9F43' : '#00CFE8' }
+                                                    ]}
+                                                    onPress={() => toggleItemTimer(item.id)}
+                                                    disabled={isToggling}
+                                                    activeOpacity={0.85}
+                                                >
+                                                    {isToggling ? (
+                                                        <ActivityIndicator size="small" color="#fff" />
+                                                    ) : (
+                                                        <Ionicons
+                                                            name={isRunning ? 'pause' : 'play'}
+                                                            size={20}
+                                                            color="#fff"
+                                                        />
+                                                    )}
+                                                </TouchableOpacity>
 
-                                            <TouchableOpacity
-                                                style={[styles.timerCompleteBtn, { borderColor: '#28C76F' }]}
-                                                onPress={() => completeItem(item.id)}
-                                                disabled={isToggling}
-                                                activeOpacity={0.85}
-                                            >
-                                                <Ionicons name="checkmark" size={20} color="#28C76F" />
-                                            </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={[styles.timerCompleteBtn, { borderColor: '#28C76F' }]}
+                                                    onPress={() => completeItem(item.id)}
+                                                    disabled={isToggling}
+                                                    activeOpacity={0.85}
+                                                >
+                                                    <Ionicons name="checkmark" size={20} color="#28C76F" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+                                    </View>
+
+                                    {/* Barra de progresso visual */}
+                                    {elapsed > 0 && (
+                                        <View style={styles.progressBarBg}>
+                                            <View style={[
+                                                styles.progressBarFill,
+                                                {
+                                                    width: `${Math.min(100, (elapsed / 3600) * 100)}%`,
+                                                    backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : '#7367F0'),
+                                                }
+                                            ]} />
                                         </View>
                                     )}
                                 </View>
+                            );
+                        })}
 
-                                {/* Barra de progresso visual */}
-                                {elapsed > 0 && (
-                                    <View style={styles.progressBarBg}>
-                                        <View style={[
-                                            styles.progressBarFill,
-                                            {
-                                                width: `${Math.min(100, (elapsed / 3600) * 100)}%`,
-                                                backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : '#7367F0'),
-                                            }
-                                        ]} />
-                                    </View>
-                                )}
+                        {(!os.items || os.items.length === 0) && (
+                            <View style={styles.emptyTimer}>
+                                <Ionicons name="timer-outline" size={32} color={colors.subText} style={{ opacity: 0.5 }} />
+                                <Text style={[{ color: colors.subText, marginTop: 8, fontSize: 13 }]}>Nenhum serviço para cronometrar.</Text>
                             </View>
-                        );
-                    })}
-
-                    {(!os.items || os.items.length === 0) && (
-                        <View style={styles.emptyTimer}>
-                            <Ionicons name="timer-outline" size={32} color={colors.subText} style={{ opacity: 0.5 }} />
-                            <Text style={[{ color: colors.subText, marginTop: 8, fontSize: 13 }]}>Nenhum serviço para cronometrar.</Text>
-                        </View>
-                    )}
-                </Animated.View>
+                        )}
+                    </Animated.View>
+                )}
 
                 {/* Parts Section */}
                 {os.parts?.length > 0 && (
@@ -532,25 +566,27 @@ export default function OSDetailScreen() {
                     </Animated.View>
                 )}
 
-                {/* Financial Summary */}
-                <Animated.View
-                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    entering={FadeInDown.delay(700).duration(500).springify()}
-                >
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name="wallet" size={20} color={'#28C76F'} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Resumo Financeiro</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
-                        <Text style={[styles.itemName, { color: colors.text, fontSize: 16 }]}>Total da Ordem</Text>
-                        <Text style={[{ color: '#28C76F', fontSize: 22, fontWeight: '900' }]}>
-                            {os.total ? `R$ ${parseFloat(os.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'R$ 0,00'}
-                        </Text>
-                    </View>
-                </Animated.View>
+                {/* Resumo Financeiro — só para admin/owner */}
+                {isAdmin && (
+                    <Animated.View
+                        style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                        entering={FadeInDown.delay(700).duration(500).springify()}
+                    >
+                        <View style={styles.sectionHeader}>
+                            <Ionicons name="wallet" size={20} color={'#28C76F'} />
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Resumo Financeiro</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8 }}>
+                            <Text style={[styles.itemName, { color: colors.text, fontSize: 16 }]}>Total da Ordem</Text>
+                            <Text style={[{ color: '#28C76F', fontSize: 22, fontWeight: '900' }]}>
+                                {os.total ? `R$ ${parseFloat(os.total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : 'R$ 0,00'}
+                            </Text>
+                        </View>
+                    </Animated.View>
+                )}
 
-                {/* BOTÃO FINALIZAR GERAL */}
-                {os.status !== 'finalized' && os.status !== 'canceled' && (
+                {/* Botão Finalizar — só para admin/owner */}
+                {os.status === 'running' && (
                     <Animated.View entering={FadeInUp.delay(800).duration(500).springify()}>
                         <TouchableOpacity
                             style={[styles.finalizeButton, { backgroundColor: '#28C76F' }]}
@@ -575,7 +611,7 @@ export default function OSDetailScreen() {
                 onFinish={() => setShowSuccess(false)}
                 message="Ordem Finalizada!"
             />
-        </View>
+        </View >
     );
 }
 
@@ -720,6 +756,24 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
         lineHeight: 20,
+    },
+    readOnlyBanner: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        gap: 12,
+        borderWidth: 1,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 20,
+    },
+    readOnlyTitle: {
+        fontSize: 14,
+        fontWeight: '700',
+        marginBottom: 4,
+    },
+    readOnlySubtitle: {
+        fontSize: 12,
+        lineHeight: 18,
     },
     actionContainer: {
         marginBottom: 25,

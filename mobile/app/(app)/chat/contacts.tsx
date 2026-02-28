@@ -22,7 +22,9 @@ export default function ContactsScreen() {
     const fetchContacts = async () => {
         try {
             const response = await api.get('/chat/contacts');
-            setContacts(response.data);
+            const data = response.data;
+            const contactsArray = Array.isArray(data) ? data : (data.team || []);
+            setContacts(contactsArray);
         } catch (error) {
             console.error(error);
         } finally {
@@ -60,7 +62,7 @@ export default function ContactsScreen() {
                 ) : (
                     <View style={[styles.avatarPlaceholder, { backgroundColor: isSupportType ? '#7367F020' : colors.primary + '20' }]}>
                         <Text style={[styles.avatarText, { color: isSupportType ? '#7367F0' : colors.primary }]}>
-                            {item.name.charAt(0).toUpperCase()}
+                            {item.name ? item.name.charAt(0).toUpperCase() : 'U'}
                         </Text>
                     </View>
                 )}
@@ -68,7 +70,7 @@ export default function ContactsScreen() {
             </View>
             <View style={styles.info}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+                    <Text style={[styles.name, { color: colors.text }]}>{item.name || 'Usuário Desconhecido'}</Text>
                     {isSupportType && (
                         <View style={styles.verifiedBadge}>
                             <Ionicons name="checkmark-circle" size={14} color="#7367F0" />

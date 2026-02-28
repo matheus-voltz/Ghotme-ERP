@@ -94,9 +94,9 @@ export async function registerForPushNotificationsAsync() {
 export function getRouteFromNotification(data: Record<string, any> | undefined): string | null {
   if (!data) return null;
 
-  // Notificação de OS (nova, status alterado, mensagem do técnico)
-  if (data.os_id || data.ordem_servico_id) {
-    const id = data.os_id ?? data.ordem_servico_id;
+  // Notificação de OS (nova, status alterado, orçamento aprovado)
+  if (data.os_id || data.ordem_servico_id || data.budget_id) {
+    const id = data.os_id ?? data.ordem_servico_id ?? data.budget_id;
     return `/os/${id}`;
   }
 
@@ -106,9 +106,9 @@ export function getRouteFromNotification(data: Record<string, any> | undefined):
     return `/chat/messages?id=${id}`;
   }
 
-  // URL direta embutida
-  if (data.url) return data.url;
-  if (data.route) return data.route;
+  // Evita URLs com http/https enviadas pelo sistema web (como redirects de painel)
+  if (data.url && !data.url.startsWith('http')) return data.url;
+  if (data.route && !data.route.startsWith('http')) return data.route;
 
   return null;
 }
@@ -116,7 +116,7 @@ export function getRouteFromNotification(data: Record<string, any> | undefined):
 // ─── Ícone por tipo de notificação ───────────────────────────────────────────
 export function getNotificationIcon(data: Record<string, any> | undefined): string {
   if (!data) return 'notifications';
-  if (data.os_id || data.ordem_servico_id) return 'construct';
+  if (data.os_id || data.ordem_servico_id || data.budget_id) return 'construct';
   if (data.chat_id || data.conversation_id) return 'chatbubbles';
   if (data.type === 'financial' || data.type === 'payment') return 'wallet';
   if (data.type === 'alert') return 'warning';
@@ -126,7 +126,7 @@ export function getNotificationIcon(data: Record<string, any> | undefined): stri
 // ─── Cor por tipo de notificação ─────────────────────────────────────────────
 export function getNotificationColor(data: Record<string, any> | undefined): string {
   if (!data) return '#7367F0';
-  if (data.os_id || data.ordem_servico_id) return '#7367F0';
+  if (data.os_id || data.ordem_servico_id || data.budget_id) return '#7367F0';
   if (data.chat_id || data.conversation_id) return '#00CFE8';
   if (data.type === 'financial' || data.type === 'payment') return '#28C76F';
   if (data.type === 'alert') return '#FF9F43';

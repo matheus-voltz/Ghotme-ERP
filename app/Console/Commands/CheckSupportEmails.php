@@ -57,15 +57,24 @@ class CheckSupportEmails extends Command
                 $from = $message->getFrom()[0]->mail ?? 'Desconhecido';
                 $textBody = $message->getTextBody() ?? $message->getHTMLBody() ?? 'Corpo de email vazio.';
 
-                // Limita o corpo do email se for muito grande para não exceder o limite do Telegram e manter a legibilidade
-                $textBody = Str::limit(strip_tags($textBody), 1500);
+                // 1. Localizar o usuário pelo email
+                $sender = \App\Models\User::where('email', $from)->first();
+                $masterId = 7; // ID do usuário Master configurado
 
-                $telegramMessage = "📩 *Novo Chamado de Suporte*\n\n";
-                $telegramMessage .= "👤 *De:* {$from}\n";
-                $telegramMessage .= "📌 *Assunto:* {$subject}\n\n";
-                $telegramMessage .= "💬 *Mensagem:*\n{$textBody}";
+                if ($sender) {
+                    \App\Models\ChatMessage::create([
+                        'company_id' => $sender->company_id,
+                        'sender_id' => $sender->id,
+                        'receiver_id' => $masterId,
+                        'message' => "[SUPORTE VIA EMAIL] Assunto: {$subject}\n\n" . strip_tags($textBody),
+                        'is_read' => false
+                    ]);
+                } else {
+                    // Se o usuário não existe, poderíamos criar um lead ou apenas logar
+                    \Illuminate\Support\Facades\Log::info("Email de suporte recebido de remetente desconhecido: {$from}");
+                }
 
-                // Envia para o Telegram
+                // Envia para o Telegram (Mantendo a funcionalidade atual)
                 $response = Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
                     'chat_id' => $chatId,
                     'text' => $telegramMessage,
