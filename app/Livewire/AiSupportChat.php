@@ -15,11 +15,11 @@ class AiSupportChat extends Component
 
     public function mount()
     {
-        // Mensagem de boas-vindas inicial
+        // Mensagem de boas-vindas inicial (teste de deploy)
         $this->messages = [
             [
                 'role' => 'assistant', 
-                'content' => "Olá, " . Auth::user()->name . "! 👋 Eu sou o Ghotme AI, seu assistente inteligente. Como posso te ajudar com o sistema hoje?"
+                'content' => "Olá, " . Auth::user()->name . "! 🚀 Sou o Ghotme AI (v2.0). Em que posso te ajudar agora?"
             ]
         ];
     }

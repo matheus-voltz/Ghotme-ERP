@@ -1,14 +1,14 @@
 name: Deploy ERP Ghotme
 on:
   push:
-    branches: [ main ] # Sobe para o servidor sempre que você der push na main
+    branches: [ main ]
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Executar comandos de Deploy via SSH
+      - name: Executar comandos de Deploy via SSH na Hostinger
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOSTINGER_HOST }}
@@ -16,12 +16,24 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: ${{ secrets.HOSTINGER_PORT }}
           script: |
-            cd domains/seu-dominio.com.br/public_html # ajuste para a sua pasta real
+            # Mudar para o diretório do projeto (ajuste o seudominio.com.br)
+            cd domains/ghotme.com.br/public_html 2>/dev/null || cd public_html
+            
+            # Baixar as últimas alterações do Git
             git pull origin main
-            composer install --no-dev --optimize-autoloader
+            
+            # Atualizar dependências do PHP
+            composer install --no-dev --optimize-autoloader --no-interaction
+            
+            # Atualizar dependências do Node e gerar Build do Vite
             npm install
             npm run build
+            
+            # Executar Migrations e Limpar Cache
             php artisan migrate --force
+            php artisan storage:link || true
             php artisan config:cache
             php artisan route:cache
-            echo "✅ Deploy concluído com sucesso!"
+            php artisan view:cache
+            
+            echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso!"
