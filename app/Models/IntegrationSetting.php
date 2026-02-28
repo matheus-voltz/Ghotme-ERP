@@ -42,4 +42,27 @@ class IntegrationSetting extends Model
         'meli_token_expires_at',
         'meli_active'
     ];
+
+    protected $casts = [
+        'mercado_pago_public_key' => 'encrypted',
+        'mercado_pago_access_token' => 'encrypted',
+        'asaas_api_key' => 'encrypted',
+        'pagar_me_api_key' => 'encrypted',
+        'pagar_me_encryption_key' => 'encrypted',
+        'pagbank_token' => 'encrypted',
+        'stripe_public_key' => 'encrypted',
+        'stripe_secret_key' => 'encrypted',
+        'stripe_webhook_secret' => 'encrypted',
+        'bitcoin_api_key' => 'encrypted',
+        'bitcoin_webhook_secret' => 'encrypted',
+        'whatsapp_token' => 'encrypted',
+        'whatsapp_api_key' => 'encrypted',
+        'fiscal_api_token' => 'encrypted',
+        'meli_client_id' => 'encrypted',
+        'meli_client_secret' => 'encrypted',
+        'meli_access_token' => 'encrypted',
+        'meli_refresh_token' => 'encrypted',
+        'meli_token_expires_at' => 'datetime',
+        'meli_active' => 'boolean'
+    ];
 }
