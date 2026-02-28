@@ -114,6 +114,12 @@ class HomePage extends Controller
   public function index()
   {
     $user = Auth::user();
+
+    // Redireciona para o Master Dashboard se for o proprietário do sistema
+    if ($user && $user->is_master) {
+      return redirect()->route('master.dashboard');
+    }
+
     $companyId = $user->company_id ?? 0;
 
     // Cache de 15 minutos para performance, chave varia por empresa e papel

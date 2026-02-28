@@ -18,16 +18,28 @@ class MasterPortalController extends Controller
 {
     public function index()
     {
+        // Estatísticas de Visitas nos últimos 30 dias
+        $days = [];
+        $visitCounts = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $days[] = now()->subDays($i)->format('d/m');
+            $visitCounts[] = \App\Models\SiteVisit::whereDate('created_at', $date)->count();
+        }
+
         $stats = [
             'total_companies' => Company::count(),
             'total_users' => User::count(),
             'total_clients' => Clients::count(),
             'total_subscribers' => NewsletterSubscriber::count(),
             'total_errors' => SystemError::count(),
+            'total_visits_30d' => \App\Models\SiteVisit::where('created_at', '>=', now()->subDays(30))->count(),
             'global_revenue' => BillingHistory::where('status', 'paid')->sum('amount'),
             'pending_revenue' => BillingHistory::where('status', 'pending')->sum('amount'),
             'recent_subscribers' => NewsletterSubscriber::latest()->limit(5)->get(),
             'recent_companies' => Company::latest()->limit(5)->get(),
+            'visit_chart_labels' => $days,
+            'visit_chart_data' => $visitCounts,
         ];
 
         $campaigns = NewsletterCampaign::latest()->get();

@@ -162,17 +162,6 @@ isset($configData['contentLayout']) && $configData['contentLayout'] === 'compact
     @endif
     <!-- Drag Target Area To SlideIn Menu On Small Screens -->
     <div class="drag-target"></div>
-
-    <!-- AI Consultant Floating Button -->
-    @if(!isset($isPublic) || !$isPublic)
-    <a href="{{ route('ai-consultant.index') }}" class="btn btn-primary btn-icon rounded-pill shadow-lg position-fixed d-flex align-items-center justify-content-center"
-      style="bottom: 25px; right: 25px; width: 50px; height: 50px; z-index: 9999;"
-      title="Consultor IA">
-      <i class="ti tabler-robot fs-2"></i>
-    </a>
-    @endif
-
-
   </div>
   <!-- / Layout wrapper -->
   @endsection

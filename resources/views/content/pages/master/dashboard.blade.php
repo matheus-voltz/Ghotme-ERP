@@ -2,6 +2,14 @@
 
 @section('title', 'Master Control Panel - Ghotme')
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/apex-charts/apex-charts.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/apex-charts/apexcharts.js'])
+@endsection
+
 @section('content')
 <div class="row g-6">
   <!-- Cabeçalho com IA -->
@@ -15,6 +23,24 @@
         <button class="btn btn-primary" id="btn-master-ai">
             <i class="ti tabler-robot me-1"></i> IA Master Analyst
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tráfego da Landing Page (Visitas) -->
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="card-title mb-0">Tráfego da Landing Page (Últimos 30 dias)</h5>
+          <small class="text-muted">Total de {{ $stats['total_visits_30d'] }} visitas neste período</small>
+        </div>
+        <div class="avatar avatar-md">
+          <span class="avatar-initial rounded bg-label-info"><i class="ti tabler-chart-line fs-4"></i></span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="visitHistoryChart"></div>
       </div>
     </div>
   </div>
@@ -250,6 +276,56 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Gráfico de Visitas
+    const visitChartEl = document.querySelector('#visitHistoryChart');
+    if (visitChartEl) {
+        const visitChartConfig = {
+            chart: {
+                height: 250,
+                type: 'area',
+                parentHeightOffset: 0,
+                toolbar: { show: false }
+            },
+            dataLabels: { enabled: false },
+            stroke: { show: true, curve: 'smooth' },
+            legend: { show: false },
+            grid: {
+                show: true,
+                borderColor: '#e5e5e5',
+                padding: { top: 0, bottom: 0, left: 0, right: 10 }
+            },
+            colors: ['#7367f0'],
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shade: 'dark',
+                    shadeIntensity: 0.5,
+                    gradientToColors: ['#7367f0'],
+                    inverseColors: true,
+                    opacityFrom: 0.6,
+                    opacityTo: 0.1,
+                    stops: [0, 100]
+                }
+            },
+            series: [{
+                name: 'Visitas',
+                data: @json($stats['visit_chart_data'])
+            }],
+            xaxis: {
+                categories: @json($stats['visit_chart_labels']),
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#a1acb8', fontSize: '13px' } }
+            },
+            yaxis: {
+                labels: { show: false }
+            },
+            tooltip: { x: { show: true } }
+        };
+        const visitChart = new ApexCharts(visitChartEl, visitChartConfig);
+        visitChart.render();
+    }
 });
 </script>
 @endsection

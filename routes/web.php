@@ -57,6 +57,16 @@ use App\Http\Controllers\VehicleLookupController;
 */
 
 Route::get('/', function () {
+    // Registra a visita de forma rápida e silenciosa
+    try {
+        \App\Models\SiteVisit::create([
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'path' => '/',
+            'referer' => request()->header('referer')
+        ]);
+    } catch (\Exception $e) {}
+
     return view('content.font-pages.landing-page');
 })->name('welcome');
 

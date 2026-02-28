@@ -1,10 +1,10 @@
 <div>
     <!-- Floating Help Button -->
-    <button wire:click="toggleChat" class="btn btn-primary rounded-pill btn-icon shadow-lg" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050; width: 60px; height: 60px;">
+    <button wire:click="toggleChat" class="btn btn-primary rounded-pill btn-icon shadow-lg" style="position: fixed; bottom: 25px; right: 25px; z-index: 9999; width: 50px; height: 50px;">
         @if($isOpen)
             <i class="ti tabler-x icon-28px"></i>
         @else
-            <i class="ti tabler-help icon-28px"></i>
+            <i class="ti tabler-robot icon-28px"></i>
         @endif
     </button>
 
@@ -17,7 +17,7 @@
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-4 scale-95"
          class="card shadow-lg chat-window-ai" 
-         style="position: fixed; bottom: 90px; right: 20px; z-index: 1050; width: 380px; max-height: 600px; display: flex; flex-direction: column;">
+         style="position: fixed; bottom: 85px; right: 25px; z-index: 9999; width: 380px; max-height: 600px; display: flex; flex-direction: column;">
         
         <!-- Header -->
         <div class="card-header bg-primary text-white p-3 d-flex justify-content-between align-items-center rounded-top">
