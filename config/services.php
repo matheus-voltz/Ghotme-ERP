@@ -40,4 +40,9 @@ return [
         'url' => env('ASAAS_API_URL', 'https://sandbox.asaas.com/api/v3'),
     ],
 
+    'ai' => [
+        'gemini_key' => env('GEMINI_API_KEY'),
+        'gemini_model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+    ],
+
 ];

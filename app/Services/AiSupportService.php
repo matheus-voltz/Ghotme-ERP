@@ -12,10 +12,9 @@ class AiSupportService
 
     public function __construct()
     {
-        // Usando a chave que você já tem no ambiente (GEMINI_API_KEY)
-        $this->apiKey = env('GEMINI_API_KEY');
-        // Modelo Gemini 2.0 Flash (o mais novo e rápido)
-        $this->model = env('GEMINI_MODEL', 'gemini-2.0-flash');
+        // Usando o arquivo de config para suportar cache em produção
+        $this->apiKey = config('services.ai.gemini_key');
+        $this->model = config('services.ai.gemini_model', 'gemini-2.0-flash');
     }
 
     public function ask($messages, $userContext = [])

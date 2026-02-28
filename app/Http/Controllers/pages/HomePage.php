@@ -35,28 +35,24 @@ class HomePage extends Controller
 
     $company = $user->company;
     $companyId = $user->company_id;
-    $apiKey = env('GEMINI_API_KEY');
+    $apiKey = config('services.ai.gemini_key');
 
     if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
 
-    // Limites de Plano (contador SEPARADO do chat do Consultor IA)
+    // Limites de Plano (usa a mesma chave do badge no dashboard)
     if (!$user->hasFeature('ai_unlimited')) {
       $monthKey = now()->format('Y-m');
-      $usageKey = "ai_dashboard_usage_{$companyId}_{$monthKey}"; // chave exclusiva do dashboard
+      $usageKey = "ai_usage_{$companyId}_{$monthKey}";
       $usageCount = Cache::get($usageKey, 0);
 
-      if ($usageCount >= 30) {
+      if ($usageCount >= 10) {
         return response()->json([
           'success' => false,
-          'message' => 'Você atingiu o limite de 30 análises de negócio mensais. Faça o upgrade para o Enterprise para análises ilimitadas!',
+          'message' => 'Limite de 10 consultas de IA mensais atingido. Faça o upgrade para o Enterprise para análises ilimitadas!',
           'limit_reached' => true
-        ]);
+        ], 403);
       }
       Cache::put($usageKey, $usageCount + 1, now()->addMonth());
-
-      // Limpa o cache do dashboard para forçar atualização do contador
-      $cacheKey = "dashboard_stats_{$companyId}_admin";
-      Cache::forget($cacheKey);
     }
 
     // Tradução manual de slugs para nomes amigáveis para a IA

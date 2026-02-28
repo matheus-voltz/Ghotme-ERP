@@ -73,7 +73,7 @@ class MasterPortalController extends Controller
 
     public function aiAnalysis()
     {
-        $apiKey = env('GEMINI_API_KEY');
+        $apiKey = config('services.ai.gemini_key');
         if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
 
         $totalCompanies = Company::count();
