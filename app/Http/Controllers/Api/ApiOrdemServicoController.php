@@ -44,7 +44,12 @@ class ApiOrdemServicoController extends Controller
         ]);
 
         try {
-            $os = clone $service->store($validated);
+            $os = $service->store($validated);
+            
+            // Adiciona o link do portal para o mobile usar
+            $os->portal_url = url("/portal/{$os->client->uuid}");
+            $os->share_message = "Olá {$os->client->name}, sua Ordem de Serviço foi aberta com sucesso na " . ($os->company->name ?? 'Ghotme') . ". Acompanhe o status e fotos em tempo real por aqui: " . $os->portal_url;
+
             return response()->json($os, 201);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erro ao criar OS: ' . $e->getMessage()], 500);

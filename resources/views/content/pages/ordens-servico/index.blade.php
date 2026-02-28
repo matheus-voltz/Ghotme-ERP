@@ -42,18 +42,32 @@
         if (dt_table) {
             const dt = new DataTable(dt_table, {
                 ajax: "{{ route('ordens-servico.data') }}",
-                columns: [
-                    { data: 'id' },
-                    { data: 'date' },
-                    { data: 'client' },
-                    { data: 'vehicle' },
-                    { data: 'opened_by' },
-                    { data: 'status' },
-                    { data: 'total' },
-                    { data: 'id' }
-                ],
-                columnDefs: [
+                columns: [{
+                        data: 'id'
+                    },
                     {
+                        data: 'date'
+                    },
+                    {
+                        data: 'client'
+                    },
+                    {
+                        data: 'vehicle'
+                    },
+                    {
+                        data: 'opened_by'
+                    },
+                    {
+                        data: 'status'
+                    },
+                    {
+                        data: 'total'
+                    },
+                    {
+                        data: 'id'
+                    }
+                ],
+                columnDefs: [{
                         targets: 5,
                         render: (data) => {
                             const colors = {
@@ -111,6 +125,27 @@
                 }
             });
         }
+
+        // Prompt para impressão de etiqueta se acabou de criar OS
+        @if(session('just_created_os'))
+        Swal.fire({
+            title: 'OS Criada com Sucesso!',
+            text: 'Deseja gerar a etiqueta com QR Code para esta Ordem de Serviço?',
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Sim, Gerar Etiqueta',
+            cancelButtonText: 'Agora Não',
+            customClass: {
+                confirmButton: 'btn btn-primary me-3',
+                cancelButton: 'btn btn-label-secondary'
+            },
+            buttonsStyling: false
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.open("{{ route('ordens-servico.print-label', session('just_created_os')) }}", "_blank");
+            }
+        });
+        @endif
     });
 </script>
 @endsection

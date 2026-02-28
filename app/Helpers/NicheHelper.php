@@ -14,6 +14,19 @@ if (!function_exists('niche_translate')) {
         $inventory = niche('inventory_items', null, $company);
         $currentNiche = get_current_niche($company);
 
+        // 1. Processar placeholders PRIMEIRO para evitar que a tradução de palavras soltas corrompa os nomes dos placeholders
+        $urlSlug = strtolower(niche('url_slug', 'vehicle', $company));
+        $entitiesSlug = strtolower(niche('url_entities_slug', 'vehicles', $company));
+        $clientSlug = strtolower(niche('url_client_slug', 'client', $company));
+        $clientsSlug = strtolower(niche('url_clients_slug', 'clients', $company));
+
+        $string = str_replace('{niche_slug}', $urlSlug, $string);
+        $string = str_replace('{niche_entities_slug}', $entitiesSlug, $string);
+        $string = str_replace('{niche_client_slug}', $clientSlug, $string);
+        $string = str_replace('{niche_clients_slug}', $clientsSlug, $string);
+        $string = str_replace('{maintenance_contracts_slug}', ($currentNiche === 'pet' ? 'planos' : 'contratos'), $string);
+
+        // 2. Tradução de rótulos globais
         $search = [
             'Clientes & Veículos',
             'Clientes & Veiculos',
@@ -86,21 +99,7 @@ if (!function_exists('niche_translate')) {
             in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimentos' : 'Serviços'
         ];
 
-        $string = str_ireplace($search, $replace, $string);
-
-        // placeholders
-        $urlSlug = strtolower(niche('url_slug', 'vehicle', $company));
-        $entitiesSlug = strtolower(niche('url_entities_slug', 'vehicles', $company));
-        $clientSlug = strtolower(niche('url_client_slug', 'client', $company));
-        $clientsSlug = strtolower(niche('url_clients_slug', 'clients', $company));
-
-        $string = str_replace('{niche_slug}', $urlSlug, $string);
-        $string = str_replace('{niche_entities_slug}', $entitiesSlug, $string);
-        $string = str_replace('{niche_client_slug}', $clientSlug, $string);
-        $string = str_replace('{niche_clients_slug}', $clientsSlug, $string);
-        $string = str_replace('{maintenance_contracts_slug}', ($currentNiche === 'pet' ? 'planos' : 'contratos'), $string);
-
-        return $string;
+        return str_ireplace($search, $replace, $string);
     }
 }
 

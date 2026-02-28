@@ -74,7 +74,7 @@ class OrdemServicoController extends Controller
         $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
-        
+
         // Carrega campos disponíveis para nova OS
         $customFields = (new OrdemServico())->getAvailableCustomFields();
 
@@ -88,10 +88,11 @@ class OrdemServicoController extends Controller
 
             if ($request->has('redirect_to_checklist')) {
                 return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])
-                    ->with('success', 'OS Criada! Realize o checklist agora.');
+                    ->with('success', 'OS Criada! Realize o checklist agora.')
+                    ->with('just_created_os', $os->id);
             }
 
-            return redirect()->route('ordens-servico')->with('success', 'OS Criada!');
+            return redirect()->route('ordens-servico')->with('success', 'OS Criada!')->with('just_created_os', $os->id);
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -158,7 +159,7 @@ class OrdemServicoController extends Controller
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
-        
+
         // Carrega campos personalizados preenchidos
         $customFields = $order->getCustomFieldsWithValues();
 
@@ -175,5 +176,13 @@ class OrdemServicoController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
         }
+    }
+
+    public function printLabel($id)
+    {
+        $os = OrdemServico::with('client')->findOrFail($id);
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . $os->id;
+
+        return view('content.pages.ordens-servico.print-label', compact('os', 'qrCodeUrl'));
     }
 }

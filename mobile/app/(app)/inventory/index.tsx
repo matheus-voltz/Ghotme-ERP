@@ -4,13 +4,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
-
 import { useNiche } from '../../../context/NicheContext';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function InventoryScreen() {
     const router = useRouter();
     const { colors } = useTheme();
     const { labels } = useNiche();
+    const { user } = useAuth();
 
     const [items, setItems] = useState<any[]>([]);
     const [filteredItems, setFilteredItems] = useState<any[]>([]);
@@ -97,15 +98,23 @@ export default function InventoryScreen() {
                 </TouchableOpacity>
             </View>
 
-            <View style={[styles.searchContainer, { backgroundColor: colors.card }]}>
-                <Ionicons name="search" size={20} color={colors.subText} style={{ marginRight: 10 }} />
-                <TextInput
-                    style={[styles.searchInput, { color: colors.text }]}
-                    placeholder={`Buscar ${labels.inventory_items?.toLowerCase() || 'item'}...`}
-                    placeholderTextColor={colors.subText}
-                    value={search}
-                    onChangeText={handleSearch}
-                />
+            <View style={styles.searchRow}>
+                <View style={[styles.searchContainer, { backgroundColor: colors.card, flex: 1 }]}>
+                    <Ionicons name="search" size={20} color={colors.subText} />
+                    <TextInput
+                        style={[styles.searchInput, { color: colors.text }]}
+                        placeholder={`Buscar ${labels.inventory_items?.split('/')[0] || 'peça'}...`}
+                        placeholderTextColor={colors.subText}
+                        value={search}
+                        onChangeText={handleSearch}
+                    />
+                </View>
+                <TouchableOpacity
+                    style={[styles.scannerButton, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push('/inventory/scanner')}
+                >
+                    <Ionicons name="barcode-outline" size={24} color="#fff" />
+                </TouchableOpacity>
             </View>
 
             {loading ? (
@@ -125,12 +134,14 @@ export default function InventoryScreen() {
                 />
             )}
 
-            <TouchableOpacity
-                style={styles.fab}
-                onPress={() => router.push('/inventory/create')}
-            >
-                <Ionicons name="add" size={30} color="#fff" />
-            </TouchableOpacity>
+            {user?.role === 'admin' && (
+                <TouchableOpacity
+                    style={styles.fab}
+                    onPress={() => router.push('/inventory/create')}
+                >
+                    <Ionicons name="add" size={30} color="#fff" />
+                </TouchableOpacity>
+            )}
         </View>
     );
 }
@@ -140,8 +151,10 @@ const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 },
     backBtn: { width: 40 },
     headerTitle: { fontSize: 20, fontWeight: 'bold' },
-    searchContainer: { flexDirection: 'row', alignItems: 'center', margin: 20, paddingHorizontal: 15, borderRadius: 12, height: 50, elevation: 2 },
-    searchInput: { flex: 1, fontSize: 16 },
+    searchRow: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 20, gap: 10 },
+    searchContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 15, borderRadius: 12, height: 50, elevation: 2 },
+    scannerButton: { width: 50, height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', elevation: 2 },
+    searchInput: { flex: 1, fontSize: 16, marginLeft: 10 },
     listContent: { paddingHorizontal: 20, paddingBottom: 80 },
     card: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 16, marginBottom: 12, elevation: 2 },
     iconContainer: { width: 50, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 15 },

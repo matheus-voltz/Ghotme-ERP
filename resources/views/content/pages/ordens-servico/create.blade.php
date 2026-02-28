@@ -51,10 +51,24 @@
                             <input type="number" name="km_entry" class="form-control" placeholder="0" />
                         </div>
                     </div>
-                    <div class="mb-0">
+                    <div class="mb-4">
                         <label class="form-label">Descrição Geral do Problema / Relato do Cliente</label>
                         <textarea name="description" class="form-control" rows="3"></textarea>
                     </div>
+
+                    @if(niche('current') === 'electronics')
+                    <div class="row border-top pt-4">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-primary"><i class="ti tabler-lock me-1"></i> Senha do Dispositivo</label>
+                            <input type="text" name="device_password" class="form-control" placeholder="Senha alfanumérica" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold text-primary"><i class="ti tabler-pattern me-1"></i> Padrão de Desenho</label>
+                            <input type="text" name="device_pattern_lock" class="form-control" placeholder="Ex: 1-2-3-5-7" />
+                            <small class="text-muted">Use números de 1 a 9 representando os pontos.</small>
+                        </div>
+                    </div>
+                    @endif
                 </div>
             </div>
 

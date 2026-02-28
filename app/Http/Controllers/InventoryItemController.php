@@ -27,7 +27,7 @@ class InventoryItemController extends Controller
 
         $limit = $request->input('length');
         $start = $request->input('start');
-        
+
         $columns = [
             0 => 'id',
             1 => 'id',
@@ -47,10 +47,10 @@ class InventoryItemController extends Controller
 
         if (!empty($request->input('search.value'))) {
             $search = $request->input('search.value');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'LIKE', "%{$search}%")
-                  ->orWhere('sku', 'LIKE', "%{$search}%")
-                  ->orWhere('description', 'LIKE', "%{$search}%");
+                    ->orWhere('sku', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%");
             });
             $totalFiltered = $query->count();
         }
@@ -163,9 +163,17 @@ class InventoryItemController extends Controller
         if (!$item) {
             return response()->json(['success' => false, 'message' => 'Item não encontrado.'], 404);
         }
-        
+
         $item->delete();
-        
+
         return response()->json(['success' => true, 'message' => 'Item removido com sucesso!']);
+    }
+
+    public function printLabel($id)
+    {
+        $item = InventoryItem::findOrFail($id);
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . ($item->sku ?? $item->id);
+
+        return view('content.inventory.items.print-label', compact('item', 'qrCodeUrl'));
     }
 }

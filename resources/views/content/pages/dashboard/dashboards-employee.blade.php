@@ -49,7 +49,7 @@
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div class="card-title mb-0">
                     <h5 class="mb-0 me-2">{{ $runningOSCount }}</h5>
-                    <small class="text-muted">OS em Andamento</small>
+                    <small class="text-muted">{{ niche('in_service_label') }}</small>
                 </div>
                 <div class="card-icon">
                     <span class="badge bg-label-info rounded p-2">
@@ -65,11 +65,11 @@
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div class="card-title mb-0">
                     <h5 class="mb-0 me-2">{{ $completedOSToday }}</h5>
-                    <small class="text-muted">Finalizadas Hoje</small>
+                    <small class="text-muted">Prontos para Retirada</small>
                 </div>
                 <div class="card-icon">
                     <span class="badge bg-label-success rounded p-2">
-                        <i class="ti tabler-check ti-sm"></i>
+                        <i class="ti tabler-package-export ti-sm"></i>
                     </span>
                 </div>
             </div>
@@ -130,22 +130,22 @@
     <!-- Quick Shortcuts -->
     <div class="col-lg-4 mb-4">
         <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Acesso Rápido</h5>
+            <div class="card-header border-bottom">
+                <h5 class="card-title mb-0">Operação Rápida</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body pt-4">
                 <div class="d-grid gap-3">
+                    <a href="{{ route('ordens-servico.create') }}" class="btn btn-primary d-flex align-items-center justify-content-center p-3 shadow-sm">
+                        <i class="ti tabler-device-mobile-plus me-2 fs-4"></i> Entrada de Dispositivo
+                    </a>
                     <a href="{{ route('budgets.create') }}" class="btn btn-outline-primary d-flex align-items-center justify-content-center p-3">
-                        <i class="ti tabler-file-plus me-2"></i> Criar Novo Orçamento
+                        <i class="ti tabler-file-plus me-2"></i> Novo Orçamento
                     </a>
-                    <a href="{{ route('ordens-servico.create') }}" class="btn btn-outline-info d-flex align-items-center justify-content-center p-3">
-                        <i class="ti tabler-tool me-2"></i> Nova Ordem de Serviço
+                    <a href="{{ route('inventory.items-list') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center p-3">
+                        <i class="ti tabler-box-seam me-2"></i> Consultar Estoque
                     </a>
-                    <a href="{{ route('clients') }}" class="btn btn-outline-secondary d-flex align-items-center justify-content-center p-3">
-                        <i class="ti tabler-user-plus me-2"></i> Cadastrar Cliente
-                    </a>
-                    <a href="{{ route('support.open-ticket') }}" class="btn btn-label-warning d-flex align-items-center justify-content-center p-3">
-                        <i class="ti tabler-headset me-2"></i> Suporte Técnico
+                    <a href="{{ route('support.chat') }}" class="btn btn-label-warning d-flex align-items-center justify-content-center p-3">
+                        <i class="ti tabler-messages me-2"></i> Chat de Suporte
                     </a>
                 </div>
             </div>
@@ -157,7 +157,7 @@
         <div class="col-lg-12 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Ordens de Serviço Recentes</h5>
+                    <h5 class="card-title mb-0">Últimos Atendimentos</h5>
                     <a href="{{ route('ordens-servico') }}" class="btn btn-sm btn-label-info">Ver todas</a>
                 </div>
                 <div class="table-responsive">
@@ -166,7 +166,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Cliente</th>
-                                <th>Veículo</th>
+                                <th>{{ niche('entity') }}</th>
                                 <th>Status</th>
                                 <th>Data</th>
                             </tr>
@@ -176,7 +176,7 @@
                             <tr>
                                 <td>#{{ $os->id }}</td>
                                 <td>{{ $os->client->name ?? 'Cliente Removido' }}</td>
-                                <td>{{ $os->veiculo->placa ?? '-' }} - {{ $os->veiculo->modelo ?? '-' }}</td>
+                                <td>{{ $os->veiculo->modelo ?? '-' }} ({{ $os->veiculo->placa ?? '-' }})</td>
                                 <td>
                                     <span class="badge bg-label-{{ $os->status === 'finalized' || $os->status === 'paid' ? 'success' : ($os->status === 'running' || $os->status === 'in_progress' ? 'info' : 'warning') }}">
                                         {{ __($os->status) }}

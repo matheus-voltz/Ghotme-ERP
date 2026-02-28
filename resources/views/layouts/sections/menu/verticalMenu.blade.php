@@ -59,6 +59,14 @@ $configData = Helper::appClasses();
         if (isset($menu->master_only) && $menu->master_only) {
             continue;
         }
+
+        // REGRAS PARA FUNCIONÁRIOS
+        if ($user->role === 'funcionario') {
+            $restrictedSlugs = ['financial', 'reports', 'settings'];
+            if (in_array($menu->slug, $restrictedSlugs)) {
+                continue;
+            }
+        }
     }
     }
     @endphp

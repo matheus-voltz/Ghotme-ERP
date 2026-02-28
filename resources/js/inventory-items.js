@@ -437,12 +437,33 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     dt_items_table && new DataTable(dt_items_table).draw();
                     const offcanvasInstance = bootstrap.Offcanvas.getInstance(offCanvasForm);
                     offcanvasInstance && offcanvasInstance.hide();
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Sucesso!',
-                        text: data.message,
-                        customClass: { confirmButton: 'btn btn-success' }
-                    });
+
+                    if (!id) { // Só pergunta se for um novo item
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Item Criado!',
+                            text: 'Deseja gerar a etiqueta com QR Code para este item agora?',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sim, Gerar Etiqueta',
+                            cancelButtonText: 'Agora Não',
+                            customClass: {
+                                confirmButton: 'btn btn-primary me-3',
+                                cancelButton: 'btn btn-label-secondary'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open(baseUrl + "inventory/items/" + data.data.id + "/print-label", "_blank");
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Atualizado!',
+                            text: data.message,
+                            customClass: { confirmButton: 'btn btn-success' }
+                        });
+                    }
                 })
                 .catch(err => {
                     if (err.message) {

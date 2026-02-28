@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker'; // You might need to install this or use a custom implementation
@@ -93,15 +93,31 @@ export default function CreateOrderScreen() {
 
             const response = await api.post('/os', payload);
 
-            Alert.alert("Sucesso", "Ordem de Serviço criada com sucesso!", [
+            const sendWhatsApp = () => {
+                const message = response.data.share_message;
+                const phone = response.data.client_phone || '';
+                const url = `whatsapp://send?text=${encodeURIComponent(message)}&phone=${phone}`;
+                Linking.openURL(url).catch(() => {
+                    Alert.alert("Erro", "Não foi possível abrir o WhatsApp.");
+                });
+            };
+
+            Alert.alert("Sucesso", "Ordem de Serviço criada com sucesso! O que deseja fazer agora?", [
                 {
-                    text: "Ir para Checklist",
+                    text: "Enviar WhatsApp 💬",
+                    onPress: () => {
+                        sendWhatsApp();
+                        router.back();
+                    }
+                },
+                {
+                    text: "Checklist",
                     onPress: () => router.push({
                         pathname: '/os/checklist',
                         params: { osId: response.data.id }
                     })
                 },
-                { text: "Depois", onPress: () => router.back() }
+                { text: "Apenas Sair", onPress: () => router.back() }
             ]);
         } catch (error: any) {
             console.error("Error creating OS:", error);

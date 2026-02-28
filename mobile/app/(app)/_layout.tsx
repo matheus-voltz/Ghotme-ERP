@@ -90,13 +90,17 @@ export default function AppLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="reports/[type]" options={{ headerShown: true, title: 'Inteligência' }} />
         <Stack.Screen name="reports/chart" options={{ headerShown: true, title: 'Fluxo de Receita' }} />
-        <Stack.Screen name="inventory/[id]" options={{ headerShown: true, title: 'Detalhe' }} />
+        <Stack.Screen name="inventory/[id]" options={{ headerShown: true, title: 'Detalhes do Item', headerBackTitle: 'Voltar' }} />
         <Stack.Screen name="os/checklist" options={{ presentation: 'modal', title: 'Vistoria', headerShown: true }} />
         <Stack.Screen name="os/technical_checklist" options={{ presentation: 'modal', title: 'Checklist Técnico', headerShown: false }} />
+        <Stack.Screen name="inventory/scanner" options={{ title: 'Escanear', headerBackTitle: 'Voltar' }} />
+        <Stack.Screen name="inventory/create" options={{ title: 'Novo Item', headerShown: true }} />
         <Stack.Screen name="os/list" options={{ title: 'Lista de Ordens', headerShown: false }} />
         <Stack.Screen name="calendar/create" options={{ presentation: 'modal', title: 'Novo Agendamento', headerShown: true }} />
         <Stack.Screen name="chat/contacts" options={{ headerShown: false }} />
         <Stack.Screen name="chat/messages" options={{ headerShown: false }} />
+        <Stack.Screen name="os/label" options={{ title: 'Gerar Etiqueta', headerShown: true }} />
+        <Stack.Screen name="inventory/label" options={{ title: 'Gerar Etiqueta', headerShown: true }} />
         <Stack.Screen name="screens/qr_scanner" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
       </Stack>
     </View>

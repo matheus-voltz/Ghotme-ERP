@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
+import { useAuth } from '../../../context/AuthContext';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -10,6 +11,7 @@ export default function InventoryDetailScreen() {
     const params = useLocalSearchParams();
     const { colors } = useTheme();
     const { labels } = useNiche();
+    const { user } = useAuth();
     const router = useRouter();
 
     const item = {
@@ -85,39 +87,49 @@ export default function InventoryDetailScreen() {
                 </View>
             </Animated.View>
 
-            {/* Pricing & Margin */}
-            <Animated.View entering={FadeInDown.duration(500).delay(100)}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>💰 Preços & Margem</Text>
-                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <View style={styles.priceRow}>
-                        <View style={styles.priceItem}>
-                            <Text style={[styles.priceLabel, { color: colors.subText }]}>Custo</Text>
-                            <Text style={[styles.priceValue, { color: '#EA5455' }]}>R$ {item.cost_price.toFixed(2)}</Text>
+            {/* Pricing & Margin - Only for Admin */}
+            {user?.role === 'admin' ? (
+                <Animated.View entering={FadeInDown.duration(500).delay(100)}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>💰 Preços & Margem</Text>
+                    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                        <View style={styles.priceRow}>
+                            <View style={styles.priceItem}>
+                                <Text style={[styles.priceLabel, { color: colors.subText }]}>Custo</Text>
+                                <Text style={[styles.priceValue, { color: '#EA5455' }]}>R$ {item.cost_price.toFixed(2)}</Text>
+                            </View>
+                            <View style={styles.priceItem}>
+                                <Text style={[styles.priceLabel, { color: colors.subText }]}>Venda</Text>
+                                <Text style={[styles.priceValue, { color: '#28C76F' }]}>R$ {item.selling_price.toFixed(2)}</Text>
+                            </View>
+                            <View style={styles.priceItem}>
+                                <Text style={[styles.priceLabel, { color: colors.subText }]}>Lucro</Text>
+                                <Text style={[styles.priceValue, { color: '#7367F0' }]}>R$ {profit.toFixed(2)}</Text>
+                            </View>
                         </View>
-                        <View style={styles.priceItem}>
-                            <Text style={[styles.priceLabel, { color: colors.subText }]}>Venda</Text>
-                            <Text style={[styles.priceValue, { color: '#28C76F' }]}>R$ {item.selling_price.toFixed(2)}</Text>
-                        </View>
-                        <View style={styles.priceItem}>
-                            <Text style={[styles.priceLabel, { color: colors.subText }]}>Lucro</Text>
-                            <Text style={[styles.priceValue, { color: '#7367F0' }]}>R$ {profit.toFixed(2)}</Text>
-                        </View>
-                    </View>
 
-                    <View style={{ marginTop: 16 }}>
-                        <View style={styles.marginLabelRow}>
-                            <Text style={[styles.marginLabel, { color: colors.subText }]}>Margem de Lucro</Text>
-                            <Text style={[styles.marginPercent, { color: margin > 30 ? '#28C76F' : '#FF9F43' }]}>{margin.toFixed(1)}%</Text>
-                        </View>
-                        <View style={[styles.marginBarBg, { backgroundColor: colors.border + '40' }]}>
-                            <View style={[styles.marginBarFill, {
-                                width: `${Math.min(margin, 100)}%`,
-                                backgroundColor: margin > 50 ? '#28C76F' : margin > 20 ? '#FF9F43' : '#EA5455',
-                            }]} />
+                        <View style={{ marginTop: 16 }}>
+                            <View style={styles.marginLabelRow}>
+                                <Text style={[styles.marginLabel, { color: colors.subText }]}>Margem de Lucro</Text>
+                                <Text style={[styles.marginPercent, { color: margin > 30 ? '#28C76F' : '#FF9F43' }]}>{margin.toFixed(1)}%</Text>
+                            </View>
+                            <View style={[styles.marginBarBg, { backgroundColor: colors.border + '40' }]}>
+                                <View style={[styles.marginBarFill, {
+                                    width: `${Math.min(margin, 100)}%`,
+                                    backgroundColor: margin > 50 ? '#28C76F' : margin > 20 ? '#FF9F43' : '#EA5455',
+                                }]} />
+                            </View>
                         </View>
                     </View>
-                </View>
-            </Animated.View>
+                </Animated.View>
+            ) : (
+                <Animated.View entering={FadeInDown.duration(500).delay(100)}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>💰 Valor de Venda</Text>
+                    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, alignItems: 'center' }]}>
+                        <Text style={[styles.priceLabel, { color: colors.subText, fontSize: 13 }]}>Preço ao Consumidor</Text>
+                        <Text style={[styles.priceValue, { color: '#28C76F', fontSize: 28, marginTop: 4 }]}>R$ {item.selling_price.toFixed(2)}</Text>
+                    </View>
+                </Animated.View>
+            )}
 
             {/* Stock Level Gauge */}
             <Animated.View entering={FadeInDown.duration(500).delay(200)}>
@@ -173,11 +185,17 @@ export default function InventoryDetailScreen() {
                 </Animated.View>
             )}
 
-            {/* Ghotme IA */}
+            {/* Ghotme IA - Filtered based on role */}
             {insights.length > 0 && (
                 <Animated.View entering={FadeInDown.duration(500).delay(400)}>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>🤖 Análise Ghotme IA</Text>
-                    {insights.map((tip, i) => (
+                    {insights.filter(tip => {
+                        if (user?.role !== 'admin') {
+                            // Hide tips that mention profit or margin for employees
+                            return !tip.toLowerCase().includes('margem') && !tip.toLowerCase().includes('lucro');
+                        }
+                        return true;
+                    }).map((tip, i) => (
                         <View key={i} style={[styles.insightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                             <Text style={[styles.insightHeader, { color: '#7367F0' }]}>Ghotme IA diz:</Text>
                             <Text style={[styles.insightText, { color: colors.text, opacity: 0.9 }]}>{tip}</Text>

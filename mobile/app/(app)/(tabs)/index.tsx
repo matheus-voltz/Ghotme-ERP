@@ -47,6 +47,16 @@ const getStatusColor = (status: string) => {
   }
 };
 
+const getEntityIcon = (niche: string) => {
+  switch (niche) {
+    case 'pet': return 'paw-outline';
+    case 'beauty_clinic': return 'heart-outline';
+    case 'electronics': return 'laptop-outline';
+    case 'construction': return 'construct-outline';
+    default: return 'car-sport-outline';
+  }
+};
+
 const numberFormat = (value: any) => {
   return parseFloat(value || 0).toLocaleString('pt-BR', {
     minimumFractionDigits: 2,
@@ -401,9 +411,68 @@ export default function DashboardScreen() {
 
   const renderMechanicHeader = () => {
     if (!data) return null;
+    const totalToday = (data.stats?.runningOS || 0) + (data.stats?.completedToday || 0);
+    const progress = totalToday > 0 ? (data.stats?.completedToday / totalToday) * 100 : 0;
+
     return (
       <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.adminStatsContainer}>
-        {/* Mechanic Summary Cards */}
+        {/* Progress Overview Card */}
+        <View style={[styles.mainProgressCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.progressHeader}>
+            <View>
+              <Text style={[styles.progressTitle, { color: colors.text }]}>Seu Progresso de Hoje</Text>
+              <Text style={[styles.progressSubtitle, { color: colors.subText }]}>
+                {data.stats?.completedToday || 0} de {totalToday} tarefas finalizadas
+              </Text>
+            </View>
+            <View style={[styles.percentageCircle, { borderColor: colors.primary + '30' }]}>
+              <Text style={[styles.percentageText, { color: colors.primary }]}>{progress.toFixed(0)}%</Text>
+            </View>
+          </View>
+          <View style={[styles.progressBarBg, { backgroundColor: colors.border + '40' }]}>
+            <View style={[styles.progressBarFill, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+          </View>
+        </View>
+
+        {/* Quick Actions for Employee */}
+        <View style={styles.quickActionsContainer}>
+          {[
+            { icon: 'scan-outline', label: 'Vistoria', color: '#7367F0', route: '/os/checklist' },
+            { icon: 'add-circle-outline', label: 'Nova OS', color: '#28C76F', route: '/os/create' },
+            { icon: 'cube-outline', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
+            { icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
+          ].map((action, idx) => (
+            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => {
+              Haptics.selectionAsync();
+              router.push(action.route as any);
+            }}>
+              <View style={[styles.quickActionIcon, { backgroundColor: action.color + '15' }]}>
+                <Ionicons name={action.icon as any} size={22} color={action.color} />
+              </View>
+              <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Ghotme IA Inside - Tech Insight */}
+        <View style={[styles.aiInsightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <View style={styles.aiHeader}>
+            <View style={styles.aiIconWrapper}>
+              <Ionicons name="sparkles" size={16} color="#fff" />
+            </View>
+            <Text style={[styles.aiTitle, { color: colors.primary }]}>Ghotme IA • Produtividade</Text>
+          </View>
+          <Text style={[styles.aiInsightText, { color: colors.text }]}>
+            {progress >= 100
+              ? "Incrível! Você concluiu todas as suas ordens de hoje. Que tal revisar o estoque ou organizar a agenda de amanhã?"
+              : progress > 50
+                ? "Você está no ritmo certo! Já passou da metade das suas tarefas. Continue assim para fechar o dia com chave de ouro."
+                : "Temos algumas ordens aguardando você. Focar na finalização da OS mais antiga pode ajudar a liberar espaço na bancada."}
+          </Text>
+        </View>
+
+        {/* Mechanic Summary Grid */}
+        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }]}>Status das Minhas OS</Text>
         <View style={styles.statusGrid}>
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
@@ -424,23 +493,28 @@ export default function DashboardScreen() {
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.completedToday || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Prontas Hoje</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push('/budgets/pending')}
+            onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Meus Orçamentos' } })}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="document-text-outline" size={20} color="#FF9F43" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.pendingBudgets || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Orçamentos</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Meus Orçamentos</Text>
           </TouchableOpacity>
         </View>
 
         <View style={{ marginTop: 10 }}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Minhas Atividades</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+            <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>Minhas Atividades</Text>
+            <TouchableOpacity onPress={() => router.push('/os/list')}>
+              <Text style={{ color: colors.primary, fontWeight: '600' }}>Ver Tudo</Text>
+            </TouchableOpacity>
+          </View>
           {data?.recentOS?.map((item: any, index: number) => renderOSCard(item, index))}
           {(!data?.recentOS || data.recentOS.length === 0) && (
             <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -480,7 +554,7 @@ export default function DashboardScreen() {
             <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>{item.client_name}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Ionicons name="car-sport-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
+            <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
             <Text style={[styles.vehicleInfo, { color: colors.subText }]}>{item.vehicle} - {item.plate}</Text>
           </View>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
@@ -990,39 +1064,113 @@ const styles = StyleSheet.create({
     color: '#999',
     marginLeft: 6,
   },
-  emptyContainer: {
-    alignItems: 'center',
-    marginTop: 40,
-    backgroundColor: '#fff',
-    padding: 30,
-    borderRadius: 16,
-    borderStyle: 'dashed',
-    borderWidth: 1,
-    borderColor: '#ccc',
-  },
-  emptyText: {
-    marginTop: 10,
-    color: '#999',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   fabContainer: {
     position: 'absolute',
-    bottom: 24,
-    right: 24,
-    zIndex: 20,
+    bottom: 110,
+    right: 20,
+    zIndex: 100,
   },
   fab: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     backgroundColor: '#7367F0',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 8,
     shadowColor: '#7367F0',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
   },
+  mainProgressCard: {
+    padding: 20,
+    borderRadius: 24,
+    borderWidth: 1,
+    marginBottom: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  progressTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  progressSubtitle: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  percentageCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  percentageText: {
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  progressBarBg: {
+    height: 8,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  aiInsightCard: {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    marginBottom: 25,
+    borderLeftWidth: 4,
+    borderLeftColor: '#7367F0',
+  },
+  aiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 8,
+  },
+  aiIconWrapper: {
+    padding: 4,
+    backgroundColor: '#7367F0',
+    borderRadius: 6,
+  },
+  aiTitle: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  aiInsightText: {
+    fontSize: 13,
+    lineHeight: 20,
+    opacity: 0.9,
+  },
+  emptyContainer: {
+    paddingVertical: 40,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderStyle: 'dashed',
+    backgroundColor: 'rgba(0,0,0,0.02)',
+  },
+  emptyText: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: '500',
+  }
 });

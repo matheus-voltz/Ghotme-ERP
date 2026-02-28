@@ -65,7 +65,8 @@ Route::get('/', function () {
             'path' => '/',
             'referer' => request()->header('referer')
         ]);
-    } catch (\Exception $e) {}
+    } catch (\Exception $e) {
+    }
 
     return view('content.font-pages.landing-page');
 })->name('welcome');
@@ -196,6 +197,7 @@ Route::middleware([
     Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
     Route::get('/ordens-servico/{id}/edit', [OrdemServicoController::class, 'edit'])->name('ordens-servico.edit');
     Route::put('/ordens-servico/{id}', [OrdemServicoController::class, 'update'])->name('ordens-servico.update');
+    Route::get('/ordens-servico/{id}/print-label', [OrdemServicoController::class, 'printLabel'])->name('ordens-servico.print-label');
     Route::get('/api/get-vehicles/{clientId}', [OrdemServicoController::class, 'getVehiclesByClient']);
 
     Route::get('/ordens-servico/checklist', [VehicleChecklistController::class, 'index'])->name('ordens-servico.checklist');
@@ -315,6 +317,7 @@ Route::middleware([
     Route::post('/inventory/items', [InventoryItemController::class, 'store'])->name('inventory.items.store');
     Route::get('/inventory/items/{id}/edit', [InventoryItemController::class, 'edit'])->name('inventory.items.edit');
     Route::put('/inventory/items/{id}', [InventoryItemController::class, 'update'])->name('inventory.items.update');
+    Route::get('/inventory/items/{id}/print-label', [InventoryItemController::class, 'printLabel'])->name('inventory.items.print-label');
     Route::delete('/inventory/items/{id}', [InventoryItemController::class, 'destroy'])->name('inventory.items.destroy');
 
     Route::get('/inventory/suppliers', [SupplierController::class, 'index'])->name('inventory.suppliers');

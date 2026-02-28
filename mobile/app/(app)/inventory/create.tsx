@@ -52,8 +52,15 @@ export default function CreateInventoryScreen() {
         setLoading(true);
         try {
             await api.post('/inventory/items', form);
-            Alert.alert("Sucesso", `${labels.inventory_items?.split('/')[0] || 'Item'} adicionado ao estoque!`, [
-                { text: "OK", onPress: () => router.back() }
+            Alert.alert("Sucesso", `${labels.inventory_items?.split('/')[0] || 'Item'} adicionado! Deseja gerar o QR Code para etiqueta?`, [
+                {
+                    text: "Sim, Gerar QR",
+                    onPress: () => router.push({
+                        pathname: '/inventory/label',
+                        params: { id: form.sku || form.name, type: 'inventory', title: form.name }
+                    })
+                },
+                { text: "Agora não", onPress: () => router.back() }
             ]);
         } catch (error: any) {
             console.error("Erro ao salvar item:", error);
