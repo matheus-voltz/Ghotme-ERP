@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Alert, Dimensions, ActivityIndicator, Modal, Linking } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
@@ -137,8 +137,25 @@ export default function ChecklistVisual() {
       });
 
       if (response.data.success) {
-        Alert.alert("Sucesso", "Vistoria enviada com sucesso!");
-        router.back();
+        const sendWhatsApp = () => {
+          const message = response.data.share_message;
+          const phone = response.data.client_phone || '';
+          const url = `whatsapp://send?text=${encodeURIComponent(message)}&phone=${phone}`;
+          Linking.openURL(url).catch(() => {
+            Alert.alert("Erro", "Não foi possível abrir o WhatsApp.");
+          });
+        };
+
+        Alert.alert("Sucesso", "Vistoria enviada com sucesso! Deseja enviar o link do portal para o cliente?", [
+          {
+            text: "Enviar WhatsApp 💬",
+            onPress: () => {
+              sendWhatsApp();
+              router.back();
+            }
+          },
+          { text: "Apenas Sair", onPress: () => router.back() }
+        ]);
       }
     } catch (error) {
       console.error("Erro ao salvar vistoria:", error);

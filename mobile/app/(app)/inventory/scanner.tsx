@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';

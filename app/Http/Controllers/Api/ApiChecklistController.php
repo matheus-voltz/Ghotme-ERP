@@ -56,10 +56,16 @@ class ApiChecklistController extends Controller
 
             DB::commit();
 
+            // Dados para compartilhamento
+            $portalUrl = url("/portal/{$os->client->uuid}");
+            $shareMessage = "Olá {$os->client->name}, a vistoria do seu dispositivo foi concluída na " . ($os->company->name ?? 'Ghotme') . ". Acompanhe o status e as fotos por aqui: " . $portalUrl;
+
             return response()->json([
                 'success' => true,
                 'message' => 'Vistoria salva com sucesso!',
-                'inspection_id' => $inspection->id
+                'inspection_id' => $inspection->id,
+                'share_message' => $shareMessage,
+                'client_phone' => $os->client->phone ?? $os->client->contact_number ?? ''
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

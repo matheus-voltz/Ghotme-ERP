@@ -42,7 +42,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'token' => $token,
-            'user' => $user
+            'user' => $user->load('company')
         ]);
     }
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'token' => $token,
-            'user' => $user
+            'user' => $user->load('company')
         ]);
     }
 
@@ -88,7 +88,7 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        $user = $request->user();
+        $user = $request->user()->load('company'); // Carrega a empresa e suas configurações
         $user->is_expired = $user->isTrialExpired();
         $user->is_locked = $user->isLockedDueToOverdue();
         $user->is_overdue = $user->isPaymentOverdue();
