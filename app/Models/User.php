@@ -144,6 +144,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'api_access',        // Acesso via API Tokens
             'bank_automation',   // Conciliação Bancária OFX
             'ai_unlimited',      // IA Analista Ilimitada
+            'recurring_plans',   // Planos de Assinatura/Recorrência
             'max_users_10'       // Até 10 usuários
         ];
 

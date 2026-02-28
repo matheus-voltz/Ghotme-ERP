@@ -31,6 +31,14 @@
     "plugins": [
       "expo-router",
       [
+        "expo-camera",
+        {
+          "cameraPermission": "O Ghotme precisa da câmera para escanear QR Codes das Ordens de Serviço.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",
@@ -54,9 +62,6 @@
       }
     },
     "owner": "nazuki854",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
     "updates": {
       "url": "https://u.expo.dev/696283d5-a3ab-4c5b-bfde-f09e66702922"
     }

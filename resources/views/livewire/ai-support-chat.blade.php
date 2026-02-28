@@ -1,4 +1,7 @@
 <div>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
     <!-- Floating Help Button -->
     <button wire:click="toggleChat" class="btn btn-primary rounded-pill btn-icon shadow-lg" style="position: fixed; bottom: 25px; right: 25px; z-index: 9999; width: 50px; height: 50px;">
         @if($isOpen)
@@ -9,7 +12,7 @@
     </button>
 
     <!-- Chat Window -->
-    <div x-data="{ open: @entangle('isOpen') }" x-show="open" 
+    <div x-cloak x-data="{ open: @entangle('isOpen') }" x-show="open" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 translate-y-4 scale-95"
          x-transition:enter-end="opacity-100 translate-y-0 scale-100"

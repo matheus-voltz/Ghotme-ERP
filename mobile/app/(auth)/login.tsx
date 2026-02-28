@@ -40,20 +40,53 @@ export default function LoginScreen() {
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [biometricAvailable, setBiometricAvailable] = useState(false);
+    const [biometricEnabled, setBiometricEnabled] = useState(false);
+    const [biometricType, setBiometricType] = useState<'faceid' | 'fingerprint' | null>(null);
+    const [biometricLoading, setBiometricLoading] = useState(false);
 
     // Animações
     const formOpacity = useSharedValue(0);
     const formTranslateY = useSharedValue(50);
     const logoScale = useSharedValue(1);
     const logoTranslateY = useSharedValue(0);
+    const bioBtnScale = useSharedValue(1);
 
     useEffect(() => {
         formOpacity.value = withDelay(400, withTiming(1, { duration: 800 }));
         formTranslateY.value = withDelay(400, withSpring(0));
-
-        // Tenta biometria automática após carregar
-        setTimeout(autoBiometrics, 1000);
+        checkBiometricAvailability();
     }, []);
+
+    // Verifica hardware e preferência do usuário
+    const checkBiometricAvailability = async () => {
+        try {
+            const hasHardware = await LocalAuthentication.hasHardwareAsync();
+            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+            const pref = await SecureStore.getItemAsync('useBiometrics');
+            const token = await SecureStore.getItemAsync('userToken');
+
+            if (hasHardware && isEnrolled) {
+                setBiometricAvailable(true);
+                const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+                if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
+                    setBiometricType('faceid');
+                } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
+                    setBiometricType('fingerprint');
+                }
+            }
+
+            const enabled = pref === 'true';
+            setBiometricEnabled(enabled);
+
+            // Disparo automático apenas se há token E biometria ativada
+            if (enabled && hasHardware && isEnrolled && token) {
+                setTimeout(() => triggerBiometricAuth(), 600);
+            }
+        } catch (e) {
+            console.log('Biometric check error:', e);
+        }
+    };
 
     const autoBiometrics = async () => {
         const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
@@ -95,6 +128,40 @@ export default function LoginScreen() {
         } catch (error) {
             console.error(error);
             Alert.alert("Erro", "Falha ao processar biometria.");
+        }
+    };
+
+    // Versão aprimorada com feedback visual
+    const triggerBiometricAuth = async () => {
+        if (biometricLoading) return;
+        try {
+            setBiometricLoading(true);
+            bioBtnScale.value = withSequence(
+                withSpring(0.93),
+                withSpring(1.0)
+            );
+
+            const token = await SecureStore.getItemAsync('userToken');
+            if (!token) {
+                Alert.alert('Biometria', 'Faça login manualmente primeiro para ativar a biometria.');
+                return;
+            }
+
+            const result = await LocalAuthentication.authenticateAsync({
+                promptMessage: biometricType === 'faceid' ? 'Entrar com Face ID' : 'Entrar com sua digital',
+                fallbackLabel: 'Usar senha',
+                disableDeviceFallback: false,
+            });
+
+            if (result.success) {
+                triggerSuccess();
+            } else if (result.error && result.error !== 'user_cancel' && result.error !== 'system_cancel') {
+                Alert.alert('Falha na biometria', 'Tente novamente ou use email e senha.');
+            }
+        } catch (e: any) {
+            Alert.alert('Erro', e?.message ?? 'Falha ao acessar biometria.');
+        } finally {
+            setBiometricLoading(false);
         }
     };
 
@@ -251,13 +318,47 @@ export default function LoginScreen() {
                                         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>ENTRAR AGORA</Text>}
                                     </TouchableOpacity>
 
-                                    <TouchableOpacity
-                                        style={{ marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
-                                        onPress={checkBiometrics}
-                                    >
-                                        <Ionicons name="finger-print-outline" size={20} color="#7367F0" style={{ marginRight: 8 }} />
-                                        <Text style={{ color: '#7367F0', fontSize: 14, fontWeight: '600' }}>Usar Biometria</Text>
-                                    </TouchableOpacity>
+                                    {/* Botão de Biometria Premium */}
+                                    {biometricAvailable && biometricEnabled && (
+                                        <Animated.View style={[{ transform: [{ scale: bioBtnScale }] }, { marginTop: 16 }]}>
+                                            <TouchableOpacity
+                                                style={styles.biometricButton}
+                                                onPress={triggerBiometricAuth}
+                                                disabled={biometricLoading}
+                                                activeOpacity={0.85}
+                                            >
+                                                {biometricLoading ? (
+                                                    <ActivityIndicator size="small" color="#7367F0" />
+                                                ) : (
+                                                    <Ionicons
+                                                        name={biometricType === 'faceid' ? 'scan-outline' : 'finger-print-outline'}
+                                                        size={26}
+                                                        color="#7367F0"
+                                                    />
+                                                )}
+                                                <Text style={styles.biometricButtonText}>
+                                                    {biometricType === 'faceid' ? 'Entrar com Face ID' : 'Entrar com Digital'}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        </Animated.View>
+                                    )}
+
+                                    {/* Link para ativar biometria caso disponível mas não configurado */}
+                                    {biometricAvailable && !biometricEnabled && (
+                                        <TouchableOpacity
+                                            style={{ marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
+                                            onPress={() => Alert.alert(
+                                                biometricType === 'faceid' ? '🔒 Face ID' : '🔒 Biometria',
+                                                'Para usar biometria: faça login com email/senha, depois acesse Perfil → Segurança e ative a opção de biometria.',
+                                                [{ text: 'Entendi' }]
+                                            )}
+                                        >
+                                            <Ionicons name={biometricType === 'faceid' ? 'scan-outline' : 'finger-print-outline'} size={16} color="#aaa" style={{ marginRight: 6 }} />
+                                            <Text style={{ color: '#aaa', fontSize: 13 }}>
+                                                {biometricType === 'faceid' ? 'Face ID disponível' : 'Digital disponível'} — ative nas configurações
+                                            </Text>
+                                        </TouchableOpacity>
+                                    )}
                                 </>
                             ) : (
                                 <View>
@@ -334,4 +435,26 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
     },
     loginButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', letterSpacing: 1.5 },
+    biometricButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 10,
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        height: 56,
+        borderWidth: 1.5,
+        borderColor: '#7367F030',
+        shadowColor: '#7367F0',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.12,
+        shadowRadius: 12,
+        elevation: 3,
+    },
+    biometricButtonText: {
+        color: '#7367F0',
+        fontSize: 15,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+    },
 });

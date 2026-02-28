@@ -70,6 +70,8 @@ export default function ActionsScreen() {
                                         router.push('/calendar');
                                     } else if (item.id === 'parts') {
                                         router.push('/inventory');
+                                    } else if (item.id === 'scan') {
+                                        router.push('/screens/qr_scanner' as any);
                                     } else {
                                         alert(`Ação: ${item.title} (Em breve)`);
                                     }

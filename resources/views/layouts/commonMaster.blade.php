@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 @php
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Route;
 use App\Helpers\Helpers;
 
 $menuFixed =
@@ -106,7 +107,9 @@ $primaryColorCSS = Helpers::generatePrimaryColorCSS($configData['color']);
   @include('layouts/sections/scripts' . $isFront)
 
   @auth
-    @livewire('ai-support-chat')
+  @if(!Route::is('customer.portal.*') && !Route::is('public.*'))
+  @livewire('ai-support-chat')
+  @endif
   @endauth
 </body>
 

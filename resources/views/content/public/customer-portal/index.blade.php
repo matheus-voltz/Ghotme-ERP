@@ -109,7 +109,7 @@ $customizerHidden = 'customizer-hide';
     .whatsapp-fab {
         position: fixed;
         bottom: 2rem;
-        right: 2rem;
+        left: 2rem;
         width: 65px;
         height: 65px;
         background: #25d366;
@@ -316,6 +316,25 @@ $customizerHidden = 'customizer-hide';
                     </div>
                 </div>
 
+                <!-- Galeria de Fotos (Dossiê Visual) -->
+                @if($order->inspection && $order->inspection->damagePoints->whereNotNull('photo_path')->isNotEmpty())
+                <div class="mt-4 px-2">
+                    <small class="text-muted fw-bold d-block mb-2"><i class="ti tabler-camera me-1"></i>Fotos do Atendimento</small>
+                    <div class="d-flex gap-2 overflow-auto pb-2" style="scrollbar-width: thin;">
+                        @foreach($order->inspection->damagePoints->whereNotNull('photo_path') as $point)
+                        <div class="flex-shrink-0">
+                            <a href="{{ asset('storage/' . $point->photo_path) }}" target="_blank">
+                                <img src="{{ asset('storage/' . $point->photo_path) }}" 
+                                     class="rounded-3 border shadow-xs" 
+                                     style="width: 100px; height: 100px; object-fit: cover;" 
+                                     alt="Foto do serviço">
+                            </a>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                     <div class="avatar-group d-none d-sm-flex">
                         <small class="text-muted"><i class="ti tabler-user-check me-1"></i>Responsável: {{ explode(' ', $order->user->name ?? 'Equipe Ghotme')[0] }}</small>
@@ -336,6 +355,29 @@ $customizerHidden = 'customizer-hide';
 
         <!-- Sidebar (4) -->
         <div class="col-lg-4 animate-up" style="animation-delay: 0.7s">
+            <!-- Minha Assinatura (Funcionalidade Nova) -->
+            @if($subscriptions->isNotEmpty())
+            <div class="mb-5">
+                <h5 class="fw-bold mb-4">Minha Assinatura</h5>
+                @foreach($subscriptions as $sub)
+                <div class="card border-0 shadow-sm bg-label-primary mb-3">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-white text-primary rounded-pill px-3">Plano Ativo</span>
+                            <i class="ti tabler-crown fs-2 text-primary"></i>
+                        </div>
+                        <h5 class="mb-1 fw-bold text-primary">{{ $sub->title }}</h5>
+                        <p class="mb-3 small text-muted">Valor: R$ {{ number_format($sub->amount, 2, ',', '.') }} / {{ $sub->frequency }}</p>
+                        <div class="d-flex align-items-center gap-2 mt-2 pt-2 border-top border-white">
+                            <i class="ti tabler-calendar-event text-primary"></i>
+                            <small class="text-primary fw-medium">Próxima cobrança: {{ $sub->next_billing_date->format('d/m/Y') }}</small>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
             <!-- Orçamentos Pendentes -->
             <div class="mb-5">
                 <h5 class="fw-bold mb-4">Orçamentos Pendentes</h5>

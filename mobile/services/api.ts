@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 // URL da API (Local para dev, domínio real para produção)
 // URL da API (Local para dev, domínio real para produção)
 // Atualizado para o IP da máquina atual
-const DEV_URL = 'http://192.168.0.144:8000/api';
+const DEV_URL = 'http://10.0.0.163:8000/api';
 const PROD_URL = 'https://ghotme.com.br/api';
 
 const api = axios.create({

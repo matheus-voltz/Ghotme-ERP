@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
     View,
     Text,
@@ -8,7 +8,8 @@ import {
     ActivityIndicator,
     Alert,
     StatusBar,
-    Linking
+    Linking,
+    Animated as RNAnimated,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -47,6 +48,21 @@ export default function OSDetailScreen() {
     const [updating, setUpdating] = useState(false);
     const [timers, setTimers] = useState<{ [key: number]: number }>({});
     const [showSuccess, setShowSuccess] = useState(false);
+    const [togglingItem, setTogglingItem] = useState<number | null>(null);
+
+    // Animação de pulso para itens em progresso
+    const pulseAnim = useRef(new RNAnimated.Value(1)).current;
+
+    useEffect(() => {
+        const pulse = RNAnimated.loop(
+            RNAnimated.sequence([
+                RNAnimated.timing(pulseAnim, { toValue: 1.06, duration: 700, useNativeDriver: true }),
+                RNAnimated.timing(pulseAnim, { toValue: 1.0, duration: 700, useNativeDriver: true }),
+            ])
+        );
+        pulse.start();
+        return () => pulse.stop();
+    }, []);
 
     const fetchOSDetails = async () => {
         try {
@@ -108,13 +124,22 @@ export default function OSDetailScreen() {
 
     const toggleItemTimer = async (itemId: number) => {
         try {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            setTogglingItem(itemId);
+            const item = os.items?.find((i: any) => i.id === itemId);
+            const isRunning = item?.status === 'in_progress';
+            if (isRunning) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            } else {
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            }
             const response = await api.post(`/os/items/${itemId}/toggle-timer`);
             if (response.data.success) {
                 fetchOSDetails();
             }
         } catch (error) {
             Alert.alert('Erro', 'Não foi possível alterar o timer.');
+        } finally {
+            setTogglingItem(null);
         }
     };
 
@@ -361,50 +386,130 @@ export default function OSDetailScreen() {
                     entering={FadeInDown.delay(500).duration(500).springify()}
                 >
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="time" size={20} color={colors.primary} />
+                        <Ionicons name="timer" size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Cronômetro de Serviços</Text>
+                        {/* Tempo total */}
+                        {os.items?.some((i: any) => (timers[i.id] ?? 0) > 0) && (
+                            <View style={styles.totalTimeBadge}>
+                                <Text style={styles.totalTimeText}>
+                                    ⏱ {formatTime(os.items?.reduce((acc: number, i: any) => acc + (timers[i.id] ?? 0), 0))}
+                                </Text>
+                            </View>
+                        )}
                     </View>
 
-                    {os.items?.map((item: any) => (
-                        <View key={`item-${item.id}`} style={[styles.timerItemRow, { borderBottomColor: colors.border }]}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={[styles.itemName, { color: colors.text }]}>{item.service?.name || 'Serviço'}</Text>
-                                <View style={styles.timerBadge}>
-                                    <Text style={styles.timerValue}>{formatTime(timers[item.id])}</Text>
+                    {os.items?.map((item: any) => {
+                        const elapsed = timers[item.id] ?? 0;
+                        const isRunning = item.status === 'in_progress';
+                        const isDone = item.status === 'completed';
+                        const isToggling = togglingItem === item.id;
+
+                        return (
+                            <View
+                                key={`item-${item.id}`}
+                                style={[
+                                    styles.timerCard,
+                                    { borderColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) },
+                                    isDone && { opacity: 0.75 },
+                                ]}
+                            >
+                                {/* Header do item */}
+                                <View style={styles.timerCardHeader}>
+                                    <View style={[
+                                        styles.timerStatusDot,
+                                        { backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : colors.border) }
+                                    ]} />
+                                    <Text style={[styles.timerItemName, { color: colors.text }]} numberOfLines={1}>
+                                        {item.service?.name || 'Serviço'}
+                                    </Text>
+                                    {isDone && (
+                                        <View style={styles.donePill}>
+                                            <Ionicons name="checkmark-circle" size={14} color="#28C76F" />
+                                            <Text style={styles.donePillText}>Concluído</Text>
+                                        </View>
+                                    )}
                                 </View>
-                            </View>
 
-                            <View style={styles.timerActions}>
-                                {item.status !== 'completed' && (
-                                    <TouchableOpacity
-                                        onPress={() => toggleItemTimer(item.id)}
-                                        style={[styles.smallIconBtn, { backgroundColor: item.status === 'in_progress' ? '#FF9F43' : '#00CFE8' }]}
-                                    >
-                                        <Ionicons name={item.status === 'in_progress' ? "pause" : "play"} size={16} color="#fff" />
-                                    </TouchableOpacity>
-                                )}
+                                {/* Display digital do tempo */}
+                                <View style={styles.timerDisplayRow}>
+                                    {isRunning ? (
+                                        <RNAnimated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                                            <View style={[styles.timerDisplay, { backgroundColor: '#00CFE820', borderColor: '#00CFE8' }]}>
+                                                <Text style={[styles.timerDigits, { color: '#00CFE8' }]}>
+                                                    {formatTime(elapsed)}
+                                                </Text>
+                                                <View style={styles.runningDot} />
+                                            </View>
+                                        </RNAnimated.View>
+                                    ) : (
+                                        <View style={[styles.timerDisplay, {
+                                            backgroundColor: isDone ? '#28C76F15' : colors.background,
+                                            borderColor: isDone ? '#28C76F' : colors.border,
+                                        }]}>
+                                            <Text style={[styles.timerDigits, {
+                                                color: isDone ? '#28C76F' : colors.subText,
+                                            }]}>
+                                                {formatTime(elapsed)}
+                                            </Text>
+                                        </View>
+                                    )}
 
-                                {item.status !== 'completed' && (
-                                    <TouchableOpacity
-                                        onPress={() => completeItem(item.id)}
-                                        style={[styles.smallIconBtn, { backgroundColor: '#28C76F' }]}
-                                    >
-                                        <Ionicons name="checkmark" size={16} color="#fff" />
-                                    </TouchableOpacity>
-                                )}
+                                    {/* Botões de ação */}
+                                    {!isDone && (
+                                        <View style={styles.timerBtns}>
+                                            <TouchableOpacity
+                                                style={[
+                                                    styles.timerMainBtn,
+                                                    { backgroundColor: isRunning ? '#FF9F43' : '#00CFE8' }
+                                                ]}
+                                                onPress={() => toggleItemTimer(item.id)}
+                                                disabled={isToggling}
+                                                activeOpacity={0.85}
+                                            >
+                                                {isToggling ? (
+                                                    <ActivityIndicator size="small" color="#fff" />
+                                                ) : (
+                                                    <Ionicons
+                                                        name={isRunning ? 'pause' : 'play'}
+                                                        size={20}
+                                                        color="#fff"
+                                                    />
+                                                )}
+                                            </TouchableOpacity>
 
-                                {item.status === 'completed' && (
-                                    <View style={styles.completedBadge}>
-                                        <Ionicons name="checkmark-circle" size={16} color="#28C76F" />
-                                        <Text style={{ color: '#28C76F', fontSize: 12, fontWeight: 'bold', marginLeft: 4 }}>Pronto</Text>
+                                            <TouchableOpacity
+                                                style={[styles.timerCompleteBtn, { borderColor: '#28C76F' }]}
+                                                onPress={() => completeItem(item.id)}
+                                                disabled={isToggling}
+                                                activeOpacity={0.85}
+                                            >
+                                                <Ionicons name="checkmark" size={20} color="#28C76F" />
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
+                                </View>
+
+                                {/* Barra de progresso visual */}
+                                {elapsed > 0 && (
+                                    <View style={styles.progressBarBg}>
+                                        <View style={[
+                                            styles.progressBarFill,
+                                            {
+                                                width: `${Math.min(100, (elapsed / 3600) * 100)}%`,
+                                                backgroundColor: isRunning ? '#00CFE8' : (isDone ? '#28C76F' : '#7367F0'),
+                                            }
+                                        ]} />
                                     </View>
                                 )}
                             </View>
-                        </View>
-                    ))}
+                        );
+                    })}
 
                     {(!os.items || os.items.length === 0) && (
-                        <Text style={[styles.subInfoText, { color: colors.subText }]}>Nenhum serviço para cronometrar.</Text>
+                        <View style={styles.emptyTimer}>
+                            <Ionicons name="timer-outline" size={32} color={colors.subText} style={{ opacity: 0.5 }} />
+                            <Text style={[{ color: colors.subText, marginTop: 8, fontSize: 13 }]}>Nenhum serviço para cronometrar.</Text>
+                        </View>
                     )}
                 </Animated.View>
 
@@ -672,45 +777,121 @@ const styles = StyleSheet.create({
         color: '#7367F0',
         marginLeft: 10,
     },
-    timerItemRow: {
+    timerCard: {
+        borderRadius: 16,
+        borderWidth: 1.5,
+        padding: 14,
+        marginBottom: 12,
+        overflow: 'hidden',
+    },
+    timerCardHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#f8f9fa',
+        marginBottom: 10,
+        gap: 8,
     },
-    timerBadge: {
-        backgroundColor: '#7367F015',
-        alignSelf: 'flex-start',
-        paddingHorizontal: 8,
-        paddingVertical: 2,
+    timerStatusDot: {
+        width: 8,
+        height: 8,
         borderRadius: 4,
     },
-    timerValue: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#7367F0',
-        fontFamily: 'monospace',
+    timerItemName: {
+        flex: 1,
+        fontSize: 14,
+        fontWeight: '600',
     },
-    timerActions: {
+    donePill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#28C76F15',
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 50,
+        gap: 4,
+    },
+    donePillText: {
+        color: '#28C76F',
+        fontSize: 11,
+        fontWeight: '700',
+    },
+    timerDisplayRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 10,
+    },
+    timerDisplay: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        gap: 8,
+    },
+    timerDigits: {
+        fontSize: 22,
+        fontWeight: '800',
+        fontVariant: ['tabular-nums'],
+        letterSpacing: 2,
+    },
+    runningDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#00CFE8',
+    },
+    timerBtns: {
         flexDirection: 'row',
         gap: 8,
-        alignItems: 'center',
     },
-    smallIconBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
+    timerMainBtn: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
+        alignItems: 'center',
         justifyContent: 'center',
-        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    completedBadge: {
-        flexDirection: 'row',
+    timerCompleteBtn: {
+        width: 48,
+        height: 48,
+        borderRadius: 14,
         alignItems: 'center',
-        backgroundColor: '#28C76F10',
-        paddingHorizontal: 8,
+        justifyContent: 'center',
+        borderWidth: 2,
+    },
+    progressBarBg: {
+        height: 4,
+        backgroundColor: 'rgba(0,0,0,0.06)',
+        borderRadius: 2,
+        marginTop: 12,
+        overflow: 'hidden',
+    },
+    progressBarFill: {
+        height: '100%',
+        borderRadius: 2,
+    },
+    totalTimeBadge: {
+        marginLeft: 'auto',
+        backgroundColor: '#7367F015',
+        paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 50,
+    },
+    totalTimeText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#7367F0',
+    },
+    emptyTimer: {
+        alignItems: 'center',
+        paddingVertical: 20,
     },
     finalizeButton: {
         flexDirection: 'row',

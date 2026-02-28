@@ -223,6 +223,12 @@
           "url": "/services/packages",
           "name": "Pacotes de serviço",
           "slug": "services.packages"
+        },
+        {
+          "url": "/services/plans",
+          "name": "Planos de Assinatura",
+          "slug": "services.plans",
+          "feature": "recurring_plans"
         }
       ]
     },

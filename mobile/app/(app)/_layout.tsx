@@ -1,21 +1,78 @@
-import { Stack } from 'expo-router';
-import { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
+import { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, AppState } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { useAuth } from '../../context/AuthContext';
-import { registerForPushNotificationsAsync } from '../../services/notifications';
+import { registerForPushNotificationsAsync, getRouteFromNotification } from '../../services/notifications';
 import api from '../../services/api';
 
 export default function AppLayout() {
   const { user } = useAuth();
+  const router = useRouter();
+  const notificationListener = useRef<any>(null);
+  const responseListener = useRef<any>(null);
 
   useEffect(() => {
+    // ── Registro do token ao fazer login ────────────────────────────────────
     if (user) {
       registerForPushNotificationsAsync().then(token => {
         if (token && !token.startsWith('Erro')) {
-          api.post('/user/push-token', { token }).catch(e => console.error("Error updating push token:", e));
+          api.post('/user/push-token', { token }).catch(e =>
+            console.error('Error updating push token:', e)
+          );
         }
       });
     }
+
+    // ── Listener: notificação recebida com app ABERTO ────────────────────────
+    // (apenas mostra o banner nativo — nenhuma ação extra necessária)
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('[Push] Recebida:', notification.request.content.title);
+    });
+
+    // ── Listener: usuário TOCOU em uma notificação ───────────────────────────
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data as Record<string, any>;
+      const route = getRouteFromNotification(data);
+
+      console.log('[Push] Tocado — data:', data, '→ rota:', route);
+
+      if (route) {
+        // Pequeno delay para garantir que a navegação ocorra após o app estar pronto
+        setTimeout(() => {
+          try {
+            router.push(route as any);
+          } catch (e) {
+            console.error('[Push] Erro ao navegar:', e);
+          }
+        }, 300);
+      }
+    });
+
+    // ── Checa notificação que abriu o app do zero (app estava fechado) ──────
+    Notifications.getLastNotificationResponseAsync().then(response => {
+      if (!response) return;
+      const data = response.notification.request.content.data as Record<string, any>;
+      const route = getRouteFromNotification(data);
+      if (route) {
+        setTimeout(() => {
+          try {
+            router.push(route as any);
+          } catch (e) {
+            console.error('[Push] Erro ao navegar (cold start):', e);
+          }
+        }, 800);
+      }
+    });
+
+    return () => {
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
+    };
   }, [user]);
 
   return (
@@ -37,6 +94,7 @@ export default function AppLayout() {
         <Stack.Screen name="calendar/create" options={{ presentation: 'modal', title: 'Novo Agendamento', headerShown: true }} />
         <Stack.Screen name="chat/contacts" options={{ headerShown: false }} />
         <Stack.Screen name="chat/messages" options={{ headerShown: false }} />
+        <Stack.Screen name="screens/qr_scanner" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
       </Stack>
     </View>
   );
@@ -46,7 +104,7 @@ const styles = StyleSheet.create({
   overdueBanner: {
     backgroundColor: '#ffdbdb',
     padding: 15,
-    paddingTop: 50, // SafeArea spacing
+    paddingTop: 50,
     borderBottomWidth: 1,
     borderBottomColor: '#ea5455',
   },
@@ -59,5 +117,5 @@ const styles = StyleSheet.create({
   overdueText: {
     color: '#ea5455',
     fontSize: 13,
-  }
+  },
 });

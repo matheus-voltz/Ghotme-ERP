@@ -17,7 +17,7 @@ class CustomerPortalController extends Controller
             ->firstOrFail();
 
         $orders = OrdemServico::withoutGlobalScope('company')
-            ->with(['veiculo', 'items', 'parts', 'user'])
+            ->with(['veiculo', 'items', 'parts', 'user', 'inspection.damagePoints'])
             ->where('client_id', $client->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -56,6 +56,14 @@ class CustomerPortalController extends Controller
             ->orderBy('created_at', 'asc')
             ->get();
 
+        // Buscar Assinaturas Ativas (funcionalidade nova)
+        // Por enquanto buscamos via MaintenanceContract que já existe, 
+        // mas vamos expandir para ServicePlan em breve.
+        $subscriptions = \App\Models\MaintenanceContract::withoutGlobalScope('company')
+            ->where('client_id', $client->id)
+            ->where('status', 'active')
+            ->get();
+
         return view('content.public.customer-portal.index', [
             'client' => $client,
             'orders' => $orders,
@@ -63,6 +71,7 @@ class CustomerPortalController extends Controller
             'unifiedHistory' => $unifiedHistory,
             'responsible' => $responsible,
             'messages' => $messages,
+            'subscriptions' => $subscriptions,
             'isPublic' => true,
             'isMenu' => false,
             'isNavbar' => false,

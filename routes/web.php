@@ -349,6 +349,12 @@ Route::middleware([
     Route::put('/services/packages/{id}', [ServicePackageController::class, 'update'])->name('services.packages.update');
     Route::delete('/services/packages/{id}', [ServicePackageController::class, 'destroy'])->name('services.packages.destroy');
 
+    // Recurring Service Plans (Subscriptions)
+    Route::get('/services/plans', [App\Http\Controllers\ServicePlanController::class, 'index'])->name('services.plans');
+    Route::get('/services/plans-list', [App\Http\Controllers\ServicePlanController::class, 'dataBase'])->name('services.plans.list');
+    Route::post('/services/plans', [App\Http\Controllers\ServicePlanController::class, 'store'])->name('services.plans.store');
+    Route::delete('/services/plans/{id}', [App\Http\Controllers\ServicePlanController::class, 'destroy'])->name('services.plans.destroy');
+
     // Finance
     Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
     Route::get('/finance/accounts-payable', [FinanceController::class, 'payables'])->name('finance.payables');
