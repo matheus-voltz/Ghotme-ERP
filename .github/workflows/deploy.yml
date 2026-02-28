@@ -5,9 +5,32 @@ on:
 
 jobs:
   deploy:
-    name: Deploy
+    name: Build & Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Código
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+
+      - name: Install Composer Dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Setup Node & Build Vite Assets
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build Frontend
+        run: |
+          npm install
+          npm run build
+
       - name: Executar comandos de Deploy via SSH na Hostinger
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -16,31 +39,32 @@ jobs:
           password: ${{ secrets.HOSTINGER_PASSWORD }}
           port: ${{ secrets.HOSTINGER_PORT }}
           script: |
-            # Mudar para o diretório do projeto (ajuste o seudominio.com.br)
+            # Mudar para o diretório do projeto
             cd domains/ghotme.com.br/public_html 2>/dev/null || cd public_html
             
-            # Baixar as últimas alterações do Git
-            git pull origin main
+            # Inicializa o Git se não existir (corrige erro fatal: not a git repository)
+            if [ ! -d ".git" ]; then
+              git init
+              git remote add origin https://github.com/matheus-voltz/Ghotme-ERP.git
+            fi
             
-            # Atualizar dependências do PHP
+            # Tentar limpar o repositório local do servidor se houver conflitos
+            git fetch origin main
+            git reset --hard origin/main
+            
+            # Atualizar dependências do PHP (via servidor)
             composer install --no-dev --optimize-autoloader --no-interaction
             
-            # Atualizar dependências do Node e gerar Build do Vite
-            npm install
-            npm run build
-            
-            # Executar Migrations e Limpar Cache
+            # Migrations e Limpeza de Cache (agora com fallback para o Reverb)
             php artisan migrate --force
             php artisan storage:link || true
             php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
             php artisan cache:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             
-            # Tentar limpar o Opcache (PHP) se o servidor permitir via CLI
+            # Limpar Opcache se disponível
             php -r "if(function_exists('opcache_reset')) opcache_reset();"
             
-            echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso!"
+            echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso (Build via GitHub)!"
