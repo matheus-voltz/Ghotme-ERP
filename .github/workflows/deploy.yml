@@ -32,8 +32,15 @@ jobs:
             # Executar Migrations e Limpar Cache
             php artisan migrate --force
             php artisan storage:link || true
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan cache:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            
+            # Tentar limpar o Opcache (PHP) se o servidor permitir via CLI
+            php -r "if(function_exists('opcache_reset')) opcache_reset();"
             
             echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso!"
