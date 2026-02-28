@@ -28,7 +28,7 @@ jobs:
 
       - name: Build Frontend
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
 
       - name: Executar comandos de Deploy via SSH na Hostinger
