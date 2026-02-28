@@ -497,10 +497,13 @@ $configData = Helper::appClasses();
             .then(data => {
               btnAi.disabled = false;
               if (data.success) {
-                // Função simples para converter Markdown básico (Negrito e Itálico) em HTML
+                // Função robusta para converter Markdown básico em HTML
                 const formattedInsight = data.insight
-                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>')
-                  .replace(/\*(.*?)\*/g, '<em>$1</em>');
+                  .replace(/^## (.*$)/gm, '<h5 class="fw-bold mt-3 mb-1 text-primary">$1</h5>') // Converte ## em Título
+                  .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>') // Negrito + Itálico
+                  .replace(/\*\*(.*?)\*\*/g, '<strong class="text-primary">$1</strong>') // Negrito
+                  .replace(/\*(.*?)\*/g, '<em>$1</em>') // Itálico
+                  .replace(/\n/g, '<br>'); // Quebras de linha
 
                 content.innerHTML = `<div class="animate__animated animate__fadeIn">${formattedInsight}</div>`;
               } else {

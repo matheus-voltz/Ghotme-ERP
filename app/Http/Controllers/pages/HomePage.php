@@ -91,7 +91,8 @@ class HomePage extends Controller
     2. Se for Pet Shop, fale de banho, tosa, ração ou vacinas.
     3. Se for Estética, fale de procedimentos, Botox, drenagem ou pacotes.
     4. Seja direto. Comece falando da {$companyName} e como ela pode lucrar mais com os {$pendingOS} serviços parados.
-    5. Retorne APENAS o texto do insight, sem saudações como 'Entendi a situação'.";
+    5. Retorne APENAS o texto do insight, sem saudações como 'Entendi a situação'.
+    6. JAMAIS use hashtags (# ou ##) no texto. Use negrito (**Texto**) para destacar títulos.";
 
     try {
       $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;

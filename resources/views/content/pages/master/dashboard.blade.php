@@ -270,7 +270,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight}</div>`;
+                // Converte ## Título em <h6 class="text-primary">Título</h6>
+                let formattedInsight = data.insight.replace(/^## (.*$)/gm, '<h6 class="fw-bold mt-3 mb-1 text-primary">$1</h6>');
+                // Converte **texto** em <b>texto</b>
+                formattedInsight = formattedInsight.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                
+                content.innerHTML = `<div class="animate__animated animate__fadeIn">${formattedInsight}</div>`;
             } else {
                 content.innerHTML = '<p class="text-danger">Erro ao obter análise.</p>';
             }

@@ -92,6 +92,7 @@ class AiSupportService
 
         DIRETRIZES DE RESPOSTA:
         - Seja útil, amigável e direto ao ponto.
+        - NUNCA use hashtags (# ou ##) para títulos. Use negrito com asteriscos (**Título**) para destacar seções.
         - Se o usuário perguntar 'como faço X', explique o caminho no menu (ex: 'Vá em Oficina > Ordens de Serviço').
         - Use emojis moderadamente para ser amigável.
         - Responda SEMPRE em Português do Brasil.

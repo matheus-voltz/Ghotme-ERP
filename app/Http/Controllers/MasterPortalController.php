@@ -91,7 +91,10 @@ class MasterPortalController extends Controller
         Com base nesses números, gere um relatório ultra-curto (máximo 3 parágrafos) com:
         1. Uma análise do crescimento.
         2. Uma sugestão de qual nicho focar o marketing agora.
-        3. Uma ideia de funcionalidade 'matadora' para aumentar o faturamento.";
+        3. Uma ideia de funcionalidade 'matadora' para aumentar o faturamento.
+
+        REGRAS DE FORMATAÇÃO:
+        - JAMAIS use hashtags (# ou ##) no texto. Use negrito (**Texto**) para destacar títulos.";
 
         try {
             $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;

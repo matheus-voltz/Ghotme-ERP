@@ -46,7 +46,14 @@
                 <div class="d-flex {{ $msg['role'] === 'user' ? 'justify-content-end' : 'justify-content-start' }} mb-4">
                     <div class="chat-message-content {{ $msg['role'] === 'user' ? 'bg-primary text-white' : 'bg-white border text-body' }} p-3 rounded" 
                          style="max-width: 85%; {{ $msg['role'] === 'user' ? 'border-bottom-right-radius: 0 !important;' : 'border-bottom-left-radius: 0 !important;' }}">
-                        <p class="mb-0 small">{!! nl2br(e($msg['content'])) !!}</p>
+                        @php
+                            $content = e($msg['content']);
+                            // Converte ## Título em um H6 estilizado
+                            $content = preg_replace('/## (.*?)\n/', '<h6 class="fw-bold mt-2 mb-1 text-primary">$1</h6>', $content);
+                            // Converte **Negrito** em <b>
+                            $content = preg_replace('/\*\*(.*?)\*\*/', '<b>$1</b>', $content);
+                        @endphp
+                        <p class="mb-0 small">{!! nl2br($content) !!}</p>
                     </div>
                 </div>
             @endforeach
