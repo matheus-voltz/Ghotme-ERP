@@ -184,12 +184,10 @@ class SupportChat extends Component
             $this->activeTab = 'support';
             $contacts = User::withoutGlobalScopes()
                 ->where('users.id', '!=', $user->id)
-                ->join('chat_messages', function ($join) use ($user) {
-                    $join->on('users.id', '=', 'chat_messages.sender_id')
-                        ->where('chat_messages.receiver_id', '=', $user->id);
-                })
-                ->select('users.*', DB::raw('MAX(chat_messages.created_at) as last_message_at'))
-                ->groupBy('users.id')
+                ->join('chat_messages', 'users.id', '=', 'chat_messages.sender_id')
+                ->where('chat_messages.receiver_id', $user->id)
+                ->select('users.id', 'users.name', 'users.email', 'users.profile_photo_path', 'users.company_id', DB::raw('MAX(chat_messages.created_at) as last_message_at'))
+                ->groupBy('users.id', 'users.name', 'users.email', 'users.profile_photo_path', 'users.company_id')
                 ->orderBy('last_message_at', 'desc')
                 ->get();
             
