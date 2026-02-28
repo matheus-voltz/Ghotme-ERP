@@ -120,7 +120,17 @@ class CustomerPortalController extends Controller
         $msg->is_read = false;
         $msg->save();
 
-        // Disparar evento para tempo real (Broadcasting)
+        // 1. Notificação no Sininho (Database Notification)
+        $master = \App\Models\User::where('is_master', true)->first();
+        if ($master) {
+            $master->notify(new \App\Notifications\SystemAlertNotification(
+                "💬 Suporte: " . $client->name,
+                "Nova mensagem: " . \Illuminate\Support\Str::limit($request->message, 50),
+                url('/support/chat')
+            ));
+        }
+
+        // 2. Disparar evento para tempo real (Broadcasting)
         event(new \App\Events\MessageReceived($msg));
 
         return response()->json(['success' => true]);

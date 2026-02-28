@@ -28,29 +28,36 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->reportable(function (Throwable $e) {
-            if ($e instanceof \Illuminate\Database\QueryException || $e instanceof \PDOException) {
-                try {
-                    \App\Models\SystemError::create([
-                        'user_id' => auth()->id() ?? null,
-                        'url' => request()->fullUrl(),
-                        'method' => request()->method(),
-                        'error_type' => get_class($e),
-                        'message' => $e->getMessage(),
-                        'stack_trace' => $e->getTraceAsString(),
-                        'request_data' => request()->all(),
-                    ]);
+            // Ignora erros comuns de validação ou não encontrados para não poluir
+            if ($e instanceof \Illuminate\Validation\ValidationException || $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
+                return;
+            }
 
-                    // Notifica o MASTER sobre o erro crítico
-                    $master = \App\Models\User::where('is_master', true)->first();
-                    if ($master) {
-                        $master->notify(new \App\Notifications\SystemAlertNotification(
-                            "🚨 Erro Crítico de SQL!",
-                            "Um erro de banco de dados ocorreu na URL: " . request()->path()
-                        ));
-                    }
-                } catch (\Exception $logException) {
-                    // Se falhar ao salvar no banco, apenas segue o fluxo padrão (logs de arquivo)
+            try {
+                $user = auth()->user();
+                $userName = $user ? $user->name : 'Visitante';
+
+                \App\Models\SystemError::create([
+                    'user_id' => $user->id ?? null,
+                    'url' => request()->fullUrl(),
+                    'method' => request()->method(),
+                    'error_type' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'stack_trace' => $e->getTraceAsString(),
+                    'request_data' => request()->except(['password', 'password_confirmation']),
+                ]);
+
+                // Notifica o MASTER sobre qualquer erro crítico
+                $master = \App\Models\User::where('is_master', true)->first();
+                if ($master && (!$user || !$user->is_master)) {
+                    $master->notify(new \App\Notifications\SystemAlertNotification(
+                        "🚨 Alerta de Erro: {$userName}",
+                        "Erro: " . \Illuminate\Support\Str::limit($e->getMessage(), 60),
+                        url('/master/errors')
+                    ));
                 }
+            } catch (\Exception $logException) {
+                // Silencioso se falhar o log
             }
         });
 

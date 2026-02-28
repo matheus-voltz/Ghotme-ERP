@@ -12,6 +12,43 @@ use App\Models\ChatMessage;
 class ChatController extends Controller
 {
     /**
+     * Get unread message count for the authenticated user
+     */
+    public function unreadCount()
+    {
+        $user = Auth::user();
+        
+        // Se for Master, conta para ele e suporte oficial
+        if ($user->is_master) {
+            $supportIds = [7, 14];
+            $unreadCount = ChatMessage::withoutGlobalScopes()
+                ->whereIn('receiver_id', $supportIds)
+                ->where('is_read', false)
+                ->count();
+            
+            $lastMessage = ChatMessage::withoutGlobalScopes()
+                ->whereIn('receiver_id', $supportIds)
+                ->where('is_read', false)
+                ->latest()
+                ->first();
+        } else {
+            $unreadCount = ChatMessage::where('receiver_id', $user->id)
+                ->where('is_read', false)
+                ->count();
+            
+            $lastMessage = ChatMessage::where('receiver_id', $user->id)
+                ->where('is_read', false)
+                ->latest()
+                ->first();
+        }
+
+        return response()->json([
+            'unread_count' => $unreadCount,
+            'last_message' => $lastMessage
+        ]);
+    }
+
+    /**
      * Get list of contacts (team members) with unread counts
      */
     public function contacts()
@@ -122,6 +159,16 @@ class ChatController extends Controller
         ]);
 
         $message->load('sender:id,name');
+
+        // Notificar Master se for uma mensagem de suporte ou para um usuário Master
+        $master = \App\Models\User::where('is_master', true)->first();
+        if ($master && $message->receiver_id == $master->id) {
+            $master->notify(new \App\Notifications\SystemAlertNotification(
+                "💬 Suporte (App): " . ($message->sender->name ?? 'Usuário'),
+                \Illuminate\Support\Str::limit($message->message, 50),
+                url('/support/chat')
+            ));
+        }
 
         try {
             broadcast(new \App\Events\MessageReceived($message));

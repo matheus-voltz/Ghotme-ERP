@@ -127,10 +127,11 @@ class BudgetController extends Controller
             // DISPARAR NOTIFICAÇÃO PUSH REAL
             $user = Auth::user();
             if ($user && $user->expo_push_token) {
+                $nicheLabel = mb_strtolower(config('niche.' . config('app.niche') . '.labels.entity', 'veículo'), 'UTF-8');
                 \App\Helpers\Helpers::sendExpoNotification(
                     $user->expo_push_token,
                     "Novo Orçamento Gerado! 📄",
-                    "O orçamento para o veículo " . ($budget->veiculo->modelo ?? '') . " foi criado com sucesso."
+                    "O orçamento para o " . $nicheLabel . " " . ($budget->veiculo->modelo ?? '') . " foi criado com sucesso."
                 );
             }
 
@@ -219,8 +220,9 @@ class BudgetController extends Controller
         $phone = preg_replace('/\D/', '', $phone);
         if (strlen($phone) == 11) $phone = "55" . $phone;
 
+        $nicheLabel = mb_strtolower(config('niche.' . config('app.niche') . '.labels.entity', 'veículo'), 'UTF-8');
         $message = "Olá, " . ($budget->client->name ?? $budget->client->company_name) . "!\n";
-        $message .= "Segue o orçamento para o veículo " . $budget->veiculo->modelo . " (Placa: " . $budget->veiculo->placa . "):\n\n";
+        $message .= "Segue o orçamento para o " . $nicheLabel . " " . $budget->veiculo->modelo . ($budget->veiculo->placa ? " (Mod/Placa: " . $budget->veiculo->placa . ")" : "") . ":\n\n";
         $message .= "Total: R$ " . number_format($budget->total, 2, ',', '.') . "\n";
         $message .= "Válido até: " . ($budget->valid_until ? $budget->valid_until->format('d/m/Y') : 'N/A') . "\n\n";
         $message .= "Você pode visualizar os detalhes e aprovar online através do link abaixo:\n";
@@ -242,11 +244,13 @@ class BudgetController extends Controller
 
 
 
+        $nicheLabel = ucfirst(config('niche.' . config('app.niche') . '.labels.entity', 'Veículo'));
+        $veiculoTexto = $budget->veiculo->placa ? " ({$budget->veiculo->placa})" : '';
         $html = '<div class="row mb-3">
 
                         <div class="col-6"><strong>Cliente:</strong><br>' . $budget->client->name . '</div>
 
-                        <div class="col-6 text-end"><strong>Veículo:</strong><br>' . $budget->veiculo->marca . ' ' . $budget->veiculo->modelo . ' (' . $budget->veiculo->placa . ')</div>
+                        <div class="col-6 text-end"><strong>' . $nicheLabel . ':</strong><br>' . $budget->veiculo->marca . ' ' . $budget->veiculo->modelo . $veiculoTexto . '</div>
 
                      </div>';
 

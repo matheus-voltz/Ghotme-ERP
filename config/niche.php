@@ -58,7 +58,7 @@ return [
                 'identifier' => 'ti-id',
             ],
             'components' => [
-                'visual_inspection' => 'components.visual-inspection.automotive',
+                'visual_inspection' => 'components.visual-inspection/automotive',
             ]
         ],
         'automotive' => [
@@ -102,7 +102,7 @@ return [
                 'identifier' => 'ti-id',
             ],
             'components' => [
-                'visual_inspection' => 'components.visual-inspection.automotive',
+                'visual_inspection' => 'components.visual-inspection/automotive',
             ]
         ],
         'electronics' => [
@@ -122,6 +122,8 @@ return [
                 'fuel_levels' => ['0%', '25%', '50%', '75%', '100%'],
                 'visual_inspection_title' => 'Inspeção Física',
                 'visual_inspection_help' => 'Clique no dispositivo para marcar riscos ou danos.',
+                'visual_inspection_prompt_title' => 'Marcar dano no dispositivo',
+                'visual_inspection_prompt_placeholder' => 'Ex: Tela trincada, Risco na carcaça...',
                 'brand' => 'Fabricante',
                 'model' => 'Modelo',
                 'color' => 'Cor',
@@ -143,7 +145,7 @@ return [
                 'identifier' => 'ti-barcode',
             ],
             'components' => [
-                'visual_inspection' => 'components.visual-inspection.electronics',
+                'visual_inspection' => 'components.visual-inspection/electronics',
             ]
         ],
         // Add more niches here...
@@ -186,7 +188,7 @@ return [
                 'identifier' => 'ti-paws',
             ],
             'components' => [
-                'visual_inspection' => 'components.visual-inspection.pet',
+                'visual_inspection' => 'components.visual-inspection/pet',
             ]
         ],
         'beauty_clinic' => [

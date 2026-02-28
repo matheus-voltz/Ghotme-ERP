@@ -8,6 +8,40 @@ use Illuminate\Support\Facades\Auth;
 
 class SupportController extends Controller
 {
+    public function unreadCount()
+    {
+        $user = Auth::user();
+        
+        // Se for Master, conta mensagens para ele OU para o suporte oficial (ID 14)
+        if ($user->is_master) {
+            $supportIds = [7, 14];
+            $unreadCount = \App\Models\ChatMessage::withoutGlobalScopes()
+                ->whereIn('receiver_id', $supportIds)
+                ->where('is_read', false)
+                ->count();
+            
+            $lastMessage = \App\Models\ChatMessage::withoutGlobalScopes()
+                ->whereIn('receiver_id', $supportIds)
+                ->where('is_read', false)
+                ->latest()
+                ->first();
+        } else {
+            $unreadCount = \App\Models\ChatMessage::where('receiver_id', $user->id)
+                ->where('is_read', false)
+                ->count();
+            
+            $lastMessage = \App\Models\ChatMessage::where('receiver_id', $user->id)
+                ->where('is_read', false)
+                ->latest()
+                ->first();
+        }
+
+        return response()->json([
+            'unread_count' => $unreadCount,
+            'last_message' => $lastMessage
+        ]);
+    }
+
     public function chatWhatsapp()
     {
         // Número de suporte atualizado

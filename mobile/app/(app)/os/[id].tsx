@@ -24,6 +24,7 @@ import DevicePassword from './components/DevicePassword';
 
 const statusTranslations: { [key: string]: string } = {
     'pending': 'Pendente',
+    'approved': 'Aprovada',
     'running': 'Em Execução',
     'finalized': 'Finalizada',
     'canceled': 'Cancelada',
@@ -32,6 +33,7 @@ const statusTranslations: { [key: string]: string } = {
 const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
         case 'pending': return '#FF9F43';
+        case 'approved': return '#00CFE8';
         case 'running': return '#00CFE8';
         case 'finalized': return '#28C76F';
         case 'canceled': return '#EA5455';

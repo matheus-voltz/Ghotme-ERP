@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -21,7 +21,7 @@ import { useLanguage } from '../../../context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useRouter, router } from 'expo-router';
+import { useRouter, router, useNavigation } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp, FadeIn, FadeOut } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Skeleton } from '../../../components/Skeleton';
@@ -29,6 +29,7 @@ import { Skeleton } from '../../../components/Skeleton';
 // Helper for status translations
 const statusTranslations: { [key: string]: string } = {
   'pending': 'Pendente',
+  'approved': 'Aprovada',
   'running': 'Em Execução',
   'finalized': 'Finalizada',
   'canceled': 'Cancelada',
@@ -38,6 +39,7 @@ const statusTranslations: { [key: string]: string } = {
 const getStatusColor = (status: string) => {
   switch (status?.toLowerCase()) {
     case 'pending': return '#FF9F43'; // Warning
+    case 'approved': return '#00CFE8'; // Info/Approved
     case 'running': return '#00CFE8'; // Info/Execution
     case 'finalized': return '#28C76F'; // Success
     case 'canceled': return '#EA5455'; // Danger
@@ -60,6 +62,7 @@ export default function DashboardScreen() {
   const { t, language } = useLanguage();
   const [data, setData] = useState<any>(null);
   const [selectedChartIndex, setSelectedChartIndex] = useState<number | null>(null);
+  const scrollRef = useRef<ScrollView>(null);
 
   const getEstablishmentName = () => {
     switch (niche) {
@@ -91,6 +94,15 @@ export default function DashboardScreen() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Scroll to top when "Início" tab is pressed again
+  const navigation = useNavigation();
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('tabPress' as any, () => {
+      scrollRef.current?.scrollTo({ y: 0, animated: true });
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   const onRefresh = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -146,7 +158,14 @@ export default function DashboardScreen() {
       <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.adminStatsContainer}>
         {/* Executive 2x2 Grid */}
         <View style={styles.executiveGrid}>
-          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/reports/revenue');
+            }}
+            activeOpacity={0.7}
+          >
             <View style={[styles.miniIcon, { backgroundColor: '#7367F020' }]}>
               <Ionicons name="cash-outline" size={18} color="#7367F0" />
             </View>
@@ -162,41 +181,62 @@ export default function DashboardScreen() {
                 {Math.abs(data.revenueGrowth || 0).toFixed(1)}%
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/reports/profitability');
+            }}
+            activeOpacity={0.7}
+          >
             <View style={[styles.miniIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="pie-chart-outline" size={18} color="#28C76F" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('profitability')}</Text>
             <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.monthlyProfitability || 0}%</Text>
             <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Margem real</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/reports/clients');
+            }}
+            activeOpacity={0.7}
+          >
             <View style={[styles.miniIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="people-outline" size={18} color="#FF9F43" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('new_clients')}</Text>
             <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.totalClients || 0}</Text>
             <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Base ativa</Text>
-          </View>
+          </TouchableOpacity>
 
-          <View style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              router.push('/reports/productivity');
+            }}
+            activeOpacity={0.7}
+          >
             <View style={[styles.miniIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="flash-outline" size={18} color="#00CFE8" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>Produtividade</Text>
             <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>
-              {data.osStats?.finalized_today || 0}/{((data.osStats?.pending || 0) + (data.osStats?.running || 0) + (data.osStats?.finalized_today || 0)) || 0}
+              {data.osStats?.finalized_today || 0}/{((data.osStats?.pending || 0) + (data.osStats?.approved || 0) + (data.osStats?.running || 0) + (data.osStats?.finalized_today || 0)) || 0}
             </Text>
             <View style={styles.miniProgressBarContainer}>
               <View style={[styles.miniProgressBar, {
-                width: `${Math.min(100, (data.osStats?.finalized_today * 100 / ((data.osStats?.pending + data.osStats?.running + data.osStats?.finalized_today) || 1)))}%`,
+                width: `${Math.min(100, (data.osStats?.finalized_today * 100 / ((data.osStats?.pending + (data.osStats?.approved || 0) + data.osStats?.running + data.osStats?.finalized_today) || 1)))}%`,
                 backgroundColor: '#00CFE8'
               }]} />
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Quick Actions Bar */}
@@ -221,8 +261,18 @@ export default function DashboardScreen() {
         </View>
 
         {/* Financial Trends Chart */}
-        <View style={{ marginTop: 10 }}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Fluxo de Receita (7 dias)</Text>
+        <TouchableOpacity
+          style={{ marginTop: 10 }}
+          activeOpacity={0.8}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push('/reports/chart');
+          }}
+        >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Fluxo de Receita (7 dias)</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.text} style={{ opacity: 0.5, marginBottom: 8 }} />
+          </View>
           <View style={[styles.chartContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.chartBars}>
               {data.revenueChart?.map((day: any, idx: number) => {
@@ -262,7 +312,7 @@ export default function DashboardScreen() {
               })}
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10 }]}>Status Operacional</Text>
 
@@ -280,6 +330,20 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.pending || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push({ pathname: '/os/list', params: { status: 'approved', title: 'Ordens Aprovadas' } });
+            }}
+          >
+            <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
+              <Ionicons name="thumbs-up-outline" size={20} color="#00CFE8" />
+            </View>
+            <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.approved || 0}</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Aprovadas</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -323,9 +387,9 @@ export default function DashboardScreen() {
                 </TouchableOpacity>
               )}
               {data.pendingBudgetsCount > 0 && (
-                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]} onPress={() => Alert.alert('Orçamentos', 'Existem orçamentos aguardando aprovação.')}>
+                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]} onPress={() => router.push('/budgets/pending')}>
                   <Ionicons name="document-text" size={20} color="#FF9F43" />
-                  <Text style={[styles.alertText, { color: colors.text }]}>{data.pendingBudgetsCount} orçamentos pendentes</Text>
+                  <Text style={[styles.alertText, { color: colors.text }]}>{data.pendingBudgetsCount} orçamentos atrasados {'>'} 5 dias</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -365,7 +429,7 @@ export default function DashboardScreen() {
 
           <TouchableOpacity
             style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Orçamentos' } })}
+            onPress={() => router.push('/budgets/pending')}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="document-text-outline" size={20} color="#FF9F43" />
@@ -499,6 +563,7 @@ export default function DashboardScreen() {
 
       {/* Content Scroll Area */}
       <ScrollView
+        ref={scrollRef}
         style={styles.listContainer}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -693,12 +758,14 @@ const styles = StyleSheet.create({
   },
   statusGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     gap: 10,
     marginBottom: 25,
   },
   statusBox: {
     flex: 1,
+    minWidth: '45%',
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 15,

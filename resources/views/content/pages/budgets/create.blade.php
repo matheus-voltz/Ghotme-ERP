@@ -31,7 +31,7 @@
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Veículo</label>
+                            <label class="form-label">{{ niche('entity') }}</label>
                             <select name="veiculo_id" id="veiculo_id" class="select2 form-select" required disabled>
                                 <option value="">Selecione o Cliente Primeiro</option>
                             </select>
@@ -140,16 +140,17 @@
             if (clientId) {
                 fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
                     .then(res => {
-                        if (!res.ok) throw new Error('Erro ao buscar veículos');
+                        if (!res.ok) throw new Error('Erro ao buscar {{ mb_strtolower(niche("entities"), "UTF-8") }}');
                         return res.json();
                     })
                     .then(data => {
-                        let html = '<option value="">Selecione o Veículo</option>';
+                        let html = '<option value="">Selecione o {{ niche("entity") }}</option>';
                         if (data.length === 0) {
-                            html = '<option value="">Nenhum veículo encontrado para este cliente</option>';
+                            html = '<option value="">Nenhum {{ mb_strtolower(niche("entity"), "UTF-8") }} encontrado para este cliente</option>';
                         } else {
                             data.forEach(v => {
-                                html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
+                                let badge = v.placa ? v.placa + ' - ' : '';
+                                html += `<option value="${v.id}">${badge}${v.modelo}</option>`;
                             });
                         }
                         vehicleSelect.html(html).prop('disabled', false);
@@ -157,7 +158,7 @@
                     .catch(err => {
                         console.error('Erro:', err);
                         vehicleSelect.html('<option value="">Erro ao carregar</option>').prop('disabled', false);
-                        alert('Não foi possível carregar os veículos deste cliente. Tente novamente.');
+                        alert('Não foi possível carregar os {{ mb_strtolower(niche("entities"), "UTF-8") }} deste cliente. Tente novamente.');
                     });
             }
         });

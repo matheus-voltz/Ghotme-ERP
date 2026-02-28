@@ -503,6 +503,7 @@ Route::middleware([
 
     Route::get('/support/knowledge-base', [SupportController::class, 'knowledgeBase'])->name('support.knowledge-base');
     Route::get('/api/academy', [App\Http\Controllers\AcademyController::class, 'index']);
+    Route::get('/support/unread-count', [SupportController::class, 'unreadCount'])->name('chat.unread-count');
     Route::get('/support/open-ticket', [SupportController::class, 'openTicket'])->name('support.open-ticket');
     Route::post('/support/open-ticket', [SupportController::class, 'sendTicket'])->name('support.open-ticket.send');
 

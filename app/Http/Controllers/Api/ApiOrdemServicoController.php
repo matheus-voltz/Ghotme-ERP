@@ -55,7 +55,7 @@ class ApiOrdemServicoController extends Controller
     {
         $user = $request->user();
         $orders = OrdemServico::where('user_id', $user->id)
-            ->whereIn('status', ['pending', 'running'])
+            ->whereIn('status', ['pending', 'approved', 'running'])
             ->with(['client', 'veiculo'])
             ->latest()
             ->get()
@@ -97,7 +97,7 @@ class ApiOrdemServicoController extends Controller
             // Current Month Revenue
             $financialRevenue = FinancialTransaction::where('type', 'in')->where('status', 'paid')
                 ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
-            $osRevenue = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+            $osRevenue = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                 ->whereMonth('updated_at', $month)->whereYear('updated_at', $year)
                 ->get()->sum('total');
             $monthlyRevenue = $financialRevenue + $osRevenue;
@@ -106,7 +106,7 @@ class ApiOrdemServicoController extends Controller
             $lastMonth = Carbon::now()->subMonth();
             $financialRevenueLast = FinancialTransaction::where('type', 'in')->where('status', 'paid')
                 ->whereMonth('paid_at', $lastMonth->month)->whereYear('paid_at', $lastMonth->year)->sum('amount');
-            $osRevenueLast = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+            $osRevenueLast = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                 ->whereMonth('updated_at', $lastMonth->month)->whereYear('updated_at', $lastMonth->year)
                 ->get()->sum('total');
             $revenueLastMonth = $financialRevenueLast + $osRevenueLast;
@@ -123,7 +123,7 @@ class ApiOrdemServicoController extends Controller
                 $date = Carbon::today()->subDays($i);
                 $dailyFinancial = FinancialTransaction::where('type', 'in')->where('status', 'paid')
                     ->whereDate('paid_at', $date)->sum('amount');
-                $dailyOS = OrdemServico::whereIn('status', ['paid', 'finalized', 'completed'])
+                $dailyOS = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                     ->whereDate('updated_at', $date)->get()->sum('total');
 
                 $revenueChart[] = [
@@ -135,6 +135,7 @@ class ApiOrdemServicoController extends Controller
 
             $osStats = [
                 'pending' => OrdemServico::where('status', 'pending')->count(),
+                'approved' => OrdemServico::where('status', 'approved')->count(),
                 'running' => OrdemServico::where('status', 'running')->count(),
                 'finalized_today' => OrdemServico::where('status', 'finalized')->whereDate('updated_at', $today)->count(),
             ];
@@ -146,8 +147,8 @@ class ApiOrdemServicoController extends Controller
                 'osStats' => $osStats,
                 'revenueChart' => $revenueChart,
                 'lowStockCount' => InventoryItem::whereColumn('quantity', '<=', 'min_quantity')->count(),
-                'pendingBudgetsCount' => Budget::where('status', 'pending')->count(),
-                'recentOS' => OrdemServico::whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
+                'pendingBudgetsCount' => Budget::where('status', 'pending')->where('created_at', '<', Carbon::now()->subDays(5))->count(),
+                'recentOS' => OrdemServico::whereIn('status', ['pending', 'approved', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
                 'unreadNotificationsCount' => $user->unreadNotifications->count()
             ]);
         }
@@ -156,18 +157,19 @@ class ApiOrdemServicoController extends Controller
             'runningOS' => OrdemServico::where('user_id', $user->id)->where('status', 'running')->count(),
             'completedToday' => OrdemServico::where('user_id', $user->id)->where('status', 'finalized')->whereDate('updated_at', Carbon::today())->count(),
             'pendingBudgets' => Budget::where('user_id', $user->id)->where('status', 'pending')->count(),
+            'criticalBudgets' => Budget::where('user_id', $user->id)->where('status', 'pending')->where('created_at', '<', Carbon::now()->subDays(5))->count(),
         ];
 
         return response()->json([
             'stats' => $stats,
-            'recentOS' => OrdemServico::where('user_id', $user->id)->whereIn('status', ['pending', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
+            'recentOS' => OrdemServico::where('user_id', $user->id)->whereIn('status', ['pending', 'approved', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
             'unreadNotificationsCount' => $user->unreadNotifications->count()
         ]);
     }
 
     public function updateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:pending,running,finalized,canceled']);
+        $request->validate(['status' => 'required|in:pending,approved,running,finalized,canceled']);
         $os = OrdemServico::findOrFail($id);
         $os->status = $request->status;
         $os->save();

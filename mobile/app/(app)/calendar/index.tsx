@@ -76,22 +76,27 @@ export default function CalendarScreen() {
   const dayEvents = events.filter(e => e.start.startsWith(selectedDate));
 
   return (
-    <View style={[styles.container, { backgroundColor: '#F3F4F6' }]}>
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <Ionicons name="chevron-back" size={28} color="#333" />
+          <Ionicons name="chevron-back" size={28} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Agenda da Oficina</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{getTitle()}</Text>
         <TouchableOpacity onPress={fetchEvents}>
           <Ionicons name="refresh" size={24} color="#7367F0" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.calendarCard}>
+      <View style={[styles.calendarCard, { backgroundColor: colors.card }]}>
         <Calendar
           onDayPress={day => setSelectedDate(day.dateString)}
           markedDates={markedDates}
           theme={{
+            backgroundColor: colors.card,
+            calendarBackground: colors.card,
+            dayTextColor: colors.text,
+            monthTextColor: colors.text,
+            textSectionTitleColor: colors.subText,
             todayTextColor: '#7367F0',
             arrowColor: '#7367F0',
             selectedDayBackgroundColor: '#7367F0',
@@ -100,16 +105,17 @@ export default function CalendarScreen() {
             textDayFontSize: 16,
             textMonthFontSize: 18,
             textMonthFontWeight: 'bold',
+            textDisabledColor: colors.subText + '60',
           }}
         />
       </View>
 
       <View style={styles.listSection}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             {selectedDate === new Date().toISOString().split('T')[0] ? 'Hoje' : selectedDate.split('-').reverse().join('/')}
           </Text>
-          <Text style={styles.eventCount}>{dayEvents.length} Agendamentos</Text>
+          <Text style={[styles.eventCount, { color: colors.subText }]}>{dayEvents.length} Agendamentos</Text>
         </View>
 
         {loading ? (
@@ -120,7 +126,7 @@ export default function CalendarScreen() {
               dayEvents.map((event, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={styles.eventCard}
+                  style={[styles.eventCard, { backgroundColor: colors.card }]}
                   onPress={() => router.push({
                     pathname: "/calendar/[id]",
                     params: {
@@ -137,16 +143,16 @@ export default function CalendarScreen() {
                     <Text style={styles.eventTime}>
                       <Ionicons name="time-outline" size={14} /> {event.start.split(/[ T]/)[1]?.substring(0, 5) || 'O dia todo'}
                     </Text>
-                    <Text style={styles.eventTitle}>{event.title}</Text>
-                    <Text style={styles.eventDesc} numberOfLines={1}>{event.extendedProps?.description || 'Sem observações'}</Text>
+                    <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
+                    <Text style={[styles.eventDesc, { color: colors.subText }]} numberOfLines={1}>{event.extendedProps?.description || 'Sem observações'}</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#ccc" />
+                  <Ionicons name="chevron-forward" size={20} color={colors.subText} />
                 </TouchableOpacity>
               ))
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons name="calendar-outline" size={50} color="#ccc" />
-                <Text style={styles.emptyText}>Nenhum serviço agendado para este dia.</Text>
+                <Ionicons name="calendar-outline" size={50} color={colors.subText} />
+                <Text style={[styles.emptyText, { color: colors.subText }]}>Nenhum serviço agendado para este dia.</Text>
               </View>
             )}
           </ScrollView>
@@ -159,27 +165,27 @@ export default function CalendarScreen() {
       >
         <Ionicons name="add" size={30} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </View >
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, backgroundColor: '#fff' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 },
   backBtn: { width: 40 },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1F2937' },
-  calendarCard: { backgroundColor: '#fff', paddingBottom: 10, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 },
+  headerTitle: { fontSize: 20, fontWeight: 'bold' },
+  calendarCard: { paddingBottom: 10, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 8 },
   listSection: { flex: 1, padding: 20 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', color: '#374151' },
-  eventCount: { fontSize: 13, color: '#6B7280', fontWeight: '600' },
-  eventCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 16, padding: 15, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10 },
+  sectionTitle: { fontSize: 18, fontWeight: 'bold' },
+  eventCount: { fontSize: 13, fontWeight: '600' },
+  eventCard: { flexDirection: 'row', alignItems: 'center', borderRadius: 16, padding: 15, marginBottom: 12, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 10 },
   eventBorder: { width: 4, height: '80%', borderRadius: 2 },
   eventInfo: { flex: 1, marginLeft: 15 },
   eventTime: { fontSize: 12, color: '#7367F0', fontWeight: 'bold', marginBottom: 2 },
-  eventTitle: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-  eventDesc: { fontSize: 13, color: '#888', marginTop: 2 },
+  eventTitle: { fontSize: 16, fontWeight: 'bold' },
+  eventDesc: { fontSize: 13, marginTop: 2 },
   emptyState: { alignItems: 'center', marginTop: 50 },
-  emptyText: { color: '#9CA3AF', marginTop: 10, fontSize: 15 },
+  emptyText: { marginTop: 10, fontSize: 15 },
   fab: { position: 'absolute', bottom: 30, right: 20, width: 60, height: 60, borderRadius: 30, backgroundColor: '#7367F0', justifyContent: 'center', alignItems: 'center', elevation: 5, shadowColor: '#7367F0', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 }
 });

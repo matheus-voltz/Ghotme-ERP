@@ -8,24 +8,45 @@ use Illuminate\Http\Request;
 
 class ApiBudgetController extends Controller
 {
-    public function index(Request $request)
+    public function getPending(Request $request)
     {
-        // O isolamento por company_id é feito automaticamente pela trait no model Budget
+        $user = $request->user();
         $query = Budget::with(['client', 'veiculo'])
-            ->latest();
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc');
 
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
+        if ($user->role !== 'admin') {
+            $query->where('user_id', $user->id);
         }
 
-        return response()->json($query->paginate(20));
+        return response()->json($query->get());
     }
 
-    public function show($id)
+    public function approve(Request $request, $id)
     {
-        $budget = Budget::with(['client', 'veiculo', 'items.service', 'parts.part'])
-            ->findOrFail($id);
+        $budget = Budget::findOrFail($id);
+        if ($request->user()->role !== 'admin' && $budget->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
 
-        return response()->json($budget);
+        $budget->status = 'approved';
+        $budget->approved_at = now();
+        $budget->save();
+
+        return response()->json(['message' => 'Orçamento aprovado!', 'budget' => $budget]);
+    }
+
+    public function reject(Request $request, $id)
+    {
+        $budget = Budget::findOrFail($id);
+        if ($request->user()->role !== 'admin' && $budget->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $budget->status = 'rejected';
+        $budget->rejected_at = now();
+        $budget->save();
+
+        return response()->json(['message' => 'Orçamento rejeitado!', 'budget' => $budget]);
     }
 }

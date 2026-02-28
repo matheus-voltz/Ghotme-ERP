@@ -220,17 +220,18 @@
     const damageInput = document.getElementById('damage_points_json');
     let damagePoints = [];
 
-    const carBlueprint = document.getElementById('car-blueprint');
+    // Busca qualquer blueprint (carro, celular, etc)
+    const blueprint = document.querySelector('#car-blueprint, #electronics-blueprint, #pet-blueprint');
 
-    if (visualContainer && carBlueprint) {
+    if (visualContainer && blueprint) {
       // Init input
       damageInput.value = JSON.stringify([]);
 
-      carBlueprint.addEventListener('click', function(e) {
+      blueprint.addEventListener('click', function(e) {
         // Ignora cliques nos ícones de remover
         if (e.target.classList.contains('remove-marker') || e.target.closest('.remove-marker')) return;
 
-        const rect = carBlueprint.getBoundingClientRect();
+        const rect = blueprint.getBoundingClientRect();
 
         // Posição do clique relativa ao SVG
         const x = e.clientX - rect.left;

@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Dashboard
     Route::get('/dashboard/stats', [ApiOrdemServicoController::class, 'getDashboardStats']);
     Route::get('/watch/dashboard', [ApiOrdemServicoController::class, 'getWatchDashboard']);
+    Route::get('/reports/{type}', [\App\Http\Controllers\Api\ApiReportController::class, 'show']);
 
     // Clientes & Veículos
     Route::post('/clients-list', [ClientVehicleController::class, 'storeClient']);
@@ -44,6 +45,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/os/{id}', [ApiOrdemServicoController::class, 'show']);
     Route::patch('/os/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
     Route::patch('/os/{id}/password', [ApiOrdemServicoController::class, 'updatePassword']);
+    Route::get('/budgets/pending', [App\Http\Controllers\Api\ApiBudgetController::class, 'getPending']);
+    Route::post('/budgets/{id}/approve', [App\Http\Controllers\Api\ApiBudgetController::class, 'approve']);
+    Route::post('/budgets/{id}/reject', [App\Http\Controllers\Api\ApiBudgetController::class, 'reject']);
+
     Route::post('/os/items/{itemId}/toggle-timer', [ApiOrdemServicoController::class, 'toggleTimer']);
     Route::post('/os/items/{itemId}/complete', [ApiOrdemServicoController::class, 'completeItem']);
 

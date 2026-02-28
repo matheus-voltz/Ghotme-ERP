@@ -30,6 +30,7 @@ type SortOption = 'date_desc' | 'date_asc' | 'value_desc' | 'value_asc';
 const STATUS_FILTERS = [
     { key: 'all', label: 'Todas', color: '#7367F0' },
     { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
     { key: 'running', label: 'Execução', color: '#00CFE8' },
     { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
     { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
@@ -49,6 +50,7 @@ const getStatusColor = (status: string) => {
 
 const statusTranslations: { [key: string]: string } = {
     pending: 'Pendente',
+    approved: 'Aprovada',
     running: 'Em Execução',
     finalized: 'Finalizada',
     canceled: 'Cancelada',

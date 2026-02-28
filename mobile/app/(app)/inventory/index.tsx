@@ -51,13 +51,31 @@ export default function InventoryScreen() {
     };
 
     const renderItem = ({ item }: { item: any }) => (
-        <View style={styles.card}>
-            <View style={styles.iconContainer}>
+        <TouchableOpacity
+            style={[styles.card, { backgroundColor: colors.card }]}
+            activeOpacity={0.7}
+            onPress={() => router.push({
+                pathname: '/inventory/[id]',
+                params: {
+                    id: item.id,
+                    name: item.name,
+                    sku: item.sku || '',
+                    cost_price: String(item.cost_price || 0),
+                    selling_price: String(item.selling_price || 0),
+                    quantity: String(item.quantity || 0),
+                    min_quantity: String(item.min_quantity || 5),
+                    location: item.location || '',
+                    unit: item.unit || 'un',
+                    supplier_name: item.supplier?.name || '',
+                }
+            })}
+        >
+            <View style={[styles.iconContainer, { backgroundColor: colors.iconBg }]}>
                 <Ionicons name="cube-outline" size={24} color="#7367F0" />
             </View>
             <View style={styles.info}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.sku}>SKU: {item.sku || 'N/A'}</Text>
+                <Text style={[styles.name, { color: colors.text }]}>{item.name}</Text>
+                <Text style={[styles.sku, { color: colors.subText }]}>SKU: {item.sku || 'N/A'}</Text>
                 <Text style={styles.price}>R$ {parseFloat(item.selling_price || 0).toFixed(2)}</Text>
             </View>
             <View style={[styles.badge, item.quantity < 5 ? styles.lowStock : styles.goodStock]}>
@@ -65,25 +83,26 @@ export default function InventoryScreen() {
                     {item.quantity} un
                 </Text>
             </View>
-        </View>
+        </TouchableOpacity>
     );
     return (
-        <View style={styles.container}>
-            <View style={styles.header}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.header, { backgroundColor: colors.background }]}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-                    <Ionicons name="chevron-back" size={28} color="#333" />
+                    <Ionicons name="chevron-back" size={28} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Estoque de {labels.inventory_items?.split('/')[0] || 'Peças'}</Text>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>Estoque de {labels.inventory_items?.split('/')[0] || 'Peças'}</Text>
                 <TouchableOpacity onPress={fetchInventory}>
                     <Ionicons name="refresh" size={24} color="#7367F0" />
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.searchContainer}>
-                <Ionicons name="search" size={20} color="#999" style={{ marginRight: 10 }} />
+            <View style={[styles.searchContainer, { backgroundColor: colors.card }]}>
+                <Ionicons name="search" size={20} color={colors.subText} style={{ marginRight: 10 }} />
                 <TextInput
-                    style={styles.searchInput}
+                    style={[styles.searchInput, { color: colors.text }]}
                     placeholder={`Buscar ${labels.inventory_items?.toLowerCase() || 'item'}...`}
+                    placeholderTextColor={colors.subText}
                     value={search}
                     onChangeText={handleSearch}
                 />
@@ -99,8 +118,8 @@ export default function InventoryScreen() {
                     contentContainerStyle={styles.listContent}
                     ListEmptyComponent={
                         <View style={styles.emptyState}>
-                            <Ionicons name="search-outline" size={50} color="#ccc" />
-                            <Text style={styles.emptyText}>Nenhum item encontrado.</Text>
+                            <Ionicons name="search-outline" size={50} color={colors.subText} />
+                            <Text style={[styles.emptyText, { color: colors.subText }]}>Nenhum item encontrado.</Text>
                         </View>
                     }
                 />
@@ -117,18 +136,18 @@ export default function InventoryScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F3F4F6' },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20, backgroundColor: '#fff' },
+    container: { flex: 1 },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingBottom: 20, paddingHorizontal: 20 },
     backBtn: { width: 40 },
-    headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1F2937' },
-    searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', margin: 20, paddingHorizontal: 15, borderRadius: 12, height: 50, elevation: 2 },
+    headerTitle: { fontSize: 20, fontWeight: 'bold' },
+    searchContainer: { flexDirection: 'row', alignItems: 'center', margin: 20, paddingHorizontal: 15, borderRadius: 12, height: 50, elevation: 2 },
     searchInput: { flex: 1, fontSize: 16 },
     listContent: { paddingHorizontal: 20, paddingBottom: 80 },
-    card: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', padding: 15, borderRadius: 16, marginBottom: 12, elevation: 2 },
-    iconContainer: { width: 50, height: 50, borderRadius: 12, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center', marginRight: 15 },
+    card: { flexDirection: 'row', alignItems: 'center', padding: 15, borderRadius: 16, marginBottom: 12, elevation: 2 },
+    iconContainer: { width: 50, height: 50, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 15 },
     info: { flex: 1 },
-    name: { fontSize: 16, fontWeight: 'bold', color: '#333' },
-    sku: { fontSize: 12, color: '#888', marginTop: 2 },
+    name: { fontSize: 16, fontWeight: 'bold' },
+    sku: { fontSize: 12, marginTop: 2 },
     price: { fontSize: 14, fontWeight: '600', color: '#7367F0', marginTop: 4 },
     badge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
     goodStock: { backgroundColor: '#E8FDF3' },
@@ -137,6 +156,6 @@ const styles = StyleSheet.create({
     goodStockText: { color: '#28C76F' },
     lowStockText: { color: '#EA5455' },
     emptyState: { alignItems: 'center', marginTop: 50 },
-    emptyText: { color: '#999', marginTop: 10 },
+    emptyText: { marginTop: 10 },
     fab: { position: 'absolute', bottom: 30, right: 20, width: 60, height: 60, borderRadius: 30, backgroundColor: '#7367F0', justifyContent: 'center', alignItems: 'center', elevation: 5 }
 });

@@ -31,8 +31,15 @@ class MessageReceived implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        return [
+        $channels = [
             new PrivateChannel('chat.' . $this->message->receiver_id),
         ];
+
+        // Se a mensagem for para o Suporte (ID 14), também avisa o Master (ID 7)
+        if ($this->message->receiver_id == 14) {
+            $channels[] = new PrivateChannel('chat.7');
+        }
+
+        return $channels;
     }
 }

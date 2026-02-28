@@ -88,6 +88,9 @@ export default function AppLayout() {
       )}
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="reports/[type]" options={{ headerShown: true, title: 'Inteligência' }} />
+        <Stack.Screen name="reports/chart" options={{ headerShown: true, title: 'Fluxo de Receita' }} />
+        <Stack.Screen name="inventory/[id]" options={{ headerShown: true, title: 'Detalhe' }} />
         <Stack.Screen name="os/checklist" options={{ presentation: 'modal', title: 'Vistoria', headerShown: true }} />
         <Stack.Screen name="os/technical_checklist" options={{ presentation: 'modal', title: 'Checklist Técnico', headerShown: false }} />
         <Stack.Screen name="os/list" options={{ title: 'Lista de Ordens', headerShown: false }} />

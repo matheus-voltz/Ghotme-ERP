@@ -30,10 +30,14 @@ export default function PersonalDataScreen() {
         }, 1500);
     };
 
-    const renderInput = (label: string, value: string, setValue: (v: string) => void, icon: any, placeholder: string, keyboardType: any = "default") => (
+    const renderInput = (label: string, value: string, setValue: (v: string) => void, icon: any, placeholder: string, keyboardType: any = "default", editable: boolean = true) => (
         <View style={styles.inputGroup}>
             <Text style={[styles.label, { color: colors.subText }]}>{label}</Text>
-            <View style={[styles.inputWrapper, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <View style={[
+                styles.inputWrapper, 
+                { backgroundColor: colors.card, borderColor: colors.border },
+                !editable && { opacity: 0.6, backgroundColor: colors.background }
+            ]}>
                 <Ionicons name={icon} size={20} color={colors.primary} style={styles.inputIcon} />
                 <TextInput
                     style={[styles.input, { color: colors.text }]}
@@ -42,7 +46,11 @@ export default function PersonalDataScreen() {
                     placeholder={placeholder}
                     placeholderTextColor="#999"
                     keyboardType={keyboardType}
+                    editable={editable}
                 />
+                {!editable && (
+                    <Ionicons name="lock-closed-outline" size={16} color={colors.subText} style={{ marginLeft: 8 }} />
+                )}
             </View>
         </View>
     );
@@ -66,7 +74,7 @@ export default function PersonalDataScreen() {
                     {renderInput("Telefone / WhatsApp", phone, setPhone, "call-outline", "(00) 00000-0000", "phone-pad")}
                     {renderInput("CPF / CNPJ", document, setDocument, "document-text-outline", "000.000.000-00")}
                     {renderInput("Cidade", city, setCity, "location-outline", "Sua cidade")}
-                    {renderInput("Cargo / Função", role, setRole, "briefcase-outline", "Ex: Mecânico Chefe")}
+                    {renderInput("Cargo / Função", role, setRole, "briefcase-outline", "Ex: Mecânico Chefe", "default", false)}
                 </View>
 
                 <TouchableOpacity
