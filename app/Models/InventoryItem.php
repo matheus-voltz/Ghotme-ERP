@@ -25,6 +25,21 @@ class InventoryItem extends Model
         'is_active',
     ];
 
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable')->orderBy('order');
+    }
+
+    public function mainImage()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('is_main', true);
+    }
+
+    public function marketplacePublications()
+    {
+        return $this->morphMany(MarketplacePublication::class, 'publishable');
+    }
+
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);

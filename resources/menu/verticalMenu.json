@@ -31,6 +31,12 @@
       "slug": "dashboard"
     },
     {
+      "url": "/ai-consultant",
+      "name": "Consultor IA",
+      "icon": "menu-icon icon-base ti tabler-robot",
+      "slug": "ai-consultant.index"
+    },
+    {
       "url": "/appointments",
       "name": "Site Appointments",
       "icon": "menu-icon icon-base ti tabler-calendar-star",

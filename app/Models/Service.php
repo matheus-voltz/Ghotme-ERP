@@ -20,6 +20,21 @@ class Service extends Model
         'is_active',
     ];
 
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable')->orderBy('order');
+    }
+
+    public function mainImage()
+    {
+        return $this->morphOne(Image::class, 'imageable')->where('is_main', true);
+    }
+
+    public function marketplacePublications()
+    {
+        return $this->morphMany(MarketplacePublication::class, 'publishable');
+    }
+
     public function packages(): BelongsToMany
     {
         return $this->belongsToMany(ServicePackage::class, 'service_package_items');

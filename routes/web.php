@@ -414,6 +414,17 @@ Route::middleware([
     Route::get('/settings/integrations', [IntegrationSettingController::class, 'index'])->name('settings.integrations');
     Route::post('/settings/integrations', [IntegrationSettingController::class, 'update'])->name('settings.integrations.update');
 
+    // Mercado Livre Integration
+    Route::get('/meli/redirect', [App\Http\Controllers\MercadoLivreController::class, 'redirect'])->name('meli.redirect');
+    Route::get('/meli/callback', [App\Http\Controllers\MercadoLivreController::class, 'callback'])->name('meli.callback');
+    Route::post('/meli/publish', [App\Http\Controllers\MercadoLivreController::class, 'publish'])->name('meli.publish');
+
+    // AI Consultant Chat
+    Route::get('/ai-consultant', [App\Http\Controllers\AiConsultantController::class, 'index'])->name('ai-consultant.index');
+    Route::get('/ai-consultant/new', [App\Http\Controllers\AiConsultantController::class, 'createChat'])->name('ai-consultant.create');
+    Route::get('/ai-consultant/{id}', [App\Http\Controllers\AiConsultantController::class, 'show'])->name('ai-consultant.show');
+    Route::post('/ai-consultant/{id}/send', [App\Http\Controllers\AiConsultantController::class, 'sendMessage'])->name('ai-consultant.send');
+
     // Print Templates
     Route::get('/settings/print-templates', [PrintTemplateController::class, 'index'])->name('settings.print-templates');
     Route::get('/settings/print-templates/{id}/edit', [PrintTemplateController::class, 'edit'])->name('settings.print-templates.edit');

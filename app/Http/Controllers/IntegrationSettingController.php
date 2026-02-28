@@ -47,6 +47,8 @@ class IntegrationSettingController extends Controller
             'whatsapp_phone_number_id' => 'nullable|string|max:255',
             'fiscal_api_token' => 'nullable|string|max:255',
             'fiscal_environment' => 'nullable|string',
+            'meli_client_id' => 'nullable|string|max:255',
+            'meli_client_secret' => 'nullable|string|max:255',
         ]);
 
         $settings->fill($validated);

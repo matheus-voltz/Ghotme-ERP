@@ -134,5 +134,42 @@
       </form>
     </div>
   </div>
+
+  <!-- Modal to publish on Mercado Livre -->
+  <div class="modal fade" id="modalPublishMeli" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Anunciar no Mercado Livre</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="formPublishMeli">
+          @csrf
+          <input type="hidden" name="id" id="publish_item_id">
+          <input type="hidden" name="type" value="product">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nome do Produto</label>
+              <input type="text" id="publish_item_name" class="form-control" readonly>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Preço no Mercado Livre (R$)</label>
+              <input type="number" step="0.01" name="price" id="publish_item_price" class="form-control" required>
+              <small class="text-muted">Sugestão: Preço de venda atual.</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">ID da Categoria (ML)</label>
+              <input type="text" name="category_id" class="form-control" placeholder="Ex: MLB1234" required>
+              <small><a href="https://developers.mercadolibre.com.br/pt_br/categorias-e-atributos" target="_blank">Como achar a categoria?</a></small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-warning">Publicar Agora</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 @endsection

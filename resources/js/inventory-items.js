@@ -141,8 +141,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     render: function (data, type, full, meta) {
                         return (
                             '<div class="d-flex align-items-center gap-4">' +
-                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddItems"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
-                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
+                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddItems" title="Editar"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
+                            `<button class="btn btn-sm btn-icon publish-meli" data-id="${full.id}" data-name="${full.name}" data-price="${full.selling_price}" title="Anunciar no Mercado Livre"><i class="icon-base ti tabler-share icon-22px text-warning"></i></button>` +
+                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="Excluir"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
                             '</div>'
                         );
                     }
@@ -457,6 +458,84 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
         offCanvasForm.addEventListener('hidden.bs.offcanvas', function () {
             fv.resetForm(true);
+        });
+    }
+
+    // Mercado Livre Publication Logic
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('.publish-meli')) {
+            const btn = e.target.closest('.publish-meli');
+            const id = btn.dataset.id;
+            const name = btn.dataset.name;
+            const price = btn.dataset.price;
+
+            document.getElementById('publish_item_id').value = id;
+            document.getElementById('publish_item_name').value = name;
+            document.getElementById('publish_item_price').value = price;
+
+            const modal = new bootstrap.Modal(document.getElementById('modalPublishMeli'));
+            modal.show();
+        }
+    });
+
+    const formPublishMeli = document.getElementById('formPublishMeli');
+    if (formPublishMeli) {
+        formPublishMeli.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const submitBtn = formPublishMeli.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Publicando...';
+
+            const formData = new FormData(formPublishMeli);
+
+            fetch(`${baseUrl}meli/publish`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Publicar Agora';
+
+                    if (data.success) {
+                        const modalElement = document.getElementById('modalPublishMeli');
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                        modalInstance.hide();
+
+                        Swal.fire({
+                            title: 'Sucesso!',
+                            text: data.message,
+                            icon: 'success',
+                            confirmButtonText: 'Ver Anúncio',
+                            showCancelButton: true,
+                            cancelButtonText: 'Fechar'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.open(data.url, '_blank');
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Erro!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Entendido'
+                        });
+                    }
+                })
+                .catch(err => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Publicar Agora';
+                    Swal.fire({
+                        title: 'Erro!',
+                        text: 'Erro ao tentar se conectar com o servidor.',
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
+                });
         });
     }
 });

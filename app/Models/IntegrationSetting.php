@@ -33,6 +33,13 @@ class IntegrationSetting extends Model
         'whatsapp_instance_id',
         'whatsapp_api_key',
         'fiscal_api_token',
-        'fiscal_environment'
+        'fiscal_environment',
+        'meli_client_id',
+        'meli_client_secret',
+        'meli_access_token',
+        'meli_refresh_token',
+        'meli_user_id',
+        'meli_token_expires_at',
+        'meli_active'
     ];
 }

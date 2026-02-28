@@ -209,10 +209,53 @@
                 </div>
             </div>
 
+            <!-- MARKETPLACE (MERCADO LIVRE) -->
+            <div class="card mb-6 border-warning shadow-none">
+                <div class="card-header border-bottom bg-label-warning py-3">
+                    <h5 class="card-title mb-0 text-warning"><i class="ti tabler-building-store me-1"></i> 3. Marketplace (Mercado Livre)</h5>
+                    <p class="text-muted small mb-0">Publique seus produtos e serviços automaticamente no Mercado Livre.</p>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="row g-4 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Client ID</label>
+                            <input type="text" name="meli_client_id" class="form-control" value="{{ $settings->meli_client_id }}" placeholder="Ex: 123456789" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Client Secret</label>
+                            <input type="password" name="meli_client_secret" class="form-control" value="{{ $settings->meli_client_secret }}" placeholder="Ex: abc...xyz" />
+                        </div>
+                        <div class="col-md-4">
+                            @if($settings->meli_active && $settings->meli_access_token)
+                                <div class="alert alert-success d-flex align-items-center mb-0 p-2">
+                                    <i class="ti tabler-circle-check me-2"></i>
+                                    <div>
+                                        <span class="fw-bold d-block small">Conta Conectada</span>
+                                        <a href="{{ route('meli.redirect') }}" class="btn btn-sm btn-outline-success mt-1 py-0 px-2">Reconectar</a>
+                                    </div>
+                                </div>
+                            @else
+                                <a href="{{ route('meli.redirect') }}" class="btn btn-warning w-100 shadow-warning">
+                                    <i class="ti tabler-link me-1"></i> Conectar Conta do Mercado Livre
+                                </a>
+                            @endif
+                        </div>
+                        <div class="col-12 mt-2">
+                            <small class="text-muted">
+                                <i class="ti tabler-help-circle me-1"></i> 
+                                Para obter essas chaves, crie um aplicativo no 
+                                <a href="https://developers.mercadolibre.com.br/devcenter" target="_blank" class="text-primary">Mercado Livre Developers</a>. 
+                                Use a URL de Redirect: <code>{{ route('meli.callback') }}</code>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- FISCAL -->
             <div class="card mb-6">
                 <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">3. Emissão de Notas Fiscais (NFe / NFSe)</h5>
+                    <h5 class="card-title mb-0">4. Emissão de Notas Fiscais (NFe / NFSe)</h5>
                 </div>
                 <div class="card-body pt-4">
                     <div class="row align-items-center">
