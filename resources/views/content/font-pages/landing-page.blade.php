@@ -1130,16 +1130,20 @@ $pageConfigs = [
               <ul class="list-unstyled pricing-list">
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    {{ __('A simple start for everyone') }}
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    30 dias de acesso ao plano Padrão
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    {{ __('30 days Standard plan') }}
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    Acesso a todos os módulos essenciais
+                  </h6>
+                </li>
+                <li>
+                  <h6 class="d-flex align-items-center mb-3">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    Sem necessidade de cartão de crédito
                   </h6>
                 </li>
               </ul>
@@ -1171,46 +1175,71 @@ $pageConfigs = [
             </div>
             <div class="card-body">
               <ul class="list-unstyled pricing-list">
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Up to 3 users') }}</strong> {{ __('and full support') }}
+                <li class="mb-2"><strong>{{ __('Indicado para:') }}</strong></li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('1 empresa (CNPJ)') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Multi-Niche') }}:</strong> {{ __('The system adapts to your business') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    <strong>{{ __('Up to 3 users') }}</strong>
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Online Booking via Site') }}:</strong> {{ __('Sell more!') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Ordens de Serviço completas (timer, checklists, fotos)') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Dynamic PIX') }}</strong> {{ __('with automatic clearing (Asaas)') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('CRM de Clientes com histórico') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Bank Reconciliation (OFX)') }}:</strong> {{ __('Save hours') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Financeiro (entradas, saídas e fluxo de caixa)') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    {{ __('WhatsApp Integration and Profit Reports') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Controle de Estoque com alertas') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Orçamentos com aprovação via WhatsApp') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Kanban de Ordens de Serviço') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Portal do Cliente (link público)') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Consultor IA – 10 análises por mês') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Suporte básico (horário comercial)') }}
                   </h6>
                 </li>
               </ul>
@@ -1243,46 +1272,71 @@ $pageConfigs = [
             </div>
             <div class="card-body">
               <ul class="list-unstyled pricing-list">
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Everything in Standard Plan +') }}</strong>
+                <li class="mb-2"><strong>{{ __('Indicado para:') }}</strong></li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    <strong>{{ __('Tudo do Padrão') }}</strong>, {{ __('mais:') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Up to 10 users') }}</strong> {{ __('and priority support') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Até 10 usuários') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Automatic Supply') }}:</strong> {{ __('Replenishment robot') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Consultor IA') }} <strong class="ms-1">{{ __('Ilimitado') }}</strong>
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Financial BPO') }}</strong> {{ __('and Accountant Portal') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Robô de Reposição de Estoque') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Tax Invoice Issuance') }}</strong> {{ __('unlimited (NFe/NFSe)') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('BPO Financeiro (gestão terceirizada)') }}
                   </h6>
                 </li>
-                <li>
-                  <h6 class="d-flex align-items-center mb-3">
-                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i
-                        class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Fleet Management and advanced B2B') }}
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Portal do Contador (acesso externo)') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Emissão Ilimitada de Notas Fiscais') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Conciliação Bancária (OFX)') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Integrações Externas (Mercado Livre, APIs)') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Relatórios Avançados e Exportações') }}
+                  </h6>
+                </li>
+                <li class="mb-3">
+                  <h6 class="d-flex align-items-center">
+                    <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
+                    {{ __('Suporte Prioritário') }}
                   </h6>
                 </li>
               </ul>

@@ -39,16 +39,16 @@ class HomePage extends Controller
 
     if (!$apiKey) return response()->json(['success' => false, 'message' => 'IA não configurada']);
 
-    // Limites de Plano
+    // Limites de Plano (contador SEPARADO do chat do Consultor IA)
     if (!$user->hasFeature('ai_unlimited')) {
       $monthKey = now()->format('Y-m');
-      $usageKey = "ai_usage_{$companyId}_{$monthKey}";
+      $usageKey = "ai_dashboard_usage_{$companyId}_{$monthKey}"; // chave exclusiva do dashboard
       $usageCount = Cache::get($usageKey, 0);
 
-      if ($usageCount >= 10) {
+      if ($usageCount >= 30) {
         return response()->json([
           'success' => false,
-          'message' => 'Você atingiu o limite de 10 análises mensais do plano Padrão. Faça o upgrade para o Enterprise para análises ilimitadas!',
+          'message' => 'Você atingiu o limite de 30 análises de negócio mensais. Faça o upgrade para o Enterprise para análises ilimitadas!',
           'limit_reached' => true
         ]);
       }
