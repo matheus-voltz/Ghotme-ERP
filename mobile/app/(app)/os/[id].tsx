@@ -20,6 +20,7 @@ import { useNiche } from '../../../context/NicheContext';
 import { useAuth } from '../../../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
+import DevicePassword from './components/DevicePassword';
 
 const statusTranslations: { [key: string]: string } = {
     'pending': 'Pendente',
@@ -339,6 +340,18 @@ export default function OSDetailScreen() {
                     </View>
                     <Text style={[styles.descriptionText, { color: colors.subText }]}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
                 </Animated.View>
+
+                {/* Device Password (Electronics Only) */}
+                {niche === 'electronics' && (
+                    <Animated.View entering={FadeInDown.delay(350).duration(500).springify()}>
+                        <DevicePassword
+                            osId={os.id}
+                            initialPassword={os.device_password}
+                            initialPattern={os.device_pattern_lock}
+                            onUpdate={(newPwd, newPat) => setOs({ ...os, device_password: newPwd, device_pattern_lock: newPat })}
+                        />
+                    </Animated.View>
+                )}
 
                 {/* ── Banner somente-leitura (pending / canceled) ───────────── */}
                 {(os.status === 'pending' || os.status === 'canceled') && (

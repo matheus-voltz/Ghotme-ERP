@@ -174,6 +174,21 @@ class ApiOrdemServicoController extends Controller
         return response()->json(['message' => 'Status atualizado', 'os' => $os]);
     }
 
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'device_password' => 'nullable|string',
+            'device_pattern_lock' => 'nullable|string'
+        ]);
+
+        $os = OrdemServico::findOrFail($id);
+        $os->device_password = $request->input('device_password');
+        $os->device_pattern_lock = $request->input('device_pattern_lock');
+        $os->save();
+
+        return response()->json(['message' => 'Senha atualizada com sucesso', 'os' => $os]);
+    }
+
     public function toggleTimer($itemId)
     {
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);

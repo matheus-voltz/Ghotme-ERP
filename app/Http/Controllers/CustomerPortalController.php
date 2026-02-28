@@ -92,7 +92,14 @@ class CustomerPortalController extends Controller
             ->latest()
             ->first();
 
-        if ($lastResponse) {
+        // REGRA DE SUPORTE GLOBAL:
+        // Se a mensagem contiver "suporte" ou se for o cliente VIP de teste, manda pro Master (7)
+        $isSupportRequest = str_contains(strtolower($request->message), 'suporte');
+        $isVipClient = ($client->email === 'vip@ghotme.com.br');
+
+        if ($isSupportRequest || $isVipClient) {
+            $receiverId = 7; // ID do Master
+        } elseif ($lastResponse) {
             $receiverId = $lastResponse->sender_id;
         } else {
             $lastOrder = OrdemServico::withoutGlobalScope('company')
@@ -100,27 +107,21 @@ class CustomerPortalController extends Controller
                 ->latest()
                 ->first();
 
-            // Fallback: busca qualquer admin da empresa se não houver OS
             $admin = \App\Models\User::where('company_id', $client->company_id)->where('role', 'admin')->first();
-            $receiverId = $lastOrder?->user_id ?? ($admin->id ?? null);
+            $receiverId = $lastOrder?->user_id ?? ($admin->id ?? 7);
         }
-
-        // DEBUG: Log the values before creating
-        \Illuminate\Support\Facades\Log::info("Portal Chat Debug:", [
-            'client_id' => $client->id,
-            'receiver_id' => $receiverId,
-            'company_id' => $client->company_id,
-            'message' => $request->message
-        ]);
 
         $msg = new \App\Models\ChatMessage();
         $msg->company_id = $client->company_id;
         $msg->client_id = $client->id;
-        $msg->sender_id = null; // GARANTE que é externo
+        $msg->sender_id = null;
         $msg->receiver_id = $receiverId;
         $msg->message = $request->message;
         $msg->is_read = false;
         $msg->save();
+
+        // Disparar evento para tempo real (Broadcasting)
+        event(new \App\Events\MessageReceived($msg));
 
         return response()->json(['success' => true]);
     }

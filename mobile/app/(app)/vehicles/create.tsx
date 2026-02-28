@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList, Modal } from 'react-native';
+import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
@@ -45,6 +46,10 @@ export default function CreateVehicleScreen() {
     const [clientSearch, setClientSearch] = useState('');
     const [filteredClients, setFilteredClients] = useState<any[]>([]);
 
+    const [permission, requestPermission] = useCameraPermissions();
+    const [showScanner, setShowScanner] = useState(false);
+    const [scanned, setScanned] = useState(false);
+
     useEffect(() => { fetchClients(); }, []);
 
     const fetchClients = async () => {
@@ -77,6 +82,25 @@ export default function CreateVehicleScreen() {
         } catch (error) {
             Alert.alert("Manual", `${labels.identifier} não encontrada. Preencha os campos abaixo.`);
         } finally { setLookupLoading(false); }
+    };
+
+    const handleOpenScanner = async () => {
+        if (!permission?.granted) {
+            const result = await requestPermission();
+            if (!result.granted) {
+                Alert.alert("Permissão", "Precisamos de acesso à câmera para ler código de barras.");
+                return;
+            }
+        }
+        setScanned(false);
+        setShowScanner(true);
+    };
+
+    const handleBarcodeScanned = ({ data }: BarcodeScanningResult) => {
+        if (scanned) return;
+        setScanned(true);
+        setPlaca(data);
+        setShowScanner(false);
     };
 
     const handleSubmit = async () => {
@@ -138,6 +162,13 @@ export default function CreateVehicleScreen() {
                             <TouchableOpacity style={styles.lookupButton} onPress={handleLookupPlaca} disabled={lookupLoading}>
                                 <LinearGradient colors={['#7367F0', '#CE9FFC']} style={styles.lookupGradient}>
                                     {lookupLoading ? <ActivityIndicator color="#fff" /> : <Ionicons name="flash" size={22} color="#fff" />}
+                                </LinearGradient>
+                            </TouchableOpacity>
+                        )}
+                        {niche === 'electronics' && (
+                            <TouchableOpacity style={styles.lookupButton} onPress={handleOpenScanner}>
+                                <LinearGradient colors={['#00CFE8', '#7367F0']} style={styles.lookupGradient}>
+                                    <Ionicons name="barcode-outline" size={24} color="#fff" />
                                 </LinearGradient>
                             </TouchableOpacity>
                         )}
@@ -206,6 +237,30 @@ export default function CreateVehicleScreen() {
                     </View>
                 </View>
             )}
+
+            <Modal animationType="slide" transparent={true} visible={showScanner} onRequestClose={() => setShowScanner(false)}>
+                <View style={{ flex: 1, backgroundColor: '#000' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, paddingTop: 50, zIndex: 10 }}>
+                        <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Escanear {labels.identifier}</Text>
+                        <TouchableOpacity onPress={() => setShowScanner(false)}>
+                            <Ionicons name="close" size={28} color="#fff" />
+                        </TouchableOpacity>
+                    </View>
+                    {showScanner && (
+                        <CameraView
+                            style={StyleSheet.absoluteFill}
+                            facing="back"
+                            barcodeScannerSettings={{ barcodeTypes: ['qr', 'code128', 'code39', 'code93', 'ean13', 'ean8', 'upc_a', 'upc_e'] }}
+                            onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+                        />
+                    )}
+                    <View style={{ position: 'absolute', bottom: 50, width: '100%', alignItems: 'center' }}>
+                        <Text style={{ color: '#fff', backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, overflow: 'hidden' }}>
+                            Aponte a câmera para o código de barras
+                        </Text>
+                    </View>
+                </View>
+            </Modal>
         </KeyboardAvoidingView>
     );
 }

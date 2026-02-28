@@ -24,6 +24,8 @@ class OrdemServico extends Model implements Auditable
         'description',
         'scheduled_at',
         'km_entry',
+        'device_password',
+        'device_pattern_lock',
     ];
 
     protected static function boot()
@@ -75,7 +77,7 @@ class OrdemServico extends Model implements Auditable
 
     public function getPartsCostTotalAttribute()
     {
-        return $this->parts->sum(function($p) {
+        return $this->parts->sum(function ($p) {
             // Se a peça não tiver custo, assume 0
             return ($p->part->cost_price ?? 0) * $p->quantity;
         });

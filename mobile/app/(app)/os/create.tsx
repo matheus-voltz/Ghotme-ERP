@@ -439,12 +439,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 12,
         padding: 15,
-        minHeight: 120,
+        height: 120,
     },
     textArea: {
+        flex: 1,
         fontSize: 16,
         textAlignVertical: 'top',
-        height: '100%',
     },
     // Status Chips
     statusContainer: {

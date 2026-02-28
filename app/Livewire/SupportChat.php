@@ -180,20 +180,34 @@ class SupportChat extends Component
         $isMaster = $user->is_master;
 
         if ($isMaster) {
-            // Master só vê quem mandou mensagem pra ele (Tickets de Suporte)
+            // Master vê QUALQUER UM que mandou mensagem para o Suporte (IDs 7 ou 14)
             $this->activeTab = 'support';
+            $supportUser = User::withoutGlobalScopes()->where('email', 'suporte@ghotme.com.br')->first();
+            $supportIds = array_filter([$user->id, $supportUser->id ?? null]);
+
+            // Busca mensagens enviadas para o suporte
             $contacts = User::withoutGlobalScopes()
-                ->where('users.id', '!=', $user->id)
                 ->join('chat_messages', 'users.id', '=', 'chat_messages.sender_id')
-                ->where('chat_messages.receiver_id', $user->id)
+                ->whereIn('chat_messages.receiver_id', $supportIds)
                 ->select('users.id', 'users.name', 'users.email', 'users.profile_photo_path', 'users.company_id', DB::raw('MAX(chat_messages.created_at) as last_message_at'))
                 ->groupBy('users.id', 'users.name', 'users.email', 'users.profile_photo_path', 'users.company_id')
                 ->orderBy('last_message_at', 'desc')
                 ->get();
             
+            // Adição Crítica: Se não achou como usuário, tenta achar como cliente (algumas mensagens do mobile entram assim)
+            $clientSupport = \App\Models\Clients::withoutGlobalScopes()
+                ->join('chat_messages', 'clients.id', '=', 'chat_messages.client_id')
+                ->whereIn('chat_messages.receiver_id', $supportIds)
+                ->select('clients.id', 'clients.name', DB::raw('clients.email as email'), DB::raw('NULL as profile_photo_path'), 'clients.company_id', DB::raw('MAX(chat_messages.created_at) as last_message_at'))
+                ->groupBy('clients.id', 'clients.name', 'clients.email', 'clients.company_id')
+                ->get();
+
+            // Unifica as duas listas
+            $supportContacts = $contacts->concat($clientSupport)->sortByDesc('last_message_at');
+            
             $teamContacts = collect();
             $clientContacts = collect();
-            $supportContacts = $contacts;
+            $contacts = $supportContacts;
         } else {
             // 1. Equipe
             $teamContacts = User::where('id', '!=', $user->id)
@@ -270,15 +284,16 @@ class SupportChat extends Component
         if ($this->chatType === 'user' && $this->activeUserId) {
             $activeContact = User::withoutGlobalScopes()->find($this->activeUserId);
             $supportUser = User::withoutGlobalScopes()->where('email', 'suporte@ghotme.com.br')->first();
-            $supportId = $supportUser->id ?? Auth::id();
+            $supportId = $supportUser->id ?? 14;
             
-            // LÓGICA DE MENSAGENS MASTER: Considera meu ID e o ID do Suporte Oficial
+            // LÓGICA DE MENSAGENS MASTER: 
+            // Se eu sou MASTER, eu quero ver a conversa entre o Usuário Ativo e o Suporte (seja ID 7 ou 14)
             $messages = ChatMessage::withoutGlobalScopes()
-                ->where(function ($q) use ($supportId) {
-                    $q->whereIn('sender_id', [Auth::id(), $supportId])->where('receiver_id', $this->activeUserId);
+                ->where(function ($q) use ($supportId, $user) {
+                    $q->whereIn('sender_id', [$user->id, $supportId])->where('receiver_id', $this->activeUserId);
                 })
-                ->orWhere(function ($q) use ($supportId) {
-                    $q->where('sender_id', $this->activeUserId)->whereIn('receiver_id', [Auth::id(), $supportId]);
+                ->orWhere(function ($q) use ($supportId, $user) {
+                    $q->where('sender_id', $this->activeUserId)->whereIn('receiver_id', [$user->id, $supportId]);
                 })
                 ->orderBy('created_at', 'asc')->get();
             
