@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Desempenho por Mecânico')
+@section('title', 'Desempenho por ' . (niche('current') === 'automotive' ? 'Mecânico' : (niche('current') === 'food_service' ? 'Cozinheiro/Chef' : 'Colaborador')))
 
 @section('content')
 <div class="row">
@@ -14,7 +14,7 @@
                     </span>
                 </div>
                 <h5 class="mb-1">{{ $m->name }}</h5>
-                <small class="d-block mb-4 text-muted">{{ $m->total_os }} OS Finalizadas</small>
+                <small class="d-block mb-4 text-muted">{{ $m->total_os }} {{ niche('entities') }} Finalizados</small>
                 <div class="d-flex justify-content-around">
                     <div>
                         <h5 class="mb-0">R$ {{ number_format($m->revenue_generated, 2, ',', '.') }}</h5>
@@ -35,10 +35,10 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Mecânico / Colaborador</th>
-                    <th>OS Concluídas</th>
+                    <th>{{ (niche('current') === 'automotive' ? 'Mecânico' : (niche('current') === 'food_service' ? 'Cozinheiro/Chef' : 'Colaborador')) }}</th>
+                    <th>{{ niche('entities') }} Concluídos</th>
                     <th>Faturamento Gerado</th>
-                    <th>Média por OS</th>
+                    <th>Média por {{ niche('entity') }}</th>
                 </tr>
             </thead>
             <tbody>

@@ -23,7 +23,14 @@ class InventoryItem extends Model
         'unit',
         'location',
         'is_active',
+        'menu_category_id',
+        'is_ingredient',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(MenuCategory::class, 'menu_category_id');
+    }
 
     public function images()
     {

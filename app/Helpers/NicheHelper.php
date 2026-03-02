@@ -99,7 +99,17 @@ if (!function_exists('niche_translate')) {
             in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimentos' : 'Serviços'
         ];
 
-        return str_ireplace($search, $replace, $string);
+        $string = str_ireplace($search, $replace, $string);
+
+        // Tradução de Orçamento/Orçamentos para niches que possuem label customizado
+        $budgetEntity   = niche('budget_entity',   null, $company);
+        $budgetEntities = niche('budget_entities',  null, $company);
+        if ($budgetEntity) {
+            $string = str_replace('Orçamentos', $budgetEntities, $string);
+            $string = str_replace('Orçamento',  $budgetEntity,   $string);
+        }
+
+        return $string;
     }
 }
 

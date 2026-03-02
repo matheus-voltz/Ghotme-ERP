@@ -58,6 +58,7 @@
       "name": "Service Orders",
       "icon": "menu-icon icon-base ti tabler-file",
       "slug": "ordens",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/ordens-servico",
@@ -72,6 +73,29 @@
         {
           "url": "/ordens-servico/checklist",
           "name": "Entry Checklist",
+          "slug": "ordens-servico.checklist"
+        }
+      ]
+    },
+    {
+      "name": "Pedidos",
+      "icon": "menu-icon icon-base ti tabler-moped",
+      "slug": "pedidos",
+      "niche": "food_service",
+      "submenu": [
+        {
+          "url": "/ordens-servico",
+          "name": "Todos os Pedidos",
+          "slug": "ordens-servico"
+        },
+        {
+          "url": "/ordens-servico/create",
+          "name": "Novo Pedido",
+          "slug": "ordens-servico.create"
+        },
+        {
+          "url": "/ordens-servico/checklist",
+          "name": "Ingredientes e Preparo",
           "slug": "ordens-servico.checklist"
         }
       ]
@@ -229,6 +253,12 @@
           "name": "Planos de Assinatura",
           "slug": "services.plans",
           "feature": "recurring_plans"
+        },
+        {
+          "url": "/menu/manage",
+          "name": "Gestão de Cardápio",
+          "slug": "menu.manage",
+          "niche": "food_service"
         }
       ]
     },

@@ -25,6 +25,16 @@ $configData = Helper::appClasses();
   <div class="menu-inner-shadow"></div>
 
   <ul class="menu-inner py-1">
+    {{-- DEBUG TEMP --}}
+    <li class="menu-item active bg-label-danger mb-2" style="display: block !important;">
+        <div class="menu-link">
+            <div class="text-white small">
+                DEBUG: Co: {{ auth()->user()->company_id }} | 
+                Niche: {{ auth()->user()->company->niche ?? 'NULO' }}
+            </div>
+        </div>
+    </li>
+
     @foreach ($menuData[0]->menu as $menu)
     {{-- adding active and open class if child is active --}}
 
@@ -48,6 +58,16 @@ $configData = Helper::appClasses();
     continue;
     }
 
+    // Niche check (Inclusão)
+    if (isset($menu->niche) && ($user->company->niche ?? null) !== $menu->niche) {
+    continue;
+    }
+
+    // Niche check (Exclusão)
+    if (isset($menu->niche_exclude) && ($user->company->niche ?? null) === $menu->niche_exclude) {
+    continue;
+    }
+
     // Master check (REGRAS DE SEPARAÇÃO TOTAL)
     if ($user->is_master) {
         // Se eu sou MASTER, eu SÓ vejo o que for master_only
@@ -67,14 +87,33 @@ $configData = Helper::appClasses();
                 continue;
             }
         }
+
+    // REGRAS ESPECÍFICAS POR NICHO (FOOD SERVICE)
+    if (($user->company->niche ?? null) === 'food_service') {
+        // Debug: descomente se precisar ver no HTML
+        // echo "<!-- DEBUG: NICHE=food_service | SLUG=" . ($menu->slug ?? 'NONE') . " -->";
+
+        // Esconde Orçamentos (slug: budgets)
+        if (($menu->slug ?? '') === 'budgets' || ($menu->name ?? '') === 'Budgets') {
+            continue;
+        }
+    }
     }
     }
     @endphp
 
     {{-- menu headers --}}
     @if (isset($menu->menuHeader))
+    @php
+        $headerText = __($menu->menuHeader);
+        if ($user && ($user->company->niche ?? null) === 'food_service') {
+            if ($headerText === 'Oficina' || $headerText === 'Operacional') {
+                $headerText = 'Restaurante / Vendas';
+            }
+        }
+    @endphp
     <li class="menu-header small">
-      <span class="menu-header-text">{{ __($menu->menuHeader) }}</span>
+      <span class="menu-header-text">{{ $headerText }}</span>
     </li>
     @else
     {{-- active menu method --}}
@@ -117,6 +156,20 @@ $configData = Helper::appClasses();
         @endisset
         @php
         $menuName = isset($menu->name) ? __($menu->name) : '';
+        
+        // REGRA DE OURO: Renomear para Food Service
+        if ($user && ($user->company->niche ?? null) === 'food_service') {
+            if ($menuName === 'Service Orders' || $menuName === 'Ordens de Serviço' || ($menu->slug ?? '') === 'ordens') {
+                $menuName = 'Pedidos';
+            }
+            if ($menuName === 'Entry Checklist' || str_contains($menuName, 'Checklist') || ($menu->slug ?? '') === 'ordens-servico.checklist') {
+                $menuName = 'Ingredientes/Preparo';
+            }
+            if ($menuName === 'Budgets' || $menuName === 'Orçamentos' || ($menu->slug ?? '') === 'budgets') {
+                $menuName = niche('budget_entities', 'Pré-pedidos');
+            }
+        }
+
         $menuName = niche_translate($menuName);
         @endphp
         <div>{{ $menuName }}</div>

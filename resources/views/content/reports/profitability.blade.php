@@ -38,7 +38,7 @@
                         </div>
                         <h4 class="ms-1 mb-0">R$ {{ number_format($totalCost, 2, ',', '.') }}</h4>
                     </div>
-                    <p class="mb-1">Custo de Peças</p>
+                    <p class="mb-1">Custo de {{ niche('inventory_items') }}</p>
                     <p class="mb-0">
                         <small class="text-muted">Custo total dos insumos</small>
                     </p>
@@ -113,13 +113,13 @@
         <div class="col-md-6 col-lg-8 mb-4">
             <div class="card h-100">
                 <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title m-0 me-2">Ordens Recentes e Lucratividade</h5>
+                    <h5 class="card-title m-0 me-2">{{ niche('entities') }} Recentes e Lucratividade</h5>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-light">
                             <tr>
-                                <th>OS #</th>
+                                <th>{{ niche('entity') }} #</th>
                                 <th>Receita</th>
                                 <th>Custo</th>
                                 <th>Lucro</th>

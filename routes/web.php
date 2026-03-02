@@ -358,6 +358,11 @@ Route::middleware([
     Route::post('/services/plans', [App\Http\Controllers\ServicePlanController::class, 'store'])->name('services.plans.store');
     Route::delete('/services/plans/{id}', [App\Http\Controllers\ServicePlanController::class, 'destroy'])->name('services.plans.destroy');
 
+    // Menu Management (Food Service)
+    Route::get('/menu/manage', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.manage');
+    Route::post('/menu/categories', [App\Http\Controllers\MenuController::class, 'storeCategory'])->name('menu.categories.store');
+    Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
+
     // Finance
     Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
     Route::get('/finance/accounts-payable', [FinanceController::class, 'payables'])->name('finance.payables');

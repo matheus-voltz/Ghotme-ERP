@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', __('Service Orders'))
+@section('title', niche('entities'))
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss'])
@@ -13,9 +13,9 @@
 @section('content')
 <div class="card">
     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">{{ __('Service Orders') }}</h5>
+        <h5 class="card-title mb-0">{{ niche('entities') }}</h5>
         <a href="{{ route('ordens-servico.create') }}" class="btn btn-primary">
-            <i class="ti tabler-plus me-1"></i> {{ __('Create OS') }}
+            <i class="ti tabler-plus me-1"></i> Nova {{ niche('entity') }}
         </a>
     </div>
     <div class="card-datatable table-responsive">
@@ -101,7 +101,7 @@
                             if (full.status !== 'finalized' && full.status !== 'paid') {
                                 html += `<button class="btn btn-sm btn-success finalize-os" data-id="${data}" title="{{ __('Finalize') }}"><i class="ti tabler-check"></i></button>`;
                             }
-                            html += `<a href="/ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="{{ __('Checklist') }}"><i class="ti tabler-clipboard-check"></i></a>`;
+                            html += `<a href="/ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="Checklist/Vistoria"><i class="ti tabler-clipboard-check"></i></a>`;
                             html += `</div>`;
                             return html;
                         }
@@ -129,8 +129,8 @@
         // Prompt para impressão de etiqueta se acabou de criar OS
         @if(session('just_created_os'))
         Swal.fire({
-            title: 'OS Criada com Sucesso!',
-            text: 'Deseja gerar a etiqueta com QR Code para esta Ordem de Serviço?',
+            title: '{{ niche("entity") }} Criada com Sucesso!',
+            text: 'Deseja gerar a etiqueta com QR Code para este {{ niche("entity") }}?',
             icon: 'success',
             showCancelButton: true,
             confirmButtonText: 'Sim, Gerar Etiqueta',

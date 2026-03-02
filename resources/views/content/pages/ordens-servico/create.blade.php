@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Nova Ordem de Serviço')
+@section('title', 'Nova ' . niche('entity'))
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/select2/select2.scss'])
@@ -45,10 +45,6 @@
                                 <option value="pending">Aguardando Início</option>
                                 <option value="running">Em Execução</option>
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">{{ niche('metric') }} na Entrada</label>
-                            <input type="number" name="km_entry" class="form-control" placeholder="0" />
                         </div>
                     </div>
                     <div class="mb-4">
@@ -172,10 +168,10 @@
                     <div class="mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="redirect_to_checklist" id="redirect_to_checklist" value="1" checked>
-                            <label class="form-check-input-label" for="redirect_to_checklist">Realizar checklist de entrada após salvar</label>
+                            <label class="form-check-input-label" for="redirect_to_checklist">Realizar vistoria de entrada após salvar</label>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Abrir Ordem de Serviço</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Abrir {{ niche('entity') }}</button>
                     <a href="{{ route('ordens-servico') }}" class="btn btn-label-secondary w-100">Cancelar</a>
                 </div>
             </div>
