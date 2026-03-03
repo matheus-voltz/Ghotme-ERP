@@ -57,8 +57,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     render: function (data, type, full) {
                         return (
                             '<div class="d-flex align-items-center gap-2">' +
-                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasService"><i class="ti tabler-edit"></i></button>` +
-                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}"><i class="ti tabler-trash"></i></button>` +
+                            `<button class="btn btn-sm btn-icon btn-outline-info me-1" onclick="openIngredientsModal(${full.id}, '${full.name.replace(/'/g, "\\'")}')" title="Ficha Técnica (Insumos)"><i class="ti tabler-clipboard-list"></i></button>` +
+                            `<button class="btn btn-sm btn-icon btn-outline-warning me-1" onclick="openAddonsModal(${full.id}, '${full.name.replace(/'/g, "\\'")}')" title="Combos e Adicionais"><i class="ti tabler-pizza"></i></button>` +
+                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasService" title="Editar Serviço"><i class="ti tabler-edit"></i></button>` +
+                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="Excluir"><i class="ti tabler-trash"></i></button>` +
                             '</div>'
                         );
                     }

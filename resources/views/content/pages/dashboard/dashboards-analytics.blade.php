@@ -317,11 +317,11 @@ $configData = Helper::appClasses();
               <td>
                 @php
                 $statusConfig = [
-                'pending' => ['color' => 'warning', 'label' => __('Pending'), 'icon' => 'tabler-clock'],
-                'running' => ['color' => 'info', 'label' => __('Running'), 'icon' => 'tabler-tool'],
-                'in_progress' => ['color' => 'info', 'label' => __('In Progress'), 'icon' => 'tabler-tool'],
-                'finalized' => ['color' => 'success', 'label' => __('Finalized'), 'icon' => 'tabler-circle-check'],
-                'paid' => ['color' => 'success', 'label' => __('Paid'), 'icon' => 'tabler-currency-dollar']
+                'pending' => ['color' => 'warning', 'label' => 'Aguardando Início', 'icon' => 'tabler-clock'],
+                'running' => ['color' => 'info', 'label' => niche('in_service_label', 'Em Serviço'), 'icon' => 'tabler-tool'],
+                'in_progress' => ['color' => 'info', 'label' => niche('in_service_label', 'Em Serviço'), 'icon' => 'tabler-tool'],
+                'finalized' => ['color' => 'success', 'label' => 'Finalizado', 'icon' => 'tabler-circle-check'],
+                'paid' => ['color' => 'success', 'label' => 'Pago / Finalizado', 'icon' => 'tabler-currency-dollar']
                 ];
                 $conf = $statusConfig[$os->status] ?? ['color' => 'secondary', 'label' => __($os->status), 'icon' => 'tabler-help'];
                 @endphp

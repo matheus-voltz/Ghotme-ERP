@@ -62,6 +62,7 @@ class HomePage extends Controller
       'automotive' => 'Centro Automotivo',
       'electronics' => 'Assistência Técnica de Eletrônicos',
       'pet' => 'Pet Shop e Clínica Veterinária',
+      'food_service' => 'Food Truck e Gastronomia (Cachorro-quente)',
       'beauty_clinic' => 'Clínica de Estética',
       'construction' => 'Construtora e Empreiteira'
     ];

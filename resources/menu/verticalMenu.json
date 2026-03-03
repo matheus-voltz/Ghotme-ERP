@@ -31,6 +31,13 @@
       "slug": "dashboard"
     },
     {
+      "url": "/pos",
+      "name": "Balcão de Vendas (PDV)",
+      "icon": "menu-icon icon-base ti tabler-shopping-cart",
+      "slug": "menu.pos",
+      "niche": "food_service"
+    },
+    {
       "url": "/ai-consultant",
       "name": "Consultor IA",
       "icon": "menu-icon icon-base ti tabler-robot",
@@ -79,13 +86,13 @@
     },
     {
       "name": "Pedidos",
-      "icon": "menu-icon icon-base ti tabler-moped",
+      "icon": "menu-icon icon-base ti tabler-tools-kitchen-2",
       "slug": "pedidos",
       "niche": "food_service",
       "submenu": [
         {
           "url": "/ordens-servico",
-          "name": "Todos os Pedidos",
+          "name": "Cozinha (Ativos)",
           "slug": "ordens-servico"
         },
         {
@@ -95,7 +102,7 @@
         },
         {
           "url": "/ordens-servico/checklist",
-          "name": "Ingredientes e Preparo",
+          "name": "Ingredientes/Preparo",
           "slug": "ordens-servico.checklist"
         }
       ]
@@ -268,6 +275,12 @@
       "slug": "finance",
       "submenu": [
         {
+          "url": "/cash-register",
+          "name": "Frente de Caixa (PDV)",
+          "slug": "cash-register.index",
+          "niche": "food_service"
+        },
+        {
           "url": "/finance/accounts-receivable",
           "name": "Contas a receber",
           "slug": "finance.receivables"
@@ -350,7 +363,7 @@
         },
         {
           "url": "/reports/mechanic-performance",
-          "name": "Desempenho por mecânico",
+          "name": "Desempenho do Funcionário",
           "slug": "reports.mechanic-performance"
         },
         {

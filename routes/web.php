@@ -37,6 +37,7 @@ use App\Http\Controllers\PublicBudgetController;
 use App\Http\Controllers\SystemErrorController;
 use App\Http\Controllers\CustomerPortalController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\CashRegisterController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -342,7 +343,20 @@ Route::middleware([
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
     Route::get('/services/{id}/edit', [ServiceController::class, 'edit'])->name('services.edit');
     Route::put('/services/{id}', [ServiceController::class, 'update'])->name('services.update');
-    Route::delete('/services/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+    Route::post('/services/delete/{id}', [ServiceController::class, 'destroy'])->name('services.destroy');
+
+    // --- Ficha de Produção do Serviço ---
+    Route::get('/services/{id}/ingredients', [ServiceController::class, 'getIngredients'])->name('services.ingredients.get');
+    Route::post('/services/{id}/ingredients', [ServiceController::class, 'storeIngredient'])->name('services.ingredients.store');
+    Route::post('/services/{id}/ingredients/{ingredientId}', [ServiceController::class, 'destroyIngredient'])->name('services.ingredients.destroy');
+
+    // --- Combos e Adicionais (Service Addons) ---
+    Route::get('/services/{id}/addons', [App\Http\Controllers\ServiceAddonController::class, 'index'])->name('services.addons.get');
+    Route::post('/services/{id}/addons/groups', [App\Http\Controllers\ServiceAddonController::class, 'storeGroup'])->name('services.addons.groups.store');
+    Route::put('/services/addons/groups/{groupId}', [App\Http\Controllers\ServiceAddonController::class, 'updateGroup'])->name('services.addons.groups.update');
+    Route::delete('/services/addons/groups/{groupId}', [App\Http\Controllers\ServiceAddonController::class, 'destroyGroup'])->name('services.addons.groups.destroy');
+    Route::post('/services/addons/groups/{groupId}/items', [App\Http\Controllers\ServiceAddonController::class, 'storeAddon'])->name('services.addons.items.store');
+    Route::delete('/services/addons/items/{addonId}', [App\Http\Controllers\ServiceAddonController::class, 'destroyAddon'])->name('services.addons.items.destroy');
 
     // Service Packages
     Route::get('/services/packages', [ServicePackageController::class, 'index'])->name('services.packages');
@@ -362,6 +376,9 @@ Route::middleware([
     Route::get('/menu/manage', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.manage');
     Route::post('/menu/categories', [App\Http\Controllers\MenuController::class, 'storeCategory'])->name('menu.categories.store');
     Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
+    
+    // Quick Sales (POS)
+    Route::get('/pos', [App\Http\Controllers\PdvController::class, 'index'])->name('menu.pos');
 
     // Finance
     Route::get('/finance/accounts-receivable', [FinanceController::class, 'receivables'])->name('finance.receivables');
@@ -381,6 +398,15 @@ Route::middleware([
 
     Route::get('/finance/reports', [FinancialReportController::class, 'index'])->name('finance.reports');
     Route::get('/finance/reports/chart-data', [FinancialReportController::class, 'getChartData']);
+
+    // Cash Register (Frente de Caixa)
+    Route::get('/cash-register', [CashRegisterController::class, 'index'])->name('cash-register.index');
+    Route::post('/cash-register/open', [CashRegisterController::class, 'open'])->name('cash-register.open');
+    Route::post('/cash-register/{id}/close', [CashRegisterController::class, 'close'])->name('cash-register.close');
+    Route::post('/cash-register/{id}/movement', [CashRegisterController::class, 'addMovement'])->name('cash-register.movement');
+    Route::post('/cash-register/{id}/checkout', [CashRegisterController::class, 'checkout'])->name('cash-register.checkout');
+    Route::get('/cash-register/{id}', [CashRegisterController::class, 'show'])->name('cash-register.show');
+    Route::get('/api/cash-register/current', [CashRegisterController::class, 'current']);
 
     // Accounting & Fiscal (BPO)
     Route::get('/accounting', [App\Http\Controllers\AccountingController::class, 'index'])->name('accounting.index');

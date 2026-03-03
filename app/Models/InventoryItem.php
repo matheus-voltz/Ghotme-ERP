@@ -25,11 +25,46 @@ class InventoryItem extends Model
         'is_active',
         'menu_category_id',
         'is_ingredient',
+        'expiry_date',
+        'batch_number',
     ];
+
+    protected $casts = [
+        'expiry_date' => 'date',
+    ];
+
+    public function scopeExpiringSoon($query, $days = 7)
+    {
+        return $query->whereNotNull('expiry_date')
+            ->where('expiry_date', '>=', now())
+            ->where('expiry_date', '<=', now()->addDays($days));
+    }
+
+    public function scopeExpired($query)
+    {
+        return $query->whereNotNull('expiry_date')
+            ->where('expiry_date', '<', now());
+    }
 
     public function category()
     {
         return $this->belongsTo(MenuCategory::class, 'menu_category_id');
+    }
+
+    /**
+     * Se for um produto final (Hot Dog), retorna os ingredientes dele
+     */
+    public function ingredients()
+    {
+        return $this->hasMany(ProductRecipe::class, 'product_id');
+    }
+
+    /**
+     * Se for um insumo (Salsicha), retorna em quais lanches ele é usado
+     */
+    public function asIngredientIn()
+    {
+        return $this->hasMany(ProductRecipe::class, 'ingredient_id');
     }
 
     public function images()
@@ -50,5 +85,15 @@ class InventoryItem extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function recipe()
+    {
+        return $this->hasMany(RecipeItem::class, 'inventory_item_id');
+    }
+
+    public function usedInRecipes()
+    {
+        return $this->hasMany(RecipeItem::class, 'ingredient_id');
     }
 }

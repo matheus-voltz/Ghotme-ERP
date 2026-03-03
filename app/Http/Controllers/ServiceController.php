@@ -4,12 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Service;
+use App\Models\ServiceIngredient;
+
+use App\Models\InventoryItem;
 
 class ServiceController extends Controller
 {
     public function index()
     {
-        return view('content.services.table.index');
+        $inventoryItems = InventoryItem::orderBy('name')->get();
+        return view('content.services.table.index', compact('inventoryItems'));
     }
 
     public function dataBase(Request $request)
@@ -19,7 +23,7 @@ class ServiceController extends Controller
 
         $limit = $request->input('length');
         $start = $request->input('start');
-        
+
         $columns = ['id', 'name', 'price', 'estimated_time', 'is_active'];
         $orderColumnIndex = $request->input('order.0.column');
         $order = $columns[$orderColumnIndex] ?? 'id';
@@ -105,5 +109,53 @@ class ServiceController extends Controller
         $service = Service::findOrFail($id);
         $service->delete();
         return response()->json(['success' => true, 'message' => 'Serviço removido com sucesso!']);
+    }
+
+    // --- Ficha de Produção ---
+
+    public function getIngredients($id)
+    {
+        $ingredients = ServiceIngredient::with('inventoryItem')
+            ->where('service_id', $id)
+            ->get()
+            ->map(function ($ing) {
+                return [
+                    'id' => $ing->id,
+                    'inventory_item_name' => $ing->inventoryItem ? $ing->inventoryItem->name : 'Desconhecido',
+                    'quantity' => $ing->quantity,
+                    'unit_of_measure' => $ing->unit_of_measure,
+                ];
+            });
+
+        return response()->json($ingredients);
+    }
+
+    public function storeIngredient(Request $request, $id)
+    {
+        $service = Service::findOrFail($id);
+
+        $validated = $request->validate([
+            'inventory_item_id' => 'required|exists:inventory_items,id',
+            'quantity' => 'required|numeric|min:0.0001',
+            'unit_of_measure' => 'required|string|max:10',
+        ]);
+
+        $ingredient = ServiceIngredient::create([
+            'company_id' => auth()->user()->company_id,
+            'service_id' => $service->id,
+            'inventory_item_id' => $validated['inventory_item_id'],
+            'quantity' => $validated['quantity'],
+            'unit_of_measure' => $validated['unit_of_measure'],
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Ingrediente adicionado à ficha técnica!']);
+    }
+
+    public function destroyIngredient($serviceId, $ingredientId)
+    {
+        $ingredient = ServiceIngredient::where('service_id', $serviceId)->findOrFail($ingredientId);
+        $ingredient->delete();
+
+        return response()->json(['success' => true, 'message' => 'Ingrediente removido com sucesso!']);
     }
 }

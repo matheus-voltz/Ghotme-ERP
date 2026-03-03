@@ -80,21 +80,21 @@
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": "clients-vehicles",
       "submenu": [
-      {
-        "url": "/{niche_clients_slug}",
-        "name": "Clientes",
-        "slug": "{niche_clients_slug}"
-      },
-      {
-        "url": "/{niche_entities_slug}",
-        "name": "Veículos",
-        "slug": "{niche_entities_slug}"
-      },
-      {
-        "url": "/{niche_slug}-history",
-        "name": "Histórico do veículo",
-        "slug": "{niche_slug}-history"
-      }
+        {
+          "url": "/{niche_clients_slug}",
+          "name": "Clientes",
+          "slug": "{niche_clients_slug}"
+        },
+        {
+          "url": "/{niche_entities_slug}",
+          "name": "Veículos",
+          "slug": "{niche_entities_slug}"
+        },
+        {
+          "url": "/{niche_slug}-history",
+          "name": "Histórico do veículo",
+          "slug": "{niche_slug}-history"
+        }
       ]
     },
     {
@@ -210,7 +210,7 @@
         },
         {
           "url": "/reports/mechanic-performance",
-          "name": "Desempenho por mecânico",
+          "name": "Desempenho do Funcionário",
           "slug": "mechanic-performance"
         },
         {

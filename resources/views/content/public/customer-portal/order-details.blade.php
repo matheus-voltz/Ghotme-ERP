@@ -141,15 +141,20 @@ $customizerHidden = 'customizer-hide';
         <div class="os-header">
             <div class="row align-items-center">
                 <div class="col-md-7">
-                    <h6 class="text-white opacity-75 text-uppercase fw-bold mb-2">Ordem de Serviço</h6>
+                    <h6 class="text-white opacity-75 text-uppercase fw-bold mb-2">{{ niche('entity', 'Ordem de Serviço', $order->company) }}</h6>
                     <h1 class="text-white fw-bold mb-3">Protocolo #{{ $order->id }}</h1>
                     <div class="d-flex align-items-center">
                         <div class="p-2 bg-white rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
                             <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $order->company) }} text-primary fs-3"></i>
                         </div>
                         <div>
+                            @if($order->veiculo)
                             <h4 class="text-white mb-0 fw-600">{{ $order->veiculo->marca }} {{ $order->veiculo->modelo }}</h4>
                             <span class="text-white opacity-75 fs-6">{{ $order->veiculo->placa }} • {{ niche('year', 'Ano', $order->company) }} {{ $order->veiculo->ano_modelo ?? $order->veiculo->ano ?? 'N/A' }}</span>
+                            @else
+                            <h4 class="text-white mb-0 fw-600">{{ niche('entity', 'Pedido', $order->company) }} Vinculado</h4>
+                            <span class="text-white opacity-75 fs-6">Acompanhamento Ativo</span>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -165,7 +170,7 @@ $customizerHidden = 'customizer-hide';
                         case 'testing': $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusText = 'Higienização'; break;
                         case 'completed':
-                        case 'finalized': $statusText = 'Pronto para Retirada'; break;
+                        case 'finalized': $statusText = niche('status_ready', 'Pronto / Finalizado', $order->company); break;
                         case 'paid': $statusText = 'Pago / Finalizado'; break;
                         }
                         @endphp
@@ -209,23 +214,23 @@ $customizerHidden = 'customizer-hide';
                         </div>
 
                         <div class="timeline-point @if($currentStep > 1) completed @elseif($currentStep == 1) active @endif">
-                            <h6 class="fw-bold mb-1">Aprovação de Orçamento</h6>
-                            <p class="text-muted small">Aguardando sua autorização para iniciar os serviços.</p>
+                            <h6 class="fw-bold mb-1">{{ niche('timeline_budget', 'Aprovação de Orçamento', $order->company) }}</h6>
+                            <p class="text-muted small">Aguardando sua autorização para iniciar.</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep > 2) completed @elseif($currentStep == 2) active @endif">
-                            <h6 class="fw-bold mb-1">Execução de Serviços</h6>
+                            <h6 class="fw-bold mb-1">{{ niche('timeline_execution', 'Execução de Serviços', $order->company) }}</h6>
                             <p class="text-muted small">{{ niche('timeline_execution_body', 'Nossos profissionais estão cuidando de tudo neste momento.', $order->company) }}</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep > 3) completed @elseif($currentStep == 3) active @endif">
-                            <h6 class="fw-bold mb-1">Fase de Finalização</h6>
+                            <h6 class="fw-bold mb-1">{{ niche('timeline_finalizing', 'Fase de Finalização', $order->company) }}</h6>
                             <p class="text-muted small">{{ niche('timeline_finalizing_body', 'Estamos realizando os últimos ajustes.', $order->company) }}</p>
                         </div>
 
                         <div class="timeline-point @if($currentStep >= 5) completed @elseif($currentStep >= 4 && $currentStep < 6) active @endif">
-                            <h6 class="fw-bold mb-1">Pronto para Retirada</h6>
-                            <p class="text-muted small">Tudo pronto! Já pode vir buscar.</p>
+                            <h6 class="fw-bold mb-1">{{ niche('timeline_ready', 'Pronto para Retirada', $order->company) }}</h6>
+                            <p class="text-muted small">Tudo pronto! Já finalizamos.</p>
                         </div>
                     </div>
                 </div>
@@ -233,13 +238,13 @@ $customizerHidden = 'customizer-hide';
                 <!-- Coluna: Detalhes Técnicos -->
                 <div class="col-lg-7">
                     <div class="p-4 bg-light rounded-4 border-dashed mb-5">
-                        <h5 class="fw-bold mb-4">Relatório do Profissional</h5>
+                        <h5 class="fw-bold mb-4">{{ niche('professional_report', 'Relatório do Profissional', $order->company) }}</h5>
                         <p class="text-muted mb-0 lh-lg">
-                            {{ $order->description ?: 'Nenhuma observação técnica adicional para este serviço.' }}
+                            {{ $order->description ?: 'Nenhuma observação técnica adicional.' }}
                         </p>
                     </div>
 
-                    <h5 class="fw-bold mb-4">Itens da Ordem de Serviço</h5>
+                    <h5 class="fw-bold mb-4">Itens do {{ niche('entity', 'Pedido', $order->company) }}</h5>
                     <div class="item-list">
                         @foreach($order->items as $item)
                         <div class="item-list-row d-flex justify-content-between align-items-center">
@@ -269,7 +274,7 @@ $customizerHidden = 'customizer-hide';
                     <div class="mt-5 p-4 bg-primary rounded-4 text-white d-flex justify-content-between align-items-center shadow">
                         <div>
                             <h5 class="text-white mb-0 fw-bold">Investimento Total</h5>
-                            <small class="opacity-75">Serviços + Peças autorizadas</small>
+                            <small class="opacity-75">{{ niche('services_and_parts', 'Serviços + Peças autorizadas', $order->company) }}</small>
                         </div>
                         <h2 class="text-white mb-0 fw-bold">R$ {{ number_format($order->total, 2, ',', '.') }}</h2>
                     </div>

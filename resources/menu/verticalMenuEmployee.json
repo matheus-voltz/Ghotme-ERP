@@ -14,6 +14,13 @@
             "slug": "employee.dashboard"
         },
         {
+            "url": "/cash-register",
+            "name": "Frente de Caixa (PDV)",
+            "icon": "menu-icon icon-base ti tabler-cash",
+            "slug": "cash-register.index",
+            "niche": "food_service"
+        },
+        {
             "url": "/calendar",
             "name": "Calendário",
             "icon": "menu-icon icon-base ti tabler-calendar",

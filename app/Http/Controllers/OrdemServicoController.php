@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateOrdemServicoRequest;
 use App\Http\Resources\OrdemServicoResource;
 use App\Jobs\SendPushNotificationJob;
 use App\Services\OrdemServicoService;
+use App\Services\StockDeductionService;
 use Illuminate\Http\Request;
 use App\Models\OrdemServico;
 use App\Models\Clients;
@@ -129,6 +130,15 @@ class OrdemServicoController extends Controller
                 'performer' => Auth::user()->name ?? 'Sistema',
                 'created_by' => Auth::id()
             ]);
+        }
+
+        // Baixa automática de estoque ao finalizar pedido
+        if (in_array($request->status, ['completed', 'paid']) && $oldStatus !== $request->status) {
+            try {
+                app(StockDeductionService::class)->deductForOrder($os);
+            } catch (\Exception $e) {
+                \Log::warning("Falha na baixa automática de estoque para OS #{$os->id}: " . $e->getMessage());
+            }
         }
 
         if (Auth::user()->expo_push_token) {

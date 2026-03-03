@@ -132,6 +132,45 @@ class OrdemServicoService
         // Gerar Comissão se a OS for finalizada
         if ($type === 'os_finalizada') {
             $this->generateCommission($os);
+            $this->deductStock($os);
+        }
+    }
+
+    protected function deductStock(OrdemServico $os)
+    {
+        // Percorre as Peças/Itens lançados na OS
+        foreach ($os->parts as $osPart) {
+            $item = $osPart->inventoryItem;
+            if (!$item) continue;
+
+            // Se o item tem uma receita (Ficha Técnica), baixa os ingredientes
+            if ($item->ingredients->count() > 0) {
+                foreach ($item->ingredients as $recipe) {
+                    $ingredient = $recipe->ingredient;
+                    if ($ingredient) {
+                        $qtyToDeduct = $recipe->quantity * $osPart->quantity;
+                        $ingredient->decrement('quantity', $qtyToDeduct);
+                        
+                        // Log de movimentação (opcional, mas recomendado)
+                        \App\Models\StockMovement::create([
+                            'inventory_item_id' => $ingredient->id,
+                            'type' => 'out',
+                            'quantity' => $qtyToDeduct,
+                            'reason' => "Consumo na OS #{$os->id} (Ingrediente de {$item->name})"
+                        ]);
+                    }
+                }
+            } else {
+                // Se não tem receita, baixa o item principal normalmente
+                $item->decrement('quantity', $osPart->quantity);
+                
+                \App\Models\StockMovement::create([
+                    'inventory_item_id' => $item->id,
+                    'type' => 'out',
+                    'quantity' => $osPart->quantity,
+                    'reason' => "Venda na OS #{$os->id}"
+                ]);
+            }
         }
     }
 
