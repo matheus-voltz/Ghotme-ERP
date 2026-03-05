@@ -374,9 +374,10 @@ Route::middleware([
 
     // Menu Management (Food Service)
     Route::get('/menu/manage', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.manage');
+    Route::get('/menu/categories', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.categories');
     Route::post('/menu/categories', [App\Http\Controllers\MenuController::class, 'storeCategory'])->name('menu.categories.store');
     Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
-    
+
     // Quick Sales (POS)
     Route::get('/pos', [App\Http\Controllers\PdvController::class, 'index'])->name('menu.pos');
 

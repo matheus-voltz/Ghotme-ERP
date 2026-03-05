@@ -26,9 +26,6 @@
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
                                 <option value="">Selecione o Cliente</option>
-                                @foreach($clients as $client)
-                                <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -143,16 +140,16 @@
                     <div class="mb-3">
                         <label class="form-label">{{ $field->name }}</label>
                         @if($field->type === 'select')
-                            <select name="custom_fields[{{ $field->id }}]" class="form-select" {{ $field->required ? 'required' : '' }}>
-                                <option value="">Selecione...</option>
-                                @foreach($field->options as $opt)
-                                    <option value="{{ $opt }}">{{ $opt }}</option>
-                                @endforeach
-                            </select>
+                        <select name="custom_fields[{{ $field->id }}]" class="form-select" {{ $field->required ? 'required' : '' }}>
+                            <option value="">Selecione...</option>
+                            @foreach($field->options as $opt)
+                            <option value="{{ $opt }}">{{ $opt }}</option>
+                            @endforeach
+                        </select>
                         @elseif($field->type === 'textarea')
-                            <textarea name="custom_fields[{{ $field->id }}]" class="form-control" rows="2" {{ $field->required ? 'required' : '' }}></textarea>
+                        <textarea name="custom_fields[{{ $field->id }}]" class="form-control" rows="2" {{ $field->required ? 'required' : '' }}></textarea>
                         @else
-                            <input type="{{ $field->type }}" name="custom_fields[{{ $field->id }}]" class="form-control" {{ $field->required ? 'required' : '' }} />
+                        <input type="{{ $field->type }}" name="custom_fields[{{ $field->id }}]" class="form-control" {{ $field->required ? 'required' : '' }} />
                         @endif
                     </div>
                     @endforeach
@@ -181,7 +178,26 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('.select2').select2();
+        $('#client_id').select2({
+            placeholder: "Buscar cliente pelo nome, CPF, CNPJ ou email...",
+            minimumInputLength: 1,
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
 
         // Busca veículos ao mudar o cliente
         $('#client_id').on('change', function() {

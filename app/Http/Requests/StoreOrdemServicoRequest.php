@@ -15,7 +15,7 @@ class StoreOrdemServicoRequest extends FormRequest
     {
         return [
             'client_id' => 'required|exists:clients,id',
-            'veiculo_id' => 'required|exists:veiculos,id',
+            'veiculo_id' => 'nullable|exists:veiculos,id',
             'status' => 'required',
             'description' => 'nullable|string',
             'km_entry' => 'nullable|integer',

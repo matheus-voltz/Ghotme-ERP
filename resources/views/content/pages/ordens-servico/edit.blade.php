@@ -31,12 +31,9 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                         <div class="col-md-6">
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
-                                <option value="">Selecione o Cliente</option>
-                                @foreach($clients as $client)
-                                <option value="{{ $client->id }}" {{ $order->client_id == $client->id ? 'selected' : '' }}>
+                                <option value="{{ $client->id }}" selected>
                                     {{ $client->name ?? $client->company_name }}
                                 </option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -173,27 +170,27 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                 </div>
                 <div class="card-body pt-4">
                     @php
-                        $invoice = \App\Models\TaxInvoice::where('ordem_servico_id', $order->id)->first();
+                    $invoice = \App\Models\TaxInvoice::where('ordem_servico_id', $order->id)->first();
                     @endphp
 
                     @if($invoice)
-                        <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
-                            <span class="alert-icon rounded-circle p-1 me-2"><i class="ti tabler-check"></i></span>
-                            <span>Nota Fiscal #{{ $invoice->invoice_number }} emitida</span>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <a href="{{ $invoice->pdf_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                <i class="ti tabler-file-type-pdf me-1"></i> Baixar PDF
-                            </a>
-                            <a href="{{ $invoice->xml_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                <i class="ti tabler-file-code me-1"></i> Baixar XML
-                            </a>
-                        </div>
-                    @else
-                        <p class="small text-muted mb-3">Esta {{ niche('entity') }} ainda não possui nota fiscal emitida.</p>
-                        <a href="{{ route('tax.invoice.create', ['os' => $order->id]) }}" class="btn btn-primary w-100">
-                            <i class="ti tabler-send me-1"></i> Emitir Nota Fiscal
+                    <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
+                        <span class="alert-icon rounded-circle p-1 me-2"><i class="ti tabler-check"></i></span>
+                        <span>Nota Fiscal #{{ $invoice->invoice_number }} emitida</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ $invoice->pdf_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <i class="ti tabler-file-type-pdf me-1"></i> Baixar PDF
                         </a>
+                        <a href="{{ $invoice->xml_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <i class="ti tabler-file-code me-1"></i> Baixar XML
+                        </a>
+                    </div>
+                    @else
+                    <p class="small text-muted mb-3">Esta {{ niche('entity') }} ainda não possui nota fiscal emitida.</p>
+                    <a href="{{ route('tax.invoice.create', ['os' => $order->id]) }}" class="btn btn-primary w-100">
+                        <i class="ti tabler-send me-1"></i> Emitir Nota Fiscal
+                    </a>
                     @endif
                 </div>
             </div>
@@ -248,7 +245,26 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('.select2').select2();
+        $('#client_id').select2({
+            placeholder: "Buscar cliente pelo nome, CPF, CNPJ ou email...",
+            minimumInputLength: 1,
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
 
         // Busca veículos ao mudar o cliente
         $('#client_id').on('change', function() {
@@ -258,14 +274,27 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
             vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
 
             if (clientId) {
-                fetch(`{{ url('api/clients') }}/${clientId}/vehicles`)
-                    .then(res => res.json())
+                fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Erro ao buscar {{ mb_strtolower(niche("entities"), "UTF-8") }}');
+                        return res.json();
+                    })
                     .then(data => {
                         let html = '<option value="">Selecione o {{ niche("entity") }}</option>';
-                        data.forEach(v => {
-                            html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
-                        });
+                        if (data.length === 0) {
+                            html = '<option value="">Nenhum {{ mb_strtolower(niche("entity"), "UTF-8") }} encontrado para este cliente</option>';
+                        } else {
+                            data.forEach(v => {
+                                let badge = v.placa ? v.placa + ' - ' : '';
+                                html += `<option value="${v.id}">${badge}${v.modelo}</option>`;
+                            });
+                        }
                         vehicleSelect.html(html).prop('disabled', false);
+                    })
+                    .catch(err => {
+                        console.error('Erro:', err);
+                        vehicleSelect.html('<option value="">Erro ao carregar</option>').prop('disabled', false);
+                        alert('Não foi possível carregar os {{ mb_strtolower(niche("entities"), "UTF-8") }} deste cliente. Tente novamente.');
                     });
             }
         });

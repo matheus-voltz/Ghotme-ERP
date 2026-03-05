@@ -25,9 +25,6 @@
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
                                 <option value="">Selecione o Cliente</option>
-                                @foreach($clients as $client)
-                                <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -129,7 +126,26 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('.select2').select2();
+        $('#client_id').select2({
+            placeholder: "Buscar cliente pelo nome, CPF, CNPJ ou email...",
+            minimumInputLength: 1,
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
         $('.flatpickr').flatpickr();
 
         $('#client_id').on('change', function() {

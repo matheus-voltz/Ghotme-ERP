@@ -163,7 +163,7 @@ $configData = Helper::appClasses();
     <div class="row g-4 h-100">
       <!-- Receita Mensal -->
       <div class="col-12 col-sm-6 col-md-12 flex-grow-1">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card card-hover h-100 shadow-premium border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div>
@@ -189,7 +189,7 @@ $configData = Helper::appClasses();
 
       <!-- Conversão -->
       <div class="col-12 col-sm-6 col-md-12 flex-grow-1">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card card-hover h-100 shadow-premium border-0">
           <div class="card-body d-flex flex-column justify-content-center p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
@@ -212,7 +212,7 @@ $configData = Helper::appClasses();
 
   <!-- Performance Chart Row -->
   <div class="col-xl-8 col-lg-12 mt-4">
-    <div class="card h-100 shadow-sm border-0">
+    <div class="card h-100 shadow-premium border-0">
       <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-transparent">
         <div>
           <h5 class="card-title mb-0 fw-bold">{{ __('Business Activity') }}</h5>
@@ -236,7 +236,7 @@ $configData = Helper::appClasses();
     <div class="row g-4 h-100">
       <!-- Métrica Rápida 1: Ticket Médio -->
       <div class="col-xl-12 col-md-6">
-        <div class="card h-100 shadow-sm border-0 bg-label-primary bg-opacity-10">
+        <div class="card card-hover h-100 shadow-premium border-0 bg-label-primary bg-opacity-10">
           <div class="card-body d-flex align-items-center">
             <div class="avatar avatar-md bg-label-primary rounded p-1 me-3">
               <i class="ti tabler-receipt-2 fs-2"></i>
@@ -250,7 +250,7 @@ $configData = Helper::appClasses();
       </div>
       <!-- Métrica Rápida 2: Taxa de Retenção -->
       <div class="col-xl-12 col-md-6">
-        <div class="card h-100 shadow-sm border-0 bg-label-info bg-opacity-10">
+        <div class="card card-hover h-100 shadow-premium border-0 bg-label-info bg-opacity-10">
           <div class="card-body d-flex align-items-center">
             <div class="avatar avatar-md bg-label-info rounded p-1 me-3">
               <i class="ti tabler-users-group fs-2"></i>
@@ -264,7 +264,7 @@ $configData = Helper::appClasses();
       </div>
       <!-- Status OS -->
       <div class="col-xl-12 col-md-12">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card h-100 shadow-premium border-0">
           <div class="card-header py-3 bg-transparent border-bottom">
             <h5 class="mb-0 fw-bold">Status de {{ niche('entities') }}</h5>
           </div>
@@ -344,7 +344,7 @@ $configData = Helper::appClasses();
   <div class="col-xl-6 col-lg-12">
     <div class="row g-4 h-100">
       <div class="col-md-6 col-12">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card card-hover h-100 shadow-premium border-0">
           <div class="card-header py-3 bg-transparent border-bottom d-flex align-items-center justify-content-between">
             <h5 class="mb-0 fw-bold">{{ __('Profitability') }}</h5>
           </div>
@@ -357,7 +357,7 @@ $configData = Helper::appClasses();
         </div>
       </div>
       <div class="col-md-6 col-12">
-        <div class="card h-100 shadow-sm border-0">
+        <div class="card card-hover h-100 shadow-premium border-0">
           <div class="card-header py-3 bg-transparent border-bottom d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold small">{{ __('Top 5 Services') }}</h5>
           </div>

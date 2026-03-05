@@ -53,13 +53,15 @@
       "url": "/calendar",
       "name": "Calendar",
       "icon": "menu-icon icon-base ti tabler-calendar",
-      "slug": "calendar"
+      "slug": "calendar",
+      "niche_exclude": "food_service"
     },
     {
       "url": "/kanban",
       "name": "Kanban",
       "icon": "menu-icon icon-base ti tabler-layout-kanban",
-      "slug": "kanban"
+      "slug": "kanban",
+      "niche_exclude": "food_service"
     },
     {
       "name": "Service Orders",

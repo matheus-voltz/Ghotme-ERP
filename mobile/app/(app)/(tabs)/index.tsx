@@ -53,6 +53,7 @@ const getEntityIcon = (niche: string) => {
     case 'beauty_clinic': return 'heart-outline';
     case 'electronics': return 'laptop-outline';
     case 'construction': return 'construct-outline';
+    case 'food_service': return 'fast-food-outline';
     default: return 'car-sport-outline';
   }
 };
@@ -79,6 +80,7 @@ export default function DashboardScreen() {
       case 'pet': return 'do Pet Shop';
       case 'beauty_clinic': return 'da Clínica';
       case 'electronics': return 'da Assistência';
+      case 'food_service': return 'do Food Truck';
       default: return 'da Oficina';
     }
   };
@@ -256,7 +258,7 @@ export default function DashboardScreen() {
             { icon: 'add-circle', label: 'Nova OS', color: '#7367F0', route: '/os/create' },
             { icon: 'person-add', label: 'Cliente', color: '#28C76F', route: '/clients/create' },
             { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
-            { icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
+            ...(niche === 'food_service' ? [{ icon: 'receipt', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
             <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => {
               Haptics.selectionAsync();
@@ -437,7 +439,7 @@ export default function DashboardScreen() {
         {/* Quick Actions for Employee */}
         <View style={styles.quickActionsContainer}>
           {[
-            { icon: 'scan-outline', label: 'Vistoria', color: '#7367F0', route: '/os/checklist' },
+            ...(niche === 'food_service' ? [] : [{ icon: 'scan-outline', label: 'Vistoria', color: '#7367F0', route: '/os/checklist' }]),
             { icon: 'add-circle-outline', label: 'Nova OS', color: '#28C76F', route: '/os/create' },
             { icon: 'cube-outline', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             { icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
@@ -519,7 +521,7 @@ export default function DashboardScreen() {
           {(!data?.recentOS || data.recentOS.length === 0) && (
             <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Ionicons name="clipboard-outline" size={40} color={colors.subText} />
-              <Text style={[styles.emptyText, { color: colors.subText }]}>Sem ordens atribuídas</Text>
+              <Text style={[styles.emptyText, { color: colors.subText }]}>Sem ordens atribuídas hj.</Text>
             </View>
           )}
         </View>
@@ -553,10 +555,12 @@ export default function DashboardScreen() {
             <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
             <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>{item.client_name}</Text>
           </View>
-          <View style={styles.infoRow}>
-            <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
-            <Text style={[styles.vehicleInfo, { color: colors.subText }]}>{item.vehicle} - {item.plate}</Text>
-          </View>
+          {niche !== 'food_service' && (
+            <View style={styles.infoRow}>
+              <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
+              <Text style={[styles.vehicleInfo, { color: colors.subText }]}>{item.vehicle} - {item.plate}</Text>
+            </View>
+          )}
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <View style={styles.cardFooter}>
             <View style={styles.dateContainer}>
@@ -659,8 +663,16 @@ export default function DashboardScreen() {
               <>
                 {renderAdminHeader()}
                 <View style={{ marginTop: 10 }}>
-                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Atividades Recentes</Text>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                    <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>Atividades Recentes</Text>
+                  </View>
                   {data?.recentOS?.map((item: any, index: number) => renderOSCard(item, index))}
+                  {(!data?.recentOS || data.recentOS.length === 0) && (
+                    <View style={[styles.emptyContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                      <Ionicons name="clipboard-outline" size={40} color={colors.subText} />
+                      <Text style={[styles.emptyText, { color: colors.subText }]}>Nenhuma atividade recente.</Text>
+                    </View>
+                  )}
                 </View>
               </>
             ) : renderMechanicHeader()}

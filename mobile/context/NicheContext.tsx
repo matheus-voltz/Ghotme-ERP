@@ -17,11 +17,16 @@ interface NicheLabels {
   features?: string;
   inventory_items?: string;
   checklist_categories?: { [key: string]: string[] };
+  in_service_label?: string;
+  timeline_checkin_body?: string;
+  timeline_execution_body?: string;
+  timeline_finalizing_body?: string;
 }
 
 interface NicheContextData {
   niche: string;
   labels: NicheLabels;
+  icons: { [key: string]: string };
   loading: boolean;
   refreshNiche: () => Promise<void>;
 }
@@ -48,6 +53,7 @@ export const NicheProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { user } = useAuth();
   const [niche, setNiche] = useState('automotive');
   const [labels, setLabels] = useState<NicheLabels>(defaultLabels);
+  const [icons, setIcons] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
 
   const refreshNiche = async () => {
@@ -55,6 +61,7 @@ export const NicheProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const response = await api.get('/niche-config');
       setNiche(response.data.niche);
       setLabels(response.data.labels);
+      setIcons(response.data.icons || {});
     } catch (error) {
       console.log('Error fetching niche config, using default:', error);
     } finally {
@@ -69,7 +76,7 @@ export const NicheProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [user]);
 
   return (
-    <NicheContext.Provider value={{ niche, labels, loading, refreshNiche }}>
+    <NicheContext.Provider value={{ niche, labels, icons, loading, refreshNiche }}>
       {children}
     </NicheContext.Provider>
   );

@@ -17,7 +17,7 @@ class ApiOrdemServicoController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $query = OrdemServico::with(['client', 'veiculo', 'user'])->latest();
+        $query = OrdemServico::with(['client', 'veiculo', 'user', 'items', 'parts'])->latest();
         if ($user->role !== 'admin') {
             $query->where('user_id', $user->id);
         }
@@ -35,24 +35,88 @@ class ApiOrdemServicoController extends Controller
 
     public function store(Request $request, \App\Services\OrdemServicoService $service)
     {
+        $user = auth()->user();
+        $isFoodService = ($user->company->niche ?? null) === 'food_service';
+
+        // Validação flexível: aceita client_id tradicional ou customer_name (food service)
         $validated = $request->validate([
-            'client_id' => 'required|integer',
-            'veiculo_id' => 'required|integer',
+            'client_id' => 'nullable|integer',
+            'customer_name' => 'nullable|string|max:255',
+            'veiculo_id' => 'nullable|integer',
+            'product_id' => 'nullable|integer',
             'status' => 'required|string',
             'description' => 'nullable|string',
             'km_entry' => 'nullable|string',
+            'parts' => 'nullable|array',
+            'services' => 'nullable|array',
         ]);
 
         try {
+            // Se for Food Service, preparamos o terreno (sempre cria client)
+            if ($isFoodService) {
+                $customerName = $request->filled('customer_name') ? $request->customer_name : 'Balcão';
+
+                // 1. Localiza ou Cria o Cliente (Evita duplicar se já existir um com mesmo nome)
+                $client = Clients::where('name', $customerName)
+                    ->where('company_id', $user->company_id)
+                    ->first();
+
+                if (!$client) {
+                    $client = Clients::create([
+                        'name' => $customerName,
+                        'company_id' => $user->company_id,
+                        'uuid' => (string) \Illuminate\Support\Str::uuid()
+                    ]);
+                }
+
+                $validated['client_id'] = $client->id;
+
+                // 2. Cria um Objeto 'Pedido' (Vehicle) genérico se não houver um
+                $pedido = \App\Models\Vehicles::where('cliente_id', $client->id)
+                    ->where('modelo', 'Pedido ' . $customerName)
+                    ->where('company_id', $user->company_id)
+                    ->first();
+
+                if (!$pedido) {
+                    $pedido = \App\Models\Vehicles::create([
+                        'cliente_id' => $client->id,
+                        'modelo' => 'Pedido ' . $customerName,
+                        'company_id' => $user->company_id,
+                        'marca' => 'Ghotme Food',
+                        'placa' => 'FOOD-' . now()->format('His')
+                    ]);
+                }
+
+                $validated['veiculo_id'] = $pedido->id;
+
+                // 3. Se selecionou um produto isolado (legacy/outros casos), injeta no array de parts
+                if ($request->filled('product_id') && !isset($validated['parts'])) {
+                    $item = InventoryItem::find($request->product_id);
+                    if ($item) {
+                        $validated['parts'] = [
+                            $item->id => [
+                                'selected' => true,
+                                'price' => $item->selling_price,
+                                'quantity' => 1
+                            ]
+                        ];
+                    }
+                }
+            }
+
             $os = $service->store($validated);
-            
+
             // Adiciona o link do portal para o mobile usar
-            $os->portal_url = url("/portal/{$os->client->uuid}");
-            $os->share_message = "Olá {$os->client->name}, sua Ordem de Serviço foi aberta com sucesso na " . ($os->company->name ?? 'Ghotme') . ". Acompanhe o status e fotos em tempo real por aqui: " . $os->portal_url;
+            $os->load('client', 'company');
+            if ($os->client) {
+                $os->portal_url = url("/portal/{$os->client->uuid}");
+                $os->share_message = "Olá {$os->client->name}, seu pedido foi recebido com sucesso na " . ($os->company->name ?? 'Ghotme') . ". Acompanhe o preparo por aqui: " . $os->portal_url;
+                $os->client_phone = $os->client->phone ?? $os->client->contact_number ?? '';
+            }
 
             return response()->json($os, 201);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erro ao criar OS: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Erro ao criar pedido: ' . $e->getMessage()], 500);
         }
     }
 
@@ -174,11 +238,60 @@ class ApiOrdemServicoController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $request->validate(['status' => 'required|in:pending,approved,running,finalized,canceled']);
-        $os = OrdemServico::findOrFail($id);
-        $os->status = $request->status;
-        $os->save();
-        return response()->json(['message' => 'Status atualizado', 'os' => $os]);
+        $request->validate([
+            'status' => 'required|in:pending,approved,running,finalized,canceled',
+            'payment_method' => 'nullable|string'
+        ]);
+
+        try {
+            $os = OrdemServico::findOrFail($id);
+            $os->status = $request->status;
+
+            // Salvar payment_method só se a coluna existir (migration pode não ter rodado)
+            if ($request->filled('payment_method') && \Illuminate\Support\Facades\Schema::hasColumn('ordem_servicos', 'payment_method')) {
+                $os->payment_method = $request->payment_method;
+            }
+
+            $os->save();
+
+            if ($request->status === 'finalized' && $request->filled('payment_method')) {
+                $methodMap = [
+                    'cash'   => 'dinheiro',
+                    'money'  => 'dinheiro',
+                    'credit' => 'cartao_credito',
+                    'debit'  => 'cartao_debito',
+                    'pix'    => 'pix',
+                ];
+                $pmType = $methodMap[$request->payment_method] ?? 'dinheiro';
+                $companyId = $os->company_id;
+
+                $pm = \App\Models\PaymentMethod::firstOrCreate(
+                    ['type' => $pmType, 'company_id' => $companyId],
+                    ['name' => ucfirst(str_replace('_', ' ', $pmType)), 'is_active' => true]
+                );
+
+                \App\Models\FinancialTransaction::create([
+                    'company_id'        => $companyId,
+                    'description'       => 'Baixa PDV - Pedido #' . $os->id,
+                    'amount'            => $os->total,
+                    'type'              => 'in',
+                    'status'            => 'paid',
+                    'due_date'          => now(),
+                    'paid_at'           => now(),
+                    'payment_method_id' => $pm->id,
+                    'client_id'         => $os->client_id,
+                    'category'          => 'Vendas',
+                    'related_type'      => get_class($os),
+                    'related_id'        => $os->id,
+                    'user_id'           => $request->user()->id,
+                ]);
+            }
+
+            return response()->json(['message' => 'Status atualizado', 'os' => $os]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('updateStatus error: ' . $e->getMessage());
+            return response()->json(['message' => 'Erro ao atualizar status: ' . $e->getMessage()], 500);
+        }
     }
 
     public function updatePassword(Request $request, $id)
@@ -212,5 +325,80 @@ class ApiOrdemServicoController extends Controller
         $item = \App\Models\OrdemServicoItem::findOrFail($itemId);
         $item->complete();
         return response()->json(['success' => true, 'item' => $item]);
+    }
+
+    public function generatePix($id)
+    {
+        $os = OrdemServico::findOrFail($id);
+
+        // Verificar permissão
+        if ($os->company_id !== auth()->user()->company_id) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        $paymentService = new \App\Services\PaymentService();
+        $result = $paymentService->generatePixCharge($os);
+
+        if (isset($result['error'])) {
+            return response()->json($result, 422);
+        }
+
+        return response()->json($result);
+    }
+
+    public function checkPixStatus($id)
+    {
+        $os = OrdemServico::findOrFail($id);
+
+        // Verificar permissão
+        if ($os->company_id !== auth()->user()->company_id) {
+            return response()->json(['error' => 'Não autorizado'], 403);
+        }
+
+        $paymentService = new \App\Services\PaymentService();
+        $isPaid = $paymentService->checkPixStatus($os);
+
+        // Se pagou, finalizar automaticamente a OS
+        if ($isPaid && $os->status !== 'finalized') {
+            $os->update([
+                'status' => 'finalized',
+                'paid_at' => now()
+            ]);
+
+            // Criar FinancialTransaction
+            $pm = \App\Models\PaymentMethod::firstOrCreate(
+                ['type' => 'pix'],
+                ['name' => 'PIX', 'is_active' => true]
+            );
+
+            \App\Models\FinancialTransaction::create([
+                'company_id' => $os->company_id,
+                'description' => 'Cobrança PIX - Pedido #' . $os->id,
+                'amount' => $os->total,
+                'type' => 'in',
+                'status' => 'paid',
+                'due_date' => now(),
+                'paid_at' => now(),
+                'payment_method_id' => $pm->id,
+                'client_id' => $os->client_id,
+                'category' => 'Vendas',
+                'related_type' => get_class($os),
+                'related_id' => $os->id,
+                'user_id' => auth()->user()->id,
+            ]);
+        }
+
+        return response()->json([
+            'is_paid' => $isPaid,
+            'payment_id' => $os->gateway_payment_id,
+            'os_status' => $os->status,
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $os = OrdemServico::findOrFail($id);
+        $os->delete();
+        return response()->json(['message' => 'Pedido excluído com sucesso']);
     }
 }

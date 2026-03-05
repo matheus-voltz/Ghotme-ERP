@@ -216,7 +216,7 @@ class ClientsController extends Controller
     {
         $client = Clients::with(['vehicles', 'attendants'])->findOrFail($id);
         $customFields = $client->getCustomFieldsWithValues();
-        
+
         return response()->json([
             'client' => $client,
             'custom_fields' => $customFields,
@@ -369,5 +369,38 @@ class ClientsController extends Controller
         }
 
         return response($html);
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->query('q');
+        $companyId = Auth::user()->company_id;
+
+        $query = Clients::where('company_id', $companyId);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('company_name', 'like', "%{$search}%")
+                    ->orWhere('cpf', 'like', "%{$search}%")
+                    ->orWhere('cnpj', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $clients = $query->limit(50)->get();
+
+        $results = $clients->map(function ($client) {
+            $displayName = $client->type === 'PF' ? $client->name : $client->company_name;
+            $doc = $client->type === 'PF' ? $client->cpf : $client->cnpj;
+            return [
+                'id' => $client->id,
+                'text' => "{$displayName} - {$doc}"
+            ];
+        });
+
+        return response()->json([
+            'results' => $results
+        ]);
     }
 }

@@ -2,6 +2,7 @@ import { Tabs, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
+import { useNiche } from '../../../context/NicheContext';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
@@ -9,6 +10,7 @@ import * as Haptics from 'expo-haptics';
 export default function TabLayout() {
   const { user, loading } = useAuth();
   const { colors } = useTheme();
+  const { niche } = useNiche();
 
   const handleTabPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -17,6 +19,8 @@ export default function TabLayout() {
   if (loading || !user) {
     return <View style={{ flex: 1, backgroundColor: colors.background }} />;
   }
+
+  const isFoodService = niche === 'food_service';
 
   return (
     <Tabs
@@ -36,7 +40,7 @@ export default function TabLayout() {
           height: 75,
           paddingBottom: 12,
           paddingTop: 8,
-          borderTopWidth: 0, // Remove default border
+          borderTopWidth: 0,
           ...styles.shadow,
         },
       }}>
@@ -55,9 +59,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="actions"
         options={{
-          title: 'Novo',
+          title: isFoodService ? 'Cardápio' : 'Novo',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "add-circle" : "add-circle-outline"} size={24} color={color} />
+            <Ionicons name={focused ? (isFoodService ? "restaurant" : "add-circle") : (isFoodService ? "restaurant-outline" : "add-circle-outline")} size={24} color={color} />
           ),
         }}
         listeners={{ tabPress: handleTabPress }}
@@ -66,7 +70,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="checklist_view"
         options={{
-          title: 'Vistoria',
+          title: isFoodService ? 'Pedidos' : 'Vistoria',
           href: null,
           tabBarIcon: ({ focused }) => (
             <View style={styles.middleButtonWrapper}>
@@ -74,7 +78,7 @@ export default function TabLayout() {
                 colors={['#7367F0', '#CE9FFC']}
                 style={styles.middleButton}
               >
-                <Ionicons name="car-sport" size={28} color="#fff" />
+                <Ionicons name={isFoodService ? "receipt" : "car-sport"} size={28} color="#fff" />
               </LinearGradient>
             </View>
           ),
@@ -83,7 +87,7 @@ export default function TabLayout() {
           tabPress: (e) => {
             e.preventDefault();
             handleTabPress();
-            router.push('/os/checklist');
+            router.push('/os/list');
           },
         })}
       />

@@ -92,7 +92,7 @@ export default function InventoryScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
                     <Ionicons name="chevron-back" size={28} color={colors.text} />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>Estoque de {labels.inventory_items?.split('/')[0] || 'Peças'}</Text>
+                <Text style={[styles.headerTitle, { color: colors.text }]}>Estoque de {labels.inventory_items || 'Itens'}</Text>
                 <TouchableOpacity onPress={fetchInventory}>
                     <Ionicons name="refresh" size={24} color="#7367F0" />
                 </TouchableOpacity>
@@ -103,7 +103,7 @@ export default function InventoryScreen() {
                     <Ionicons name="search" size={20} color={colors.subText} />
                     <TextInput
                         style={[styles.searchInput, { color: colors.text }]}
-                        placeholder={`Buscar ${labels.inventory_items?.split('/')[0] || 'peça'}...`}
+                        placeholder={`Buscar ${labels.inventory_items?.split('/')[0].toLowerCase() || 'item'}...`}
                         placeholderTextColor={colors.subText}
                         value={search}
                         onChangeText={handleSearch}

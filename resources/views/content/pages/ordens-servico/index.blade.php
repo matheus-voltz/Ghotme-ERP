@@ -18,8 +18,8 @@
             <i class="ti tabler-plus me-1"></i> Nova {{ niche('entity') }}
         </a>
     </div>
-    <div class="card-datatable table-responsive">
-        <table class="datatables-os table border-top">
+    <div class="card-datatable table-responsive p-2">
+        <table class="datatables-os table table-hover border-top">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -86,7 +86,7 @@
                                 running: 'Em Andamento',
                                 canceled: 'Cancelada'
                             };
-                            return `<span class="badge bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
+                            return `<span class="badge badge-soft bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
                         }
                     },
                     {

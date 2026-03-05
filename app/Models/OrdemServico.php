@@ -21,12 +21,17 @@ class OrdemServico extends Model implements Auditable
         'veiculo_id',
         'user_id',
         'status',
+        'payment_method',
+        'gateway_payment_id',
+        'paid_at',
         'description',
         'scheduled_at',
         'km_entry',
         'device_password',
         'device_pattern_lock',
     ];
+
+    protected $appends = ['total', 'client_name'];
 
     protected static function boot()
     {
@@ -73,6 +78,11 @@ class OrdemServico extends Model implements Auditable
         $servicesTotal = $this->items->sum(fn($i) => $i->price * $i->quantity);
         $partsTotal = $this->parts->sum(fn($p) => $p->price * $p->quantity);
         return $servicesTotal + $partsTotal;
+    }
+
+    public function getClientNameAttribute()
+    {
+        return $this->client->name ?? $this->client->company_name ?? 'Balcão';
     }
 
     public function getPartsCostTotalAttribute()

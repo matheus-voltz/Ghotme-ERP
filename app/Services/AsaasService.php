@@ -10,10 +10,18 @@ class AsaasService
     protected $apiKey;
     protected $baseUrl;
 
-    public function __construct()
+    public function __construct(?string $apiKey = null, ?string $environment = null)
     {
-        $this->apiKey = config('services.asaas.key') ?: env('ASAAS_API_KEY');
-        $this->baseUrl = config('services.asaas.url') ?: 'https://sandbox.asaas.com/api/v3';
+        $this->apiKey = $apiKey ?? config('services.asaas.key') ?: env('ASAAS_API_KEY');
+
+        // Determinar a URL base de acordo com o ambiente
+        if ($environment) {
+            $this->baseUrl = $environment === 'production'
+                ? 'https://api.asaas.com/v3'
+                : 'https://sandbox.asaas.com/api/v3';
+        } else {
+            $this->baseUrl = config('services.asaas.url') ?: 'https://sandbox.asaas.com/api/v3';
+        }
     }
 
     public function getOrCreateCustomer($user)
@@ -125,6 +133,13 @@ class AsaasService
     {
         return Http::withHeaders(['access_token' => $this->apiKey])
             ->get($this->baseUrl . "/payments/{$paymentId}/pixQrCode")
+            ->json();
+    }
+
+    public function getPaymentStatus($paymentId)
+    {
+        return Http::withHeaders(['access_token' => $this->apiKey])
+            ->get($this->baseUrl . "/payments/{$paymentId}")
             ->json();
     }
 }

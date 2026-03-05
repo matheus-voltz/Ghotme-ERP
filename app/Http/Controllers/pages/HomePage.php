@@ -130,7 +130,8 @@ class HomePage extends Controller
       return $this->getAdminData($companyId);
     });
 
-    $view = ($user && $user->role !== 'admin') ? 'content.pages.dashboard.dashboards-employee' : 'content.pages.dashboard.dashboards-analytics';
+    $currentNiche = get_current_niche();
+    $view = ($user && $user->role !== 'admin') ? 'content.pages.dashboard.dashboards-employee' : ($currentNiche === 'food_service' ? 'content.pages.dashboard.dashboards-foodservice' : 'content.pages.dashboard.dashboards-analytics');
     $aiUsageCount = Cache::get("ai_usage_{$companyId}_" . now()->format('Y-m'), 0);
 
     return view($view, array_merge($data, [
@@ -222,29 +223,69 @@ class HomePage extends Controller
       ->whereDate('due_date', '<=', $now->copy()->addDays(7))
       ->sum('amount');
 
-    // 4. Gráficos e Tendências (Últimos 6 Meses)
+    // 4. Gráficos e Tendências (Últimos 6 Meses) OTIMIZADO (1 Query por Métrica)
     $months = [];
     $revenueTrends = [];
     $expenseTrends = [];
     $budgetTrends = [];
 
+    $sixMonthsAgo = $now->copy()->subMonths(5)->startOfMonth();
+
+    // Sumarização direta no BD de Transações (Receita/Despesa Direta)
+    $financialRaw = FinancialTransaction::select(
+      DB::raw('MONTH(paid_at) as m'),
+      DB::raw('YEAR(paid_at) as y'),
+      'type',
+      DB::raw('SUM(amount) as total')
+    )->where('company_id', $companyId)
+      ->where('status', 'paid')
+      ->where('paid_at', '>=', $sixMonthsAgo)
+      ->groupBy('y', 'm', 'type')
+      ->get();
+
+    // Sumarização OS Itens/Peças (Apenas para Receita)
+    $osIdsForSixMonths = OrdemServico::where('company_id', $companyId)
+      ->whereIn('status', ['paid', 'finalized', 'completed'])
+      ->where('updated_at', '>=', $sixMonthsAgo)
+      ->pluck('id', 'updated_at');
+
+    // Mapeia OS Itens pela Data da OS
+    $osItemsRaw = DB::table('ordem_servico_items')
+      ->join('ordem_servicos', 'ordem_servico_items.ordem_servico_id', '=', 'ordem_servicos.id')
+      ->whereIn('ordem_servicos.id', $osIdsForSixMonths->keys())
+      ->select(DB::raw('MONTH(ordem_servicos.updated_at) as m'), DB::raw('YEAR(ordem_servicos.updated_at) as y'), DB::raw('SUM(price * quantity) as total'))
+      ->groupBy('y', 'm')
+      ->get();
+
+    $osPartsRaw = DB::table('ordem_servico_parts')
+      ->join('ordem_servicos', 'ordem_servico_parts.ordem_servico_id', '=', 'ordem_servicos.id')
+      ->whereIn('ordem_servicos.id', $osIdsForSixMonths->keys())
+      ->select(DB::raw('MONTH(ordem_servicos.updated_at) as m'), DB::raw('YEAR(ordem_servicos.updated_at) as y'), DB::raw('SUM(price * quantity) as total'))
+      ->groupBy('y', 'm')
+      ->get();
+
+    // Budgets em Lote
+    $budgetsRaw = Budget::select(DB::raw('MONTH(created_at) as m'), DB::raw('YEAR(created_at) as y'), DB::raw('COUNT(*) as total'))
+      ->where('company_id', $companyId)
+      ->where('created_at', '>=', $sixMonthsAgo)
+      ->groupBy('y', 'm')
+      ->get();
+
     for ($i = 5; $i >= 0; $i--) {
       $mDate = $now->copy()->subMonths($i);
+      $m = $mDate->month;
+      $y = $mDate->year;
       $months[] = $mDate->translatedFormat('M');
 
-      $revenueTrends[] = $calculateRevenue($mDate->month, $mDate->year);
+      // Busca na coleção puxada do array
+      $finIn = $financialRaw->where('m', $m)->where('y', $y)->where('type', 'in')->sum('total');
+      $itemsInc = $osItemsRaw->where('m', $m)->where('y', $y)->sum('total');
+      $partsInc = $osPartsRaw->where('m', $m)->where('y', $y)->sum('total');
 
-      $expenseTrends[] = FinancialTransaction::where('company_id', $companyId)
-        ->where('type', 'out')
-        ->where('status', 'paid')
-        ->whereMonth('paid_at', $mDate->month)
-        ->whereYear('paid_at', $mDate->year)
-        ->sum('amount');
+      $revenueTrends[] = $finIn + $itemsInc + $partsInc;
 
-      $budgetTrends[] = Budget::where('company_id', $companyId)
-        ->whereMonth('created_at', $mDate->month)
-        ->whereYear('created_at', $mDate->year)
-        ->count();
+      $expenseTrends[] = $financialRaw->where('m', $m)->where('y', $y)->where('type', 'out')->sum('total');
+      $budgetTrends[] = $budgetsRaw->where('m', $m)->where('y', $y)->sum('total');
     }
 
     // 5. Melhores Serviços (Ranking) - Filtrado por Empresa
@@ -268,13 +309,16 @@ class HomePage extends Controller
     $totalClients = Clients::count();
     $avgTicket = $osStats['total_month'] > 0 ? $revenueMonth / $osStats['total_month'] : 0;
 
-    // Retenção: Clientes com mais de 1 OS nos últimos 6 meses
-    $retentionCount = OrdemServico::select('client_id')
+    // Retenção: Clientes com mais de 1 OS nos últimos 6 meses (Otimizado)
+    $retentionCount = DB::table('ordem_servicos')
+      ->select('client_id')
+      ->where('company_id', $companyId)
       ->where('created_at', '>=', $now->copy()->subMonths(6))
       ->groupBy('client_id')
       ->having(DB::raw('count(*)'), '>', 1)
       ->get()
       ->count();
+
     $retentionRate = $totalClients > 0 ? ($retentionCount / $totalClients) * 100 : 0;
 
     // Academy Highlights

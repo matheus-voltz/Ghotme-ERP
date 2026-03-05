@@ -49,10 +49,22 @@ class IntegrationSettingController extends Controller
             'fiscal_environment' => 'nullable|string',
             'meli_client_id' => 'nullable|string|max:255',
             'meli_client_secret' => 'nullable|string|max:255',
+            'ifood_merchant_id' => 'nullable|string|max:255',
+            'ifood_client_id' => 'nullable|string|max:255',
+            'ifood_client_secret' => 'nullable|string|max:255',
         ]);
 
         $settings->fill($validated);
         $settings->save();
+
+        // Save iFood specific fields to Company model if niche is food_service
+        if (Auth::user()->company->niche === 'food_service') {
+            Auth::user()->company->update([
+                'ifood_merchant_id' => $request->ifood_merchant_id,
+                'ifood_client_id' => $request->ifood_client_id,
+                'ifood_client_secret' => $request->ifood_client_secret,
+            ]);
+        }
 
         return response()->json(['success' => true, 'message' => 'Integrações atualizadas com sucesso!']);
     }

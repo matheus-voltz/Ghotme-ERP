@@ -15,8 +15,8 @@ class OrdemServicoService
     {
         return DB::transaction(function () use ($data) {
             $os = OrdemServico::create([
-                'client_id' => $data['client_id'],
-                'veiculo_id' => $data['veiculo_id'],
+                'client_id' => $data['client_id'] ?? null,
+                'veiculo_id' => $data['veiculo_id'] ?? null,
                 'status' => $data['status'],
                 'description' => $data['description'] ?? null,
                 'km_entry' => $data['km_entry'] ?? null,
@@ -42,8 +42,8 @@ class OrdemServicoService
     {
         return DB::transaction(function () use ($os, $data) {
             $os->update([
-                'client_id' => $data['client_id'],
-                'veiculo_id' => $data['veiculo_id'],
+                'client_id' => $data['client_id'] ?? null,
+                'veiculo_id' => $data['veiculo_id'] ?? null,
                 'status' => $data['status'],
                 'description' => $data['description'] ?? null,
                 'km_entry' => $data['km_entry'] ?? null,
@@ -116,18 +116,20 @@ class OrdemServicoService
 
     protected function logHistory(OrdemServico $os, string $type, string $title, string $description)
     {
-        VehicleHistory::create([
-            'company_id' => Auth::user()->company_id,
-            'veiculo_id' => $os->veiculo_id,
-            'ordem_servico_id' => $os->id,
-            'date' => now(),
-            'km' => $os->km_entry ?? 0,
-            'event_type' => $type,
-            'title' => $title,
-            'description' => $description,
-            'performer' => Auth::user()->name,
-            'created_by' => Auth::id()
-        ]);
+        if ($os->veiculo_id) {
+            VehicleHistory::create([
+                'company_id' => Auth::user()->company_id,
+                'veiculo_id' => $os->veiculo_id,
+                'ordem_servico_id' => $os->id,
+                'date' => now(),
+                'km' => $os->km_entry ?? 0,
+                'event_type' => $type,
+                'title' => $title,
+                'description' => $description,
+                'performer' => Auth::user()->name,
+                'created_by' => Auth::id()
+            ]);
+        }
 
         // Gerar Comissão se a OS for finalizada
         if ($type === 'os_finalizada') {
@@ -150,7 +152,7 @@ class OrdemServicoService
                     if ($ingredient) {
                         $qtyToDeduct = $recipe->quantity * $osPart->quantity;
                         $ingredient->decrement('quantity', $qtyToDeduct);
-                        
+
                         // Log de movimentação (opcional, mas recomendado)
                         \App\Models\StockMovement::create([
                             'inventory_item_id' => $ingredient->id,
@@ -163,7 +165,7 @@ class OrdemServicoService
             } else {
                 // Se não tem receita, baixa o item principal normalmente
                 $item->decrement('quantity', $osPart->quantity);
-                
+
                 \App\Models\StockMovement::create([
                     'inventory_item_id' => $item->id,
                     'type' => 'out',
@@ -177,7 +179,7 @@ class OrdemServicoService
     protected function generateCommission(OrdemServico $os)
     {
         $user = $os->user; // Técnico responsável
-        
+
         if ($user && $user->commission_percentage > 0) {
             $baseAmount = $os->total; // Ou apenas mão de obra se preferir
             $commissionAmount = ($baseAmount * $user->commission_percentage) / 100;

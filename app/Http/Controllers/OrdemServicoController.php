@@ -72,20 +72,23 @@ class OrdemServicoController extends Controller
 
     public function create()
     {
-        $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
 
         // Carrega campos disponíveis para nova OS
         $customFields = (new OrdemServico())->getAvailableCustomFields();
 
-        return view('content.pages.ordens-servico.create', compact('clients', 'services', 'parts', 'customFields'));
+        return view('content.pages.ordens-servico.create', compact('services', 'parts', 'customFields'));
     }
 
     public function store(StoreOrdemServicoRequest $request)
     {
         try {
             $os = $this->service->store($request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'os_id' => $os->id]);
+            }
 
             if ($request->has('redirect_to_checklist')) {
                 return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])
@@ -95,6 +98,9 @@ class OrdemServicoController extends Controller
 
             return redirect()->route('ordens-servico')->with('success', 'OS Criada!')->with('just_created_os', $os->id);
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+            }
             return back()->with('error', $e->getMessage());
         }
     }
@@ -137,7 +143,7 @@ class OrdemServicoController extends Controller
             try {
                 app(StockDeductionService::class)->deductForOrder($os);
             } catch (\Exception $e) {
-                \Log::warning("Falha na baixa automática de estoque para OS #{$os->id}: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::warning("Falha na baixa automática de estoque para OS #{$os->id}: " . $e->getMessage());
             }
         }
 
@@ -165,7 +171,7 @@ class OrdemServicoController extends Controller
     public function edit($id)
     {
         $order = OrdemServico::with(['items', 'parts'])->findOrFail($id);
-        $clients = Clients::all();
+        $client = $order->client; // Pega apenas o cliente da OS atual
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
@@ -173,7 +179,7 @@ class OrdemServicoController extends Controller
         // Carrega campos personalizados preenchidos
         $customFields = $order->getCustomFieldsWithValues();
 
-        return view('content.pages.ordens-servico.edit', compact('order', 'clients', 'services', 'parts', 'vehicles', 'customFields'));
+        return view('content.pages.ordens-servico.edit', compact('order', 'client', 'services', 'parts', 'vehicles', 'customFields'));
     }
 
     public function update(UpdateOrdemServicoRequest $request, $id)

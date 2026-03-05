@@ -22,12 +22,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInUp, FadeInDown } from 'react-native-reanimated';
 import DevicePassword from './components/DevicePassword';
 
-const statusTranslations: { [key: string]: string } = {
-    'pending': 'Pendente',
-    'approved': 'Aprovada',
-    'running': 'Em Execução',
-    'finalized': 'Finalizada',
-    'canceled': 'Cancelada',
+const getStatusTranslations = (niche: string) => {
+    const isFood = niche === 'food_service';
+    return {
+        'pending': 'Pendente',
+        'approved': 'Aprovada',
+        'running': isFood ? 'Em Cozinha' : 'Em Execução',
+        'finalized': isFood ? 'Pronto' : 'Finalizada',
+        'canceled': 'Cancelada',
+    };
 };
 
 const getStatusColor = (status: string) => {
@@ -193,10 +196,16 @@ export default function OSDetailScreen() {
 
             if (notify) {
                 const phone = os.client?.whatsapp || os.client?.phone;
-                const emoji = niche === 'pet' ? '🐾' : (niche === 'electronics' ? '💻' : '🚗');
-                const establishment = niche === 'pet' ? 'Pet Shop' : (niche === 'beauty_clinic' ? 'Clínica' : 'Oficina');
+                const isFood = niche === 'food_service';
+                const emoji = isFood ? '🍔' : (niche === 'pet' ? '🐾' : (niche === 'electronics' ? '💻' : '🚗'));
+                const establishment = isFood ? 'Food Truck' : (niche === 'pet' ? 'Pet Shop' : (niche === 'beauty_clinic' ? 'Clínica' : 'Oficina'));
 
-                const message = `Olá ${os.client?.name || 'Cliente'}! ${emoji}\nSeu ${labels.entity.toLowerCase()} ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto no ${establishment} Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
+                let message = "";
+                if (isFood) {
+                    message = `Olá ${os.client?.name || 'Cliente'}! ${emoji}\nSeu pedido #${os.id} já está pronto no ${establishment} Ghotme!\n\nJá pode vir retirá-lo ou aguardar a entrega!`;
+                } else {
+                    message = `Olá ${os.client?.name || 'Cliente'}! ${emoji}\nSeu ${labels.entity.toLowerCase()} ${os.veiculo?.marca} ${os.veiculo?.modelo} já está pronto no ${establishment} Ghotme!\n\nOrdem de Serviço: #${os.id}\n\nJá pode vir retirá-lo!`;
+                }
 
                 if (phone) {
                     const cleanPhone = phone.replace(/\D/g, '');
@@ -222,7 +231,8 @@ export default function OSDetailScreen() {
             setUpdating(true);
             await api.patch(`/os/${id}/status`, { status: newStatus });
             setOs({ ...os, status: newStatus });
-            Alert.alert('Sucesso', `Status atualizado para ${statusTranslations[newStatus]}`);
+            const trans = getStatusTranslations(niche);
+            Alert.alert('Sucesso', `Status atualizado para ${trans[newStatus as keyof typeof trans]}`);
         } catch (error) {
             Alert.alert('Erro', 'Falha ao atualizar status.');
         } finally {
@@ -241,7 +251,8 @@ export default function OSDetailScreen() {
 
     const renderTimeline = () => {
         const steps = ['pending', 'approved', 'running', 'finalized'];
-        const labels = ['Entrada', 'Aprovado', 'Execução', 'Pronto'];
+        const isFood = niche === 'food_service';
+        const timelineLabels = isFood ? ['Pedido', 'Aceito', 'Cozinha', 'Pronto'] : ['Entrada', 'Aprovado', 'Execução', 'Pronto'];
         const currentIndex = steps.indexOf(os.status === 'canceled' ? 'pending' : os.status);
 
         return (
@@ -263,7 +274,7 @@ export default function OSDetailScreen() {
                                 <Text style={[
                                     styles.stepLabel,
                                     isActive && { color: '#7367F0', fontWeight: 'bold' }
-                                ]}>{labels[index]}</Text>
+                                ]}>{timelineLabels[index]}</Text>
                             </View>
                         );
                     })}
@@ -282,7 +293,9 @@ export default function OSDetailScreen() {
                     <TouchableOpacity onPress={() => router.back()}>
                         <Ionicons name="arrow-back" size={24} color="#fff" />
                     </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Ordem de Serviço #{os.id}</Text>
+                    <Text style={styles.headerTitle}>
+                        {niche === 'food_service' ? `Pedido #${os.id}` : `Ordem de Serviço #${os.id}`}
+                    </Text>
                     <View style={{ width: 24 }} />
                 </View>
                 {/* Timeline Substitui o Status Badge Simples */}
@@ -304,32 +317,34 @@ export default function OSDetailScreen() {
                 </Animated.View>
 
                 {/* Vehicle Info */}
-                <Animated.View
-                    style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
-                    entering={FadeInDown.delay(200).duration(500).springify()}
-                >
-                    <View style={styles.sectionHeader}>
-                        <Ionicons name={niche === 'pet' ? "paw" : (niche === 'electronics' ? "laptop" : "car")} size={20} color={colors.primary} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.entity}</Text>
-                    </View>
-                    <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
-
-                    {/* Identifier Badge (Plate/Serial/Name) */}
-                    {os.veiculo?.placa ? (
-                        <View style={[
-                            styles.plateBadge,
-                            { borderColor: colors.border, backgroundColor: colors.background },
-                            niche === 'automotive' ? { borderWidth: 2, borderRadius: 4 } : { borderWidth: 0, paddingHorizontal: 0 }
-                        ]}>
-                            <Text style={[
-                                styles.plateText,
-                                { color: colors.text },
-                                niche === 'automotive' ? { letterSpacing: 2, textTransform: 'uppercase' } : { fontSize: 16 }
-                            ]}>{niche === 'automotive' ? os.veiculo.placa : `Mod: ${os.veiculo.placa}`}</Text>
+                {niche !== 'food_service' && (
+                    <Animated.View
+                        style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
+                        entering={FadeInDown.delay(200).duration(500).springify()}
+                    >
+                        <View style={styles.sectionHeader}>
+                            <Ionicons name={niche === 'pet' ? "paw" : (niche === 'electronics' ? "laptop" : "car")} size={20} color={colors.primary} />
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.entity}</Text>
                         </View>
-                    ) : null}
-                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} {labels.metric ? `| ${labels.metric}: ${os.km_entry}` : ''}</Text>
-                </Animated.View>
+                        <Text style={[styles.infoText, { color: colors.text }]}>{os.veiculo?.marca} {os.veiculo?.modelo}</Text>
+
+                        {/* Identifier Badge (Plate/Serial/Name) */}
+                        {os.veiculo?.placa ? (
+                            <View style={[
+                                styles.plateBadge,
+                                { borderColor: colors.border, backgroundColor: colors.background },
+                                niche === 'automotive' ? { borderWidth: 2, borderRadius: 4 } : { borderWidth: 0, paddingHorizontal: 0 }
+                            ]}>
+                                <Text style={[
+                                    styles.plateText,
+                                    { color: colors.text },
+                                    niche === 'automotive' ? { letterSpacing: 2, textTransform: 'uppercase' } : { fontSize: 16 }
+                                ]}>{niche === 'automotive' ? os.veiculo.placa : `Mod: ${os.veiculo.placa}`}</Text>
+                            </View>
+                        ) : null}
+                        <Text style={[styles.subInfoText, { color: colors.subText }]}>{labels.color}: {os.veiculo?.cor} {labels.metric ? `| ${labels.metric}: ${os.km_entry}` : ''}</Text>
+                    </Animated.View>
+                )}
 
                 {/* Description / Problem */}
                 <Animated.View
@@ -337,10 +352,14 @@ export default function OSDetailScreen() {
                     entering={FadeInDown.delay(300).duration(500).springify()}
                 >
                     <View style={styles.sectionHeader}>
-                        <Ionicons name="alert-circle" size={20} color={colors.primary} />
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Relato do Problema</Text>
+                        <Ionicons name={niche === 'food_service' ? "receipt-outline" : "alert-circle"} size={20} color={colors.primary} />
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                            {niche === 'food_service' ? 'Detalhes do Pedido' : 'Relato do Problema'}
+                        </Text>
                     </View>
-                    <Text style={[styles.descriptionText, { color: colors.subText }]}>{os.description || 'Nenhuma descrição fornecida.'}</Text>
+                    <Text style={[styles.descriptionText, { color: colors.subText }]}>
+                        {os.description || (niche === 'food_service' ? 'Nenhuma observação no pedido.' : 'Nenhuma descrição fornecida.')}
+                    </Text>
                 </Animated.View>
 
                 {/* Device Password (Electronics Only) */}
@@ -403,32 +422,36 @@ export default function OSDetailScreen() {
                                     {updating
                                         ? <ActivityIndicator size="small" color="#fff" />
                                         : <Ionicons name="play" size={18} color="#fff" />}
-                                    <Text style={styles.buttonText}>Iniciar OS</Text>
+                                    <Text style={styles.buttonText}>{niche === 'food_service' ? 'Preparar' : 'Iniciar OS'}</Text>
                                 </TouchableOpacity>
                             )}
 
-                            {/* Fotos e Checklist — disponíveis em approved e running */}
-                            <TouchableOpacity
-                                style={[styles.actionButton, { backgroundColor: '#7367F0' }]}
-                                onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
-                            >
-                                <Ionicons name="camera" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Fotos</Text>
-                            </TouchableOpacity>
+                            {/* Fotos e Checklist — disponíveis em approved e running (desativado para food service) */}
+                            {niche !== 'food_service' && (
+                                <>
+                                    <TouchableOpacity
+                                        style={[styles.actionButton, { backgroundColor: '#7367F0' }]}
+                                        onPress={() => router.push({ pathname: '/os/checklist', params: { osId: os.id } })}
+                                    >
+                                        <Ionicons name="camera" size={18} color="#fff" />
+                                        <Text style={styles.buttonText}>Fotos</Text>
+                                    </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[styles.actionButton, { backgroundColor: '#FF9F43' }]}
-                                onPress={() => router.push({ pathname: '/os/technical_checklist', params: { osId: os.id } })}
-                            >
-                                <Ionicons name="clipboard" size={18} color="#fff" />
-                                <Text style={styles.buttonText}>Checklist</Text>
-                            </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.actionButton, { backgroundColor: '#FF9F43' }]}
+                                        onPress={() => router.push({ pathname: '/os/technical_checklist', params: { osId: os.id } })}
+                                    >
+                                        <Ionicons name="clipboard" size={18} color="#fff" />
+                                        <Text style={styles.buttonText}>Checklist</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
                         </View>
                     </Animated.View>
                 )}
 
-                {/* ── Timer — só aparece quando em execução ou finalizada ── */}
-                {(os.status === 'running' || os.status === 'finalized') && (
+                {/* ── Timer — só aparece quando em execução ou finalizada (e não é food_service) ── */}
+                {(os.status === 'running' || os.status === 'finalized') && niche !== 'food_service' && (
                     <Animated.View
                         style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }]}
                         entering={FadeInDown.delay(500).duration(500).springify()}
@@ -569,12 +592,16 @@ export default function OSDetailScreen() {
                         entering={FadeInDown.delay(600).duration(500).springify()}
                     >
                         <View style={styles.sectionHeader}>
-                            <Ionicons name="build" size={20} color={colors.primary} />
-                            <Text style={[styles.sectionTitle, { color: colors.text }]}>{labels.inventory_items?.split('/')[0] + ' Utilizados' || 'Peças Utilizadas'}</Text>
+                            <Ionicons name={niche === 'food_service' ? 'fast-food' : 'build'} size={20} color={colors.primary} />
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                                {niche === 'food_service' ? 'Itens do Pedido' : (labels.inventory_items?.split('/')[0] + ' Utilizados' || 'Peças Utilizadas')}
+                            </Text>
                         </View>
                         {os.parts.map((part: any) => (
                             <View key={`part-${part.id}`} style={[styles.itemRow, { borderBottomColor: colors.border }]}>
-                                <Text style={[styles.itemName, { color: colors.text }]}>{part.inventoryItem?.name || 'Peça'}</Text>
+                                <Text style={[styles.itemName, { color: colors.text }]}>
+                                    {part.inventory_item?.name || part.part?.name || part.inventoryItem?.name || (niche === 'food_service' ? 'Produto' : 'Peça')}
+                                </Text>
                                 <Text style={[styles.itemQty, { color: colors.primary }]}>x{part.quantity}</Text>
                             </View>
                         ))}

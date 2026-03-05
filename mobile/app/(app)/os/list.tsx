@@ -62,7 +62,7 @@ export default function OSListScreen() {
     const { status: initialStatus, title } = useLocalSearchParams();
     const router = useRouter();
     const { colors, activeTheme } = useTheme();
-    const { niche } = useNiche();
+    const { niche, labels } = useNiche();
 
     const [allData, setAllData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -136,12 +136,12 @@ export default function OSListScreen() {
             result = result.filter(item => {
                 const clientName = (item.client?.name ?? item.client?.company_name ?? '').toLowerCase();
                 const osId = String(item.id);
-                const plate = (item.veiculo?.placa ?? '').toLowerCase();
+                const secondaryId = String(item.veiculo?.placa ?? '').toLowerCase();
                 const model = `${item.veiculo?.marca ?? ''} ${item.veiculo?.modelo ?? ''}`.toLowerCase();
                 return (
                     clientName.includes(query) ||
                     osId.includes(query) ||
-                    plate.includes(query) ||
+                    secondaryId.includes(query) ||
                     model.includes(query)
                 );
             });
@@ -218,18 +218,20 @@ export default function OSListScreen() {
                     {item.client?.name ?? item.client?.company_name ?? 'Consumidor'}
                 </Text>
 
-                <View style={styles.infoRow}>
-                    <Ionicons
-                        name={niche === 'pet' ? 'paw-outline' : niche === 'electronics' ? 'laptop-outline' : 'car-sport-outline'}
-                        size={13}
-                        color={colors.subText}
-                        style={{ marginRight: 5 }}
-                    />
-                    <Text style={[styles.vehicle, { color: colors.subText }]} numberOfLines={1}>
-                        {item.veiculo?.marca ?? ''} {item.veiculo?.modelo ?? ''}
-                        {item.veiculo?.placa ? ` · ${item.veiculo.placa}` : ''}
-                    </Text>
-                </View>
+                {niche !== 'food_service' && (
+                    <View style={styles.infoRow}>
+                        <Ionicons
+                            name={niche === 'pet' ? 'paw-outline' : niche === 'electronics' ? 'laptop-outline' : 'car-sport-outline'}
+                            size={13}
+                            color={colors.subText}
+                            style={{ marginRight: 5 }}
+                        />
+                        <Text style={[styles.vehicle, { color: colors.subText }]} numberOfLines={1}>
+                            {item.veiculo?.marca ?? ''} {item.veiculo?.modelo ?? ''}
+                            {item.veiculo?.placa ? ` · ${item.veiculo.placa}` : ''}
+                        </Text>
+                    </View>
+                )}
 
                 <View style={[styles.footer, { borderTopColor: colors.border }]}>
                     <View style={styles.dateBox}>
@@ -290,7 +292,7 @@ export default function OSListScreen() {
                     <Ionicons name="search-outline" size={18} color={searchFocused ? '#7367F0' : colors.subText} style={{ marginRight: 8 }} />
                     <TextInput
                         style={[styles.searchInput, { color: colors.text }]}
-                        placeholder="Buscar por cliente, nº OS ou placa..."
+                        placeholder={`Buscar por cliente, nº ${niche === 'food_service' ? 'Pedido' : 'OS'} ou ${labels.identifier.toLowerCase()}...`}
                         placeholderTextColor={colors.subText}
                         value={searchText}
                         onChangeText={setSearchText}

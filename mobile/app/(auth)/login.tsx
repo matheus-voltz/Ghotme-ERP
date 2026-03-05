@@ -177,6 +177,10 @@ export default function LoginScreen() {
         ]
     }));
 
+    const animatedBioStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: bioBtnScale.value }]
+    }));
+
     async function handleLogin() {
         if (!email || !password) {
             Alert.alert('Campos vazios', 'Por favor, preencha seu email e senha.');
@@ -320,7 +324,7 @@ export default function LoginScreen() {
 
                                     {/* Botão de Biometria Premium */}
                                     {biometricAvailable && biometricEnabled && (
-                                        <Animated.View style={[{ transform: [{ scale: bioBtnScale }] }, { marginTop: 16 }]}>
+                                        <Animated.View style={[animatedBioStyle, { marginTop: 16 }]}>
                                             <TouchableOpacity
                                                 style={styles.biometricButton}
                                                 onPress={triggerBiometricAuth}

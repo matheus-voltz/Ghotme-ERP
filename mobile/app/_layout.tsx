@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NicheProvider } from '../context/NicheContext';
 import { ChatProvider } from '../context/ChatContext';
 import { LanguageProvider } from '../context/LanguageContext';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
@@ -84,18 +85,20 @@ function RootLayoutNav() {
 
 export default function Layout() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <AuthProvider>
-          <LanguageProvider>
-            <NicheProvider>
-              <ChatProvider>
-                <RootLayoutNav />
-              </ChatProvider>
-            </NicheProvider>
-          </LanguageProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <LanguageProvider>
+              <NicheProvider>
+                <ChatProvider>
+                  <RootLayoutNav />
+                </ChatProvider>
+              </NicheProvider>
+            </LanguageProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

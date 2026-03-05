@@ -252,6 +252,42 @@
                 </div>
             </div>
 
+            @if(Auth::user()->company->niche === 'food_service')
+            <!-- IFOOD (FOOD TRUCK / RESTAURANTE) -->
+            <div class="card mb-6 border-danger shadow-none">
+                <div class="card-header border-bottom bg-label-danger py-3">
+                    <h5 class="card-title mb-0 text-danger"><i class="ti tabler-tools-kitchen-2 me-1"></i> 4. Delivery iFood (Food Truck)</h5>
+                    <p class="text-muted small mb-0">Receba seus pedidos do iFood diretamente no seu ERP com aviso sonoro.</p>
+                </div>
+                <div class="card-body pt-4">
+                    <div class="row g-4 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Merchant ID (Loja)</label>
+                            <input type="text" name="ifood_merchant_id" class="form-control border-danger" value="{{ Auth::user()->company->ifood_merchant_id }}" placeholder="Ex: 5763132e-..." />
+                            <small class="text-muted">ID único da sua loja no iFood.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Client ID</label>
+                            <input type="text" name="ifood_client_id" class="form-control" value="{{ Auth::user()->company->ifood_client_id }}" placeholder="Client ID do App iFood" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Client Secret</label>
+                            <input type="password" name="ifood_client_secret" class="form-control" value="{{ Auth::user()->company->ifood_client_secret }}" placeholder="Client Secret do App iFood" />
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="alert alert-outline-secondary d-flex align-items-center mb-0">
+                                <i class="ti tabler-info-circle me-2"></i>
+                                <div>
+                                    Configure esta URL de Webhook no Portal do Desenvolvedor iFood: 
+                                    <code class="fw-bold text-primary">{{ url('/api/webhooks/ifood') }}</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- FISCAL -->
             <div class="card mb-6">
                 <div class="card-header border-bottom">
