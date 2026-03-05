@@ -4,12 +4,12 @@ import {
   Text,
   ActivityIndicator,
   Alert,
-  TouchableOpacity,
   StyleSheet,
   StatusBar,
   RefreshControl,
   ScrollView,
-  Platform
+  Platform,
+  Pressable
 } from 'react-native';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -22,7 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter, router, useNavigation } from 'expo-router';
-import Animated, { FadeInDown, FadeInUp, FadeIn, FadeOut } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, FadeIn, FadeOut, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Skeleton } from '../../../components/Skeleton';
 
@@ -63,6 +63,41 @@ const numberFormat = (value: any) => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+};
+
+const premiumShadow = {
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.04,
+  shadowRadius: 8,
+  elevation: 2,
+};
+
+// Reusable Animated Card Wrapper
+const AnimatedCard = ({ children, onPress, style, activeOpacity = 0.9 }: any) => {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }]
+  }));
+
+  return (
+    <Pressable
+      onPressIn={() => {
+        scale.value = withSpring(0.97, { damping: 15, stiffness: 200 });
+      }}
+      onPressOut={() => {
+        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+      }}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (onPress) onPress();
+      }}
+    >
+      <Animated.View style={[style, animatedStyle]}>
+        {children}
+      </Animated.View>
+    </Pressable>
+  );
 };
 
 export default function DashboardScreen() {
@@ -170,15 +205,11 @@ export default function DashboardScreen() {
       <Animated.View entering={FadeInDown.duration(600).springify()} style={styles.adminStatsContainer}>
         {/* Executive 2x2 Grid */}
         <View style={styles.executiveGrid}>
-          <TouchableOpacity
-            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/reports/revenue');
-            }}
-            activeOpacity={0.7}
+          <AnimatedCard
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+            onPress={() => router.push('/reports/revenue')}
           >
-            <View style={[styles.miniIcon, { backgroundColor: '#7367F020' }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#7367F015' }]}>
               <Ionicons name="cash-outline" size={18} color="#7367F0" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>Faturamento</Text>
@@ -193,49 +224,37 @@ export default function DashboardScreen() {
                 {Math.abs(data.revenueGrowth || 0).toFixed(1)}%
               </Text>
             </View>
-          </TouchableOpacity>
+          </AnimatedCard>
 
-          <TouchableOpacity
-            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/reports/profitability');
-            }}
-            activeOpacity={0.7}
+          <AnimatedCard
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+            onPress={() => router.push('/reports/profitability')}
           >
-            <View style={[styles.miniIcon, { backgroundColor: '#28C76F20' }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#28C76F15' }]}>
               <Ionicons name="pie-chart-outline" size={18} color="#28C76F" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('profitability')}</Text>
             <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.monthlyProfitability || 0}%</Text>
             <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Margem real</Text>
-          </TouchableOpacity>
+          </AnimatedCard>
 
-          <TouchableOpacity
-            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/reports/clients');
-            }}
-            activeOpacity={0.7}
+          <AnimatedCard
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+            onPress={() => router.push('/reports/clients')}
           >
-            <View style={[styles.miniIcon, { backgroundColor: '#FF9F4320' }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#FF9F4315' }]}>
               <Ionicons name="people-outline" size={18} color="#FF9F43" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>{t('new_clients')}</Text>
             <Text style={[styles.statValue, { color: colors.text, fontSize: 18 }]}>{data.totalClients || 0}</Text>
             <Text style={[styles.statSubLabel, { color: colors.subText, fontSize: 10 }]}>Base ativa</Text>
-          </TouchableOpacity>
+          </AnimatedCard>
 
-          <TouchableOpacity
-            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              router.push('/reports/productivity');
-            }}
-            activeOpacity={0.7}
+          <AnimatedCard
+            style={[styles.executiveCard, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+            onPress={() => router.push('/reports/productivity')}
           >
-            <View style={[styles.miniIcon, { backgroundColor: '#00CFE820' }]}>
+            <View style={[styles.miniIcon, { backgroundColor: '#00CFE815' }]}>
               <Ionicons name="flash-outline" size={18} color="#00CFE8" />
             </View>
             <Text style={[styles.statLabel, { color: colors.subText }]}>Produtividade</Text>
@@ -248,34 +267,37 @@ export default function DashboardScreen() {
                 backgroundColor: '#00CFE8'
               }]} />
             </View>
-          </TouchableOpacity>
+          </AnimatedCard>
         </View>
 
         {/* Quick Actions Bar */}
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }]}>Ações Rápidas</Text>
         <View style={styles.quickActionsContainer}>
           {[
-            { icon: 'add-circle', label: 'Nova OS', color: '#7367F0', route: '/os/create' },
+            { icon: 'add-circle', label: niche === 'food_service' ? 'Novo Pedido' : 'Nova OS', color: '#7367F0', route: '/os/create' },
             { icon: 'person-add', label: 'Cliente', color: '#28C76F', route: '/clients/create' },
             { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             ...(niche === 'food_service' ? [{ icon: 'receipt', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
-            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => {
-              Haptics.selectionAsync();
-              router.push(action.route as any);
-            }}>
+            <Pressable 
+              key={idx} 
+              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]} 
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push(action.route as any);
+              }}
+            >
               <View style={[styles.quickActionIcon, { backgroundColor: action.color + '15' }]}>
                 <Ionicons name={action.icon as any} size={22} color={action.color} />
               </View>
               <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
         {/* Financial Trends Chart */}
-        <TouchableOpacity
-          style={{ marginTop: 10 }}
-          activeOpacity={0.8}
+        <Pressable
+          style={({ pressed }) => [{ marginTop: 10, opacity: pressed ? 0.9 : 1 }]}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             router.push('/reports/chart');
@@ -292,10 +314,9 @@ export default function DashboardScreen() {
                 const height = (day.value / maxVal) * 100;
                 const isSelected = selectedChartIndex === idx;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={idx}
                     style={styles.chartColumn}
-                    activeOpacity={0.8}
                     onPress={() => {
                       Haptics.selectionAsync();
                       setSelectedChartIndex(isSelected ? null : idx);
@@ -319,19 +340,19 @@ export default function DashboardScreen() {
                       }
                     ]} />
                     <Text style={[styles.chartLabel, { color: colors.subText, fontWeight: isSelected ? 'bold' : 'normal' }]}>{day.day}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10 }]}>Status Operacional</Text>
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
               router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } });
@@ -342,10 +363,10 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.pending || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
               router.push({ pathname: '/os/list', params: { status: 'approved', title: 'Ordens Aprovadas' } });
@@ -356,10 +377,10 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.approved || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Aprovadas</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
               router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } });
@@ -370,10 +391,10 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.running || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
               router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } });
@@ -384,7 +405,7 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.finalized_today || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Alerts Section */}
@@ -393,16 +414,22 @@ export default function DashboardScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Alertas Críticos</Text>
             <View style={styles.alertRow}>
               {data.lowStockCount > 0 && (
-                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#EA545515' }]} onPress={() => router.push('/inventory')}>
+                <Pressable 
+                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#EA545515', opacity: pressed ? 0.8 : 1 }]} 
+                  onPress={() => router.push('/inventory')}
+                >
                   <Ionicons name="warning" size={20} color="#EA5455" />
                   <Text style={[styles.alertText, { color: colors.text }]}>{data.lowStockCount} itens com baixo estoque</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
               {data.pendingBudgetsCount > 0 && (
-                <TouchableOpacity style={[styles.alertItem, { backgroundColor: '#FF9F4315' }]} onPress={() => router.push('/budgets/pending')}>
+                <Pressable 
+                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#FF9F4315', opacity: pressed ? 0.8 : 1 }]} 
+                  onPress={() => router.push('/budgets/pending')}
+                >
                   <Ionicons name="document-text" size={20} color="#FF9F43" />
                   <Text style={[styles.alertText, { color: colors.text }]}>{data.pendingBudgetsCount} orçamentos atrasados {'>'} 5 dias</Text>
-                </TouchableOpacity>
+                </Pressable>
               )}
             </View>
           </View>
@@ -440,19 +467,23 @@ export default function DashboardScreen() {
         <View style={styles.quickActionsContainer}>
           {[
             ...(niche === 'food_service' ? [] : [{ icon: 'scan-outline', label: 'Vistoria', color: '#7367F0', route: '/os/checklist' }]),
-            { icon: 'add-circle-outline', label: 'Nova OS', color: '#28C76F', route: '/os/create' },
+            { icon: 'add-circle-outline', label: niche === 'food_service' ? 'Novo Pedido' : 'Nova OS', color: '#28C76F', route: '/os/create' },
             { icon: 'cube-outline', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
-            { icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' },
+            ...(niche === 'food_service' ? [{ icon: 'receipt-outline', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
-            <TouchableOpacity key={idx} style={styles.quickActionItem} onPress={() => {
-              Haptics.selectionAsync();
-              router.push(action.route as any);
-            }}>
+            <Pressable 
+              key={idx} 
+              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]} 
+              onPress={() => {
+                Haptics.selectionAsync();
+                router.push(action.route as any);
+              }}
+            >
               <View style={[styles.quickActionIcon, { backgroundColor: action.color + '15' }]}>
                 <Ionicons name={action.icon as any} size={22} color={action.color} />
               </View>
               <Text style={[styles.quickActionLabel, { color: colors.text }]}>{action.label}</Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
@@ -476,8 +507,8 @@ export default function DashboardScreen() {
         {/* Mechanic Summary Grid */}
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }]}>Status das Minhas OS</Text>
         <View style={styles.statusGrid}>
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'running', title: 'Minhas Ordens' } })}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
@@ -485,10 +516,10 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.runningOS || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Minhas Prontas' } })}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
@@ -496,10 +527,10 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.completedToday || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border }]}
+          <Pressable
+            style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Meus Orçamentos' } })}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
@@ -507,15 +538,15 @@ export default function DashboardScreen() {
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.stats?.pendingBudgets || 0}</Text>
             <Text style={[styles.statusLabelText, { color: colors.subText }]}>Meus Orçamentos</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={{ marginTop: 10 }}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
             <Text style={[styles.sectionTitle, { color: colors.text, marginBottom: 0 }]}>Minhas Atividades</Text>
-            <TouchableOpacity onPress={() => router.push('/os/list')}>
+            <Pressable onPress={() => router.push('/os/list')} style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}>
               <Text style={{ color: colors.primary, fontWeight: '600' }}>Ver Tudo</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
           {data?.recentOS?.map((item: any, index: number) => renderOSCard(item, index))}
           {(!data?.recentOS || data.recentOS.length === 0) && (
@@ -534,16 +565,19 @@ export default function DashboardScreen() {
       key={item.id}
       entering={FadeInDown.delay(index * 100).duration(600).springify()}
     >
-      <TouchableOpacity
-        style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-        activeOpacity={0.9}
+      <Pressable
+        style={({ pressed }) => [
+          styles.card, 
+          { backgroundColor: colors.card, borderColor: colors.border },
+          pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }
+        ]}
         onPress={() => router.push(`/os/${item.id}`)}
       >
         <View style={styles.cardHeader}>
           <View style={styles.idBadge}>
             <Text style={styles.idText}>#{item.id}</Text>
           </View>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '20' }]}>
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '15' }]}>
             <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
               {statusTranslations[item.status?.toLowerCase()] || item.status}
             </Text>
@@ -555,24 +589,24 @@ export default function DashboardScreen() {
             <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
             <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>{item.client_name}</Text>
           </View>
-          {niche !== 'food_service' && (
-            <View style={styles.infoRow}>
-              <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
-              <Text style={[styles.vehicleInfo, { color: colors.subText }]}>{item.vehicle} - {item.plate}</Text>
-            </View>
-          )}
+          <View style={styles.infoRow}>
+            <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
+            <Text style={[styles.vehicleInfo, { color: colors.subText }]}>
+              {niche === 'food_service' ? (item.plate || 'Balcão/Mesa') : `${item.vehicle} - ${item.plate}`}
+            </Text>
+          </View>
           <View style={[styles.divider, { backgroundColor: colors.border }]} />
           <View style={styles.cardFooter}>
             <View style={styles.dateContainer}>
               <Ionicons name="calendar-outline" size={14} color={colors.subText} />
               <Text style={[styles.dateText, { color: colors.subText }]}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
             </View>
-            <Text style={{ fontSize: 13, fontWeight: '700', color: colors.primary }}>
+            <Text style={{ fontSize: 14, fontWeight: '800', color: colors.primary }}>
               R$ {numberFormat(item.total)}
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </Pressable>
     </Animated.View>
   );
 
@@ -596,8 +630,8 @@ export default function DashboardScreen() {
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity
-              style={styles.chatButton}
+            <Pressable
+              style={({ pressed }) => [styles.chatButton, { opacity: pressed ? 0.6 : 1 }]}
               onPress={() => router.push('/screens/notifications')}
             >
               <Ionicons name="notifications-outline" size={24} color="#fff" />
@@ -606,10 +640,10 @@ export default function DashboardScreen() {
                   <Text style={styles.badgeText}>{data.unreadNotificationsCount > 9 ? '9+' : data.unreadNotificationsCount}</Text>
                 </View>
               )}
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={styles.chatButton}
+            <Pressable
+              style={({ pressed }) => [styles.chatButton, { opacity: pressed ? 0.6 : 1 }]}
               onPress={() => router.push('/chat/contacts')}
             >
               <Ionicons name="chatbubbles-outline" size={24} color="#fff" />
@@ -618,9 +652,12 @@ export default function DashboardScreen() {
                   <Text style={styles.badgeText}>{unreadCount > 9 ? '9+' : unreadCount}</Text>
                 </View>
               )}
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity style={styles.profileButton} onPress={() => router.push('/profile')}>
+            <Pressable 
+              style={({ pressed }) => [styles.profileButton, { opacity: pressed ? 0.8 : 1 }]} 
+              onPress={() => router.push('/profile')}
+            >
               <View style={styles.avatarPlaceholder}>
                 {user?.profile_photo_url ? (
                   <Image
@@ -634,7 +671,7 @@ export default function DashboardScreen() {
                   </Text>
                 )}
               </View>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </LinearGradient>
@@ -685,13 +722,15 @@ export default function DashboardScreen() {
         entering={FadeInUp.delay(500).springify()}
         style={styles.fabContainer}
       >
-        <TouchableOpacity
-          style={styles.fab}
+        <Pressable
+          style={({ pressed }) => [
+            styles.fab,
+            pressed && { transform: [{ scale: 0.95 }], opacity: 0.9 }
+          ]}
           onPress={() => router.push('/os/create')}
-          activeOpacity={0.8}
         >
-          <Ionicons name="add" size={30} color="#fff" />
-        </TouchableOpacity>
+          <Ionicons name="add" size={32} color="#fff" />
+        </Pressable>
       </Animated.View>
     </View>
   );
@@ -700,7 +739,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f2f2f7',
   },
   header: {
     position: 'absolute',
@@ -710,10 +749,9 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingBottom: 25,
     paddingHorizontal: 24,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     zIndex: 10,
-    // elevation: 5, // Removed to avoid conflict with list scrolling underneath if any
   },
   headerContent: {
     flexDirection: 'row',
@@ -723,12 +761,14 @@ const styles = StyleSheet.create({
   welcomeText: {
     color: '#fff',
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
   subtitleText: {
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     fontSize: 14,
     marginTop: 4,
+    fontWeight: '500',
   },
   profileButton: {
     padding: 4,
@@ -746,10 +786,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 4,
-    backgroundColor: '#FF9F43',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    backgroundColor: '#EA5455',
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -758,16 +798,18 @@ const styles = StyleSheet.create({
   badgeText: {
     color: '#fff',
     fontSize: 10,
-    fontWeight: 'bold'
+    fontWeight: '900'
   },
   avatarPlaceholder: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    overflow: 'hidden'
+    backgroundColor: 'rgba(255,255,255,0.25)',
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   avatarText: {
     color: '#fff',
@@ -776,7 +818,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingTop: 130, // Make space for header
+    paddingTop: 130, 
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -802,29 +844,27 @@ const styles = StyleSheet.create({
     marginRight: 15,
     width: 200,
     borderLeftWidth: 5,
-    borderWidth: 1, // Added
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, // Refined
-    shadowRadius: 10,   // Refined
-    elevation: 2,       // Refined
+    borderWidth: 1, 
+    borderColor: '#e5e5ea',
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '600',
+    color: '#8e8e93',
+    fontWeight: '700',
     textTransform: 'uppercase',
     marginBottom: 4,
+    letterSpacing: 0.5,
   },
   statValue: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '800',
+    color: '#1c1c1e',
   },
   statSubLabel: {
     fontSize: 11,
-    color: '#999',
+    color: '#aeaeb2',
     marginTop: 4,
+    fontWeight: '500',
   },
   growthContainer: {
     flexDirection: 'row',
@@ -833,20 +873,21 @@ const styles = StyleSheet.create({
   },
   growthText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     marginLeft: 4,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 17,
+    fontWeight: '800',
+    color: '#1c1c1e',
     marginBottom: 15,
+    letterSpacing: -0.2,
   },
   statusGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: 12,
     marginBottom: 25,
   },
   statusBox: {
@@ -854,31 +895,27 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 15,
+    padding: 16,
     alignItems: 'center',
-    borderWidth: 1, // Added
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, // Refined
-    shadowRadius: 10,   // Refined
-    elevation: 2,       // Refined
+    borderWidth: 1, 
+    borderColor: '#e5e5ea',
   },
   statusIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
   },
   statusCountText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#1c1c1e',
   },
   statusLabelText: {
-    fontSize: 11,
-    color: '#666',
+    fontSize: 12,
+    color: '#8e8e93',
     fontWeight: '600',
     marginTop: 2,
     textAlign: 'center',
@@ -887,7 +924,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   alertRow: {
-    gap: 10,
+    gap: 12,
   },
   executiveGrid: {
     flexDirection: 'row',
@@ -898,43 +935,40 @@ const styles = StyleSheet.create({
   },
   executiveCard: {
     width: '48%',
-    borderRadius: 20,
-    padding: 15,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 3,
+    borderColor: '#e5e5ea',
+    backgroundColor: '#fff',
   },
   miniIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   miniProgressBarContainer: {
-    height: 4,
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 2,
-    marginTop: 10,
+    height: 5,
+    backgroundColor: '#f2f2f7',
+    borderRadius: 3,
+    marginTop: 12,
     overflow: 'hidden',
   },
   miniProgressBar: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 3,
   },
   quickActionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(115, 103, 240, 0.05)',
-    borderRadius: 20,
-    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
     marginVertical: 15,
     borderWidth: 1,
-    borderColor: 'rgba(115, 103, 240, 0.1)',
+    borderColor: '#e5e5ea',
   },
   quickActionItem: {
     alignItems: 'center',
@@ -946,29 +980,34 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   quickActionLabel: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
     textAlign: 'center',
+    color: '#1c1c1e',
   },
   alertItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 16,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   alertText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginLeft: 10,
+    fontWeight: '700',
+    color: '#1c1c1e',
+    marginLeft: 12,
   },
   chartContainer: {
     padding: 20,
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
+    borderColor: '#e5e5ea',
+    backgroundColor: '#fff',
     marginBottom: 20,
   },
   chartBars: {
@@ -983,35 +1022,31 @@ const styles = StyleSheet.create({
     width: '12%',
   },
   chartBar: {
-    width: 10,
-    borderRadius: 5,
+    width: 12,
+    borderRadius: 6,
   },
   chartLabel: {
-    fontSize: 9,
+    fontSize: 10,
     marginTop: 8,
     fontWeight: '600',
   },
   chartValueWrapper: {
     position: 'absolute',
-    top: -15,
+    top: -18,
     width: 40,
     alignItems: 'center',
   },
   chartValueText: {
-    fontSize: 8,
-    fontWeight: 'bold',
+    fontSize: 9,
+    fontWeight: '800',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 16,
     marginBottom: 16,
     padding: 16,
-    borderWidth: 1, // Added
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05, // Refined
-    shadowRadius: 10,   // Refined
-    elevation: 2,       // Refined
+    borderWidth: 1, 
+    borderColor: '#e5e5ea',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -1020,14 +1055,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   idBadge: {
-    backgroundColor: '#7367F015',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
+    backgroundColor: '#f2f2f7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
   idText: {
-    color: '#7367F0',
-    fontWeight: '700',
+    color: '#1c1c1e',
+    fontWeight: '800',
     fontSize: 12,
   },
   statusBadge: {
@@ -1037,7 +1072,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 11,
-    fontWeight: 'bold',
+    fontWeight: '800',
     textTransform: 'uppercase',
   },
   cardBody: {
@@ -1049,18 +1084,19 @@ const styles = StyleSheet.create({
   },
   clientName: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '800',
+    color: '#1c1c1e',
     flex: 1,
   },
   vehicleInfo: {
-    fontSize: 13,
-    color: '#666',
+    fontSize: 14,
+    color: '#8e8e93',
+    fontWeight: '500',
   },
   divider: {
     height: 1,
-    backgroundColor: '#f1f1f1',
-    marginVertical: 4,
+    backgroundColor: '#f2f2f7',
+    marginVertical: 8,
   },
   cardFooter: {
     flexDirection: 'row',
@@ -1072,39 +1108,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateText: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 13,
+    color: '#8e8e93',
     marginLeft: 6,
+    fontWeight: '600',
   },
   fabContainer: {
     position: 'absolute',
-    bottom: 110,
+    bottom: 100,
     right: 20,
     zIndex: 100,
   },
   fab: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#7367F0',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 8,
+    elevation: 4,
     shadowColor: '#7367F0',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
-    shadowRadius: 10,
+    shadowRadius: 8,
   },
   mainProgressCard: {
     padding: 20,
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
+    borderColor: '#e5e5ea',
+    backgroundColor: '#fff',
     marginBottom: 20,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -1114,40 +1148,45 @@ const styles = StyleSheet.create({
   },
   progressTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    color: '#1c1c1e',
   },
   progressSubtitle: {
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 2,
+    color: '#8e8e93',
+    fontWeight: '500',
   },
   percentageCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   percentageText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '900',
   },
   progressBarBg: {
-    height: 8,
-    borderRadius: 4,
+    height: 6,
+    borderRadius: 3,
     overflow: 'hidden',
+    backgroundColor: '#f2f2f7',
   },
   progressBarFill: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: 3,
   },
   aiInsightCard: {
     padding: 16,
-    borderRadius: 20,
+    borderRadius: 16,
     borderWidth: 1,
     marginBottom: 25,
     borderLeftWidth: 4,
     borderLeftColor: '#7367F0',
+    backgroundColor: '#fff',
   },
   aiHeader: {
     flexDirection: 'row',
@@ -1156,33 +1195,36 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   aiIconWrapper: {
-    padding: 4,
+    padding: 6,
     backgroundColor: '#7367F0',
-    borderRadius: 6,
+    borderRadius: 8,
   },
   aiTitle: {
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: 13,
+    fontWeight: '800',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   aiInsightText: {
-    fontSize: 13,
-    lineHeight: 20,
-    opacity: 0.9,
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#3a3a3c',
+    fontWeight: '500',
   },
   emptyContainer: {
     paddingVertical: 40,
-    borderRadius: 24,
+    borderRadius: 16,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     borderStyle: 'dashed',
-    backgroundColor: 'rgba(0,0,0,0.02)',
+    backgroundColor: '#f2f2f7',
+    borderColor: '#c7c7cc',
   },
   emptyText: {
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: '500',
+    marginTop: 12,
+    fontSize: 15,
+    fontWeight: '600',
   }
 });
+

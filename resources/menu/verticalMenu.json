@@ -113,6 +113,7 @@
       "name": "Budgets",
       "icon": "menu-icon icon-base ti tabler-file-dollar",
       "slug": "budgets",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/budgets/pending",
@@ -223,7 +224,8 @@
           "url": "/inventory/purchase-orders",
           "name": "Suprimento Automático",
           "slug": "inventory.purchase-orders",
-          "feature": "auto_supply"
+          "feature": "auto_supply",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/inventory/adjustments",
@@ -250,18 +252,21 @@
         {
           "url": "/services/table",
           "name": "Tabela de serviços",
-          "slug": "services.table"
+          "slug": "services.table",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/services/packages",
           "name": "Pacotes de serviço",
-          "slug": "services.packages"
+          "slug": "services.packages",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/services/plans",
           "name": "Planos de Assinatura",
           "slug": "services.plans",
-          "feature": "recurring_plans"
+          "feature": "recurring_plans",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/menu/manage",

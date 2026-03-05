@@ -12,13 +12,14 @@ import {
     ScrollView,
     Keyboard,
     Animated as RNAnimated,
+    Pressable,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeIn, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Skeleton } from '../../../components/Skeleton';
@@ -54,6 +55,36 @@ const statusTranslations: { [key: string]: string } = {
     running: 'Em Execução',
     finalized: 'Finalizada',
     canceled: 'Cancelada',
+};
+
+const premiumShadow = {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 3,
+};
+
+const AnimatedCard = ({ children, onPress, style }: any) => {
+    const scale = useSharedValue(1);
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }]
+    }));
+
+    return (
+        <Pressable
+            onPressIn={() => { scale.value = withSpring(0.96, { damping: 15, stiffness: 200 }); }}
+            onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 200 }); }}
+            onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (onPress) onPress();
+            }}
+        >
+            <Animated.View style={[style, animatedStyle]}>
+                {children}
+            </Animated.View>
+        </Pressable>
+    );
 };
 
 // ─── Componente Principal ────────────────────────────────────────────────────
@@ -197,10 +228,9 @@ export default function OSListScreen() {
 
     const renderItem = ({ item, index }: { item: any; index: number }) => (
         <Animated.View entering={FadeInDown.delay(index * 40).duration(350).springify()}>
-            <TouchableOpacity
-                style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-                onPress={() => { Haptics.selectionAsync(); router.push(`/os/${item.id}`); }}
-                activeOpacity={0.88}
+            <AnimatedCard
+                style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+                onPress={() => { router.push(`/os/${item.id}`); }}
             >
                 <View style={styles.cardHeader}>
                     <View style={styles.idBadge}>
@@ -244,7 +274,7 @@ export default function OSListScreen() {
                         R$ {(Number(item.total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Text>
                 </View>
-            </TouchableOpacity>
+            </AnimatedCard>
         </Animated.View>
     );
 

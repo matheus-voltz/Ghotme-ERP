@@ -201,6 +201,8 @@ Sua dupla missão é:
                             $result = $aiToolsService->getOverdueTransactions();
                         } elseif ($functionName === 'get_appointments') {
                             $result = $aiToolsService->getAppointments($args['day'] ?? 'today');
+                        } elseif ($functionName === 'get_sales_analytics') {
+                            $result = $aiToolsService->getSalesAnalytics($args['days'] ?? 30);
                         } elseif ($functionName === 'save_business_fact') {
                             $result = $aiToolsService->saveBusinessFact($args['fact'], $args['key'] ?? 'general_fact', $args['importance'] ?? 1);
                         } else {
