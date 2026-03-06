@@ -1,19 +1,21 @@
 @extends('layouts/layoutMaster')
 
-@section('title', __('Checklists de Entrada'))
+@section('title', get_current_niche() === 'food_service' ? __('Ingredientes e Preparo') : __('Checklists de Entrada'))
 
 @section('content')
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h5 class="mb-0">{{ __('Histórico de Checklists') }}</h5>
-    <a href="{{ route('ordens-servico.checklist.create') }}" class="btn btn-primary">{{ __('Novo Checklist') }}</a>
+    <h5 class="mb-0">{{ get_current_niche() === 'food_service' ? __('Histórico de Produção') : __('Histórico de Checklists') }}</h5>
+    <a href="{{ route('ordens-servico.checklist.create') }}" class="btn btn-primary">
+      <i class="ti tabler-plus me-1"></i> {{ get_current_niche() === 'food_service' ? __('Nova Ficha de Preparo') : __('Novo Checklist') }}
+    </a>
   </div>
   <div class="table-responsive text-nowrap">
     <table class="table">
       <thead>
         <tr>
           <th>ID</th>
-          <th>{{ __('Veículo') }}</th>
+          <th>{{ get_current_niche() === 'food_service' ? __('Pedido / Mesa') : __('Veículo') }}</th>
           <th>{{ __('Responsável') }}</th>
           <th>{{ __('Data') }}</th>
           <th>{{ __('Ações') }}</th>
@@ -24,8 +26,13 @@
         <tr>
           <td>#{{ $inspection->id }}</td>
           <td>
-            <strong>{{ $inspection->veiculo->placa ?? 'N/A' }}</strong><br>
-            <small>{{ $inspection->veiculo->modelo ?? 'Veículo não encontrado' }}</small>
+            @if(get_current_niche() === 'food_service')
+              <strong>{{ $inspection->ordemServico->description ?? 'Mesa não informada' }}</strong><br>
+              <small class="text-primary">Pedido #{{ $inspection->ordem_servico_id }}</small>
+            @else
+              <strong>{{ $inspection->veiculo->placa ?? 'N/A' }}</strong><br>
+              <small>{{ $inspection->veiculo->modelo ?? 'Veículo não encontrado' }}</small>
+            @endif
           </td>
           <td>{{ $inspection->user->name }}</td>
           <td>{{ $inspection->created_at->format('d/m/Y H:i') }}</td>
@@ -45,6 +52,8 @@
     </table>
   </div>
 </div>
+@endsection
+
 @section('vendor-style')
 @vite([
 'resources/assets/vendor/libs/animate-css/animate.scss',
@@ -107,5 +116,4 @@
     }
   });
 </script>
-@endsection
 @endsection

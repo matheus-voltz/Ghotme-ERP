@@ -199,6 +199,7 @@ $customizerHidden = 'customizer-hide';
     <div class="row">
         <!-- Coluna Principal (8) -->
         <div class="col-lg-8 animate-up" style="animation-delay: 0.5s">
+            @if(niche('current', '', $client->company) !== 'food_service')
             <!-- Seção de Veículos -->
             <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
                 <h4 class="mb-0 fw-bold"><i class="ti {{ niche_icon('entity', 'tabler-car', $client->company) }} me-2 text-primary"></i>Meus {{ niche('entities', 'Veículos', $client->company) }}</h4>
@@ -249,6 +250,7 @@ $customizerHidden = 'customizer-hide';
                 </div>
                 @endforelse
             </div>
+            @endif
 
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h4 class="mb-0 fw-bold"><i class="ti tabler-activity me-2 text-primary"></i>Acompanhamento Ativo</h4>
@@ -267,7 +269,7 @@ $customizerHidden = 'customizer-hide';
                                     {{ $order->veiculo ? ($order->veiculo->marca . ' ' . $order->veiculo->modelo) : 'Pedido #' . $order->id }}
                                 </h5>
                                 <div class="d-flex gap-2 align-items-center">
-                                    @if($order->veiculo && $order->veiculo->placa)
+                                    @if($order->veiculo && $order->veiculo->placa && niche('current', '', $client->company) !== 'food_service')
                                     <span class="badge bg-label-secondary text-uppercase">{{ $order->veiculo->placa }}</span>
                                     @endif
                                     <small class="text-muted"><i class="ti tabler-calendar-event me-1"></i>Início: {{ $order->created_at->format('d/m/Y H:i') }}</small>
@@ -323,6 +325,7 @@ $customizerHidden = 'customizer-hide';
                 </div>
 
                 <!-- Galeria de Fotos (Dossiê Visual) -->
+                @if(niche('current', '', $client->company) !== 'food_service')
                 @if($order->inspection && $order->inspection->damagePoints->whereNotNull('photo_path')->isNotEmpty())
                 <div class="mt-4 px-2">
                     <small class="text-muted fw-bold d-block mb-2"><i class="ti tabler-camera me-1"></i>Fotos do Atendimento</small>
@@ -339,6 +342,7 @@ $customizerHidden = 'customizer-hide';
                         @endforeach
                     </div>
                 </div>
+                @endif
                 @endif
 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">

@@ -199,6 +199,7 @@ Route::middleware([
     Route::get('/ordens-servico/{id}/edit', [OrdemServicoController::class, 'edit'])->name('ordens-servico.edit');
     Route::put('/ordens-servico/{id}', [OrdemServicoController::class, 'update'])->name('ordens-servico.update');
     Route::get('/ordens-servico/{id}/print-label', [OrdemServicoController::class, 'printLabel'])->name('ordens-servico.print-label');
+    Route::get('/ordens-servico/{id}/print-order', [OrdemServicoController::class, 'printOrder'])->name('ordens-servico.print-order');
     Route::get('/api/get-vehicles/{clientId}', [OrdemServicoController::class, 'getVehiclesByClient']);
 
     Route::get('/ordens-servico/checklist', [VehicleChecklistController::class, 'index'])->name('ordens-servico.checklist');

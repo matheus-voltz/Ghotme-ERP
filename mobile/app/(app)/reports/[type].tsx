@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, StatusBar } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useTheme } from '../../../context/ThemeContext';
+import { useNiche } from '../../../context/NicheContext';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +13,7 @@ export default function ReportScreen() {
     const { type } = useLocalSearchParams();
     const router = useRouter();
     const { colors } = useTheme();
+    const { niche } = useNiche();
     const insets = useSafeAreaInsets();
 
     const [data, setData] = useState<any>(null);
@@ -23,7 +25,7 @@ export default function ReportScreen() {
 
     const fetchData = async () => {
         try {
-            const resp = await api.get(`/reports/${type}`);
+            const resp = await api.get(`/reports/${type}`, { params: { niche } });
             setData(resp.data);
         } catch (e) {
             console.error(e);

@@ -18,6 +18,7 @@ class OrdemServico extends Model implements Auditable
         'company_id',
         'uuid',
         'client_id',
+        'customer_name',
         'veiculo_id',
         'user_id',
         'status',
@@ -82,7 +83,7 @@ class OrdemServico extends Model implements Auditable
 
     public function getClientNameAttribute()
     {
-        return $this->client->name ?? $this->client->company_name ?? 'Balcão';
+        return $this->client->name ?? $this->client->company_name ?? $this->attributes['customer_name'] ?? 'Balcão';
     }
 
     public function getPartsCostTotalAttribute()

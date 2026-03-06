@@ -21,18 +21,21 @@ import { useLanguage } from '../../../context/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useRouter, router, useNavigation } from 'expo-router';
+import { useRouter, router, useNavigation, useFocusEffect } from 'expo-router';
 import Animated, { FadeInDown, FadeInUp, FadeIn, FadeOut, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { Skeleton } from '../../../components/Skeleton';
 
 // Helper for status translations
-const statusTranslations: { [key: string]: string } = {
-  'pending': 'Pendente',
-  'approved': 'Aprovada',
-  'running': 'Em Execução',
-  'finalized': 'Finalizada',
-  'canceled': 'Cancelada',
+const getStatusTranslations = (niche: string) => {
+  const isFood = niche === 'food_service';
+  return {
+    'pending': isFood ? 'Recebido' : 'Pendente',
+    'approved': isFood ? 'Aceito' : 'Aprovada',
+    'running': isFood ? 'Em Cozinha' : 'Em Execução',
+    'finalized': isFood ? 'Pronto' : 'Finalizada',
+    'canceled': isFood ? 'Cancelado' : 'Cancelada',
+  };
 };
 
 // Helper for status colors (Platform Palette)
@@ -81,22 +84,23 @@ const AnimatedCard = ({ children, onPress, style, activeOpacity = 0.9 }: any) =>
   }));
 
   return (
-    <Pressable
-      onPressIn={() => {
-        scale.value = withSpring(0.97, { damping: 15, stiffness: 200 });
-      }}
-      onPressOut={() => {
-        scale.value = withSpring(1, { damping: 15, stiffness: 200 });
-      }}
-      onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        if (onPress) onPress();
-      }}
-    >
-      <Animated.View style={[style, animatedStyle]}>
+    <Animated.View style={[style, animatedStyle]}>
+      <Pressable
+        style={{ flex: 1 }}
+        onPressIn={() => {
+          scale.value = withSpring(0.97, { damping: 15, stiffness: 200 });
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, { damping: 15, stiffness: 200 });
+        }}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          if (onPress) onPress();
+        }}
+      >
         {children}
-      </Animated.View>
-    </Pressable>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -141,6 +145,13 @@ export default function DashboardScreen() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
+
+  // Atualiza ao voltar de outra tela (ex: após criar um pedido)
+  useFocusEffect(
+    useCallback(() => {
+      fetchDashboardData();
+    }, [])
+  );
 
   // Scroll to top when "Início" tab is pressed again
   const navigation = useNavigation();
@@ -279,9 +290,9 @@ export default function DashboardScreen() {
             { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             ...(niche === 'food_service' ? [{ icon: 'receipt', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
-            <Pressable 
-              key={idx} 
-              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]} 
+            <Pressable
+              key={idx}
+              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]}
               onPress={() => {
                 Haptics.selectionAsync();
                 router.push(action.route as any);
@@ -347,7 +358,9 @@ export default function DashboardScreen() {
           </View>
         </Pressable>
 
-        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10 }]}>Status Operacional</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10 }]}>
+          {niche === 'food_service' ? 'Pedidos de Hoje' : 'Status Operacional'}
+        </Text>
 
         {/* Operational Grid */}
         <View style={styles.statusGrid}>
@@ -355,56 +368,64 @@ export default function DashboardScreen() {
             style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
-              router.push({ pathname: '/os/list', params: { status: 'pending', title: 'Ordens Pendentes' } });
+              router.push({ pathname: '/os/list', params: { status: 'pending', title: niche === 'food_service' ? 'Pedidos Recebidos' : 'Ordens Pendentes' } });
             }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#FF9F4320' }]}>
               <Ionicons name="hourglass-outline" size={20} color="#FF9F43" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.pending || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Pendentes</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>
+              {niche === 'food_service' ? 'Recebidos' : 'Pendentes'}
+            </Text>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
-              router.push({ pathname: '/os/list', params: { status: 'approved', title: 'Ordens Aprovadas' } });
+              router.push({ pathname: '/os/list', params: { status: 'approved', title: niche === 'food_service' ? 'Pedidos Aceitos' : 'Ordens Aprovadas' } });
             }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
               <Ionicons name="thumbs-up-outline" size={20} color="#00CFE8" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.approved || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Aprovadas</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>
+              {niche === 'food_service' ? 'Aceitos' : 'Aprovadas'}
+            </Text>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
-              router.push({ pathname: '/os/list', params: { status: 'running', title: 'Em Execução' } });
+              router.push({ pathname: '/os/list', params: { status: 'running', title: niche === 'food_service' ? 'Na Cozinha' : 'Em Execução' } });
             }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#00CFE820' }]}>
-              <Ionicons name="play-outline" size={20} color="#00CFE8" />
+              <Ionicons name={niche === 'food_service' ? 'flame-outline' : 'play-outline'} size={20} color="#00CFE8" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.running || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Em Execução</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>
+              {niche === 'food_service' ? 'Na Cozinha' : 'Em Execução'}
+            </Text>
           </Pressable>
 
           <Pressable
             style={({ pressed }) => [styles.statusBox, { backgroundColor: colors.card, borderColor: colors.border, opacity: pressed ? 0.8 : 1 }]}
             onPress={() => {
               Haptics.selectionAsync();
-              router.push({ pathname: '/os/list', params: { status: 'finalized', title: 'Finalizadas Hoje' } });
+              router.push({ pathname: '/os/list', params: { status: 'finalized', title: niche === 'food_service' ? 'Prontos Hoje' : 'Finalizadas Hoje' } });
             }}
           >
             <View style={[styles.statusIcon, { backgroundColor: '#28C76F20' }]}>
               <Ionicons name="checkmark-done-outline" size={20} color="#28C76F" />
             </View>
             <Text style={[styles.statusCountText, { color: colors.text }]}>{data.osStats?.finalized_today || 0}</Text>
-            <Text style={[styles.statusLabelText, { color: colors.subText }]}>Finalizadas Hoje</Text>
+            <Text style={[styles.statusLabelText, { color: colors.subText }]}>
+              {niche === 'food_service' ? 'Prontos Hoje' : 'Finalizadas Hoje'}
+            </Text>
           </Pressable>
         </View>
 
@@ -414,17 +435,17 @@ export default function DashboardScreen() {
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Alertas Críticos</Text>
             <View style={styles.alertRow}>
               {data.lowStockCount > 0 && (
-                <Pressable 
-                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#EA545515', opacity: pressed ? 0.8 : 1 }]} 
-                  onPress={() => router.push('/inventory')}
+                <Pressable
+                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#EA545515', opacity: pressed ? 0.8 : 1 }]}
+                  onPress={() => router.push({ pathname: '/inventory', params: { filter: 'low_stock' } })}
                 >
                   <Ionicons name="warning" size={20} color="#EA5455" />
                   <Text style={[styles.alertText, { color: colors.text }]}>{data.lowStockCount} itens com baixo estoque</Text>
                 </Pressable>
               )}
               {data.pendingBudgetsCount > 0 && (
-                <Pressable 
-                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#FF9F4315', opacity: pressed ? 0.8 : 1 }]} 
+                <Pressable
+                  style={({ pressed }) => [styles.alertItem, { backgroundColor: '#FF9F4315', opacity: pressed ? 0.8 : 1 }]}
                   onPress={() => router.push('/budgets/pending')}
                 >
                   <Ionicons name="document-text" size={20} color="#FF9F43" />
@@ -471,9 +492,9 @@ export default function DashboardScreen() {
             { icon: 'cube-outline', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             ...(niche === 'food_service' ? [{ icon: 'receipt-outline', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
-            <Pressable 
-              key={idx} 
-              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]} 
+            <Pressable
+              key={idx}
+              style={({ pressed }) => [styles.quickActionItem, { opacity: pressed ? 0.7 : 1 }]}
               onPress={() => {
                 Haptics.selectionAsync();
                 router.push(action.route as any);
@@ -560,55 +581,75 @@ export default function DashboardScreen() {
     );
   };
 
-  const renderOSCard = (item: any, index: number = 0) => (
-    <Animated.View
-      key={item.id}
-      entering={FadeInDown.delay(index * 100).duration(600).springify()}
-    >
-      <Pressable
-        style={({ pressed }) => [
-          styles.card, 
-          { backgroundColor: colors.card, borderColor: colors.border },
-          pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }
-        ]}
-        onPress={() => router.push(`/os/${item.id}`)}
-      >
-        <View style={styles.cardHeader}>
-          <View style={styles.idBadge}>
-            <Text style={styles.idText}>#{item.id}</Text>
-          </View>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '15' }]}>
-            <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-              {statusTranslations[item.status?.toLowerCase()] || item.status}
-            </Text>
-          </View>
-        </View>
+  const renderOSCard = (item: any, index: number = 0) => {
+    const isDelivery = item.is_delivery || item.payment_method === 'ifood';
+    const deliveryColor = '#EA1D2C';
 
-        <View style={styles.cardBody}>
-          <View style={styles.infoRow}>
-            <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
-            <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>{item.client_name}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Ionicons name={getEntityIcon(niche) as any} size={16} color={colors.subText} style={{ marginRight: 6 }} />
-            <Text style={[styles.vehicleInfo, { color: colors.subText }]}>
-              {niche === 'food_service' ? (item.plate || 'Balcão/Mesa') : `${item.vehicle} - ${item.plate}`}
-            </Text>
-          </View>
-          <View style={[styles.divider, { backgroundColor: colors.border }]} />
-          <View style={styles.cardFooter}>
-            <View style={styles.dateContainer}>
-              <Ionicons name="calendar-outline" size={14} color={colors.subText} />
-              <Text style={[styles.dateText, { color: colors.subText }]}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
+    return (
+      <Animated.View
+        key={item.id}
+        entering={FadeInDown.delay(index * 100).duration(600).springify()}
+      >
+        <Pressable
+          style={({ pressed }) => [
+            styles.card,
+            { backgroundColor: colors.card, borderColor: isDelivery ? deliveryColor + '40' : colors.border },
+            isDelivery && { borderLeftWidth: 4, borderLeftColor: deliveryColor },
+            pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }
+          ]}
+          onPress={() => router.push(`/os/${item.id}`)}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.idBadge}>
+              <Text style={styles.idText}>#{item.id}</Text>
             </View>
-            <Text style={{ fontSize: 14, fontWeight: '800', color: colors.primary }}>
-              R$ {numberFormat(item.total)}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {isDelivery && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: deliveryColor + '15', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 }}>
+                  <Ionicons name="bicycle-outline" size={12} color={deliveryColor} style={{ marginRight: 3 }} />
+                  <Text style={{ color: deliveryColor, fontSize: 10, fontWeight: '800' }}>Entrega</Text>
+                </View>
+              )}
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) + '15' }]}>
+                <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
+                  {getStatusTranslations(niche)[item.status?.toLowerCase() as keyof ReturnType<typeof getStatusTranslations>] || item.status}
+                </Text>
+              </View>
+            </View>
           </View>
-        </View>
-      </Pressable>
-    </Animated.View>
-  );
+
+          <View style={styles.cardBody}>
+            <View style={styles.infoRow}>
+              <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 6 }} />
+              <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>
+                {item.client_name && item.client_name !== 'Balcão'
+                  ? item.client_name
+                  : item.customer_name || (niche === 'food_service' ? 'Balcão' : 'Cliente não informado')}
+              </Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Ionicons name={isDelivery ? 'bicycle-outline' : (getEntityIcon(niche) as any)} size={16} color={isDelivery ? deliveryColor : colors.subText} style={{ marginRight: 6 }} />
+              <Text style={[styles.vehicleInfo, { color: isDelivery ? deliveryColor : colors.subText, fontWeight: isDelivery ? '700' : '500' }]}>
+                {niche === 'food_service'
+                  ? (isDelivery ? '🛵 Entrega' : 'Balcão/Mesa')
+                  : `${item.vehicle} - ${item.plate}`}
+              </Text>
+            </View>
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <View style={styles.cardFooter}>
+              <View style={styles.dateContainer}>
+                <Ionicons name="calendar-outline" size={14} color={colors.subText} />
+                <Text style={[styles.dateText, { color: colors.subText }]}>{new Date(item.created_at).toLocaleDateString('pt-BR')}</Text>
+              </View>
+              <Text style={{ fontSize: 14, fontWeight: '800', color: colors.primary }}>
+                R$ {numberFormat(item.total)}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
+      </Animated.View>
+    );
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -654,8 +695,8 @@ export default function DashboardScreen() {
               )}
             </Pressable>
 
-            <Pressable 
-              style={({ pressed }) => [styles.profileButton, { opacity: pressed ? 0.8 : 1 }]} 
+            <Pressable
+              style={({ pressed }) => [styles.profileButton, { opacity: pressed ? 0.8 : 1 }]}
               onPress={() => router.push('/profile')}
             >
               <View style={styles.avatarPlaceholder}>
@@ -818,7 +859,7 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingTop: 130, 
+    paddingTop: 130,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -844,7 +885,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     width: 200,
     borderLeftWidth: 5,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: '#e5e5ea',
   },
   statLabel: {
@@ -897,7 +938,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: '#e5e5ea',
   },
   statusIcon: {
@@ -1045,7 +1086,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 16,
     padding: 16,
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: '#e5e5ea',
   },
   cardHeader: {

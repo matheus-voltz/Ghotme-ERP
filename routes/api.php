@@ -67,6 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // Inventory
     Route::get('/inventory/items-list', [ApiInventoryController::class, 'index']);
     Route::post('/inventory/items', [ApiInventoryController::class, 'store']);
+    Route::get('/inventory/items/{id}', [ApiInventoryController::class, 'show']);
+    Route::put('/inventory/items/{id}', [ApiInventoryController::class, 'update']);
+    Route::delete('/inventory/items/{id}', [ApiInventoryController::class, 'destroy']);
     Route::get('/inventory/menu', [ApiInventoryController::class, 'menu']);
 
     // Chat
@@ -99,4 +102,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // PIX Payment
     Route::post('/pix/generate', [\App\Http\Controllers\Api\ApiPixPaymentController::class, 'generate']);
     Route::get('/pix/status/{paymentId}', [\App\Http\Controllers\Api\ApiPixPaymentController::class, 'status']);
+
+    // Categories
+    Route::get('/categories', [\App\Http\Controllers\Api\ApiCategoryController::class, 'index']);
+    Route::post('/categories', [\App\Http\Controllers\Api\ApiCategoryController::class, 'store']);
 });

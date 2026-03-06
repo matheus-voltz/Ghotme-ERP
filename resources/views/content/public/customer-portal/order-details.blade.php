@@ -148,7 +148,7 @@ $customizerHidden = 'customizer-hide';
                             <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $order->company) }} text-primary fs-3"></i>
                         </div>
                         <div>
-                            @if($order->veiculo)
+                            @if($order->veiculo && niche('current', '', $order->company) !== 'food_service')
                             <h4 class="text-white mb-0 fw-600">{{ $order->veiculo->marca }} {{ $order->veiculo->modelo }}</h4>
                             <span class="text-white opacity-75 fs-6">{{ $order->veiculo->placa }} • {{ niche('year', 'Ano', $order->company) }} {{ $order->veiculo->ano_modelo ?? $order->veiculo->ano ?? 'N/A' }}</span>
                             @else
@@ -237,12 +237,23 @@ $customizerHidden = 'customizer-hide';
 
                 <!-- Coluna: Detalhes Técnicos -->
                 <div class="col-lg-7">
+                    @if(!empty(trim($order->description)))
+                    <div class="p-4 bg-light rounded-4 border-dashed mb-5">
+                        <h5 class="fw-bold mb-4">{{ niche('professional_report', 'Relatório / Observações', $order->company) }}</h5>
+                        <p class="text-muted mb-0 lh-lg">
+                            {!! nl2br(e($order->description)) !!}
+                        </p>
+                    </div>
+                    @else
+                    @if(niche('current', '', $order->company) !== 'food_service')
                     <div class="p-4 bg-light rounded-4 border-dashed mb-5">
                         <h5 class="fw-bold mb-4">{{ niche('professional_report', 'Relatório do Profissional', $order->company) }}</h5>
                         <p class="text-muted mb-0 lh-lg">
-                            {{ $order->description ?: 'Nenhuma observação técnica adicional.' }}
+                            Nenhuma observação técnica adicional.
                         </p>
                     </div>
+                    @endif
+                    @endif
 
                     <h5 class="fw-bold mb-4">Itens do {{ niche('entity', 'Pedido', $order->company) }}</h5>
                     <div class="item-list">

@@ -49,6 +49,7 @@ class ApiOrdemServicoController extends Controller
             'km_entry' => 'nullable|string',
             'parts' => 'nullable|array',
             'services' => 'nullable|array',
+            'payment_method' => 'nullable|string',
         ]);
 
         try {
@@ -70,6 +71,7 @@ class ApiOrdemServicoController extends Controller
                 }
 
                 $validated['client_id'] = $client->id;
+                $validated['customer_name'] = $customerName;
 
                 // 2. Cria um Objeto 'Pedido' (Vehicle) genérico se não houver um
                 $pedido = \App\Models\Vehicles::where('cliente_id', $client->id)
@@ -147,42 +149,47 @@ class ApiOrdemServicoController extends Controller
     {
         $user = $request->user();
         $formatOS = function ($os) {
+            $isDelivery = str_contains($os->description ?? '', 'ENTREGA') || ($os->payment_method === 'ifood');
             return [
                 'id' => $os->id,
-                'client_name' => $os->client ? ($os->client->name ?: $os->client->company_name) : 'Cliente Removido',
-                'vehicle' => $os->veiculo ? $os->veiculo->modelo : 'Veículo Removido',
+                'client_name' => $os->client ? ($os->client->name ?: $os->client->company_name) : ($os->customer_name ?: 'Balcão'),
+                'customer_name' => $os->customer_name,
+                'vehicle' => $os->veiculo ? $os->veiculo->modelo : null,
                 'plate' => $os->veiculo ? $os->veiculo->placa : 'N/A',
                 'status' => $os->status,
                 'total' => $os->total,
+                'payment_method' => $os->payment_method,
+                'is_delivery' => $isDelivery,
                 'created_at' => $os->created_at
             ];
         };
 
         if ($user->role === 'admin') {
+            $companyId = $user->company_id;
             $today = Carbon::today();
             $month = Carbon::now()->month;
             $year = Carbon::now()->year;
 
             // Current Month Revenue
-            $financialRevenue = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+            $financialRevenue = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')
                 ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
-            $osRevenue = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
+            $osRevenue = OrdemServico::where('company_id', $companyId)->with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                 ->whereMonth('updated_at', $month)->whereYear('updated_at', $year)
                 ->get()->sum('total');
             $monthlyRevenue = $financialRevenue + $osRevenue;
 
             // Last Month Revenue for Growth
             $lastMonth = Carbon::now()->subMonth();
-            $financialRevenueLast = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+            $financialRevenueLast = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')
                 ->whereMonth('paid_at', $lastMonth->month)->whereYear('paid_at', $lastMonth->year)->sum('amount');
-            $osRevenueLast = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
+            $osRevenueLast = OrdemServico::where('company_id', $companyId)->with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                 ->whereMonth('updated_at', $lastMonth->month)->whereYear('updated_at', $lastMonth->year)
                 ->get()->sum('total');
             $revenueLastMonth = $financialRevenueLast + $osRevenueLast;
             $revenueGrowth = round($revenueLastMonth > 0 ? (($monthlyRevenue - $revenueLastMonth) / $revenueLastMonth) * 100 : ($monthlyRevenue > 0 ? 100 : 0), 1);
 
             // Expenses for Profitability
-            $monthlyExpenses = FinancialTransaction::where('type', 'out')->where('status', 'paid')
+            $monthlyExpenses = FinancialTransaction::where('company_id', $companyId)->where('type', 'out')->where('status', 'paid')
                 ->whereMonth('paid_at', $month)->whereYear('paid_at', $year)->sum('amount');
             $monthlyProfitability = round($monthlyRevenue > 0 ? (($monthlyRevenue - $monthlyExpenses) / $monthlyRevenue) * 100 : 0, 1);
 
@@ -190,9 +197,9 @@ class ApiOrdemServicoController extends Controller
             $revenueChart = [];
             for ($i = 6; $i >= 0; $i--) {
                 $date = Carbon::today()->subDays($i);
-                $dailyFinancial = FinancialTransaction::where('type', 'in')->where('status', 'paid')
+                $dailyFinancial = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')
                     ->whereDate('paid_at', $date)->sum('amount');
-                $dailyOS = OrdemServico::with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
+                $dailyOS = OrdemServico::where('company_id', $companyId)->with(['items', 'parts'])->whereIn('status', ['paid', 'finalized', 'completed'])
                     ->whereDate('updated_at', $date)->get()->sum('total');
 
                 $revenueChart[] = [
@@ -201,23 +208,22 @@ class ApiOrdemServicoController extends Controller
                 ];
             }
 
-
             $osStats = [
-                'pending' => OrdemServico::where('status', 'pending')->count(),
-                'approved' => OrdemServico::where('status', 'approved')->count(),
-                'running' => OrdemServico::where('status', 'running')->count(),
-                'finalized_today' => OrdemServico::where('status', 'finalized')->whereDate('updated_at', $today)->count(),
+                'pending' => OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count(),
+                'approved' => OrdemServico::where('company_id', $companyId)->where('status', 'approved')->count(),
+                'running' => OrdemServico::where('company_id', $companyId)->where('status', 'running')->count(),
+                'finalized_today' => OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->whereDate('updated_at', $today)->count(),
             ];
             return response()->json([
                 'monthlyRevenue' => $monthlyRevenue,
                 'revenueGrowth' => $revenueGrowth,
                 'monthlyProfitability' => $monthlyProfitability,
-                'totalClients' => Clients::count(),
+                'totalClients' => Clients::where('company_id', $companyId)->count(),
                 'osStats' => $osStats,
                 'revenueChart' => $revenueChart,
-                'lowStockCount' => InventoryItem::whereColumn('quantity', '<=', 'min_quantity')->count(),
-                'pendingBudgetsCount' => Budget::where('status', 'pending')->where('created_at', '<', Carbon::now()->subDays(5))->count(),
-                'recentOS' => OrdemServico::whereIn('status', ['pending', 'approved', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
+                'lowStockCount' => InventoryItem::where('company_id', $companyId)->whereColumn('quantity', '<=', 'min_quantity')->count(),
+                'pendingBudgetsCount' => Budget::where('company_id', $companyId)->where('status', 'pending')->where('created_at', '<', Carbon::now()->subDays(5))->count(),
+                'recentOS' => OrdemServico::where('company_id', $companyId)->whereIn('status', ['pending', 'approved', 'running'])->with(['client', 'veiculo'])->latest()->take(10)->get()->map($formatOS),
                 'unreadNotificationsCount' => $user->unreadNotifications->count()
             ]);
         }
@@ -253,6 +259,14 @@ class ApiOrdemServicoController extends Controller
             }
 
             $os->save();
+
+            // Aciona automações de estoque e financeiro via Service se necessário
+            $osService = app(\App\Services\OrdemServicoService::class);
+            $isFood = (auth()->user()->company->niche ?? null) === 'food_service';
+
+            if ($os->status === 'finalized' || ($isFood && $os->status === 'running')) {
+                $osService->deductStock($os);
+            }
 
             if ($request->status === 'finalized' && $request->filled('payment_method')) {
                 $methodMap = [

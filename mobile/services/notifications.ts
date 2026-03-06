@@ -54,17 +54,25 @@ export async function setupNotificationChannels() {
 
 // ─── Registro do token de push ────────────────────────────────────────────────
 export async function registerForPushNotificationsAsync() {
-  let token;
+  try {
+    let token;
 
-  await setupNotificationChannels();
+    if (Platform.OS === 'android') {
+      await setupNotificationChannels();
+    }
 
-  if (Device.isDevice) {
+    if (!Device.isDevice) {
+      console.log('Push Notifications: Ignorado no simulador.');
+      return;
+    }
+
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
     if (existingStatus !== 'granted') {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
+
     if (finalStatus !== 'granted') {
       console.warn('Permissão de push negada pelo usuário.');
       return;
@@ -81,13 +89,27 @@ export async function registerForPushNotificationsAsync() {
       }
 
       console.log('Expo Push Token:', token);
-    } catch (e) {
-      token = `Erro ao obter token: ${e}`;
+    } catch (e: any) {
+      // Caso comum em builds de Personal Team no iOS: a falta de entitlements
+      // Captura tanto em inglês quanto no português exibido no erro do usuário
+      const errorMsg = e.message || '';
+      if (
+        errorMsg.includes('aps-environment') ||
+        errorMsg.includes('authorization code') ||
+        errorMsg.includes('autorização válido') ||
+        errorMsg.includes('entitlement')
+      ) {
+        console.warn('Push Notifications indisponíveis: Este build não possui as permissões necessárias (aps-environment).');
+        return null;
+      }
+      token = `Erro ao obter token: ${errorMsg}`;
       console.error(e);
     }
+    return token;
+  } catch (err: any) {
+    console.error('Falha geral no registro de Push:', err);
+    return null;
   }
-
-  return token;
 }
 
 // ─── Utilitário: extrair rota de navegação a partir de uma notificação ─────────

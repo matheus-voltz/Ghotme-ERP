@@ -15,6 +15,8 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
@@ -147,6 +149,7 @@ export default function OSDetailScreen() {
     const [timers, setTimers] = useState<{ [key: number]: number }>({});
     const [showSuccess, setShowSuccess] = useState(false);
     const [togglingItem, setTogglingItem] = useState<number | null>(null);
+    const [printing, setPrinting] = useState(false);
 
     const pulseAnim = useRef(new RNAnimated.Value(1)).current;
 
@@ -305,6 +308,198 @@ export default function OSDetailScreen() {
         }
     };
 
+    const generateReceiptHTML = () => {
+        if (!os) return '';
+        const isFood = niche === 'food_service';
+        const isDelivery = (os.description ?? '').includes('ENTREGA') || os.payment_method === 'ifood';
+        const clientName = os.client?.name || os.customer_name || (isFood ? 'Balcão' : 'Cliente');
+        const paymentLabels: any = { cash: 'Dinheiro', pix: 'PIX', debit: 'Débito', credit: 'Crédito', ifood: 'iFood' };
+        const paymentLabel = paymentLabels[os.payment_method] || os.payment_method || '---';
+        const date = new Date(os.created_at).toLocaleString('pt-BR');
+        const total = parseFloat(os.total || 0).toFixed(2).replace('.', ',');
+
+        // Extrair telefone da descri\u00e7\u00e3o se n\u00e3o houver no cadastro
+        const clientPhoneFromDB = os.client?.phone || os.client?.whatsapp || '';
+        let clientPhoneFromDesc = '';
+        if (!clientPhoneFromDB && os.description) {
+            const phoneMatch = os.description.match(/\ud83d\udcde\s*([+\d\s\(\)\-]{7,20})/);
+            if (phoneMatch) clientPhoneFromDesc = phoneMatch[1].trim();
+        }
+        const clientPhone = clientPhoneFromDB || clientPhoneFromDesc;
+
+        let itemsHTML = '';
+        if (os.parts && os.parts.length > 0) {
+            os.parts.forEach((p: any) => {
+                const name = p.inventory_item?.name || p.part?.name || p.inventoryItem?.name || 'Item';
+                const qty = p.quantity || 1;
+                const price = parseFloat(p.price || 0).toFixed(2).replace('.', ',');
+                const subtotal = (qty * parseFloat(p.price || 0)).toFixed(2).replace('.', ',');
+                itemsHTML += `
+                    <tr>
+                        <td style="text-align:left;padding:2px 0;">${qty}x ${name}</td>
+                        <td style="text-align:right;padding:2px 0;">R$ ${subtotal}</td>
+                    </tr>`;
+            });
+        }
+        if (os.items && os.items.length > 0) {
+            os.items.forEach((item: any) => {
+                const name = item.service?.name || 'Serviço';
+                const qty = item.quantity || 1;
+                const subtotal = (qty * parseFloat(item.price || 0)).toFixed(2).replace('.', ',');
+                itemsHTML += `
+                    <tr>
+                        <td style="text-align:left;padding:2px 0;">${qty}x ${name}</td>
+                        <td style="text-align:right;padding:2px 0;">R$ ${subtotal}</td>
+                    </tr>`;
+            });
+        }
+
+        // Extrair dados de entrega da descrição
+        let deliveryInfo = '';
+        if (isDelivery && os.description) {
+            const lines = os.description.split('\n');
+            const deliveryLines = lines.filter((l: string) => l.startsWith('📞') || l.startsWith('🏠') || l.startsWith('📌'));
+            if (deliveryLines.length > 0) {
+                deliveryInfo = `
+                    <div style="border:1px dashed #000;padding:6px;margin:8px 0;">
+                        <div style="font-weight:bold;text-align:center;margin-bottom:4px;">🛵 ENTREGA</div>
+                        ${deliveryLines.map((l: string) => `<div style="font-size:11px;">${l}</div>`).join('')}
+                    </div>`;
+            }
+        }
+
+        return `
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                @page { margin: 0; size: 80mm auto; }
+                body {
+                    font-family: 'Courier New', Courier, monospace;
+                    font-size: 12px;
+                    width: 72mm;
+                    margin: 4mm auto;
+                    padding: 0;
+                    color: #000;
+                }
+                .center { text-align: center; }
+                .bold { font-weight: bold; }
+                .divider {
+                    border-top: 1px dashed #000;
+                    margin: 6px 0;
+                }
+                .double-divider {
+                    border-top: 2px solid #000;
+                    margin: 6px 0;
+                }
+                table { width: 100%; border-collapse: collapse; }
+                .total-row td {
+                    font-size: 16px;
+                    font-weight: bold;
+                    padding-top: 6px;
+                }
+                .header-logo {
+                    font-size: 18px;
+                    font-weight: bold;
+                    letter-spacing: 2px;
+                }
+                .order-badge {
+                    font-size: 22px;
+                    font-weight: bold;
+                    border: 2px solid #000;
+                    display: inline-block;
+                    padding: 4px 16px;
+                    margin: 6px 0;
+                }
+                .delivery-badge {
+                    background: #000;
+                    color: #fff;
+                    padding: 4px 12px;
+                    font-weight: bold;
+                    font-size: 13px;
+                    display: inline-block;
+                    margin: 4px 0;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="center">
+                <div class="header-logo">GHOTME</div>
+                <div style="font-size:10px;margin-top:2px;">${isFood ? 'Food Service' : 'Ordem de Serviço'}</div>
+                <div class="divider"></div>
+                <div class="order-badge">#${os.id}</div>
+                ${isDelivery ? '<div><span class="delivery-badge">🛵 ENTREGA</span></div>' : '<div style="font-size:11px;">🏪 BALCÃO</div>'}
+            </div>
+
+            <div class="divider"></div>
+
+            <table>
+                <tr>
+                    <td class="bold">Cliente:</td>
+                    <td style="text-align:right;">${clientName}</td>
+                </tr>
+                ${clientPhone ? `<tr><td class="bold">Tel:</td><td style="text-align:right;">${clientPhone}</td></tr>` : ''}
+                <tr>
+                    <td class="bold">Data:</td>
+                    <td style="text-align:right;">${date}</td>
+                </tr>
+                <tr>
+                    <td class="bold">Pagamento:</td>
+                    <td style="text-align:right;">${paymentLabel}</td>
+                </tr>
+            </table>
+
+            ${deliveryInfo}
+
+            <div class="double-divider"></div>
+            <div class="center bold" style="font-size:13px;">ITENS DO PEDIDO</div>
+            <div class="divider"></div>
+
+            <table>
+                ${itemsHTML || '<tr><td colspan="2" class="center">Nenhum item</td></tr>'}
+            </table>
+
+            <div class="double-divider"></div>
+            <table>
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td style="text-align:right;">R$ ${total}</td>
+                </tr>
+            </table>
+            <div class="divider"></div>
+
+            <div class="center" style="font-size:10px;margin-top:8px;">
+                <div>Obrigado pela preferência!</div>
+                <div style="margin-top:4px;">Ghotme ERP • ghotme.com</div>
+                <div style="margin-top:2px;font-size:9px;">${date}</div>
+            </div>
+
+            <div style="height:20px;"></div>
+        </body>
+        </html>`;
+    };
+
+    const handlePrintReceipt = async () => {
+        try {
+            setPrinting(true);
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            const html = generateReceiptHTML();
+            await Print.printAsync({ html });
+        } catch (error) {
+            console.error('Print error:', error);
+            // Fallback: gerar PDF e compartilhar
+            try {
+                const html = generateReceiptHTML();
+                const { uri } = await Print.printToFileAsync({ html, width: 302, height: 792 });
+                await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+            } catch (e) {
+                Alert.alert('Erro', 'Não foi possível imprimir o recibo.');
+            }
+        } finally {
+            setPrinting(false);
+        }
+    };
+
     const handleUpdateStatus = async (newStatus: string) => {
         try {
             setUpdating(true);
@@ -320,6 +515,7 @@ export default function OSDetailScreen() {
     };
 
     const timeline = useMemo(() => {
+        if (!os) return null;
         const steps = ['pending', 'approved', 'running', 'finalized'];
         const isFood = niche === 'food_service';
         const timelineLabels = isFood ? ['Pedido', 'Aceito', 'Cozinha', 'Pronto'] : ['Entrada', 'Aprovado', 'Execução', 'Pronto'];
@@ -351,7 +547,7 @@ export default function OSDetailScreen() {
                 </View>
             </View>
         );
-    }, [os.status, niche]);
+    }, [os?.status, niche]);
 
     if (loading || !os) {
         return (
@@ -374,7 +570,15 @@ export default function OSDetailScreen() {
                     <Text style={styles.headerTitle}>
                         {niche === 'food_service' ? `Pedido #${os.id}` : `Ordem de Serviço #${os.id}`}
                     </Text>
-                    <View style={{ width: 24 }} />
+                    <Pressable
+                        onPress={handlePrintReceipt}
+                        style={({ pressed }) => [{ opacity: pressed ? 0.6 : 1 }]}
+                        disabled={printing}
+                    >
+                        {printing
+                            ? <ActivityIndicator size="small" color="#fff" />
+                            : <Ionicons name="print-outline" size={22} color="#fff" />}
+                    </Pressable>
                 </View>
                 {timeline}
             </LinearGradient>
@@ -388,8 +592,38 @@ export default function OSDetailScreen() {
                         <Ionicons name="person" size={20} color={colors.primary} />
                         <Text style={[styles.sectionTitle, { color: colors.text }]}>Cliente</Text>
                     </View>
-                    <Text style={[styles.infoText, { color: colors.text }]}>{os.client?.name || os.client?.company_name}</Text>
-                    <Text style={[styles.subInfoText, { color: colors.subText }]}>{os.client?.phone || 'Sem telefone'}</Text>
+                    <Text style={[styles.infoText, { color: colors.text }]}>
+                        {os.client?.name || os.client?.company_name || os.customer_name || (niche === 'food_service' ? 'Balcão' : 'Cliente não informado')}
+                    </Text>
+                    {(() => {
+                        // Prioridade: telefone do cadastro > telefone extraído da descrição
+                        const clientPhone = os.client?.phone || os.client?.whatsapp;
+                        let phoneFromDesc = '';
+                        if (!clientPhone && os.description) {
+                            const phoneMatch = os.description.match(/📞\s*([+\d\s\(\)\-]{7,20})/);
+                            if (phoneMatch) phoneFromDesc = phoneMatch[1].trim();
+                        }
+                        const phone = clientPhone || phoneFromDesc;
+                        if (phone) {
+                            return (
+                                <Pressable
+                                    style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6 }}
+                                    onPress={() => {
+                                        const cleanPhone = phone.replace(/\D/g, '');
+                                        Linking.openURL(`whatsapp://send?phone=55${cleanPhone}`);
+                                    }}
+                                >
+                                    <Ionicons name="logo-whatsapp" size={16} color="#28C76F" style={{ marginRight: 6 }} />
+                                    <Text style={[styles.subInfoText, { color: '#28C76F', fontWeight: '700' }]}>{phone}</Text>
+                                </Pressable>
+                            );
+                        }
+                        return (
+                            <Text style={[styles.subInfoText, { color: colors.subText }]}>
+                                {niche === 'food_service' ? 'Sem telefone informado' : 'Sem telefone'}
+                            </Text>
+                        );
+                    })()}
                 </Animated.View>
 
                 {niche !== 'food_service' && (
@@ -446,31 +680,69 @@ export default function OSDetailScreen() {
                     </Animated.View>
                 )}
 
-                {(os.status === 'pending' || os.status === 'canceled') && (
+                {os.status === 'canceled' && (
                     <Animated.View
                         entering={FadeInDown.delay(400).duration(400).springify()}
-                        style={[
-                            styles.readOnlyBanner,
-                            {
-                                backgroundColor: os.status === 'canceled' ? '#EA545515' : '#FF9F4315',
-                                borderColor: os.status === 'canceled' ? '#EA5455' : '#FF9F43',
-                            }
-                        ]}
+                        style={[styles.readOnlyBanner, { backgroundColor: '#EA545515', borderColor: '#EA5455' }]}
                     >
-                        <Ionicons
-                            name={os.status === 'canceled' ? 'close-circle-outline' : 'time-outline'}
-                            size={22}
-                            color={os.status === 'canceled' ? '#EA5455' : '#FF9F43'}
-                        />
+                        <Ionicons name="close-circle-outline" size={22} color="#EA5455" />
                         <View style={{ flex: 1 }}>
-                            <Text style={[styles.readOnlyTitle, { color: os.status === 'canceled' ? '#EA5455' : '#FF9F43' }]}>
-                                {os.status === 'canceled' ? 'Ordem Cancelada' : 'Aguardando Aprovação'}
+                            <Text style={[styles.readOnlyTitle, { color: '#EA5455' }]}>
+                                {niche === 'food_service' ? 'Pedido Cancelado' : 'Ordem Cancelada'}
                             </Text>
                             <Text style={[styles.readOnlySubtitle, { color: colors.subText }]}>
-                                {os.status === 'canceled'
-                                    ? 'Esta OS foi cancelada e não pode ser editada.'
-                                    : 'Somente visualização. As ações serão liberadas após a aprovação pelo gestor no painel web.'}
+                                {niche === 'food_service' ? 'Este pedido foi cancelado.' : 'Esta OS foi cancelada e não pode ser editada.'}
                             </Text>
+                        </View>
+                    </Animated.View>
+                )}
+
+                {os.status === 'pending' && niche !== 'food_service' && (
+                    <Animated.View
+                        entering={FadeInDown.delay(400).duration(400).springify()}
+                        style={[styles.readOnlyBanner, { backgroundColor: '#FF9F4315', borderColor: '#FF9F43' }]}
+                    >
+                        <Ionicons name="time-outline" size={22} color="#FF9F43" />
+                        <View style={{ flex: 1 }}>
+                            <Text style={[styles.readOnlyTitle, { color: '#FF9F43' }]}>Aguardando Aprovação</Text>
+                            <Text style={[styles.readOnlySubtitle, { color: colors.subText }]}>
+                                Somente visualização. As ações serão liberadas após a aprovação pelo gestor no painel web.
+                            </Text>
+                        </View>
+                    </Animated.View>
+                )}
+
+                {os.status === 'pending' && niche === 'food_service' && (
+                    <Animated.View
+                        entering={FadeInDown.delay(400).duration(400).springify()}
+                        style={styles.actionContainer}
+                    >
+                        <Text style={[styles.actionTitle, { color: colors.text }]}>Ações do Pedido</Text>
+                        <View style={styles.buttonRow}>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.actionButton,
+                                    { backgroundColor: '#28C76F', opacity: pressed || updating ? 0.7 : 1 }
+                                ]}
+                                onPress={() => handleUpdateStatus('approved')}
+                                disabled={updating}
+                            >
+                                {updating
+                                    ? <ActivityIndicator size="small" color="#fff" />
+                                    : <Ionicons name="checkmark-circle" size={18} color="#fff" />}
+                                <Text style={styles.buttonText}>Aceitar Pedido</Text>
+                            </Pressable>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.actionButton,
+                                    { backgroundColor: '#EA5455', opacity: pressed || updating ? 0.7 : 1 }
+                                ]}
+                                onPress={() => handleUpdateStatus('canceled')}
+                                disabled={updating}
+                            >
+                                <Ionicons name="close-circle" size={18} color="#fff" />
+                                <Text style={styles.buttonText}>Recusar</Text>
+                            </Pressable>
                         </View>
                     </Animated.View>
                 )}
@@ -620,7 +892,7 @@ export default function OSDetailScreen() {
                             {updating ? <ActivityIndicator color="#fff" /> : (
                                 <>
                                     <Ionicons name="checkmark-done-circle" size={24} color="#fff" />
-                                    <Text style={styles.finalizeButtonText}>FINALIZAR E ENTREGAR</Text>
+                                    <Text style={styles.finalizeButtonText}>{niche === 'food_service' ? 'MARCAR COMO PRONTO' : 'FINALIZAR E ENTREGAR'}</Text>
                                 </>
                             )}
                         </Pressable>
@@ -632,8 +904,12 @@ export default function OSDetailScreen() {
 
             <SuccessAnimation
                 visible={showSuccess}
-                onFinish={() => setShowSuccess(false)}
-                message="Ordem Finalizada!"
+                onFinish={() => {
+                    setShowSuccess(false);
+                    router.back();
+                }}
+                message={niche === 'food_service' ? 'Pedido Concluído!' : 'Ordem Finalizada!'}
+                emoji={niche === 'food_service' ? '🍽️' : (niche === 'pet' ? '🐾' : (niche === 'electronics' ? '💻' : (niche === 'beauty_clinic' ? '💅' : '🔧')))}
             />
         </View >
     );

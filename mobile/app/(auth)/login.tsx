@@ -28,7 +28,7 @@ import Animated, {
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 
 export default function LoginScreen() {
-    const { signIn, verify2FA } = useAuth();
+    const { signIn, verify2FA, getStoredCredentials } = useAuth();
     const router = useRouter();
 
     const [email, setEmail] = useState('');
@@ -62,7 +62,7 @@ export default function LoginScreen() {
             const hasHardware = await LocalAuthentication.hasHardwareAsync();
             const isEnrolled = await LocalAuthentication.isEnrolledAsync();
             const pref = await SecureStore.getItemAsync('useBiometrics');
-            const token = await SecureStore.getItemAsync('userToken');
+            const creds = await getStoredCredentials();
 
             if (hasHardware && isEnrolled) {
                 setBiometricAvailable(true);
@@ -77,8 +77,8 @@ export default function LoginScreen() {
             const enabled = pref === 'true';
             setBiometricEnabled(enabled);
 
-            // Disparo automático apenas se há token E biometria ativada
-            if (enabled && hasHardware && isEnrolled && token) {
+            // Disparo automático apenas se há credenciais salvas E biometria ativada
+            if (enabled && hasHardware && isEnrolled && creds) {
                 setTimeout(() => triggerBiometricAuth(), 600);
             }
         } catch (e) {
@@ -96,9 +96,9 @@ export default function LoginScreen() {
                 withSpring(1.0)
             );
 
-            const token = await SecureStore.getItemAsync('userToken');
-            if (!token) {
-                Alert.alert('Biometria', 'Faça login manualmente primeiro para ativar a biometria.');
+            const creds = await getStoredCredentials();
+            if (!creds) {
+                Alert.alert('Biometria', 'Faça login manualmente primeiro para ativar a biometria nesta conta.');
                 return;
             }
 
@@ -109,7 +109,27 @@ export default function LoginScreen() {
             });
 
             if (result.success) {
-                triggerSuccess();
+                // Realizar o login real com as credenciais guardadas
+                try {
+                    setLoading(true);
+                    const response = await signIn({
+                        email: creds.email,
+                        password: creds.password
+                    });
+
+                    if (response?.two_factor) {
+                        setEmail(creds.email);
+                        setShow2FA(true);
+                        setLoading(false);
+                        return;
+                    }
+
+                    triggerSuccess();
+                } catch (loginError) {
+                    Alert.alert('Falha no Login', 'Suas credenciais salvas parecem estar desatualizadas. Faça login com senha novamente.');
+                } finally {
+                    setLoading(false);
+                }
             } else if (result.error && result.error !== 'user_cancel' && result.error !== 'system_cancel') {
                 Alert.alert('Falha na biometria', 'Tente novamente ou use email e senha.');
             }
@@ -267,8 +287,8 @@ export default function LoginScreen() {
                                                 onChangeText={setPassword}
                                                 secureTextEntry={!showPassword}
                                             />
-                                            <Pressable 
-                                                onPress={() => setShowPassword(!showPassword)} 
+                                            <Pressable
+                                                onPress={() => setShowPassword(!showPassword)}
                                                 style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, padding: 5 }]}
                                             >
                                                 <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#7367F0" />
@@ -276,12 +296,12 @@ export default function LoginScreen() {
                                         </View>
                                     </View>
 
-                                    <Pressable 
+                                    <Pressable
                                         style={({ pressed }) => [
                                             styles.loginButton,
                                             { opacity: pressed || loading ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }
-                                        ]} 
-                                        onPress={handleLogin} 
+                                        ]}
+                                        onPress={handleLogin}
                                         disabled={loading}
                                     >
                                         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Entrar agora</Text>}
@@ -353,12 +373,12 @@ export default function LoginScreen() {
                                         </Text>
                                     </View>
 
-                                    <Pressable 
+                                    <Pressable
                                         style={({ pressed }) => [
                                             styles.loginButton,
                                             { opacity: pressed || loading ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }
-                                        ]} 
-                                        onPress={handleVerify2FA} 
+                                        ]}
+                                        onPress={handleVerify2FA}
                                         disabled={loading}
                                     >
                                         {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Verificar Código</Text>}

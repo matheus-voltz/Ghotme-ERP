@@ -42,6 +42,7 @@ class OrdemServicoController extends Controller
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
                     ->orWhereHas('client', function ($cq) use ($search) {
                         $cq->where('name', 'like', "%{$search}%")
                             ->orWhere('company_name', 'like', "%{$search}%");
@@ -75,10 +76,18 @@ class OrdemServicoController extends Controller
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
 
+        // Dados específicos para PDV Food Service
+        $categories = [];
+        if (get_current_niche() === 'food_service') {
+            $categories = \App\Models\MenuCategory::with(['items' => function($q) {
+                $q->where('is_active', true);
+            }])->get();
+        }
+
         // Carrega campos disponíveis para nova OS
         $customFields = (new OrdemServico())->getAvailableCustomFields();
 
-        return view('content.pages.ordens-servico.create', compact('services', 'parts', 'customFields'));
+        return view('content.pages.ordens-servico.create', compact('services', 'parts', 'customFields', 'categories'));
     }
 
     public function store(StoreOrdemServicoRequest $request)
@@ -200,5 +209,14 @@ class OrdemServicoController extends Controller
         $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . $os->id;
 
         return view('content.pages.ordens-servico.print-label', compact('os', 'qrCodeUrl'));
+    }
+
+    public function printOrder($id)
+    {
+        $order = OrdemServico::with(['client', 'items.service', 'parts.inventoryItem'])->findOrFail($id);
+        $company = Auth::user()->company;
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . route('customer.portal.order', $order->uuid);
+
+        return view('content.pages.ordens-servico.print-order', compact('order', 'company', 'qrCodeUrl'));
     }
 }

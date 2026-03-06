@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
     // Variable declaration for table
     const dt_items_table = document.querySelector('.datatables-items'),
         offCanvasForm = document.getElementById('offcanvasAddItems'),
-        t = window.inventoryTranslations || {};
+        t = window.inventoryTranslations || {},
+        uploadedAvatar = document.getElementById('uploadedAvatar');
 
     // Select2 initialization
     var select2 = $('.select2');
@@ -311,6 +312,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     .then(data => {
                         document.getElementById('item_id').value = data.id;
                         document.getElementById('add-item-name').value = data.name;
+                        
+                        if (data.main_image) {
+                            uploadedAvatar.src = baseUrl + 'storage/' + data.main_image.path;
+                        } else {
+                            uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
+                        }
                         document.getElementById('add-item-sku').value = data.sku || '';
                         document.getElementById('add-item-cost').value = data.cost_price;
                         document.getElementById('add-item-price').value = data.selling_price;
@@ -324,6 +331,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         if ($supplier.length && $supplier.hasClass('select2-hidden-accessible')) {
                             $supplier.val(data.supplier_id).trigger('change');
                         }
+
+                        const $category = $('#add-item-category');
+                        if ($category.length && $category.hasClass('select2-hidden-accessible')) {
+                            $category.val(data.menu_category_id).trigger('change');
+                        }
                     });
             }
         });
@@ -333,6 +345,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         if (addNewBtn) {
             addNewBtn.addEventListener('click', function () {
                 document.getElementById('item_id').value = '';
+                uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
                 document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Add Item'] || 'Adicionar Item';
                 document.getElementById('addNewItemsForm').reset();
                 $('#add-item-supplier').val(null).trigger('change');
@@ -386,37 +399,33 @@ document.addEventListener('DOMContentLoaded', function (e) {
             }
         }).on('core.form.valid', function () {
             const formData = new FormData(addNewItemsForm);
-            const formDataObj = {};
-            formData.forEach((value, key) => formDataObj[key] = value);
-
-            // Determine method (POST or PUT) based on ID existence
-            const id = formDataObj['id'];
+            
+            // Determine method (POST or spoofed PUT) based on ID existence
+            const id = formData.get('id');
             const url = id ? `${baseUrl}inventory/items/${id}` : `${baseUrl}inventory/items`;
-            const method = id ? 'PUT' : 'POST';
-
-            const searchParams = new URLSearchParams();
-            for (const [key, value] of Object.entries(formDataObj)) {
-                searchParams.append(key, value);
+            
+            if (id) {
+                formData.append('_method', 'PUT');
             }
 
             fetch(url, {
-                method: method,
+                method: 'POST', // Use POST with _method spoofing for file uploads in PUT requests
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Accept': 'application/json'
                 },
-                body: searchParams.toString()
+                body: formData
             })
                 .then(async response => {
                     const data = await response.json();
                     if (!response.ok) {
                         if (response.status === 422 && data.errors) {
                             // Limpar erros anteriores
-                            addNewItemForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                            addNewItemForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+                            addNewItemsForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            addNewItemsForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
                             Object.keys(data.errors).forEach(key => {
-                                const input = addNewItemForm.querySelector(`[name="${key}"]`);
+                                const input = addNewItemsForm.querySelector(`[name="${key}"]`);
                                 if (input) {
                                     input.classList.add('is-invalid');
                                     const feedback = document.createElement('div');

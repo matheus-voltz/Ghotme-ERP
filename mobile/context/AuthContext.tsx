@@ -10,6 +10,9 @@ type AuthContextType = {
     verify2FA: (email: string, code: string) => Promise<void>;
     updateUser: (newData: any) => Promise<void>;
     refreshUser: () => Promise<void>;
+    storeCredentials: (email: string, password: string) => Promise<void>;
+    getStoredCredentials: () => Promise<{ email: string, password: string } | null>;
+    clearStoredCredentials: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -94,6 +97,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }
 
+    async function storeCredentials(email: string, password: string) {
+        await SecureStore.setItemAsync('userEmail', email);
+        await SecureStore.setItemAsync('userPassword', password);
+    }
+
+    async function getStoredCredentials() {
+        const email = await SecureStore.getItemAsync('userEmail');
+        const password = await SecureStore.getItemAsync('userPassword');
+        if (email && password) return { email, password };
+        return null;
+    }
+
+    async function clearStoredCredentials() {
+        await SecureStore.deleteItemAsync('userEmail');
+        await SecureStore.deleteItemAsync('userPassword');
+        await SecureStore.deleteItemAsync('useBiometrics');
+    }
+
     async function signIn({ email, password }: any) {
         try {
             const response = await api.post('/login', { email, password });
@@ -116,13 +137,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             await SecureStore.deleteItemAsync('userToken');
             await SecureStore.deleteItemAsync('userData');
+
+            // Se a biometria NÃO estiver ativada, limpamos as credenciais salvas por segurança
+            const useBio = await SecureStore.getItemAsync('useBiometrics');
+            if (useBio !== 'true') {
+                await clearStoredCredentials();
+            }
+
             delete api.defaults.headers.common['Authorization'];
             setUser(null);
         } catch (error) { console.error('Error during signOut:', error); }
     }
 
     return (
-        <AuthContext.Provider value={{ user, loading, signIn, signOut, verify2FA, updateUser, refreshUser }}>
+        <AuthContext.Provider value={{
+            user,
+            loading,
+            signIn,
+            signOut,
+            verify2FA,
+            updateUser,
+            refreshUser,
+            storeCredentials,
+            getStoredCredentials,
+            clearStoredCredentials
+        }}>
             {children}
         </AuthContext.Provider>
     );

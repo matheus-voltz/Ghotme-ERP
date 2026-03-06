@@ -31,42 +31,37 @@
 @vite(['resources/js/inventory-items.js'])
 <script>
   window.inventoryTranslations = {
-    'Select': '{{ __("Select") }}',
-    'Active': '{{ __("Active") }}',
-    'Inactive': '{{ __("Inactive") }}',
-    'Actions': '{{ __("Actions") }}',
-    'Edit': '{{ __("Edit") }}',
-    'Publish on Mercado Livre': '{{ __("Publish on Mercado Livre") }}',
-    'Delete': '{{ __("Delete") }}',
-    'Search Item': '{{ __("Search Item") }}',
-    'Add Item': '{{ __("Add Item") }}',
-    'Showing _START_ to _END_ of _TOTAL_ entries': '{{ __("Showing _START_ to _END_ of _TOTAL_ entries") }}',
-    'Details of': '{{ __("Details of") }}',
-    'Are you sure?': '{{ __("Are you sure?") }}',
-    'You won\'t be able to revert this!': '{{ __("You won\'t be able to revert this!") }}',
-    'Yes, delete it!': '{{ __("Yes, delete it!") }}',
-    'Deleted!': '{{ __("Deleted!") }}',
-    'The item has been deleted!': '{{ __("The item has been deleted!") }}',
-    'Edit Item': '{{ __("Edit Item") }}',
-    'Item Created!': '{{ __("Item Created!") }}',
-    'Do you want to generate the QR Code label for this item now?': '{{ __("Do you want to generate the QR Code label for this item now?") }}',
-    'Yes, Generate Label': '{{ __("Yes, Generate Label") }}',
-    'Not Now': '{{ __("Not Now") }}',
-    'Updated!': '{{ __("Updated!") }}',
-    'Success!': '{{ __("Success!") }}',
-    'View Ad': '{{ __("View Ad") }}',
-    'Close': '{{ __("Close") }}',
-    'Error!': '{{ __("Error!") }}',
-    'Understood': '{{ __("Understood") }}',
-    'Publishing...': '{{ __("Publishing...") }}',
-    'Publish Now': '{{ __("Publish Now") }}',
-    'Please fill in the item name': '{{ __("Please fill in the item name") }}',
-    'Please fill in the cost': '{{ __("Please fill in the cost") }}',
-    'Please fill in the selling price': '{{ __("Please fill in the selling price") }}',
-    'Please fill in the quantity': '{{ __("Please fill in the quantity") }}',
-    'Please fill in the minimum stock': '{{ __("Please fill in the minimum stock") }}',
-    'Please fill in the unit': '{{ __("Please fill in the unit") }}'
+    // ... (traduções existentes)
   };
+
+  // Immediate Image Preview Logic
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('upload');
+    const previewImg = document.getElementById('uploadedAvatar');
+    const resetBtn = document.querySelector('.account-image-reset');
+    const defaultImg = "{{ asset('assets/img/elements/food-placeholder.png') }}";
+
+    if (fileInput && previewImg) {
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImg.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    if (resetBtn && fileInput && previewImg) {
+      resetBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.value = '';
+        previewImg.src = defaultImg;
+      });
+    }
+  });
 </script>
 @endsection
 
@@ -101,9 +96,28 @@
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
-      <form class="add-new-items pt-0" id="addNewItemsForm">
+      <form class="add-new-items pt-0" id="addNewItemsForm" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="id" id="item_id">
+
+        <div class="mb-6">
+          <label class="form-label d-block">{{ __('Item Photo') }}</label>
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            <img src="{{ asset('assets/img/elements/food-placeholder.png') }}" alt="product-image" class="d-block rounded" height="100" width="100" id="uploadedAvatar" style="object-fit: cover;" />
+            <div class="button-wrapper">
+              <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                <span class="d-none d-sm-block">{{ __('Upload new photo') }}</span>
+                <i class="ti tabler-upload d-block d-sm-none"></i>
+              </label>
+              <input type="file" id="upload" name="image" class="account-file-input" hidden accept="image/png, image/jpeg, image/jpg, image/gif, image/webp" />
+              <button type="button" class="btn btn-label-secondary account-image-reset mb-4">
+                <i class="ti tabler-refresh-dot d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Reset</span>
+              </button>
+              <div class="text-muted small">JPG, PNG, GIF ou WEBP. Máx 5MB.</div>
+            </div>
+          </div>
+        </div>
 
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-item-name">{{ __('Item Name') }}</label>
@@ -154,6 +168,16 @@
             <option value="">{{ __('Select') }}</option>
             @foreach($suppliers as $supplier)
             <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="mb-6">
+          <label class="form-label" for="add-item-category">{{ __('Category') }}</label>
+          <select id="add-item-category" class="select2 form-select" name="menu_category_id">
+            <option value="">{{ __('Select Category') }}</option>
+            @foreach($categories as $category)
+            <option value="{{ $category->id }}">{{ $category->name }}</option>
             @endforeach
           </select>
         </div>

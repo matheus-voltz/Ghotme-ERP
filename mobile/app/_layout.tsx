@@ -11,6 +11,7 @@ import { NicheProvider } from '../context/NicheContext';
 import { ChatProvider } from '../context/ChatContext';
 import { LanguageProvider } from '../context/LanguageContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { DeviceProvider } from '../context/DeviceContext';
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
@@ -92,7 +93,9 @@ export default function Layout() {
             <LanguageProvider>
               <NicheProvider>
                 <ChatProvider>
-                  <RootLayoutNav />
+                  <DeviceProvider>
+                    <RootLayoutNav />
+                  </DeviceProvider>
                 </ChatProvider>
               </NicheProvider>
             </LanguageProvider>

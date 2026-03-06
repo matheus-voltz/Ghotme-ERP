@@ -138,7 +138,7 @@
       ]
     },
     {
-      "name": "Customers & Entities",
+      "name": "Clientes",
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": [
         "{niche_clients_slug}",
@@ -156,24 +156,28 @@
         {
           "url": "/{niche_entities_slug}",
           "name": "Vehicles",
-          "slug": "{niche_entities_slug}"
+          "slug": "{niche_entities_slug}",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/fleet-management",
           "name": "Gestão de Frotas / B2B",
           "slug": "fleet.management",
-          "feature": "fleet_management"
+          "feature": "fleet_management",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/maintenance-contracts",
           "name": "Contratos de Manutenção",
           "slug": "maintenance-contracts",
-          "feature": "maintenance_contracts"
+          "feature": "maintenance_contracts",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/{niche_slug}-history",
           "name": "Vehicle history",
-          "slug": "{niche_slug}-history"
+          "slug": "{niche_slug}-history",
+          "niche_exclude": "food_service"
         }
       ]
     },

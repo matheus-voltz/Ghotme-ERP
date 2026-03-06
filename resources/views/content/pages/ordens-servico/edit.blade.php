@@ -31,21 +31,28 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                         <div class="col-md-6">
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
+                                @if($client)
                                 <option value="{{ $client->id }}" selected>
                                     {{ $client->name ?? $client->company_name }}
                                 </option>
+                                @else
+                                <option value="" selected>Consumidor Final</option>
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">{{ niche('entity') }}</label>
-                            <select name="veiculo_id" id="veiculo_id" class="select2 form-select" required>
-                                <option value="">Selecione o {{ niche('entity') }}</option>
+                            <label class="form-label">{{ niche('entity') }} ({{ get_current_niche() === 'food_service' ? 'Opcional' : 'Obrigatório' }})</label>
+                            <select name="veiculo_id" id="veiculo_id" class="select2 form-select" {{ get_current_niche() === 'food_service' ? '' : 'required' }}>
+                                <option value="">{{ get_current_niche() === 'food_service' ? 'Sem Mesa / Senha' : 'Selecione o ' . niche('entity') }}</option>
                                 @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}" {{ $order->veiculo_id == $vehicle->id ? 'selected' : '' }}>
+                                <option value="{{ $vehicle->id }}" {{ ($order->veiculo_id ?? 0) == $vehicle->id ? 'selected' : '' }}>
                                     {{ $vehicle->placa }} - {{ $vehicle->modelo }}
                                 </option>
                                 @endforeach
                             </select>
+                            @if(get_current_niche() === 'food_service')
+                            <small class="text-muted">Dica: Use para Mesa ou Senha.</small>
+                            @endif
                         </div>
                     </div>
                     <div class="row mb-4">

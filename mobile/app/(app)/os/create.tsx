@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
     View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity,
-    Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList, Linking, Modal
+    Alert, ActivityIndicator, KeyboardAvoidingView, Platform, FlatList, Linking, Modal, SectionList
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
@@ -13,6 +13,8 @@ import * as Haptics from 'expo-haptics';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
+import paymentService from '../../../services/payment';
+import { useDevices } from '../../../context/DeviceContext';
 
 // ─── Tipagens ───────────────────────────────────────────────────────────────
 interface IngredientInfo {
@@ -23,6 +25,7 @@ interface IngredientInfo {
 interface MenuItem {
     id: number;
     name: string;
+    sku: string | null;
     description: string | null;
     selling_price: number;
     quantity: number;
@@ -45,8 +48,9 @@ interface CartItem extends MenuItem {
 const PAYMENT_METHODS = [
     { id: 'cash', label: 'Dinheiro', icon: 'cash-outline', color: '#28C76F' },
     { id: 'pix', label: 'PIX', icon: 'qr-code-outline', color: '#7367F0' },
-    { id: 'debit', label: 'Débito', icon: 'card-outline', color: '#00CFE8' },
-    { id: 'credit', label: 'Crédito', icon: 'card-outline', color: '#FF9F43' },
+    { id: 'card_reader', label: 'Maquininha', icon: 'bluetooth-outline', color: '#7367F0' },
+    { id: 'debit', label: 'Débito (Manual)', icon: 'card-outline', color: '#00CFE8' },
+    { id: 'credit', label: 'Crédito (Manual)', icon: 'card-outline', color: '#FF9F43' },
     { id: 'ifood', label: 'iFood', icon: 'bicycle-outline', color: '#EA1D2C' },
 ];
 
@@ -64,6 +68,49 @@ export default function CreateOrderScreen() {
     return <OriginalCreateOrder />;
 }
 
+// Componente Auxiliar para Item de Produto (para reutilizar na SectionList)
+const ProductItem = ({ item, index, cart, addToCart, setDetailItem, colors }: any) => {
+    const inCart = cart.find((c: any) => c.id === item.id);
+    return (
+        <Animated.View entering={FadeInDown.delay(index * 60).duration(300)} style={s.productCardWrapper}>
+            <TouchableOpacity
+                style={[s.productCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+                activeOpacity={0.85}
+                onPress={() => setDetailItem(item)}
+            >
+                {item.image_url ? (
+                    <Image source={{ uri: item.image_url }} style={s.productImage} contentFit="cover" transition={200} />
+                ) : (
+                    <View style={[s.productImagePlaceholder, { backgroundColor: '#7367F015' }]}>
+                        <Ionicons name="fast-food-outline" size={36} color="#7367F0" />
+                    </View>
+                )}
+                <View style={s.productInfo}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        {item.sku ? (
+                            <View style={{ backgroundColor: '#7367F015', paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 }}>
+                                <Text style={{ fontSize: 10, fontWeight: 'bold', color: '#7367F0' }}>#{item.sku}</Text>
+                            </View>
+                        ) : null}
+                        <Text style={[s.productName, { color: colors.text, flex: 1 }]} numberOfLines={1}>{item.name}</Text>
+                    </View>
+                    <Text style={s.productPrice}>R$ {item.selling_price ? item.selling_price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</Text>
+                </View>
+                <TouchableOpacity style={s.addBtn} onPress={() => addToCart(item)}>
+                    <LinearGradient colors={['#7367F0', '#CE9FFC']} style={s.addBtnGradient}>
+                        <Ionicons name="add" size={20} color="#fff" />
+                    </LinearGradient>
+                </TouchableOpacity>
+                {inCart && (
+                    <View style={s.qtyBadge}>
+                        <Text style={s.qtyBadgeText}>{inCart.qty}</Text>
+                    </View>
+                )}
+            </TouchableOpacity>
+        </Animated.View>
+    );
+};
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PDV FOOD SERVICE — Cardápio Visual com Carrinho
 // ═══════════════════════════════════════════════════════════════════════════
@@ -71,6 +118,7 @@ function FoodServicePDV() {
     const router = useRouter();
     const { colors } = useTheme();
     const insets = useSafeAreaInsets();
+    const { pairedDevices } = useDevices();
 
     // Estado
     const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -79,12 +127,14 @@ function FoodServicePDV() {
     const [cart, setCart] = useState<CartItem[]>([]);
     const [step, setStep] = useState<'menu' | 'cart' | 'payment' | 'pix'>('menu');
     const [customerName, setCustomerName] = useState('');
+    const [customerPhone, setCustomerPhone] = useState(''); // 📱 Telefone opcional
     const [selectedPayment, setSelectedPayment] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [notesModal, setNotesModal] = useState<{ itemId: number; notes: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [detailItem, setDetailItem] = useState<MenuItem | null>(null);
     const [sortBy, setSortBy] = useState<'default' | 'az' | 'za' | 'expensive' | 'cheap'>('default');
+    const [lastCreatedOS, setLastCreatedOS] = useState<any>(null); // Para impressão pós-pedido
 
     // Tipo de pedido: Balcão ou Entrega
     const [orderType, setOrderType] = useState<'counter' | 'delivery'>('counter');
@@ -103,8 +153,16 @@ function FoodServicePDV() {
         try {
             const res = await api.get('/inventory/menu');
             const data = res.data || [];
+
+            // Garantir que as categorias tenham o formato para SectionList
+            const sections = data.map((cat: any) => ({
+                id: cat.id,
+                title: cat.name,
+                data: cat.items || []
+            })).filter((s: any) => s.data.length > 0);
+
             setCategories(data);
-            if (data.length > 0) setActiveCatId(data[0].id);
+            if (sections.length > 0) setActiveCatId(sections[0].id);
         } catch (e) {
             // Fallback para a lista simples se o endpoint não existir
             try {
@@ -124,13 +182,22 @@ function FoodServicePDV() {
     // Itens filtrados por categoria + pesquisa
     const allItems = categories.flatMap(c => c.items);
     const isSearching = searchQuery.trim().length > 0;
-    const rawItems = isSearching
-        ? allItems.filter(i => i.name.toLowerCase().includes(searchQuery.toLowerCase()))
-        : (categories.find(c => c.id === activeCatId)?.items || []);
+    const activeSections = React.useMemo(() => {
+        if (isSearching) return [];
+        return categories.map(cat => ({
+            id: cat.id,
+            title: cat.name,
+            data: cat.items
+        })).filter(s => s.data.length > 0);
+    }, [categories, isSearching]);
 
-    // Ordenação
     const activeItems = React.useMemo(() => {
-        const items = [...rawItems];
+        if (!isSearching) return [];
+        const lowerQuery = searchQuery.toLowerCase();
+        const items = [...allItems.filter(i =>
+            i.name.toLowerCase().includes(lowerQuery) ||
+            (i.sku && i.sku.toLowerCase().includes(lowerQuery))
+        )];
         switch (sortBy) {
             case 'az': return items.sort((a, b) => a.name.localeCompare(b.name));
             case 'za': return items.sort((a, b) => b.name.localeCompare(a.name));
@@ -138,7 +205,22 @@ function FoodServicePDV() {
             case 'cheap': return items.sort((a, b) => a.selling_price - b.selling_price);
             default: return items;
         }
-    }, [rawItems, sortBy]);
+    }, [allItems, searchQuery, isSearching, sortBy]);
+
+    const sectionListRef = React.useRef<SectionList>(null);
+
+    const scrollToCategory = (id: number) => {
+        const index = activeSections.findIndex(s => s.id === id);
+        if (index !== -1 && sectionListRef.current) {
+            sectionListRef.current.scrollToLocation({
+                sectionIndex: index,
+                itemIndex: 0,
+                animated: true,
+                viewOffset: 0
+            });
+            setActiveCatId(id);
+        }
+    };
 
     const cartTotal = cart.reduce((sum, i) => sum + i.selling_price * i.qty, 0);
     const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -198,7 +280,7 @@ function FoodServicePDV() {
             return line;
         }).join('\n');
 
-        // Adicionar dados de entrega na descrição
+        // Adicionar dados de entrega ou de balcão na descrição
         if (orderType === 'delivery') {
             description += `\n\n📍 ENTREGA`;
             description += `\n📞 ${deliveryPhone}`;
@@ -206,6 +288,33 @@ function FoodServicePDV() {
             if (deliveryRef.trim()) description += `\n📌 Ref: ${deliveryRef}`;
         } else {
             description += `\n\n🏪 BALCÃO`;
+            // Inclui telefone de balcão se informado
+            if (customerPhone.trim()) description += `\n📞 ${customerPhone}`;
+        }
+
+        // Se for Maquininha Bluetooth
+        if (selectedPayment === 'card_reader') {
+            const hasReader = pairedDevices.some(d => d.type === 'card_reader');
+            if (!hasReader) {
+                Alert.alert('Dispositivo não encontrado', 'Vá em Perfil > Dispositivos e conecte sua maquininha primeiro.');
+                return;
+            }
+
+            try {
+                setSubmitting(true);
+                // 1000 = R$ 10,00 (O PlugPag geralmente usa centavos)
+                const paymentResult: any = await paymentService.processPayment(cartTotal * 100);
+                if (!paymentResult.success) {
+                    Alert.alert('Erro no Cartão', paymentResult.message || 'O pagamento foi recusado ou cancelado.');
+                    setSubmitting(false);
+                    return;
+                }
+                // Se pagou, segue para criar a OS
+            } catch (e) {
+                Alert.alert('Erro de Conexão', 'Não foi possível comunicar com a maquininha.');
+                setSubmitting(false);
+                return;
+            }
         }
 
         // Se for PIX, gerar QR Code primeiro
@@ -255,17 +364,54 @@ function FoodServicePDV() {
                 customer_name: customerName || 'Balcão',
                 parts: parts,
                 description,
-                status: 'pending',
+                status: 'running', // 🍳 Vai direto para a cozinha!
                 payment_method: selectedPayment,
             };
 
             const response = await api.post('/os', payload);
+            setLastCreatedOS(response.data);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-            Alert.alert('Pedido Confirmado! 🎉', `Pedido #${response.data.id} enviado para a cozinha.\nTotal: R$ ${fmt(cartTotal)}`, [
-                { text: 'Novo Pedido', onPress: () => { setCart([]); setStep('menu'); setCustomerName(''); setSelectedPayment(null); setOrderType('counter'); setDeliveryAddress(''); setDeliveryPhone(''); setDeliveryRef(''); } },
-                { text: 'Voltar', onPress: () => router.back(), style: 'cancel' },
-            ]);
+            const resetState = () => {
+                setCart([]);
+                setStep('menu');
+                setCustomerName('');
+                setCustomerPhone('');
+                setSelectedPayment(null);
+                setOrderType('counter');
+                setDeliveryAddress('');
+                setDeliveryPhone('');
+                setDeliveryRef('');
+                setLastCreatedOS(null);
+            };
+
+            // Tentar imprimir automaticamente se houver impressora
+            const hasPrinter = pairedDevices.some(d => d.type === 'printer');
+            if (hasPrinter) {
+                paymentService.printReceipt(`PEDIDO #${response.data.id}\n----------------\n${description}\n----------------\nTotal: R$ ${cartTotal.toFixed(2)}`);
+            }
+
+            Alert.alert(
+                '🍳 Na Cozinha!',
+                `Pedido #${response.data.id} enviado direto para a cozinha.\nTotal: R$ ${fmt(cartTotal)}\n\nDeseja imprimir a comanda?`,
+                [
+                    {
+                        text: '🖨️ Imprimir',
+                        onPress: () => {
+                            router.push(`/os/${response.data.id}` as any);
+                        }
+                    },
+                    {
+                        text: '+ Novo Pedido',
+                        onPress: resetState
+                    },
+                    {
+                        text: 'Fechar',
+                        onPress: () => router.back(),
+                        style: 'cancel'
+                    },
+                ]
+            );
         } catch (e: any) {
             Alert.alert('Erro', e.response?.data?.message || 'Falha ao criar pedido.');
         } finally { setSubmitting(false); }
@@ -296,7 +442,7 @@ function FoodServicePDV() {
                             customer_name: customerName || 'Balcão',
                             parts: parts,
                             description,
-                            status: 'pending',
+                            status: 'running', // 🍳 PIX pago → direto para a cozinha!
                             payment_method: 'pix',
                         });
                     } catch (e) { console.error('Erro ao criar OS após PIX:', e); }
@@ -351,7 +497,7 @@ function FoodServicePDV() {
                             <Ionicons name="search" size={18} color={colors.subText} />
                             <TextInput
                                 style={[s.searchInputText, { color: colors.text }]}
-                                placeholder="Pesquisar no cardápio..."
+                                placeholder="Nome ou código do item..."
                                 placeholderTextColor={colors.subText}
                                 value={searchQuery}
                                 onChangeText={setSearchQuery}
@@ -368,14 +514,14 @@ function FoodServicePDV() {
                     {!isSearching && (
                         <View style={[s.categoryBar, { backgroundColor: colors.card }]}>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 15 }}>
-                                {categories.map(cat => (
+                                {activeSections.map(cat => (
                                     <TouchableOpacity
                                         key={cat.id}
                                         style={[s.categoryTab, activeCatId === cat.id && s.categoryTabActive]}
-                                        onPress={() => { Haptics.selectionAsync(); setActiveCatId(cat.id); }}
+                                        onPress={() => { Haptics.selectionAsync(); scrollToCategory(cat.id); }}
                                     >
                                         <Text style={[s.categoryTabText, { color: activeCatId === cat.id ? '#7367F0' : colors.subText }]}>
-                                            {cat.name}
+                                            {cat.title}
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
@@ -405,55 +551,67 @@ function FoodServicePDV() {
                         </ScrollView>
                     </View>
 
-                    {/* Grid de Produtos */}
-                    <FlatList
-                        data={activeItems}
-                        keyExtractor={item => item.id.toString()}
-                        numColumns={2}
-                        columnWrapperStyle={s.gridRow}
-                        contentContainerStyle={{ padding: 12, paddingBottom: 120 }}
-                        showsVerticalScrollIndicator={false}
-                        renderItem={({ item, index }) => {
-                            const inCart = cart.find(c => c.id === item.id);
-                            return (
-                                <Animated.View entering={FadeInDown.delay(index * 60).duration(300)} style={s.productCardWrapper}>
-                                    <TouchableOpacity
-                                        style={[s.productCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-                                        activeOpacity={0.85}
-                                        onPress={() => setDetailItem(item)}
-                                    >
-                                        {item.image_url ? (
-                                            <Image source={{ uri: item.image_url }} style={s.productImage} contentFit="cover" transition={200} />
-                                        ) : (
-                                            <View style={[s.productImagePlaceholder, { backgroundColor: '#7367F015' }]}>
-                                                <Ionicons name="fast-food-outline" size={36} color="#7367F0" />
-                                            </View>
-                                        )}
-                                        <View style={s.productInfo}>
-                                            <Text style={[s.productName, { color: colors.text }]} numberOfLines={2}>{item.name}</Text>
-                                            <Text style={s.productPrice}>R$ {fmt(item.selling_price)}</Text>
+                    {/* Grid de Produtos ou Seções */}
+                    {isSearching ? (
+                        <FlatList
+                            data={activeItems}
+                            keyExtractor={item => item.id.toString()}
+                            numColumns={2}
+                            columnWrapperStyle={s.gridRow}
+                            contentContainerStyle={{ padding: 12, paddingBottom: 120 }}
+                            showsVerticalScrollIndicator={false}
+                            renderItem={({ item, index }) => <ProductItem item={item} index={index} cart={cart} addToCart={addToCart} setDetailItem={setDetailItem} colors={colors} />}
+                            ListEmptyComponent={
+                                <View style={s.emptyState}>
+                                    <Ionicons name="search-outline" size={48} color={colors.subText + '44'} />
+                                    <Text style={[s.emptyText, { color: colors.subText }]}>Nenhum item encontrado na busca</Text>
+                                </View>
+                            }
+                        />
+                    ) : (
+                        <SectionList
+                            ref={sectionListRef}
+                            sections={activeSections}
+                            keyExtractor={item => item.id.toString()}
+                            stickySectionHeadersEnabled={false}
+                            showsVerticalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBottom: 120 }}
+                            renderSectionHeader={({ section: { title } }) => (
+                                <View style={[s.sectionHeader, { backgroundColor: colors.background }]}>
+                                    <View style={s.sectionHeaderLine} />
+                                    <Text style={[s.sectionHeaderText, { color: colors.text }]}>{title}</Text>
+                                    <View style={s.sectionHeaderLine} />
+                                </View>
+                            )}
+                            renderSectionFooter={() => <View style={{ height: 20 }} />}
+                            // Para manter o visual de GRID 2 Colunas em SectionList:
+                            renderItem={({ item, index, section }) => {
+                                if (index % 2 !== 0) return null;
+                                const nextItem = section.data[index + 1];
+                                return (
+                                    <View style={s.gridRow}>
+                                        <View style={{ flex: 1 }}>
+                                            <ProductItem item={item} index={index} cart={cart} addToCart={addToCart} setDetailItem={setDetailItem} colors={colors} />
                                         </View>
-                                        <TouchableOpacity style={s.addBtn} onPress={() => addToCart(item)}>
-                                            <LinearGradient colors={['#7367F0', '#CE9FFC']} style={s.addBtnGradient}>
-                                                <Ionicons name="add" size={20} color="#fff" />
-                                            </LinearGradient>
-                                        </TouchableOpacity>
-                                        {inCart && (
-                                            <View style={s.qtyBadge}>
-                                                <Text style={s.qtyBadgeText}>{inCart.qty}</Text>
-                                            </View>
-                                        )}
-                                    </TouchableOpacity>
-                                </Animated.View>
-                            );
-                        }}
-                        ListEmptyComponent={
-                            <View style={s.emptyState}>
-                                <Ionicons name="restaurant-outline" size={48} color={colors.subText + '44'} />
-                                <Text style={[s.emptyText, { color: colors.subText }]}>Nenhum item nesta categoria</Text>
-                            </View>
-                        }
-                    />
+                                        <View style={{ flex: 1 }}>
+                                            {nextItem ? (
+                                                <ProductItem item={nextItem} index={index + 1} cart={cart} addToCart={addToCart} setDetailItem={setDetailItem} colors={colors} />
+                                            ) : <View style={s.productCardWrapper} />}
+                                        </View>
+                                    </View>
+                                );
+                            }}
+                            onViewableItemsChanged={({ viewableItems }) => {
+                                if (viewableItems.length > 0) {
+                                    const firstVisible = viewableItems[0];
+                                    if (firstVisible.section) {
+                                        setActiveCatId((firstVisible.section as any).id);
+                                    }
+                                }
+                            }}
+                            viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+                        />
+                    )}
 
                     {/* Barra inferior do carrinho */}
                     {cartCount > 0 && (
@@ -571,19 +729,35 @@ function FoodServicePDV() {
                             </View>
                         </View>
 
-                        {/* Nome do Cliente */}
+                        {/* Nome do Cliente + Telefone */}
                         <View style={[s.cartSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
                             <View style={s.cartSectionHeader}>
                                 <Ionicons name="person-outline" size={18} color="#7367F0" />
                                 <Text style={[s.cartSectionTitle, { color: colors.text }]}>Cliente</Text>
                             </View>
-                            <TextInput
-                                style={[s.cartInput, { color: colors.text, backgroundColor: colors.background, borderColor: colors.border }]}
-                                placeholder="Nome do cliente (opcional)"
-                                placeholderTextColor={colors.subText}
-                                value={customerName}
-                                onChangeText={setCustomerName}
-                            />
+                            {/* Campo Nome */}
+                            <View style={[s.cartInputWrapper, { backgroundColor: colors.background, borderColor: colors.border, marginBottom: 10 }]}>
+                                <Ionicons name="person-outline" size={16} color={colors.subText} style={{ marginRight: 10 }} />
+                                <TextInput
+                                    style={[s.cartInputInner, { color: colors.text }]}
+                                    placeholder="Nome do cliente (opcional)"
+                                    placeholderTextColor={colors.subText}
+                                    value={customerName}
+                                    onChangeText={setCustomerName}
+                                />
+                            </View>
+                            {/* Campo Telefone */}
+                            <View style={[s.cartInputWrapper, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                                <Ionicons name="call-outline" size={16} color={colors.subText} style={{ marginRight: 10 }} />
+                                <TextInput
+                                    style={[s.cartInputInner, { color: colors.text }]}
+                                    placeholder="Telefone (opcional)"
+                                    placeholderTextColor={colors.subText}
+                                    value={customerPhone}
+                                    onChangeText={setCustomerPhone}
+                                    keyboardType="phone-pad"
+                                />
+                            </View>
                         </View>
 
                         {/* Dados de Entrega (condicional) */}
@@ -755,8 +929,8 @@ function FoodServicePDV() {
                                     <ActivityIndicator color="#fff" />
                                 ) : (
                                     <>
-                                        <Ionicons name="checkmark-circle" size={22} color="#fff" style={{ marginRight: 8 }} />
-                                        <Text style={s.confirmFullBtnText}>Confirmar Pedido — R$ {fmt(cartTotal)}</Text>
+                                        <Ionicons name="flame" size={22} color="#fff" style={{ marginRight: 8 }} />
+                                        <Text style={s.confirmFullBtnText}>🍳 Enviar para Cozinha — R$ {fmt(cartTotal)}</Text>
                                     </>
                                 )}
                             </LinearGradient>
@@ -832,7 +1006,7 @@ function FoodServicePDV() {
                             <View style={{ flexDirection: 'row', marginTop: 30, width: '100%' }}>
                                 <TouchableOpacity
                                     style={{ flex: 1, marginRight: 8 }}
-                                    onPress={() => { setCart([]); setStep('menu'); setCustomerName(''); setSelectedPayment(null); setPixData(null); setPixStatus('loading'); setOrderType('counter'); setDeliveryAddress(''); setDeliveryPhone(''); setDeliveryRef(''); }}
+                                    onPress={() => { setCart([]); setStep('menu'); setCustomerName(''); setCustomerPhone(''); setSelectedPayment(null); setPixData(null); setPixStatus('loading'); setOrderType('counter'); setDeliveryAddress(''); setDeliveryPhone(''); setDeliveryRef(''); }}
                                 >
                                     <LinearGradient colors={['#7367F0', '#CE9FFC']} style={s.pixActionBtn}>
                                         <Text style={s.pixActionBtnText}>Novo Pedido</Text>
@@ -964,7 +1138,11 @@ function OriginalCreateOrder() {
     };
 
     useEffect(() => {
-        setFilteredProducts(products.filter(p => p.name.toLowerCase().includes(productSearch.toLowerCase())));
+        const lowerQuery = productSearch.toLowerCase();
+        setFilteredProducts(products.filter(p =>
+            p.name.toLowerCase().includes(lowerQuery) ||
+            (p.sku && p.sku.toLowerCase().includes(lowerQuery))
+        ));
     }, [productSearch, products]);
 
     const handleSelectProduct = (item: any) => { setProductId(item.id.toString()); setShowProductModal(false); setProductSearch(''); };
@@ -1036,9 +1214,16 @@ function OriginalCreateOrder() {
                         </View>
                         <FlatList data={filteredProducts} keyExtractor={item => item.id.toString()} renderItem={({ item }) => (
                             <TouchableOpacity style={{ paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: colors.border }} onPress={() => handleSelectProduct(item)}>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <View><Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{item.name}</Text><Text style={{ fontSize: 13, color: colors.subText }}>Disponível: {item.quantity}</Text></View>
-                                    <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary }}>R$ {parseFloat(item.selling_price).toFixed(2)}</Text>
+                                <View>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                                        {item.sku ? (
+                                            <View style={{ backgroundColor: colors.primary + '15', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4 }}>
+                                                <Text style={{ fontSize: 11, fontWeight: 'bold', color: colors.primary }}>#{item.sku}</Text>
+                                            </View>
+                                        ) : null}
+                                        <Text style={{ fontSize: 16, fontWeight: '600', color: colors.text }}>{item.name}</Text>
+                                    </View>
+                                    <Text style={{ fontSize: 13, color: colors.subText }}>Disponível: {item.quantity}</Text>
                                 </View>
                             </TouchableOpacity>
                         )} ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum lanche encontrado.</Text>} />
@@ -1055,6 +1240,11 @@ function OriginalCreateOrder() {
 const s = StyleSheet.create({
     container: { flex: 1 },
     loadingText: { marginTop: 10, fontSize: 14 },
+
+    sectionHeader: { flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 20, gap: 10 },
+    sectionHeaderLine: { flex: 1, height: 1.5, backgroundColor: 'rgba(115, 103, 240, 0.15)' },
+    sectionHeaderText: { fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5, color: '#7367F0' },
+
 
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 15, paddingHorizontal: 15 },
     headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#fff' },
@@ -1094,6 +1284,9 @@ const s = StyleSheet.create({
     cartSectionHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 8 },
     cartSectionTitle: { fontSize: 16, fontWeight: '700' },
     cartInput: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 16, height: 50, fontSize: 16 },
+    // Novo: input com ícone integrado como prefixo
+    cartInputWrapper: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, height: 50 },
+    cartInputInner: { flex: 1, fontSize: 16 },
 
     cartItem: { paddingVertical: 14 },
     cartItemTop: { flexDirection: 'row', alignItems: 'center' },
@@ -1128,11 +1321,11 @@ const s = StyleSheet.create({
     summaryTotalLabel: { fontSize: 16, fontWeight: '700' },
     summaryTotalValue: { fontSize: 20, fontWeight: '900', color: '#7367F0' },
 
-    paymentGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
-    paymentCardWrapper: { width: '48%', marginBottom: 12 },
-    paymentCard: { width: '100%', borderRadius: 20, paddingVertical: 20, paddingHorizontal: 14, alignItems: 'center', borderWidth: 1.5, position: 'relative' },
+    paymentGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%' },
+    paymentCardWrapper: { width: '48%', marginBottom: 12, minWidth: '45%' },
+    paymentCard: { width: '100%', borderRadius: 20, paddingVertical: 16, paddingHorizontal: 4, alignItems: 'center', borderWidth: 1.5, position: 'relative', backgroundColor: '#fff', minHeight: 100, justifyContent: 'center' },
     paymentIconWrap: { width: 56, height: 56, borderRadius: 28, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
-    paymentLabel: { fontSize: 15, fontWeight: '700', textAlign: 'center' },
+    paymentLabel: { fontSize: 15, fontWeight: '700', textAlign: 'center', width: '100%' },
     paymentCheck: { position: 'absolute', top: 10, right: 10 },
 
     confirmFullBtn: { width: '100%' },
@@ -1158,11 +1351,11 @@ const s = StyleSheet.create({
 
     // Modal de Detalhes do Produto
     detailOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-    detailContent: { borderTopLeftRadius: 30, borderTopRightRadius: 30, maxHeight: '90%' },
-    detailHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ddd', alignSelf: 'center', marginTop: 12 },
-    detailClose: { position: 'absolute', top: 12, right: 16, zIndex: 10 },
-    detailImage: { width: '100%', height: 220 },
-    detailImagePlaceholder: { width: '100%', height: 180, justifyContent: 'center', alignItems: 'center' },
+    detailContent: { borderTopLeftRadius: 30, borderTopRightRadius: 30, maxHeight: '90%', overflow: 'hidden' },
+    detailHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: 'rgba(0,0,0,0.1)', alignSelf: 'center', marginTop: 12, marginBottom: 8, zIndex: 11 },
+    detailClose: { position: 'absolute', top: 12, right: 16, zIndex: 12, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 20 },
+    detailImage: { width: '100%', height: 260, borderTopLeftRadius: 30, borderTopRightRadius: 30 },
+    detailImagePlaceholder: { width: '100%', height: 260, justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 30, borderTopRightRadius: 30 },
     detailBody: { padding: 20 },
     detailName: { fontSize: 22, fontWeight: 'bold', marginBottom: 6 },
     detailPrice: { fontSize: 24, fontWeight: '900', color: '#7367F0', marginBottom: 12 },

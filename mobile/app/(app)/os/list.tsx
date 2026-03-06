@@ -28,14 +28,97 @@ import { Skeleton } from '../../../components/Skeleton';
 
 type SortOption = 'date_desc' | 'date_asc' | 'value_desc' | 'value_asc';
 
-const STATUS_FILTERS = [
-    { key: 'all', label: 'Todas', color: '#7367F0' },
-    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
-    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
-    { key: 'running', label: 'Execução', color: '#00CFE8' },
-    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
-    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
-];
+// ─── Termos por Nicho ─────────────────────────────────────────────────────────
+
+const getNicheTerms = (niche: string) => {
+    switch (niche) {
+        case 'food_service':
+            return {
+                pageTitle: 'Pedidos',
+                singular: 'pedido',
+                plural: 'pedidos',
+                clientLabel: 'Balcão',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Recebido', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aceito', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Cozinha', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Pronto', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Recebido', approved: 'Aceito', running: 'Em Cozinha', finalized: 'Pronto', canceled: 'Cancelado' },
+            };
+        case 'pet':
+            return {
+                pageTitle: 'Atendimentos',
+                singular: 'atendimento',
+                plural: 'atendimentos',
+                clientLabel: 'Tutor não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovado', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Serviço', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizado', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovado', running: 'Em Serviço', finalized: 'Finalizado', canceled: 'Cancelado' },
+            };
+        case 'beauty_clinic':
+            return {
+                pageTitle: 'Atendimentos',
+                singular: 'atendimento',
+                plural: 'atendimentos',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Agendado', color: '#FF9F43' },
+                    { key: 'approved', label: 'Confirmado', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Serviço', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizado', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Agendado', approved: 'Confirmado', running: 'Em Serviço', finalized: 'Finalizado', canceled: 'Cancelado' },
+            };
+        case 'electronics':
+            return {
+                pageTitle: 'Ordens de Serviço',
+                singular: 'ordem',
+                plural: 'ordens',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todas', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Reparo', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovada', running: 'Em Reparo', finalized: 'Finalizada', canceled: 'Cancelada' },
+            };
+        default: // automotive, construction, etc.
+            return {
+                pageTitle: 'Ordens de Serviço',
+                singular: 'ordem',
+                plural: 'ordens',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todas', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
+                    { key: 'running', label: 'Execução', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovada', running: 'Em Execução', finalized: 'Finalizada', canceled: 'Cancelada' },
+            };
+    }
+};
+
+const STATUS_COLORS: Record<string, string> = {
+    all: '#7367F0', pending: '#FF9F43', approved: '#00CFE8',
+    running: '#00CFE8', finalized: '#28C76F', canceled: '#EA5455',
+};
 
 const SORT_OPTIONS: { key: SortOption; label: string; icon: string }[] = [
     { key: 'date_desc', label: 'Mais recente', icon: 'arrow-down' },
@@ -44,18 +127,7 @@ const SORT_OPTIONS: { key: SortOption; label: string; icon: string }[] = [
     { key: 'value_asc', label: 'Menor valor', icon: 'trending-down' },
 ];
 
-const getStatusColor = (status: string) => {
-    const found = STATUS_FILTERS.find(f => f.key === status);
-    return found?.color ?? '#7367F0';
-};
-
-const statusTranslations: { [key: string]: string } = {
-    pending: 'Pendente',
-    approved: 'Aprovada',
-    running: 'Em Execução',
-    finalized: 'Finalizada',
-    canceled: 'Cancelada',
-};
+const getStatusColor = (status: string) => STATUS_COLORS[status] ?? '#7367F0';
 
 const premiumShadow = {
     shadowColor: '#000',
@@ -94,6 +166,7 @@ export default function OSListScreen() {
     const router = useRouter();
     const { colors, activeTheme } = useTheme();
     const { niche, labels } = useNiche();
+    const terms = getNicheTerms(niche);
 
     const [allData, setAllData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -239,13 +312,16 @@ export default function OSListScreen() {
                     <View style={[styles.statusPill, { backgroundColor: getStatusColor(item.status) + '20' }]}>
                         <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
                         <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                            {statusTranslations[item.status?.toLowerCase()] ?? item.status}
+                            {terms.statusMap[item.status?.toLowerCase() as keyof typeof terms.statusMap] ?? item.status}
                         </Text>
                     </View>
                 </View>
 
                 <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>
-                    {item.client?.name ?? item.client?.company_name ?? 'Consumidor'}
+                    {(item.client?.name && item.client.name !== 'Balcão' ? item.client.name : null)
+                        ?? item.customer_name
+                        ?? item.client?.company_name
+                        ?? terms.clientLabel}
                 </Text>
 
                 {niche !== 'food_service' && (
@@ -299,12 +375,12 @@ export default function OSListScreen() {
                     </TouchableOpacity>
                     <View style={{ flex: 1, marginHorizontal: 12 }}>
                         <Text style={styles.headerTitle} numberOfLines={1}>
-                            {title ? String(title) : 'Ordens de Serviço'}
+                            {title ? String(title) : terms.pageTitle}
                         </Text>
                         {!loading && (
                             <Text style={styles.headerCount}>
-                                {filteredData.length} {filteredData.length === 1 ? 'ordem' : 'ordens'}
-                                {searchText || activeStatus !== 'all' ? ' encontradas' : ' no total'}
+                                {filteredData.length} {filteredData.length === 1 ? terms.singular : terms.plural}
+                                {searchText || activeStatus !== 'all' ? ' encontrados' : ' no total'}
                             </Text>
                         )}
                     </View>
@@ -370,7 +446,7 @@ export default function OSListScreen() {
             {/* ── Chips de filtro de status ─────────────────────────────────────── */}
             <View style={styles.chipsWrapper}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-                    {STATUS_FILTERS.map(f => {
+                    {terms.statusFilters.map(f => {
                         const isActive = activeStatus === f.key;
                         const count = countByStatus[f.key] ?? 0;
                         return (
@@ -421,11 +497,11 @@ export default function OSListScreen() {
                         <View style={styles.emptyContainer}>
                             <Ionicons name="search-outline" size={52} color={colors.subText} style={{ opacity: 0.5 }} />
                             <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                                {searchText ? 'Nenhuma OS encontrada' : 'Sem ordens nesta categoria'}
+                                {searchText ? `Nenhum ${terms.singular} encontrado` : `Sem ${terms.plural} nesta categoria`}
                             </Text>
                             <Text style={[styles.emptySubtitle, { color: colors.subText }]}>
                                 {searchText
-                                    ? `Nenhuma OS corresponde a "${searchText}"`
+                                    ? `Nenhum ${terms.singular} corresponde a "${searchText}"`
                                     : 'Tente selecionar outro filtro de status'}
                             </Text>
                             {searchText.length > 0 && (

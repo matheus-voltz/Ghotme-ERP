@@ -97,6 +97,7 @@ function OriginalActionsScreen({ colors, labels, niche }: any) {
         { id: 'scan', title: 'Ler QR Code', icon: 'scan-outline', color: '#4B4B4B', desc: 'Buscar por etiqueta' },
         { id: 'calendar', title: 'Agenda', icon: 'calendar-outline', color: '#FF9F43', desc: 'Ver agendamentos' },
         { id: 'parts', title: labels.inventory_items?.split('/')[0] || 'Peças/Produtos', icon: 'cube-outline', color: '#EA5455', desc: 'Consultar estoque' },
+        { id: 'calculator', title: 'Calculadora', icon: 'calculator-outline', color: '#16a085', desc: 'Cálculo de margem' },
         { id: 'ai', title: 'Ghotme IA', icon: 'sparkles-outline', color: '#CE9FFC', desc: 'Consultor inteligente' },
     ];
 
@@ -109,6 +110,7 @@ function OriginalActionsScreen({ colors, labels, niche }: any) {
             'scan': '/screens/qr_scanner',
             'calendar': '/calendar',
             'parts': '/inventory',
+            'calculator': '/screens/cost_calculator',
             'ai': '/ai-consultant',
         };
         if (routes[id]) router.push(routes[id] as any);
@@ -411,10 +413,18 @@ function PDVScreen({ colors, user }: any) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             {/* Header PDV */}
             <LinearGradient colors={['#7367F0', '#CE9FFC']} style={styles.header}>
-                <Animated.View entering={FadeInUp.duration(600).springify()}>
-                    <Text style={styles.headerTitle}>Balcão PDV</Text>
-                    <Text style={styles.headerSubtitle}>Vendas de Hoje: R$ {numberFormat(todaySales)}</Text>
-                </Animated.View>
+                <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Animated.View entering={FadeInUp.duration(600).springify()}>
+                        <Text style={[styles.headerTitle, { textAlign: 'left' }]}>Balcão PDV</Text>
+                        <Text style={[styles.headerSubtitle, { textAlign: 'left' }]}>Vendas de Hoje: R$ {numberFormat(todaySales)}</Text>
+                    </Animated.View>
+                    <TouchableOpacity
+                        onPress={() => router.push('/screens/cost_calculator' as any)}
+                        style={{ padding: 10, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 12 }}
+                    >
+                        <Ionicons name="calculator-outline" size={24} color="#fff" />
+                    </TouchableOpacity>
+                </View>
             </LinearGradient>
 
             {/* Filtros */}
