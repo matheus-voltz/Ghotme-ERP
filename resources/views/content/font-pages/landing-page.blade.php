@@ -345,6 +345,22 @@ $pageConfigs = [
             </div>
           </a>
         </div>
+        <!-- Food Service -->
+        <div class="col-lg-3 col-md-6">
+          <a href="{{ route('solutions.show', 'food_service') }}" class="text-decoration-none">
+            <div class="card h-100 niche-card text-center p-6">
+              <div class="card-body">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                  <span class="avatar-initial rounded-circle bg-label-danger" style="border-radius: 50% !important;">
+                    <i class="ti tabler-tools-kitchen-2 fs-1"></i>
+                  </span>
+                </div>
+                <h5 class="fw-bold text-heading mb-2">{{ __('Food Service & Trucks') }}</h5>
+                <p class="text-muted small mb-0">{{ __('Pedidos em tempo real, integração iFood e controle de insumos.') }}</p>
+              </div>
+            </div>
+          </a>
+        </div>
       </div>
     </div>
   </section>
@@ -457,6 +473,15 @@ $pageConfigs = [
             </div>
             <h5 class="fw-extrabold mb-3">{{ __('Construção e Engenharia') }}</h5>
             <p class="text-muted small mb-0">{{ __('Controle de obras, medições e emissão de RDO (Relatório Diário de Obra) em tempo real.') }}</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card niche-card shadow-sm text-center p-5 h-100">
+            <div class="avatar avatar-xl mx-auto mb-4 bg-label-danger rounded-circle">
+              <i class="ti tabler-tools-kitchen-2 fs-1"></i>
+            </div>
+            <h5 class="fw-extrabold mb-3">{{ __('Food Truck e Delivery') }}</h5>
+            <p class="text-muted small mb-0">{{ __('Integrado ao iFood com alertas de cozinha, gestão de receitas e controle de estoque de insumos.') }}</p>
           </div>
         </div>
       </div>
@@ -575,7 +600,7 @@ $pageConfigs = [
                 {{ __('The flexible system that adapts to your reality.') }}
               </p>
               <div class="row gy-6 mb-5">
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -590,7 +615,7 @@ $pageConfigs = [
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -606,7 +631,7 @@ $pageConfigs = [
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -618,6 +643,21 @@ $pageConfigs = [
                       </div>
                       <h5 class="mb-2">{{ __('Independent Professionals') }}</h5>
                       <p class="mb-0">{{ __('Lawyers, architects and freelancers. Simplify your financials and issue tax invoices in seconds.') }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
+                    <div class="card-body text-center">
+                      <div class="mb-3">
+                        <div class="avatar avatar-xl mx-auto">
+                          <span class="avatar-initial rounded bg-label-danger">
+                            <i class="ti tabler-tools-kitchen-2 icon-xl"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <h5 class="mb-2">{{ __('Gastronomia e Delivery') }}</h5>
+                      <p class="mb-0">{{ __('Food trucks, lanchonetes e bares. Receba pedidos do iFood com alertas sonoros na sua dashboard.') }}</p>
                     </div>
                   </div>
                 </div>
@@ -643,7 +683,7 @@ $pageConfigs = [
                 {{ __('Centralize your operation by connecting the tools you already use.') }}
               </p>
               <div class="row gy-6 mb-5">
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -658,7 +698,7 @@ $pageConfigs = [
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -673,7 +713,7 @@ $pageConfigs = [
                     </div>
                   </div>
                 </div>
-                <div class="col-lg-4 col-sm-6">
+                <div class="col-lg-3 col-sm-6">
                   <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
                     <div class="card-body text-center">
                       <div class="mb-3">
@@ -685,6 +725,21 @@ $pageConfigs = [
                       </div>
                       <h5 class="mb-2">{{ __('Payment Methods') }}</h5>
                       <p class="mb-0">{{ __('Generate registered bank slips, charges via PIX and automatic bank reconciliation with the main platforms.') }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                  <div class="card h-100 border-0 shadow-sm hover-shadow-lg transition-all">
+                    <div class="card-body text-center">
+                      <div class="mb-3">
+                        <div class="avatar avatar-xl mx-auto">
+                          <span class="avatar-initial rounded bg-label-danger">
+                            <i class="ti tabler-brand-shopee icon-xl"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <h5 class="mb-2">{{ __('Delivery iFood') }}</h5>
+                      <p class="mb-0">{{ __('Receba notificações em tempo real e integre o fluxo de cozinha com o maior marketplace de comida.') }}</p>
                     </div>
                   </div>
                 </div>

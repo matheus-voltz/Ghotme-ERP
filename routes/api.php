@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/login/two-factor', [AuthController::class, 'loginTwoFactor']);
 
+// iFood Webhook (Public, handle security in controller)
+Route::post('/webhooks/ifood', [\App\Http\Controllers\IFoodController::class, 'handleWebhook']);
+
 // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
@@ -43,8 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/os', [ApiOrdemServicoController::class, 'index']);
     Route::post('/os', [ApiOrdemServicoController::class, 'store']);
     Route::get('/os/{id}', [ApiOrdemServicoController::class, 'show']);
+    Route::delete('/os/{id}', [ApiOrdemServicoController::class, 'destroy']);
     Route::patch('/os/{id}/status', [ApiOrdemServicoController::class, 'updateStatus']);
     Route::patch('/os/{id}/password', [ApiOrdemServicoController::class, 'updatePassword']);
+    Route::post('/os/{id}/pix/generate', [ApiOrdemServicoController::class, 'generatePix']);
+    Route::get('/os/{id}/pix/status', [ApiOrdemServicoController::class, 'checkPixStatus']);
     Route::get('/budgets/pending', [App\Http\Controllers\Api\ApiBudgetController::class, 'getPending']);
     Route::post('/budgets/{id}/approve', [App\Http\Controllers\Api\ApiBudgetController::class, 'approve']);
     Route::post('/budgets/{id}/reject', [App\Http\Controllers\Api\ApiBudgetController::class, 'reject']);
@@ -61,6 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Inventory
     Route::get('/inventory/items-list', [ApiInventoryController::class, 'index']);
     Route::post('/inventory/items', [ApiInventoryController::class, 'store']);
+    Route::get('/inventory/items/{id}', [ApiInventoryController::class, 'show']);
+    Route::put('/inventory/items/{id}', [ApiInventoryController::class, 'update']);
+    Route::delete('/inventory/items/{id}', [ApiInventoryController::class, 'destroy']);
+    Route::get('/inventory/menu', [ApiInventoryController::class, 'menu']);
 
     // Chat
     Route::get('/chat/contacts', [ChatController::class, 'contacts']);
@@ -82,4 +92,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Push Token
     Route::post('/user/push-token', [AuthController::class, 'updatePushToken']);
+
+    // AI Consultant (Mobile)
+    Route::get('/ai-consultant/chats', [\App\Http\Controllers\Api\ApiAiConsultantController::class, 'index']);
+    Route::post('/ai-consultant/chats', [\App\Http\Controllers\Api\ApiAiConsultantController::class, 'store']);
+    Route::post('/ai-consultant/chats/{id}/send', [\App\Http\Controllers\Api\ApiAiConsultantController::class, 'send']);
+    Route::get('/ai-consultant/chats/{id}/messages', [\App\Http\Controllers\Api\ApiAiConsultantController::class, 'messages']);
+
+    // PIX Payment
+    Route::post('/pix/generate', [\App\Http\Controllers\Api\ApiPixPaymentController::class, 'generate']);
+    Route::get('/pix/status/{paymentId}', [\App\Http\Controllers\Api\ApiPixPaymentController::class, 'status']);
+
+    // Categories
+    Route::get('/categories', [\App\Http\Controllers\Api\ApiCategoryController::class, 'index']);
+    Route::post('/categories', [\App\Http\Controllers\Api\ApiCategoryController::class, 'store']);
 });

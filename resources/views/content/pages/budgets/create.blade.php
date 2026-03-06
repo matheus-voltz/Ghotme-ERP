@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Novo Orçamento')
+@section('title', niche('new_budget', 'Novo Orçamento'))
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/select2/select2.scss', 'resources/assets/vendor/libs/flatpickr/flatpickr.scss'])
@@ -17,7 +17,7 @@
         <div class="col-md-8">
             <div class="card mb-4">
                 <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">Dados do Orçamento</h5>
+                    <h5 class="card-title mb-0">Dados do {{ niche('budget_entity', 'Orçamento') }}</h5>
                 </div>
                 <div class="card-body pt-4">
                     <div class="row mb-4">
@@ -25,9 +25,6 @@
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
                                 <option value="">Selecione o Cliente</option>
-                                @foreach($clients as $client)
-                                <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -119,7 +116,7 @@
                     <h5 class="card-title mb-0">Finalizar</h5>
                 </div>
                 <div class="card-body pt-4">
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Gerar Orçamento</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Gerar {{ niche('budget_entity', 'Orçamento') }}</button>
                     <a href="{{ route('budgets.pending') }}" class="btn btn-label-secondary w-100">Cancelar</a>
                 </div>
             </div>
@@ -129,7 +126,26 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('.select2').select2();
+        $('#client_id').select2({
+            placeholder: "Buscar cliente pelo nome, CPF, CNPJ ou email...",
+            minimumInputLength: 1,
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
         $('.flatpickr').flatpickr();
 
         $('#client_id').on('change', function() {

@@ -66,13 +66,12 @@ class BudgetController extends Controller
 
     public function create()
     {
-        $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $appSettings = AppSetting::first();
         $validityDays = $appSettings->budget_validity_days ?? 7;
 
-        return view('content.pages.budgets.create', compact('clients', 'services', 'parts', 'validityDays'));
+        return view('content.pages.budgets.create', compact('services', 'parts', 'validityDays'));
     }
 
     public function store(Request $request)

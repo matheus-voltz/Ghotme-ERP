@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateOrdemServicoRequest;
 use App\Http\Resources\OrdemServicoResource;
 use App\Jobs\SendPushNotificationJob;
 use App\Services\OrdemServicoService;
+use App\Services\StockDeductionService;
 use Illuminate\Http\Request;
 use App\Models\OrdemServico;
 use App\Models\Clients;
@@ -41,6 +42,7 @@ class OrdemServicoController extends Controller
         if ($search = $request->input('search.value')) {
             $query->where(function ($q) use ($search) {
                 $q->where('id', 'like', "%{$search}%")
+                    ->orWhere('customer_name', 'like', "%{$search}%")
                     ->orWhereHas('client', function ($cq) use ($search) {
                         $cq->where('name', 'like', "%{$search}%")
                             ->orWhere('company_name', 'like', "%{$search}%");
@@ -71,20 +73,31 @@ class OrdemServicoController extends Controller
 
     public function create()
     {
-        $clients = Clients::all();
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
+
+        // Dados específicos para PDV Food Service
+        $categories = [];
+        if (get_current_niche() === 'food_service') {
+            $categories = \App\Models\MenuCategory::with(['items' => function($q) {
+                $q->where('is_active', true);
+            }])->get();
+        }
 
         // Carrega campos disponíveis para nova OS
         $customFields = (new OrdemServico())->getAvailableCustomFields();
 
-        return view('content.pages.ordens-servico.create', compact('clients', 'services', 'parts', 'customFields'));
+        return view('content.pages.ordens-servico.create', compact('services', 'parts', 'customFields', 'categories'));
     }
 
     public function store(StoreOrdemServicoRequest $request)
     {
         try {
             $os = $this->service->store($request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json(['success' => true, 'os_id' => $os->id]);
+            }
 
             if ($request->has('redirect_to_checklist')) {
                 return redirect()->route('ordens-servico.checklist.create', ['os_id' => $os->id])
@@ -94,6 +107,9 @@ class OrdemServicoController extends Controller
 
             return redirect()->route('ordens-servico')->with('success', 'OS Criada!')->with('just_created_os', $os->id);
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+            }
             return back()->with('error', $e->getMessage());
         }
     }
@@ -131,6 +147,15 @@ class OrdemServicoController extends Controller
             ]);
         }
 
+        // Baixa automática de estoque ao finalizar pedido
+        if (in_array($request->status, ['completed', 'paid']) && $oldStatus !== $request->status) {
+            try {
+                app(StockDeductionService::class)->deductForOrder($os);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("Falha na baixa automática de estoque para OS #{$os->id}: " . $e->getMessage());
+            }
+        }
+
         if (Auth::user()->expo_push_token) {
             $msg = match ($request->status) {
                 'in_progress' => "O mecânico começou a trabalhar na OS #{$os->id}.",
@@ -155,7 +180,7 @@ class OrdemServicoController extends Controller
     public function edit($id)
     {
         $order = OrdemServico::with(['items', 'parts'])->findOrFail($id);
-        $clients = Clients::all();
+        $client = $order->client; // Pega apenas o cliente da OS atual
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();
@@ -163,7 +188,7 @@ class OrdemServicoController extends Controller
         // Carrega campos personalizados preenchidos
         $customFields = $order->getCustomFieldsWithValues();
 
-        return view('content.pages.ordens-servico.edit', compact('order', 'clients', 'services', 'parts', 'vehicles', 'customFields'));
+        return view('content.pages.ordens-servico.edit', compact('order', 'client', 'services', 'parts', 'vehicles', 'customFields'));
     }
 
     public function update(UpdateOrdemServicoRequest $request, $id)
@@ -184,5 +209,14 @@ class OrdemServicoController extends Controller
         $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" . $os->id;
 
         return view('content.pages.ordens-servico.print-label', compact('os', 'qrCodeUrl'));
+    }
+
+    public function printOrder($id)
+    {
+        $order = OrdemServico::with(['client', 'items.service', 'parts.inventoryItem'])->findOrFail($id);
+        $company = Auth::user()->company;
+        $qrCodeUrl = "https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=" . route('customer.portal.order', $order->uuid);
+
+        return view('content.pages.ordens-servico.print-order', compact('order', 'company', 'qrCodeUrl'));
     }
 }

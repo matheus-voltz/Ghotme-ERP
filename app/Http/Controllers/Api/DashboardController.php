@@ -33,7 +33,8 @@ class DashboardController extends Controller
                     return [
                         'id' => $os->id,
                         'status' => $os->status,
-                        'client_name' => $os->client->name ?? $os->client->company_name ?? 'N/A',
+                        'client_name' => $os->client ? ($os->client->name ?: $os->client->company_name) : ($os->customer_name ?: 'Balcão'),
+                        'customer_name' => $os->customer_name,
                         'vehicle' => $os->veiculo ? "{$os->veiculo->marca} {$os->veiculo->modelo}" : 'N/A',
                         'plate' => $os->veiculo->placa ?? '',
                         'total' => $os->total,
@@ -149,7 +150,7 @@ class DashboardController extends Controller
         $monthlyProfitability = $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0;
 
         // Recent OS
-        $recentOSData = OrdemServico::with(['client', 'veiculo'])
+        $recentOSData = OrdemServico::where('company_id', $companyId)->with(['client', 'veiculo'])
             ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get()
@@ -157,9 +158,10 @@ class DashboardController extends Controller
                 return [
                     'id' => $os->id,
                     'status' => $os->status,
-                    'client_name' => $os->client->name ?? $os->client->company_name ?? 'N/A',
-                    'vehicle' => $os->veiculo ? "{$os->veiculo->marca} {$os->veiculo->modelo}" : 'N/A',
-                    'plate' => $os->veiculo->placa ?? '',
+                    'client_name' => $os->client ? ($os->client->name ?: $os->client->company_name) : ($os->customer_name ?: 'Balcão'),
+                    'customer_name' => $os->customer_name,
+                    'vehicle' => $os->veiculo ? "{$os->veiculo->marca} {$os->veiculo->modelo}" : null,
+                    'plate' => $os->veiculo ? $os->veiculo->placa : null,
                     'total' => $os->total,
                     'created_at' => $os->created_at->format('Y-m-d H:i:s'),
                 ];

@@ -1,0 +1,7 @@
+{
+    "ignore_dirs": [
+        ".gemini",
+        ".git",
+        "node_modules"
+    ]
+}

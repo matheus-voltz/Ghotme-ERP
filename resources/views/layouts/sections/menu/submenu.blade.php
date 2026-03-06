@@ -22,22 +22,23 @@ use Illuminate\Support\Facades\Route;
   $activeClass = null;
   $active = $configData["layout"] === 'vertical' ? 'active open':'active';
   $currentRouteName = Route::currentRouteName();
-  $translatedSlug = niche_translate($submenu->slug);
+  $slug = $submenu->slug ?? '';
+  $translatedSlug = niche_translate($slug);
 
-  if ($currentRouteName === $translatedSlug || $currentRouteName === $translatedSlug . '.index') {
+  if ($translatedSlug && ($currentRouteName === $translatedSlug || $currentRouteName === $translatedSlug . '.index')) {
   $activeClass = 'active';
   }
   elseif (isset($submenu->submenu)) {
-  if (gettype($submenu->slug) === 'array') {
-  foreach($submenu->slug as $slug){
-  $slug = niche_translate($slug);
-  if (str_contains($currentRouteName,$slug) and strpos($currentRouteName,$slug) === 0) {
+  if (gettype($slug) === 'array') {
+  foreach($slug as $s){
+  $s = niche_translate($s);
+  if (str_contains($currentRouteName,$s) and strpos($currentRouteName,$s) === 0) {
   $activeClass = $active;
   }
   }
   }
   else{
-  if (str_contains($currentRouteName,$submenu->slug) and strpos($currentRouteName,$submenu->slug) === 0) {
+  if ($slug && str_contains($currentRouteName,$slug) and strpos($currentRouteName,$slug) === 0) {
   $activeClass = $active;
   }
   }

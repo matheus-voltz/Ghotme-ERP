@@ -8,14 +8,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as LocalAuthentication from 'expo-local-authentication';
 import * as SecureStore from 'expo-secure-store';
 
+// Precisamos pedir a senha para ativar a biometria pela primeira vez (para salvar com segurança)
+import { Modal, TextInput } from 'react-native';
+
 export default function SecurityScreen() {
-    const { user } = useAuth();
+    const { user, storeCredentials, signIn, clearStoredCredentials } = useAuth();
     const { colors, activeTheme } = useTheme();
     const router = useRouter();
-    
+
     const [biometricEnabled, setBiometricEnabled] = useState(false);
     const [isBiometricAvailable, setIsBiometricAvailable] = useState(false);
     const [authType, setAuthType] = useState<string>('');
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [password, setPassword] = useState('');
+    const [activating, setActivating] = useState(false);
 
     useEffect(() => {
         checkBiometricSupport();
@@ -27,9 +33,9 @@ export default function SecurityScreen() {
             const compatible = await LocalAuthentication.hasHardwareAsync();
             const enrolled = await LocalAuthentication.isEnrolledAsync();
             const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
-            
+
             setIsBiometricAvailable(compatible && enrolled);
-            
+
             if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
                 setAuthType('FaceID');
             } else if (types.includes(LocalAuthentication.AuthenticationType.FINGERPRINT)) {
@@ -47,7 +53,29 @@ export default function SecurityScreen() {
 
     const toggleBiometrics = async (value: boolean) => {
         if (value) {
-            try {
+            // Abrir modal para confirmar senha antes de ativar (para salvar credenciais)
+            setShowPasswordModal(true);
+        } else {
+            await SecureStore.deleteItemAsync('useBiometrics');
+            await clearStoredCredentials();
+            setBiometricEnabled(false);
+        }
+    };
+
+    const handleConfirmPassword = async () => {
+        if (!password) {
+            Alert.alert("Erro", "Digite sua senha para continuar.");
+            return;
+        }
+
+        try {
+            setActivating(true);
+
+            // 1. Validar a senha com o servidor primeiro
+            const response = await signIn({ email: user.email, password });
+
+            if (response) {
+                // 2. Pedir biometria do sistema
                 const result = await LocalAuthentication.authenticateAsync({
                     promptMessage: 'Confirme sua identidade para ativar',
                     fallbackLabel: 'Usar Senha',
@@ -55,22 +83,18 @@ export default function SecurityScreen() {
                 });
 
                 if (result.success) {
+                    await storeCredentials(user.email, password);
                     await SecureStore.setItemAsync('useBiometrics', 'true');
                     setBiometricEnabled(true);
+                    setShowPasswordModal(false);
+                    setPassword('');
                     Alert.alert("Sucesso", "Biometria ativada!");
-                } else {
-                    setBiometricEnabled(false);
-                    if (result.error !== 'user_cancel') {
-                        Alert.alert("Erro na Autenticação", `Motivo: ${result.error}`);
-                    }
                 }
-            } catch (error: any) {
-                Alert.alert("Erro de Sistema", error.message || "Falha ao acessar biometria");
-                setBiometricEnabled(false);
             }
-        } else {
-            await SecureStore.deleteItemAsync('useBiometrics');
-            setBiometricEnabled(false);
+        } catch (error: any) {
+            Alert.alert("Erro de Validação", "Senha incorreta. Digite novamente para ativar a biometria.");
+        } finally {
+            setActivating(false);
         }
     };
 
@@ -129,8 +153,8 @@ export default function SecurityScreen() {
                     "finger-print-outline",
                     `Biometria (${authType || 'Detectando...'})`,
                     isBiometricAvailable ? `Acessar o app usando ${authType}` : "Hardware não disponível ou não configurado",
-                    <Switch 
-                        value={biometricEnabled} 
+                    <Switch
+                        value={biometricEnabled}
                         onValueChange={toggleBiometrics}
                         disabled={!isBiometricAvailable}
                         trackColor={{ false: '#767577', true: '#28C76F' }}
@@ -152,6 +176,54 @@ export default function SecurityScreen() {
                     </Text>
                 </View>
             </ScrollView>
+
+            {/* Modal de confirmação de senha para ativar biometria */}
+            <Modal
+                visible={showPasswordModal}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setShowPasswordModal(false)}
+            >
+                <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0,0,0,0.6)' }]}>
+                    <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                        <Text style={[styles.modalTitle, { color: colors.text }]}>Confirmar Senha</Text>
+                        <Text style={[styles.modalSubtitle, { color: colors.subText }]}>
+                            Digite sua senha atual para ativar a biometria com segurança.
+                        </Text>
+
+                        <TextInput
+                            style={[styles.modalInput, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
+                            placeholder="Sua senha"
+                            placeholderTextColor={colors.subText}
+                            secureTextEntry
+                            value={password}
+                            onChangeText={setPassword}
+                            autoFocus
+                        />
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.modalBtn, { backgroundColor: colors.border }]}
+                                onPress={() => { setShowPasswordModal(false); setBiometricEnabled(false); setPassword(''); }}
+                            >
+                                <Text style={[styles.modalBtnText, { color: colors.text }]}>Cancelar</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.modalBtn, { backgroundColor: colors.primary }]}
+                                onPress={handleConfirmPassword}
+                                disabled={activating}
+                            >
+                                {activating ? (
+                                    <ActivityIndicator size="small" color="#fff" />
+                                ) : (
+                                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>Ativar</Text>
+                                )}
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -183,5 +255,14 @@ const styles = StyleSheet.create({
     itemSubtitle: { fontSize: 12 },
     badgeContainer: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     infoCard: { flexDirection: 'row', padding: 20, borderRadius: 16, marginTop: 20, gap: 12, alignItems: 'flex-start' },
-    infoText: { flex: 1, fontSize: 13, lineHeight: 20, opacity: 0.8 }
+    infoText: { flex: 1, fontSize: 13, lineHeight: 20, opacity: 0.8 },
+    // Estilos do Modal
+    modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+    modalContent: { width: '100%', maxWidth: 350, padding: 25, borderRadius: 24, elevation: 5 },
+    modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 10, textAlign: 'center' },
+    modalSubtitle: { fontSize: 14, textAlign: 'center', marginBottom: 20, lineHeight: 20 },
+    modalInput: { height: 50, borderRadius: 12, borderWidth: 1, paddingHorizontal: 15, fontSize: 16, marginBottom: 20 },
+    modalButtons: { flexDirection: 'row', gap: 12 },
+    modalBtn: { flex: 1, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
+    modalBtnText: { fontSize: 16, fontWeight: 'bold' }
 });

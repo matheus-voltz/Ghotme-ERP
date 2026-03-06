@@ -10,11 +10,12 @@ class CompanySettingController extends Controller
 {
     public function index()
     {
-        $settings = CompanySetting::first() ?? new CompanySetting();
         $user = auth()->user();
+        $settings = CompanySetting::where('company_id', $user->company_id)->first() ?? new CompanySetting();
 
         // Se for um registro novo (vazio), tenta pré-preencher com os dados do cadastro da Company
         if (!$settings->exists && $user->company) {
+            $settings->company_id = $user->company_id;
             $settings->company_name = $user->company->name;
             $settings->cnpj = $user->company->document_number;
             $settings->email = $user->company->email;
@@ -26,14 +27,14 @@ class CompanySettingController extends Controller
             $settings->logo_path = $user->company->logo_path;
         }
 
-        $userNiche = $user->niche ?? 'workshop';
+        $userNiche = $user->company->niche ?? ($user->niche ?? 'workshop');
         return view('content.settings.company-data.index', compact('settings', 'userNiche'));
     }
 
     public function update(Request $request)
     {
-        $settings = CompanySetting::first() ?? new CompanySetting();
         $user = auth()->user();
+        $settings = CompanySetting::where('company_id', $user->company_id)->first() ?? new CompanySetting(['company_id' => $user->company_id]);
 
         $validated = $request->validate([
             'company_name' => 'nullable|string|max:255',
@@ -50,7 +51,7 @@ class CompanySettingController extends Controller
             'city' => 'nullable|string|max:255',
             'state' => 'nullable|string|max:2',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'niche' => 'nullable|string|in:workshop,automotive,electronics,pet,beauty_clinic,construction',
+            'niche' => 'nullable|string|in:workshop,automotive,electronics,pet,beauty_clinic,construction,food_service',
             'remove_logo' => 'nullable|boolean'
         ]);
 

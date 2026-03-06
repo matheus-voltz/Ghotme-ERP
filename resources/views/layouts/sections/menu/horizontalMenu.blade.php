@@ -1,66 +1,67 @@
 @php
-  use Illuminate\Support\Facades\Route;
-  $configData = Helper::appClasses();
+use Illuminate\Support\Facades\Route;
+$configData = Helper::appClasses();
 @endphp
 <!-- Horizontal Menu -->
 <aside id="layout-menu" class="layout-menu-horizontal menu-horizontal  menu bg-menu-theme flex-grow-0"
-  @foreach ($configData['menuAttributes'] as $attribute => $value)
+  @foreach ($configData['menuAttributes'] as $attribute=> $value)
   {{ $attribute }}="{{ $value }}" @endforeach>
   <div class="{{ $containerNav }} d-flex h-100">
     <ul class="menu-inner">
       @foreach ($menuData[1]->menu as $menu)
-        {{-- active menu method --}}
-        @php
-          $activeClass = null;
-          $currentRouteName = Route::currentRouteName();
+      {{-- active menu method --}}
+      @php
+      $activeClass = null;
+      $currentRouteName = Route::currentRouteName();
 
-          if ($currentRouteName === $menu->slug) {
-              $activeClass = 'active';
-          } elseif (isset($menu->submenu)) {
-              if (gettype($menu->slug) === 'array') {
-                  foreach ($menu->slug as $slug) {
-                      if (str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
-                          $activeClass = 'active';
-                      }
-                  }
-              } else {
-                  if (str_contains($currentRouteName, $menu->slug) and strpos($currentRouteName, $menu->slug) === 0) {
-                      $activeClass = 'active';
-                  }
-              }
-          }
-        @endphp
+      $slugName = $menu->slug ?? '';
+      if ($slugName && $currentRouteName === $slugName) {
+      $activeClass = 'active';
+      } elseif (isset($menu->submenu)) {
+      if (isset($menu->slug) && gettype($menu->slug) === 'array') {
+      foreach ($menu->slug as $slug) {
+      if ($slug && str_contains($currentRouteName, $slug) and strpos($currentRouteName, $slug) === 0) {
+      $activeClass = 'active';
+      }
+      }
+      } else {
+      if ($slugName && str_contains($currentRouteName, $slugName) and strpos($currentRouteName, $slugName) === 0) {
+      $activeClass = 'active';
+      }
+      }
+      }
+      @endphp
 
-        {{-- main menu --}}
-        <li class="menu-item {{ $activeClass }}">
-          <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
-            class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
-            @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
-            @isset($menu->icon)
-              <i class="{{ $menu->icon }}"></i>
-            @endisset
-            @php
-              $menuName = isset($menu->name) ? __($menu->name) : '';
-              // Dynamic Niche Translation (Robust)
-              $search = ['Veículos', 'Veículo', 'veículo', 'veículos', 'Itens/Peças', 'Peças'];
-              $replace = [
-                  niche('entities'), 
-                  niche('entity'), 
-                  strtolower(niche('entity')), 
-                  strtolower(niche('entities')),
-                  niche('inventory_items'),
-                  niche('inventory_items')
-              ];
-              $menuName = str_replace($search, $replace, $menuName);
-            @endphp
-            <div>{{ $menuName }}</div>
-          </a>
-
-          {{-- submenu --}}
-          @isset($menu->submenu)
-            @include('layouts.sections.menu.submenu', ['menu' => $menu->submenu])
+      {{-- main menu --}}
+      <li class="menu-item {{ $activeClass }}">
+        <a href="{{ isset($menu->url) ? url($menu->url) : 'javascript:void(0);' }}"
+          class="{{ isset($menu->submenu) ? 'menu-link menu-toggle' : 'menu-link' }}"
+          @if (isset($menu->target) and !empty($menu->target)) target="_blank" @endif>
+          @isset($menu->icon)
+          <i class="{{ $menu->icon }}"></i>
           @endisset
-        </li>
+          @php
+          $menuName = isset($menu->name) ? __($menu->name) : '';
+          // Dynamic Niche Translation (Robust)
+          $search = ['Veículos', 'Veículo', 'veículo', 'veículos', 'Itens/Peças', 'Peças'];
+          $replace = [
+          niche('entities'),
+          niche('entity'),
+          strtolower(niche('entity')),
+          strtolower(niche('entities')),
+          niche('inventory_items'),
+          niche('inventory_items')
+          ];
+          $menuName = str_replace($search, $replace, $menuName);
+          @endphp
+          <div>{{ $menuName }}</div>
+        </a>
+
+        {{-- submenu --}}
+        @isset($menu->submenu)
+        @include('layouts.sections.menu.submenu', ['menu' => $menu->submenu])
+        @endisset
+      </li>
       @endforeach
     </ul>
   </div>

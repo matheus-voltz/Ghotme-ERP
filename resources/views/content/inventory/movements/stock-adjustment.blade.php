@@ -4,91 +4,105 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/select2/select2.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('page-script')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const select2 = $('.select2');
-    if (select2.length) {
-        select2.each(function() {
-            var $this = $(this);
-            $this.wrap('<div class="position-relative"></div>').select2({
-                placeholder: 'Selecione um item',
-                dropdownParent: $this.parent()
+    document.addEventListener('DOMContentLoaded', function() {
+        const select2 = $('.select2');
+        if (select2.length) {
+            select2.each(function() {
+                var $this = $(this);
+                $this.wrap('<div class="position-relative"></div>').select2({
+                    placeholder: 'Selecione um item',
+                    dropdownParent: $this.parent()
+                });
             });
-        });
-    }
+        }
 
-    const form = document.getElementById('formAdjustment');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            
-            fetch("{{ route('inventory.movements.store') }}", {
-                method: 'POST',
-                body: new URLSearchParams(formData),
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
-                    form.reset();
-                    $('.select2').val(null).trigger('change');
-                    $('#current-qty-display').text('---');
-                    $('#diff-display').text('0').removeClass('text-success text-danger');
-                } else {
-                    Swal.fire({ icon: 'error', title: 'Erro!', text: data.message, customClass: { confirmButton: 'btn btn-danger' } });
-                }
+        const form = document.getElementById('formAdjustment');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                fetch("{{ route('inventory.movements.store') }}", {
+                        method: 'POST',
+                        body: new URLSearchParams(formData),
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Sucesso!',
+                                text: data.message,
+                                customClass: {
+                                    confirmButton: 'btn btn-success'
+                                }
+                            });
+                            form.reset();
+                            $('.select2').val(null).trigger('change');
+                            $('#current-qty-display').text('---');
+                            $('#diff-display').text('0').removeClass('text-success text-danger');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erro!',
+                                text: data.message,
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                }
+                            });
+                        }
+                    });
             });
+        }
+
+        // Exibir quantidade atual ao selecionar
+        $('#inventory_item_id').on('change', function() {
+            const selected = $(this).find(':selected');
+            const qty = selected.data('qty');
+            if (qty !== undefined) {
+                $('#current-qty-display').text(qty);
+                $('#new_quantity').val(qty);
+                $('#diff-display').text('0').removeClass('text-success text-danger');
+            } else {
+                $('#current-qty-display').text('---');
+                $('#diff-display').text('0');
+            }
         });
-    }
 
-    // Exibir quantidade atual ao selecionar
-    $('#inventory_item_id').on('change', function() {
-        const selected = $(this).find(':selected');
-        const qty = selected.data('qty');
-        if (qty !== undefined) {
-            $('#current-qty-display').text(qty);
-            $('#new_quantity').val(qty);
-            $('#diff-display').text('0').removeClass('text-success text-danger');
-        } else {
-            $('#current-qty-display').text('---');
-            $('#diff-display').text('0');
-        }
-    });
+        // Calcular diferença ao digitar nova quantidade
+        $('#new_quantity').on('input', function() {
+            const current = parseInt($('#current-qty-display').text()) || 0;
+            const newVal = parseInt($(this).val()) || 0;
+            const diff = newVal - current;
 
-    // Calcular diferença ao digitar nova quantidade
-    $('#new_quantity').on('input', function() {
-        const current = parseInt($('#current-qty-display').text()) || 0;
-        const newVal = parseInt($(this).val()) || 0;
-        const diff = newVal - current;
-        
-        const diffDisplay = $('#diff-display');
-        if (diff > 0) {
-            diffDisplay.text('+' + diff).removeClass('text-danger').addClass('text-success');
-        } else if (diff < 0) {
-            diffDisplay.text(diff).removeClass('text-success').addClass('text-danger');
-        } else {
-            diffDisplay.text('0').removeClass('text-success text-danger');
-        }
+            const diffDisplay = $('#diff-display');
+            if (diff > 0) {
+                diffDisplay.text('+' + diff).removeClass('text-danger').addClass('text-success');
+            } else if (diff < 0) {
+                diffDisplay.text(diff).removeClass('text-success').addClass('text-danger');
+            } else {
+                diffDisplay.text('0').removeClass('text-success text-danger');
+            }
+        });
     });
-});
 </script>
 @endsection
 
@@ -103,15 +117,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 <form id="formAdjustment">
                     @csrf
                     <input type="hidden" name="type" value="adjustment">
-                    
+
                     <div class="mb-6">
-                        <label class="form-label" for="inventory_item_id">Item / Peça</label>
+                        <label class="form-label" for="inventory_item_id">Item / {{ niche('inventory_items') }}</label>
                         <select id="inventory_item_id" name="inventory_item_id" class="select2 form-select" required>
                             <option value="">Selecione</option>
                             @foreach($items as $item)
-                                <option value="{{ $item->id }}" data-qty="{{ $item->quantity }}">
-                                    {{ $item->name }} (SKU: {{ $item->sku ?? '-' }})
-                                </option>
+                            <option value="{{ $item->id }}" data-qty="{{ $item->quantity }}">
+                                {{ $item->name }} (SKU: {{ $item->sku ?? '-' }})
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -154,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h5 class="card-title mb-0">Quando usar o Ajuste?</h5>
             </div>
             <div class="card-body pt-6">
-                <p>O <strong>Ajuste de Inventário</strong> deve ser usado para sincronizar o sistema com a realidade física da oficina, como em casos de:</p>
+                <p>O <strong>Ajuste de Inventário</strong> deve ser usado para sincronizar o sistema com a realidade física da {{ niche('current') === 'automotive' ? 'oficina' : (niche('current') === 'food_service' ? 'cozinha / despensa' : 'loja') }}, como em casos de:</p>
                 <ul>
                     <li class="mb-2">Contagens periódicas de estoque.</li>
-                    <li class="mb-2">Perdas acidentais de peças.</li>
+                    <li class="mb-2">Perdas acidentais de {{ strtolower(niche('inventory_items')) }}.</li>
                     <li class="mb-2">Erros de lançamento anteriores.</li>
                 </ul>
                 <div class="alert alert-info py-2 px-3 mt-4">

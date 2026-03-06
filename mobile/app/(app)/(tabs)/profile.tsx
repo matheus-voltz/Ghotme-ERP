@@ -246,6 +246,8 @@ export default function ProfileScreen() {
 
                     <Text style={[styles.sectionHeader, { color: colors.text }]}>{t('preferences')}</Text>
                     <View style={[styles.sectionCard, { backgroundColor: colors.card, shadowColor: colors.text }]}>
+                        {renderSettingItem("bluetooth-outline", "Dispositivos", "Maquininhas e impressoras", () => router.push('/profile/devices'))}
+                        <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("notifications-outline", t('notifications'), t('manage_alerts'), () => router.push('/screens/notification_settings'))}
                         <View style={[styles.separator, { backgroundColor: colors.border }]} />
                         {renderSettingItem("moon-outline", t('theme'), getCurrentThemeLabel(theme, t), handleChangeTheme)}

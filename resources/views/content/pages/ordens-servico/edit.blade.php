@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Editar Ordem de Serviço #' . $order->id)
+@section('title', 'Editar ' . niche('entity') . ' #' . $order->id)
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/select2/select2.scss'])
@@ -31,24 +31,28 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                         <div class="col-md-6">
                             <label class="form-label">Cliente</label>
                             <select name="client_id" id="client_id" class="select2 form-select" required>
-                                <option value="">Selecione o Cliente</option>
-                                @foreach($clients as $client)
-                                <option value="{{ $client->id }}" {{ $order->client_id == $client->id ? 'selected' : '' }}>
+                                @if($client)
+                                <option value="{{ $client->id }}" selected>
                                     {{ $client->name ?? $client->company_name }}
                                 </option>
-                                @endforeach
+                                @else
+                                <option value="" selected>Consumidor Final</option>
+                                @endif
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">{{ niche('entity') }}</label>
-                            <select name="veiculo_id" id="veiculo_id" class="select2 form-select" required>
-                                <option value="">Selecione o {{ niche('entity') }}</option>
+                            <label class="form-label">{{ niche('entity') }} ({{ get_current_niche() === 'food_service' ? 'Opcional' : 'Obrigatório' }})</label>
+                            <select name="veiculo_id" id="veiculo_id" class="select2 form-select" {{ get_current_niche() === 'food_service' ? '' : 'required' }}>
+                                <option value="">{{ get_current_niche() === 'food_service' ? 'Sem Mesa / Senha' : 'Selecione o ' . niche('entity') }}</option>
                                 @foreach($vehicles as $vehicle)
-                                <option value="{{ $vehicle->id }}" {{ $order->veiculo_id == $vehicle->id ? 'selected' : '' }}>
+                                <option value="{{ $vehicle->id }}" {{ ($order->veiculo_id ?? 0) == $vehicle->id ? 'selected' : '' }}>
                                     {{ $vehicle->placa }} - {{ $vehicle->modelo }}
                                 </option>
                                 @endforeach
                             </select>
+                            @if(get_current_niche() === 'food_service')
+                            <small class="text-muted">Dica: Use para Mesa ou Senha.</small>
+                            @endif
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -63,10 +67,6 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                                 <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Concluído</option>
                                 <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>Pago</option>
                             </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">{{ niche('metric') }} na Entrada</label>
-                            <input type="number" name="km_entry" class="form-control" value="{{ $order->km_entry }}" />
                         </div>
                     </div>
                     <div class="mb-0">
@@ -124,7 +124,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
             <!-- Peças -->
             <div class="card">
                 <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">Peças e Insumos</h5>
+                    <h5 class="card-title mb-0">{{ niche('inventory_items') }} e Insumos</h5>
                 </div>
                 <div class="card-body pt-4">
                     <div class="table-responsive">
@@ -132,7 +132,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                             <thead>
                                 <tr>
                                     <th width="50">Add</th>
-                                    <th>Peça</th>
+                                    <th>{{ niche('entity') === 'Pedido' ? 'Ingrediente' : 'Peça' }}</th>
                                     <th>Venda Un.</th>
                                     <th>Qtd</th>
                                 </tr>
@@ -177,58 +177,30 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                 </div>
                 <div class="card-body pt-4">
                     @php
-                        $invoice = \App\Models\TaxInvoice::where('ordem_servico_id', $order->id)->first();
+                    $invoice = \App\Models\TaxInvoice::where('ordem_servico_id', $order->id)->first();
                     @endphp
 
                     @if($invoice)
-                        <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
-                            <span class="alert-icon rounded-circle p-1 me-2"><i class="ti tabler-check"></i></span>
-                            <span>Nota Fiscal #{{ $invoice->invoice_number }} emitida</span>
-                        </div>
-                        <div class="d-grid gap-2">
-                            <a href="{{ $invoice->pdf_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                <i class="ti tabler-file-type-pdf me-1"></i> Baixar PDF
-                            </a>
-                            <a href="{{ $invoice->xml_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                                <i class="ti tabler-file-code me-1"></i> Baixar XML
-                            </a>
-                        </div>
-                    @else
-                        <p class="small text-muted mb-3">Esta Ordem de Serviço ainda não possui nota fiscal emitida.</p>
-                        <a href="{{ route('tax.invoice.create', ['os' => $order->id]) }}" class="btn btn-primary w-100">
-                            <i class="ti tabler-send me-1"></i> Emitir Nota Fiscal
+                    <div class="alert alert-success d-flex align-items-center mb-3" role="alert">
+                        <span class="alert-icon rounded-circle p-1 me-2"><i class="ti tabler-check"></i></span>
+                        <span>Nota Fiscal #{{ $invoice->invoice_number }} emitida</span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <a href="{{ $invoice->pdf_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <i class="ti tabler-file-type-pdf me-1"></i> Baixar PDF
                         </a>
+                        <a href="{{ $invoice->xml_url }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                            <i class="ti tabler-file-code me-1"></i> Baixar XML
+                        </a>
+                    </div>
+                    @else
+                    <p class="small text-muted mb-3">Esta {{ niche('entity') }} ainda não possui nota fiscal emitida.</p>
+                    <a href="{{ route('tax.invoice.create', ['os' => $order->id]) }}" class="btn btn-primary w-100">
+                        <i class="ti tabler-send me-1"></i> Emitir Nota Fiscal
+                    </a>
                     @endif
                 </div>
             </div>
-
-            @if(isset($customFields) && $customFields->count() > 0)
-            <div class="card mb-4">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">Informações Adicionais</h5>
-                </div>
-                <div class="card-body pt-4">
-                    @foreach($customFields as $field)
-                    <div class="mb-3">
-                        <label class="form-label">{{ $field->name }}</label>
-                        @php $val = $field->current_value; @endphp
-                        @if($field->type === 'select')
-                            <select name="custom_fields[{{ $field->id }}]" class="form-select" {{ $field->required ? 'required' : '' }}>
-                                <option value="">Selecione...</option>
-                                @foreach($field->options as $opt)
-                                    <option value="{{ $opt }}" {{ $val == $opt ? 'selected' : '' }}>{{ $opt }}</option>
-                                @endforeach
-                            </select>
-                        @elseif($field->type === 'textarea')
-                            <textarea name="custom_fields[{{ $field->id }}]" class="form-control" rows="2" {{ $field->required ? 'required' : '' }}>{{ $val }}</textarea>
-                        @else
-                            <input type="{{ $field->type }}" name="custom_fields[{{ $field->id }}]" class="form-control" value="{{ $val }}" {{ $field->required ? 'required' : '' }} />
-                        @endif
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-            @endif
 
             <div class="card mb-4">
                 <div class="card-header border-bottom">
@@ -280,7 +252,26 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('.select2').select2();
+        $('#client_id').select2({
+            placeholder: "Buscar cliente pelo nome, CPF, CNPJ ou email...",
+            minimumInputLength: 1,
+            ajax: {
+                url: '/api/clients/search',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
 
         // Busca veículos ao mudar o cliente
         $('#client_id').on('change', function() {
@@ -290,14 +281,27 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
             vehicleSelect.html('<option value="">Carregando...</option>').prop('disabled', true);
 
             if (clientId) {
-                fetch(`{{ url('api/clients') }}/${clientId}/vehicles`)
-                    .then(res => res.json())
+                fetch(`{{ url('api/get-vehicles') }}/${clientId}`)
+                    .then(res => {
+                        if (!res.ok) throw new Error('Erro ao buscar {{ mb_strtolower(niche("entities"), "UTF-8") }}');
+                        return res.json();
+                    })
                     .then(data => {
-                        let html = '<option value="">Selecione o Veículo</option>';
-                        data.forEach(v => {
-                            html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`;
-                        });
+                        let html = '<option value="">Selecione o {{ niche("entity") }}</option>';
+                        if (data.length === 0) {
+                            html = '<option value="">Nenhum {{ mb_strtolower(niche("entity"), "UTF-8") }} encontrado para este cliente</option>';
+                        } else {
+                            data.forEach(v => {
+                                let badge = v.placa ? v.placa + ' - ' : '';
+                                html += `<option value="${v.id}">${badge}${v.modelo}</option>`;
+                            });
+                        }
                         vehicleSelect.html(html).prop('disabled', false);
+                    })
+                    .catch(err => {
+                        console.error('Erro:', err);
+                        vehicleSelect.html('<option value="">Erro ao carregar</option>').prop('disabled', false);
+                        alert('Não foi possível carregar os {{ mb_strtolower(niche("entities"), "UTF-8") }} deste cliente. Tente novamente.');
                     });
             }
         });

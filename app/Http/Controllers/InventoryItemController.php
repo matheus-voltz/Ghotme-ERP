@@ -14,7 +14,8 @@ class InventoryItemController extends Controller
     public function index()
     {
         $suppliers = Supplier::where('is_active', true)->get();
-        return view('content.inventory.items.index', compact('suppliers'));
+        $categories = \App\Models\MenuCategory::all();
+        return view('content.inventory.items.index', compact('suppliers', 'categories'));
     }
 
     /**
@@ -96,22 +97,37 @@ class InventoryItemController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:255|unique:inventory_items,sku',
-            'description' => 'nullable|string',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'min_quantity' => 'required|integer|min:0',
-            'supplier_id' => 'nullable|exists:suppliers,id',
-            'unit' => 'required|string|max:20',
-            'location' => 'nullable|string|max:100',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'sku' => 'nullable|string|max:255|unique:inventory_items,sku',
+                'description' => 'nullable|string',
+                'cost_price' => 'required|numeric|min:0',
+                'selling_price' => 'required|numeric|min:0',
+                'quantity' => 'required|integer|min:0',
+                'min_quantity' => 'required|integer|min:0',
+                'supplier_id' => 'nullable|exists:suppliers,id',
+                'menu_category_id' => 'nullable|exists:menu_categories,id',
+                'unit' => 'required|string|max:20',
+                'location' => 'nullable|string|max:100',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120'
+            ]);
 
-        $item = InventoryItem::create($validated);
+            $item = InventoryItem::create($validated);
 
-        return response()->json(['success' => true, 'message' => 'Item criado com sucesso!', 'data' => $item]);
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('inventory', 'public');
+                $item->images()->create([
+                    'company_id' => auth()->user()->company_id,
+                    'path' => $path,
+                    'is_main' => true
+                ]);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Item criado com sucesso!', 'data' => $item]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao salvar item: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -119,7 +135,7 @@ class InventoryItemController extends Controller
      */
     public function edit($id)
     {
-        $item = InventoryItem::find($id);
+        $item = InventoryItem::with('mainImage')->find($id);
         if (!$item) {
             return response()->json(['success' => false, 'message' => 'Item não encontrado.'], 404);
         }
@@ -131,27 +147,52 @@ class InventoryItemController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $item = InventoryItem::find($id);
-        if (!$item) {
-            return response()->json(['success' => false, 'message' => 'Item não encontrado.'], 404);
+        try {
+            $item = InventoryItem::find($id);
+            if (!$item) {
+                return response()->json(['success' => false, 'message' => 'Item não encontrado.'], 404);
+            }
+
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'sku' => 'nullable|string|max:255|unique:inventory_items,sku,' . $id,
+                'description' => 'nullable|string',
+                'cost_price' => 'required|numeric|min:0',
+                'selling_price' => 'required|numeric|min:0',
+                'quantity' => 'required|integer|min:0',
+                'min_quantity' => 'required|integer|min:0',
+                'supplier_id' => 'nullable|exists:suppliers,id',
+                'menu_category_id' => 'nullable|exists:menu_categories,id',
+                'unit' => 'required|string|max:20',
+                'location' => 'nullable|string|max:100',
+                'image' => [
+                    'nullable',
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($request->hasFile('image') && !$request->file('image')->isValid()) {
+                            $fail('O arquivo de imagem enviado é inválido.');
+                        }
+                    }
+                ]
+            ]);
+
+            $item->update($validated);
+
+            if ($request->hasFile('image')) {
+                // Remove imagem antiga se existir
+                $item->mainImage()?->delete();
+                
+                $path = $request->file('image')->store('inventory', 'public');
+                $item->images()->create([
+                    'company_id' => auth()->user()->company_id,
+                    'path' => $path,
+                    'is_main' => true
+                ]);
+            }
+
+            return response()->json(['success' => true, 'message' => 'Item atualizado com sucesso!', 'data' => $item]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Erro ao atualizar item: ' . $e->getMessage()], 500);
         }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:255|unique:inventory_items,sku,' . $id,
-            'description' => 'nullable|string',
-            'cost_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
-            'quantity' => 'required|integer|min:0',
-            'min_quantity' => 'required|integer|min:0',
-            'supplier_id' => 'nullable|exists:suppliers,id',
-            'unit' => 'required|string|max:20',
-            'location' => 'nullable|string|max:100',
-        ]);
-
-        $item->update($validated);
-
-        return response()->json(['success' => true, 'message' => 'Item atualizado com sucesso!', 'data' => $item]);
     }
 
     /**

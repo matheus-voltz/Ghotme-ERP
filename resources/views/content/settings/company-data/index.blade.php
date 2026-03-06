@@ -15,7 +15,7 @@
   <div class="col-12">
     <div class="card mb-6">
       <div class="card-header border-bottom">
-        <h5 class="card-title mb-0">{{ niche_translate('Configurações da Oficina') }}</h5>
+        <h5 class="card-title mb-0">Configurações da Empresa</h5>
       </div>
       <div class="card-body pt-6">
         <form id="formCompanyData" enctype="multipart/form-data">
@@ -27,7 +27,7 @@
             </div>
             <div class="col-md-6 mb-4">
               <label class="form-label">Nome Fantasia</label>
-              <input type="text" name="trade_name" class="form-control" value="{{ $settings->trade_name }}" placeholder="{{ niche_translate('Minha Oficina') }}" />
+              <input type="text" name="trade_name" class="form-control" value="{{ $settings->trade_name }}" placeholder="Nome do seu Negócio" />
             </div>
             <div class="col-md-4 mb-4">
               <label class="form-label">CNPJ</label>
@@ -35,7 +35,7 @@
             </div>
             <div class="col-md-4 mb-4">
               <label class="form-label">E-mail</label>
-              <input type="email" name="email" class="form-control" value="{{ $settings->email }}" placeholder="{{ niche_translate('contato@oficina.com') }}" />
+              <input type="email" name="email" class="form-control" value="{{ $settings->email }}" placeholder="contato@empresa.com" />
             </div>
             <div class="col-md-2 mb-4">
               <label class="form-label">Telefone</label>
@@ -51,6 +51,7 @@
                 <option value="workshop" {{ $userNiche == 'workshop' ? 'selected' : '' }}>Oficina Mecânica (Veículos)</option>
                 <option value="electronics" {{ $userNiche == 'electronics' ? 'selected' : '' }}>Assistência Técnica (Eletrônicos/Dispositivos)</option>
                 <option value="pet" {{ $userNiche == 'pet' ? 'selected' : '' }}>Pet Shop / Veterinária (Pets/Banho e Tosa)</option>
+                <option value="food_service" {{ $userNiche == 'food_service' ? 'selected' : '' }}>Food Truck / Gastronomia (Pedidos/Lanches)</option>
                 <option value="beauty_clinic" {{ $userNiche == 'beauty_clinic' ? 'selected' : '' }}>Clínica de Estética / Saúde (Pacientes)</option>
                 <option value="construction" {{ $userNiche == 'construction' ? 'selected' : '' }}>Construção Civil / Empreiteira (Obras/Projetos)</option>
               </select>
@@ -90,7 +91,7 @@
           <hr class="my-4">
           <div class="row align-items-center">
             <div class="col-md-6 mb-4">
-              <label class="form-label">{{ niche_translate('Logotipo da Oficina') }}</label>
+              <label class="form-label">Logotipo da Empresa</label>
               <input type="file" name="logo" class="form-control" accept="image/*" />
               <input type="hidden" name="remove_logo" id="remove_logo" value="0">
               <small class="text-muted">Formatos aceitos: JPG, PNG. Tamanho máx: 2MB.</small>

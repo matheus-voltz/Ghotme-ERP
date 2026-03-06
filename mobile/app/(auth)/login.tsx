@@ -3,7 +3,7 @@ import {
     View,
     Text,
     TextInput,
-    TouchableOpacity,
+    Pressable,
     StyleSheet,
     Alert,
     KeyboardAvoidingView,
@@ -23,14 +23,12 @@ import Animated, {
     withSpring,
     withTiming,
     withDelay,
-    withRepeat,
-    withSequence,
-    Easing
+    withSequence
 } from 'react-native-reanimated';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 
 export default function LoginScreen() {
-    const { signIn, verify2FA } = useAuth();
+    const { signIn, verify2FA, getStoredCredentials } = useAuth();
     const router = useRouter();
 
     const [email, setEmail] = useState('');
@@ -64,7 +62,7 @@ export default function LoginScreen() {
             const hasHardware = await LocalAuthentication.hasHardwareAsync();
             const isEnrolled = await LocalAuthentication.isEnrolledAsync();
             const pref = await SecureStore.getItemAsync('useBiometrics');
-            const token = await SecureStore.getItemAsync('userToken');
+            const creds = await getStoredCredentials();
 
             if (hasHardware && isEnrolled) {
                 setBiometricAvailable(true);
@@ -79,55 +77,12 @@ export default function LoginScreen() {
             const enabled = pref === 'true';
             setBiometricEnabled(enabled);
 
-            // Disparo automático apenas se há token E biometria ativada
-            if (enabled && hasHardware && isEnrolled && token) {
+            // Disparo automático apenas se há credenciais salvas E biometria ativada
+            if (enabled && hasHardware && isEnrolled && creds) {
                 setTimeout(() => triggerBiometricAuth(), 600);
             }
         } catch (e) {
             console.log('Biometric check error:', e);
-        }
-    };
-
-    const autoBiometrics = async () => {
-        const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
-        if (useBiometrics === 'true') {
-            checkBiometrics();
-        }
-    };
-
-    const checkBiometrics = async () => {
-        try {
-            const hasHardware = await LocalAuthentication.hasHardwareAsync();
-            const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-            if (!hasHardware) {
-                Alert.alert("Erro", "Este dispositivo não suporta biometria.");
-                return;
-            }
-            if (!isEnrolled) {
-                Alert.alert("Biometria", "Nenhuma digital ou rosto cadastrado no sistema do celular.");
-                return;
-            }
-
-            const useBiometrics = await SecureStore.getItemAsync('useBiometrics');
-            const token = await SecureStore.getItemAsync('userToken');
-
-            if (useBiometrics === 'true' && token) {
-                const result = await LocalAuthentication.authenticateAsync({
-                    promptMessage: 'Entrar com Biometria',
-                    fallbackLabel: 'Usar Senha',
-                    disableDeviceFallback: false
-                });
-
-                if (result.success) {
-                    triggerSuccess();
-                }
-            } else if (useBiometrics !== 'true') {
-                Alert.alert("Aviso", "Ative a biometria na tela de Segurança dentro do seu perfil primeiro.");
-            }
-        } catch (error) {
-            console.error(error);
-            Alert.alert("Erro", "Falha ao processar biometria.");
         }
     };
 
@@ -141,9 +96,9 @@ export default function LoginScreen() {
                 withSpring(1.0)
             );
 
-            const token = await SecureStore.getItemAsync('userToken');
-            if (!token) {
-                Alert.alert('Biometria', 'Faça login manualmente primeiro para ativar a biometria.');
+            const creds = await getStoredCredentials();
+            if (!creds) {
+                Alert.alert('Biometria', 'Faça login manualmente primeiro para ativar a biometria nesta conta.');
                 return;
             }
 
@@ -154,7 +109,27 @@ export default function LoginScreen() {
             });
 
             if (result.success) {
-                triggerSuccess();
+                // Realizar o login real com as credenciais guardadas
+                try {
+                    setLoading(true);
+                    const response = await signIn({
+                        email: creds.email,
+                        password: creds.password
+                    });
+
+                    if (response?.two_factor) {
+                        setEmail(creds.email);
+                        setShow2FA(true);
+                        setLoading(false);
+                        return;
+                    }
+
+                    triggerSuccess();
+                } catch (loginError) {
+                    Alert.alert('Falha no Login', 'Suas credenciais salvas parecem estar desatualizadas. Faça login com senha novamente.');
+                } finally {
+                    setLoading(false);
+                }
             } else if (result.error && result.error !== 'user_cancel' && result.error !== 'system_cancel') {
                 Alert.alert('Falha na biometria', 'Tente novamente ou use email e senha.');
             }
@@ -175,6 +150,10 @@ export default function LoginScreen() {
             { scale: logoScale.value },
             { translateY: logoTranslateY.value }
         ]
+    }));
+
+    const animatedBioStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: bioBtnScale.value }]
     }));
 
     async function handleLogin() {
@@ -232,7 +211,7 @@ export default function LoginScreen() {
 
     return (
         <LinearGradient
-            colors={['#ffffff', '#f8f9fa']}
+            colors={['#ffffff', '#f2f2f7']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.container}
@@ -308,56 +287,68 @@ export default function LoginScreen() {
                                                 onChangeText={setPassword}
                                                 secureTextEntry={!showPassword}
                                             />
-                                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ padding: 5 }}>
+                                            <Pressable
+                                                onPress={() => setShowPassword(!showPassword)}
+                                                style={({ pressed }) => [{ opacity: pressed ? 0.5 : 1, padding: 5 }]}
+                                            >
                                                 <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color="#7367F0" />
-                                            </TouchableOpacity>
+                                            </Pressable>
                                         </View>
                                     </View>
 
-                                    <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
-                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>ENTRAR AGORA</Text>}
-                                    </TouchableOpacity>
+                                    <Pressable
+                                        style={({ pressed }) => [
+                                            styles.loginButton,
+                                            { opacity: pressed || loading ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }
+                                        ]}
+                                        onPress={handleLogin}
+                                        disabled={loading}
+                                    >
+                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Entrar agora</Text>}
+                                    </Pressable>
 
                                     {/* Botão de Biometria Premium */}
                                     {biometricAvailable && biometricEnabled && (
-                                        <Animated.View style={[{ transform: [{ scale: bioBtnScale }] }, { marginTop: 16 }]}>
-                                            <TouchableOpacity
-                                                style={styles.biometricButton}
+                                        <Animated.View style={[animatedBioStyle, { marginTop: 16 }]}>
+                                            <Pressable
+                                                style={({ pressed }) => [
+                                                    styles.biometricButton,
+                                                    { opacity: pressed || biometricLoading ? 0.8 : 1 }
+                                                ]}
                                                 onPress={triggerBiometricAuth}
                                                 disabled={biometricLoading}
-                                                activeOpacity={0.85}
                                             >
                                                 {biometricLoading ? (
                                                     <ActivityIndicator size="small" color="#7367F0" />
                                                 ) : (
                                                     <Ionicons
                                                         name={biometricType === 'faceid' ? 'scan-outline' : 'finger-print-outline'}
-                                                        size={26}
+                                                        size={24}
                                                         color="#7367F0"
                                                     />
                                                 )}
                                                 <Text style={styles.biometricButtonText}>
-                                                    {biometricType === 'faceid' ? 'Entrar com Face ID' : 'Entrar com Digital'}
+                                                    {biometricType === 'faceid' ? 'Face ID' : 'Digital'}
                                                 </Text>
-                                            </TouchableOpacity>
+                                            </Pressable>
                                         </Animated.View>
                                     )}
 
                                     {/* Link para ativar biometria caso disponível mas não configurado */}
                                     {biometricAvailable && !biometricEnabled && (
-                                        <TouchableOpacity
-                                            style={{ marginTop: 20, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}
+                                        <Pressable
+                                            style={({ pressed }) => [{ marginTop: 24, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', opacity: pressed ? 0.5 : 1 }]}
                                             onPress={() => Alert.alert(
                                                 biometricType === 'faceid' ? '🔒 Face ID' : '🔒 Biometria',
                                                 'Para usar biometria: faça login com email/senha, depois acesse Perfil → Segurança e ative a opção de biometria.',
                                                 [{ text: 'Entendi' }]
                                             )}
                                         >
-                                            <Ionicons name={biometricType === 'faceid' ? 'scan-outline' : 'finger-print-outline'} size={16} color="#aaa" style={{ marginRight: 6 }} />
-                                            <Text style={{ color: '#aaa', fontSize: 13 }}>
+                                            <Ionicons name={biometricType === 'faceid' ? 'scan-outline' : 'finger-print-outline'} size={14} color="#aaa" style={{ marginRight: 6 }} />
+                                            <Text style={{ color: '#aaa', fontSize: 13, fontWeight: '500' }}>
                                                 {biometricType === 'faceid' ? 'Face ID disponível' : 'Digital disponível'} — ative nas configurações
                                             </Text>
-                                        </TouchableOpacity>
+                                        </Pressable>
                                     )}
                                 </>
                             ) : (
@@ -377,21 +368,28 @@ export default function LoginScreen() {
                                                 autoFocus
                                             />
                                         </View>
-                                        <Text style={{ color: '#666', fontSize: 12, textAlign: 'center', marginTop: 10, opacity: 0.8 }}>
+                                        <Text style={{ color: '#8e8e93', fontSize: 13, textAlign: 'center', marginTop: 12 }}>
                                             Abra seu app de autenticação e digite o código.
                                         </Text>
                                     </View>
 
-                                    <TouchableOpacity style={styles.loginButton} onPress={handleVerify2FA} disabled={loading}>
-                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>VERIFICAR CÓDIGO</Text>}
-                                    </TouchableOpacity>
+                                    <Pressable
+                                        style={({ pressed }) => [
+                                            styles.loginButton,
+                                            { opacity: pressed || loading ? 0.85 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] }
+                                        ]}
+                                        onPress={handleVerify2FA}
+                                        disabled={loading}
+                                    >
+                                        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Verificar Código</Text>}
+                                    </Pressable>
 
-                                    <TouchableOpacity
-                                        style={{ marginTop: 20, alignItems: 'center' }}
+                                    <Pressable
+                                        style={({ pressed }) => [{ marginTop: 20, alignItems: 'center', opacity: pressed ? 0.6 : 1 }]}
                                         onPress={() => setShow2FA(false)}
                                     >
-                                        <Text style={{ color: '#7367F0', fontSize: 14, fontWeight: '600' }}>Voltar ao Login</Text>
-                                    </TouchableOpacity>
+                                        <Text style={{ color: '#7367F0', fontSize: 15, fontWeight: '600' }}>Voltar ao Login</Text>
+                                    </Pressable>
                                 </View>
                             )}
                         </Animated.View>
@@ -405,56 +403,46 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     keyboardView: { flex: 1, justifyContent: 'center' },
-    contentContainer: { paddingHorizontal: 30, width: '100%', maxWidth: 500, alignSelf: 'center' },
+    contentContainer: { paddingHorizontal: 24, width: '100%', maxWidth: 400, alignSelf: 'center' },
     headerContainer: { alignItems: 'center', marginBottom: 40 },
     logoPlaceholder: {
         width: 120, height: 120,
         justifyContent: 'center', alignItems: 'center',
-        marginBottom: 10,
+        marginBottom: 16,
     },
-    appName: { fontSize: 32, fontWeight: 'bold', color: '#333', letterSpacing: 1 },
-    tagline: { fontSize: 16, color: '#666', marginTop: 5, textAlign: 'center' },
+    appName: { fontSize: 34, fontWeight: '800', color: '#1c1c1e', letterSpacing: -0.5 },
+    tagline: { fontSize: 17, color: '#8e8e93', marginTop: 8, textAlign: 'center', paddingHorizontal: 20, lineHeight: 22 },
     formContainer: { width: '100%' },
-    inputWrapper: { marginBottom: 20 },
-    label: { fontSize: 12, fontWeight: 'bold', color: '#555', marginBottom: 8, marginLeft: 4, textTransform: 'uppercase', opacity: 0.9 },
+    inputWrapper: { marginBottom: 16 },
+    label: { fontSize: 13, fontWeight: '600', color: '#1c1c1e', marginBottom: 8, marginLeft: 2, opacity: 0.8 },
     inputContainer: {
         flexDirection: 'row', alignItems: 'center',
-        backgroundColor: '#fff', borderRadius: 16,
-        paddingHorizontal: 18, height: 60,
-        borderWidth: 1, borderColor: '#E0E0E0',
-        shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05, shadowRadius: 5, elevation: 2,
+        backgroundColor: '#f2f2f7', borderRadius: 12,
+        paddingHorizontal: 16, height: 56,
+        borderWidth: 1, borderColor: '#e5e5ea',
     },
-    inputIcon: { marginRight: 12 },
-    input: { flex: 1, height: 60, color: '#333', fontSize: 16 },
+    inputIcon: { marginRight: 12, opacity: 0.7 },
+    input: { flex: 1, height: 56, color: '#000', fontSize: 17 },
     loginButton: {
-        backgroundColor: '#7367F0', borderRadius: 16,
-        height: 60, justifyContent: 'center', alignItems: 'center',
-        marginTop: 10,
-        shadowColor: '#7367F0', shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+        backgroundColor: '#7367F0', borderRadius: 12,
+        height: 56, justifyContent: 'center', alignItems: 'center',
+        marginTop: 12,
     },
-    loginButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold', letterSpacing: 1.5 },
+    loginButtonText: { color: '#fff', fontSize: 17, fontWeight: '700', letterSpacing: -0.4 },
     biometricButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
+        gap: 8,
         backgroundColor: '#fff',
-        borderRadius: 16,
-        height: 56,
-        borderWidth: 1.5,
+        borderRadius: 12,
+        height: 52,
+        borderWidth: 1,
         borderColor: '#7367F030',
-        shadowColor: '#7367F0',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
-        elevation: 3,
     },
     biometricButtonText: {
         color: '#7367F0',
-        fontSize: 15,
-        fontWeight: '700',
-        letterSpacing: 0.5,
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

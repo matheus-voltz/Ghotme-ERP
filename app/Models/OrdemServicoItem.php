@@ -27,6 +27,11 @@ class OrdemServicoItem extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function addons()
+    {
+        return $this->hasMany(OrdemServicoItemAddon::class, 'ordem_servico_item_id');
+    }
+
     public function ordemServico()
     {
         return $this->belongsTo(OrdemServico::class);

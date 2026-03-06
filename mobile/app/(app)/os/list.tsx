@@ -12,13 +12,14 @@ import {
     ScrollView,
     Keyboard,
     Animated as RNAnimated,
+    Pressable,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import api from '../../../services/api';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
-import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeIn, useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Skeleton } from '../../../components/Skeleton';
@@ -27,14 +28,97 @@ import { Skeleton } from '../../../components/Skeleton';
 
 type SortOption = 'date_desc' | 'date_asc' | 'value_desc' | 'value_asc';
 
-const STATUS_FILTERS = [
-    { key: 'all', label: 'Todas', color: '#7367F0' },
-    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
-    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
-    { key: 'running', label: 'Execução', color: '#00CFE8' },
-    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
-    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
-];
+// ─── Termos por Nicho ─────────────────────────────────────────────────────────
+
+const getNicheTerms = (niche: string) => {
+    switch (niche) {
+        case 'food_service':
+            return {
+                pageTitle: 'Pedidos',
+                singular: 'pedido',
+                plural: 'pedidos',
+                clientLabel: 'Balcão',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Recebido', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aceito', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Cozinha', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Pronto', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Recebido', approved: 'Aceito', running: 'Em Cozinha', finalized: 'Pronto', canceled: 'Cancelado' },
+            };
+        case 'pet':
+            return {
+                pageTitle: 'Atendimentos',
+                singular: 'atendimento',
+                plural: 'atendimentos',
+                clientLabel: 'Tutor não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovado', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Serviço', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizado', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovado', running: 'Em Serviço', finalized: 'Finalizado', canceled: 'Cancelado' },
+            };
+        case 'beauty_clinic':
+            return {
+                pageTitle: 'Atendimentos',
+                singular: 'atendimento',
+                plural: 'atendimentos',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todos', color: '#7367F0' },
+                    { key: 'pending', label: 'Agendado', color: '#FF9F43' },
+                    { key: 'approved', label: 'Confirmado', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Serviço', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizado', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelado', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Agendado', approved: 'Confirmado', running: 'Em Serviço', finalized: 'Finalizado', canceled: 'Cancelado' },
+            };
+        case 'electronics':
+            return {
+                pageTitle: 'Ordens de Serviço',
+                singular: 'ordem',
+                plural: 'ordens',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todas', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
+                    { key: 'running', label: 'Em Reparo', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovada', running: 'Em Reparo', finalized: 'Finalizada', canceled: 'Cancelada' },
+            };
+        default: // automotive, construction, etc.
+            return {
+                pageTitle: 'Ordens de Serviço',
+                singular: 'ordem',
+                plural: 'ordens',
+                clientLabel: 'Cliente não informado',
+                statusFilters: [
+                    { key: 'all', label: 'Todas', color: '#7367F0' },
+                    { key: 'pending', label: 'Pendente', color: '#FF9F43' },
+                    { key: 'approved', label: 'Aprovada', color: '#00CFE8' },
+                    { key: 'running', label: 'Execução', color: '#00CFE8' },
+                    { key: 'finalized', label: 'Finalizada', color: '#28C76F' },
+                    { key: 'canceled', label: 'Cancelada', color: '#EA5455' },
+                ],
+                statusMap: { pending: 'Pendente', approved: 'Aprovada', running: 'Em Execução', finalized: 'Finalizada', canceled: 'Cancelada' },
+            };
+    }
+};
+
+const STATUS_COLORS: Record<string, string> = {
+    all: '#7367F0', pending: '#FF9F43', approved: '#00CFE8',
+    running: '#00CFE8', finalized: '#28C76F', canceled: '#EA5455',
+};
 
 const SORT_OPTIONS: { key: SortOption; label: string; icon: string }[] = [
     { key: 'date_desc', label: 'Mais recente', icon: 'arrow-down' },
@@ -43,17 +127,36 @@ const SORT_OPTIONS: { key: SortOption; label: string; icon: string }[] = [
     { key: 'value_asc', label: 'Menor valor', icon: 'trending-down' },
 ];
 
-const getStatusColor = (status: string) => {
-    const found = STATUS_FILTERS.find(f => f.key === status);
-    return found?.color ?? '#7367F0';
+const getStatusColor = (status: string) => STATUS_COLORS[status] ?? '#7367F0';
+
+const premiumShadow = {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 3,
 };
 
-const statusTranslations: { [key: string]: string } = {
-    pending: 'Pendente',
-    approved: 'Aprovada',
-    running: 'Em Execução',
-    finalized: 'Finalizada',
-    canceled: 'Cancelada',
+const AnimatedCard = ({ children, onPress, style }: any) => {
+    const scale = useSharedValue(1);
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }]
+    }));
+
+    return (
+        <Pressable
+            onPressIn={() => { scale.value = withSpring(0.96, { damping: 15, stiffness: 200 }); }}
+            onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 200 }); }}
+            onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (onPress) onPress();
+            }}
+        >
+            <Animated.View style={[style, animatedStyle]}>
+                {children}
+            </Animated.View>
+        </Pressable>
+    );
 };
 
 // ─── Componente Principal ────────────────────────────────────────────────────
@@ -62,7 +165,8 @@ export default function OSListScreen() {
     const { status: initialStatus, title } = useLocalSearchParams();
     const router = useRouter();
     const { colors, activeTheme } = useTheme();
-    const { niche } = useNiche();
+    const { niche, labels } = useNiche();
+    const terms = getNicheTerms(niche);
 
     const [allData, setAllData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -136,12 +240,12 @@ export default function OSListScreen() {
             result = result.filter(item => {
                 const clientName = (item.client?.name ?? item.client?.company_name ?? '').toLowerCase();
                 const osId = String(item.id);
-                const plate = (item.veiculo?.placa ?? '').toLowerCase();
+                const secondaryId = String(item.veiculo?.placa ?? '').toLowerCase();
                 const model = `${item.veiculo?.marca ?? ''} ${item.veiculo?.modelo ?? ''}`.toLowerCase();
                 return (
                     clientName.includes(query) ||
                     osId.includes(query) ||
-                    plate.includes(query) ||
+                    secondaryId.includes(query) ||
                     model.includes(query)
                 );
             });
@@ -197,10 +301,9 @@ export default function OSListScreen() {
 
     const renderItem = ({ item, index }: { item: any; index: number }) => (
         <Animated.View entering={FadeInDown.delay(index * 40).duration(350).springify()}>
-            <TouchableOpacity
-                style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}
-                onPress={() => { Haptics.selectionAsync(); router.push(`/os/${item.id}`); }}
-                activeOpacity={0.88}
+            <AnimatedCard
+                style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, ...premiumShadow }]}
+                onPress={() => { router.push(`/os/${item.id}`); }}
             >
                 <View style={styles.cardHeader}>
                     <View style={styles.idBadge}>
@@ -209,27 +312,32 @@ export default function OSListScreen() {
                     <View style={[styles.statusPill, { backgroundColor: getStatusColor(item.status) + '20' }]}>
                         <View style={[styles.statusDot, { backgroundColor: getStatusColor(item.status) }]} />
                         <Text style={[styles.statusText, { color: getStatusColor(item.status) }]}>
-                            {statusTranslations[item.status?.toLowerCase()] ?? item.status}
+                            {terms.statusMap[item.status?.toLowerCase() as keyof typeof terms.statusMap] ?? item.status}
                         </Text>
                     </View>
                 </View>
 
                 <Text style={[styles.clientName, { color: colors.text }]} numberOfLines={1}>
-                    {item.client?.name ?? item.client?.company_name ?? 'Consumidor'}
+                    {(item.client?.name && item.client.name !== 'Balcão' ? item.client.name : null)
+                        ?? item.customer_name
+                        ?? item.client?.company_name
+                        ?? terms.clientLabel}
                 </Text>
 
-                <View style={styles.infoRow}>
-                    <Ionicons
-                        name={niche === 'pet' ? 'paw-outline' : niche === 'electronics' ? 'laptop-outline' : 'car-sport-outline'}
-                        size={13}
-                        color={colors.subText}
-                        style={{ marginRight: 5 }}
-                    />
-                    <Text style={[styles.vehicle, { color: colors.subText }]} numberOfLines={1}>
-                        {item.veiculo?.marca ?? ''} {item.veiculo?.modelo ?? ''}
-                        {item.veiculo?.placa ? ` · ${item.veiculo.placa}` : ''}
-                    </Text>
-                </View>
+                {niche !== 'food_service' && (
+                    <View style={styles.infoRow}>
+                        <Ionicons
+                            name={niche === 'pet' ? 'paw-outline' : niche === 'electronics' ? 'laptop-outline' : 'car-sport-outline'}
+                            size={13}
+                            color={colors.subText}
+                            style={{ marginRight: 5 }}
+                        />
+                        <Text style={[styles.vehicle, { color: colors.subText }]} numberOfLines={1}>
+                            {item.veiculo?.marca ?? ''} {item.veiculo?.modelo ?? ''}
+                            {item.veiculo?.placa ? ` · ${item.veiculo.placa}` : ''}
+                        </Text>
+                    </View>
+                )}
 
                 <View style={[styles.footer, { borderTopColor: colors.border }]}>
                     <View style={styles.dateBox}>
@@ -242,7 +350,7 @@ export default function OSListScreen() {
                         R$ {(Number(item.total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                     </Text>
                 </View>
-            </TouchableOpacity>
+            </AnimatedCard>
         </Animated.View>
     );
 
@@ -267,12 +375,12 @@ export default function OSListScreen() {
                     </TouchableOpacity>
                     <View style={{ flex: 1, marginHorizontal: 12 }}>
                         <Text style={styles.headerTitle} numberOfLines={1}>
-                            {title ? String(title) : 'Ordens de Serviço'}
+                            {title ? String(title) : terms.pageTitle}
                         </Text>
                         {!loading && (
                             <Text style={styles.headerCount}>
-                                {filteredData.length} {filteredData.length === 1 ? 'ordem' : 'ordens'}
-                                {searchText || activeStatus !== 'all' ? ' encontradas' : ' no total'}
+                                {filteredData.length} {filteredData.length === 1 ? terms.singular : terms.plural}
+                                {searchText || activeStatus !== 'all' ? ' encontrados' : ' no total'}
                             </Text>
                         )}
                     </View>
@@ -290,7 +398,7 @@ export default function OSListScreen() {
                     <Ionicons name="search-outline" size={18} color={searchFocused ? '#7367F0' : colors.subText} style={{ marginRight: 8 }} />
                     <TextInput
                         style={[styles.searchInput, { color: colors.text }]}
-                        placeholder="Buscar por cliente, nº OS ou placa..."
+                        placeholder={`Buscar por cliente, nº ${niche === 'food_service' ? 'Pedido' : 'OS'} ou ${labels.identifier.toLowerCase()}...`}
                         placeholderTextColor={colors.subText}
                         value={searchText}
                         onChangeText={setSearchText}
@@ -338,7 +446,7 @@ export default function OSListScreen() {
             {/* ── Chips de filtro de status ─────────────────────────────────────── */}
             <View style={styles.chipsWrapper}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-                    {STATUS_FILTERS.map(f => {
+                    {terms.statusFilters.map(f => {
                         const isActive = activeStatus === f.key;
                         const count = countByStatus[f.key] ?? 0;
                         return (
@@ -389,11 +497,11 @@ export default function OSListScreen() {
                         <View style={styles.emptyContainer}>
                             <Ionicons name="search-outline" size={52} color={colors.subText} style={{ opacity: 0.5 }} />
                             <Text style={[styles.emptyTitle, { color: colors.text }]}>
-                                {searchText ? 'Nenhuma OS encontrada' : 'Sem ordens nesta categoria'}
+                                {searchText ? `Nenhum ${terms.singular} encontrado` : `Sem ${terms.plural} nesta categoria`}
                             </Text>
                             <Text style={[styles.emptySubtitle, { color: colors.subText }]}>
                                 {searchText
-                                    ? `Nenhuma OS corresponde a "${searchText}"`
+                                    ? `Nenhum ${terms.singular} corresponde a "${searchText}"`
                                     : 'Tente selecionar outro filtro de status'}
                             </Text>
                             {searchText.length > 0 && (

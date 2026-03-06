@@ -1,22 +1,25 @@
 {
   "expo": {
-    "name": "mobile",
+    "name": "Ghotme",
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "ghotme",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSFaceIDUsageDescription": "O Ghotme ERP precisa do FaceID para autenticação rápida e segura.",
+        "NSBluetoothAlwaysUsageDescription": "O Ghotme precisa de acesso ao Bluetooth para conectar com maquininhas de cartão e impressoras.",
+        "NSBluetoothPeripheralUsageDescription": "O Ghotme precisa de acesso ao Bluetooth para conectar com maquininhas de cartão e impressoras.",
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.nazuki854.mobile"
+      "bundleIdentifier": "com.nazuki854.ghotme.app"
     },
     "android": {
+      "package": "com.nazuki854.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -26,7 +29,12 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "permissions": [
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -44,10 +52,16 @@
         }
       ],
       [
+        "react-native-ble-manager",
+        {
+          "bluetoothAlwaysPermission": "O Ghotme precisa de acesso ao Bluetooth para conectar com maquininhas de cartão e impressoras."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/images/icon.png",
+          "imageWidth": 280,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {

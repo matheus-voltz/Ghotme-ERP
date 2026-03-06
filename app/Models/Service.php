@@ -20,6 +20,27 @@ class Service extends Model
         'is_active',
     ];
 
+    public function category()
+    {
+        return $this->belongsTo(ServiceCategory::class, 'category_id');
+    }
+
+    /**
+     * Get the ingredients (Ficha de Produção) for the service.
+     */
+    public function ingredients()
+    {
+        return $this->hasMany(ServiceIngredient::class);
+    }
+
+    /**
+     * Get the addon groups for the service (ex: "Escolha o Pão", "Adicionais").
+     */
+    public function addonGroups()
+    {
+        return $this->hasMany(ServiceAddonGroup::class);
+    }
+
     public function images()
     {
         return $this->morphMany(Image::class, 'imageable')->orderBy('order');

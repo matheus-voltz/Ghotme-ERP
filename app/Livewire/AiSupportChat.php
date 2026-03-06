@@ -46,8 +46,8 @@ class AiSupportChat extends Component
         
         $userContext = [
             'name' => Auth::user()->name,
-            'company_name' => Auth::user()->company->name ?? 'Sua Oficina',
-            'niche' => Auth::user()->company->niche ?? 'automotive'
+            'company_name' => Auth::user()->company->name ?? 'Sua Empresa',
+            'niche' => get_current_niche()
         ];
 
         // Filtramos apenas as últimas 5 mensagens para o histórico da IA (limite de contexto/tokens)

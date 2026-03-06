@@ -174,6 +174,7 @@ $customizerHidden = 'customizer-hide';
                 <small class="text-muted">Em Serviço</small>
             </div>
         </div>
+        @if(niche('current', '', $client->company) !== 'food_service')
         <div class="col-md-3 col-6 animate-up" style="animation-delay: 0.3s">
             <div class="stat-card shadow-sm">
                 <div class="stat-icon bg-label-warning">
@@ -183,6 +184,7 @@ $customizerHidden = 'customizer-hide';
                 <small class="text-muted">Orçamentos</small>
             </div>
         </div>
+        @endif
         <div class="col-md-3 d-none d-md-block animate-up" style="animation-delay: 0.4s">
             <div class="stat-card shadow-sm">
                 <div class="stat-icon bg-label-success">
@@ -197,6 +199,7 @@ $customizerHidden = 'customizer-hide';
     <div class="row">
         <!-- Coluna Principal (8) -->
         <div class="col-lg-8 animate-up" style="animation-delay: 0.5s">
+            @if(niche('current', '', $client->company) !== 'food_service')
             <!-- Seção de Veículos -->
             <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
                 <h4 class="mb-0 fw-bold"><i class="ti {{ niche_icon('entity', 'tabler-car', $client->company) }} me-2 text-primary"></i>Meus {{ niche('entities', 'Veículos', $client->company) }}</h4>
@@ -247,9 +250,10 @@ $customizerHidden = 'customizer-hide';
                 </div>
                 @endforelse
             </div>
+            @endif
 
             <div class="d-flex align-items-center justify-content-between mb-4">
-                <h4 class="mb-0 fw-bold"><i class="ti tabler-tool me-2 text-primary"></i>Status de Manutenção</h4>
+                <h4 class="mb-0 fw-bold"><i class="ti tabler-activity me-2 text-primary"></i>Acompanhamento Ativo</h4>
             </div>
 
             @forelse($orders->whereIn('status', ['pending', 'in_progress', 'testing', 'cleaning', 'completed', 'finalized', 'awaiting_approval']) as $order)
@@ -261,10 +265,14 @@ $customizerHidden = 'customizer-hide';
                                 <i class="ti {{ niche_icon('entity', 'tabler-car-suv', $client->company) }} fs-2"></i>
                             </div>
                             <div>
-                                <h5 class="mb-1 fw-bold">{{ $order->veiculo->marca }} {{ $order->veiculo->modelo }}</h5>
+                                <h5 class="mb-1 fw-bold">
+                                    {{ $order->veiculo ? ($order->veiculo->marca . ' ' . $order->veiculo->modelo) : 'Pedido #' . $order->id }}
+                                </h5>
                                 <div class="d-flex gap-2 align-items-center">
+                                    @if($order->veiculo && $order->veiculo->placa && niche('current', '', $client->company) !== 'food_service')
                                     <span class="badge bg-label-secondary text-uppercase">{{ $order->veiculo->placa }}</span>
-                                    <small class="text-muted"><i class="ti tabler-calendar-event me-1"></i>Início: {{ $order->created_at->format('d/m/Y') }}</small>
+                                    @endif
+                                    <small class="text-muted"><i class="ti tabler-calendar-event me-1"></i>Início: {{ $order->created_at->format('d/m/Y H:i') }}</small>
                                 </div>
                             </div>
                         </div>
@@ -280,7 +288,7 @@ $customizerHidden = 'customizer-hide';
                         case 'testing': $statusClass = 'bg-label-primary'; $statusText = 'Testes Finais'; break;
                         case 'cleaning': $statusClass = 'bg-label-info'; $statusText = 'Higienização'; break;
                         case 'completed':
-                        case 'finalized': $statusClass = 'bg-label-success'; $statusText = 'Pronto para Retirada'; break;
+                        case 'finalized': $statusClass = 'bg-label-success'; $statusText = 'Pronto / Concluído'; break;
                         case 'paid': $statusClass = 'bg-label-success'; $statusText = 'Pago / Finalizado'; break;
                         }
                         @endphp
@@ -317,6 +325,7 @@ $customizerHidden = 'customizer-hide';
                 </div>
 
                 <!-- Galeria de Fotos (Dossiê Visual) -->
+                @if(niche('current', '', $client->company) !== 'food_service')
                 @if($order->inspection && $order->inspection->damagePoints->whereNotNull('photo_path')->isNotEmpty())
                 <div class="mt-4 px-2">
                     <small class="text-muted fw-bold d-block mb-2"><i class="ti tabler-camera me-1"></i>Fotos do Atendimento</small>
@@ -324,15 +333,16 @@ $customizerHidden = 'customizer-hide';
                         @foreach($order->inspection->damagePoints->whereNotNull('photo_path') as $point)
                         <div class="flex-shrink-0">
                             <a href="{{ asset('storage/' . $point->photo_path) }}" target="_blank">
-                                <img src="{{ asset('storage/' . $point->photo_path) }}" 
-                                     class="rounded-3 border shadow-xs" 
-                                     style="width: 100px; height: 100px; object-fit: cover;" 
-                                     alt="Foto do serviço">
+                                <img src="{{ asset('storage/' . $point->photo_path) }}"
+                                    class="rounded-3 border shadow-xs"
+                                    style="width: 100px; height: 100px; object-fit: cover;"
+                                    alt="Foto do serviço">
                             </a>
                         </div>
                         @endforeach
                     </div>
                 </div>
+                @endif
                 @endif
 
                 <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
@@ -348,7 +358,7 @@ $customizerHidden = 'customizer-hide';
             <div class="text-center py-5 glass-card mb-4 mt-2">
                 <i class="ti tabler-ghost display-3 text-muted opacity-25"></i>
                 <h5 class="mt-3 text-muted">A empresa está tranquila hoje.</h5>
-                <p class="text-muted small">Nenhum serviço em andamento para seus {{ strtolower(niche('entities', 'itens', $client->company)) }}.</p>
+                <p class="text-muted small">Nenhum atendimento em andamento no momento.</p>
             </div>
             @endforelse
         </div>
@@ -379,6 +389,7 @@ $customizerHidden = 'customizer-hide';
             @endif
 
             <!-- Orçamentos Pendentes -->
+            @if(niche('current', '', $client->company) !== 'food_service')
             <div class="mb-5">
                 <h5 class="fw-bold mb-4">Orçamentos Pendentes</h5>
                 @forelse($budgets->where('status', 'pending') as $budget)
@@ -399,6 +410,7 @@ $customizerHidden = 'customizer-hide';
                 </div>
                 @endforelse
             </div>
+            @endif
 
             <!-- FAQ Section -->
             <div class="mt-5">
@@ -407,7 +419,7 @@ $customizerHidden = 'customizer-hide';
                     <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
                         <h2 class="accordion-header" id="headingOne">
                             <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                <i class="ti tabler-search me-2 text-primary"></i> Como acompanho o serviço?
+                                <i class="ti tabler-search me-2 text-primary"></i> {{ niche('current') === 'food_service' ? 'Como acompanho o meu pedido?' : 'Como acompanho o serviço?' }}
                             </button>
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#portalFaq">
@@ -416,6 +428,7 @@ $customizerHidden = 'customizer-hide';
                             </div>
                         </div>
                     </div>
+                    @if(niche('current', '', $client->company) !== 'food_service')
                     <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
                         <h2 class="accordion-header" id="headingTwo">
                             <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -428,6 +441,7 @@ $customizerHidden = 'customizer-hide';
                             </div>
                         </div>
                     </div>
+                    @endif
                     <div class="accordion-item border-0 mb-3 rounded-4 overflow-hidden shadow-sm">
                         <h2 class="accordion-header" id="headingThree">
                             <button class="accordion-button collapsed bg-white shadow-none fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">

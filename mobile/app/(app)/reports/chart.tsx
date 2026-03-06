@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
-import { Stack } from 'expo-router';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Dimensions, TouchableOpacity, StatusBar } from 'react-native';
+import { Stack, useRouter } from 'expo-router';
 import { useTheme } from '../../../context/ThemeContext';
 import Animated, { FadeInDown, FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import api from '../../../services/api';
 
@@ -11,6 +13,8 @@ const screenWidth = Dimensions.get('window').width;
 
 export default function ChartDetailScreen() {
     const { colors } = useTheme();
+    const router = useRouter();
+    const insets = useSafeAreaInsets();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [selectedBar, setSelectedBar] = useState<number | null>(null);
@@ -52,136 +56,159 @@ export default function ChartDetailScreen() {
     const maxVal = Math.max(...chartData.map((d: any) => d.value), 1);
 
     return (
-        <ScrollView
-            style={[styles.container, { backgroundColor: colors.background }]}
-            contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
-            contentInsetAdjustmentBehavior="automatic"
-        >
-            <Stack.Screen options={{
-                title: 'Fluxo de Receita',
-                headerBackTitle: 'Voltar',
-                headerShadowVisible: false,
-                headerStyle: { backgroundColor: colors.background },
-            }} />
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <StatusBar barStyle="light-content" backgroundColor="#7367F0" />
 
-            {/* Hero Metric */}
-            <Animated.View entering={FadeInDown.duration(400)}>
-                <Text style={[styles.title, { color: colors.text }]}>{data.title}</Text>
-                <Text style={[styles.description, { color: colors.subText }]}>{data.description}</Text>
-
-                <View style={[styles.heroCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <Text style={[styles.mainMetric, { color: colors.text }]}>{data.main_metric}</Text>
-                    <Text style={[styles.subMetric, { color: colors.subText }]}>{data.secondary_metric}</Text>
+            {/* Custom Header */}
+            <LinearGradient
+                colors={['#7367F0', '#CE9FFC']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={[styles.header, { paddingTop: insets.top + 10 }]}
+            >
+                <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                    <Ionicons name="chevron-back" size={28} color="#fff" />
+                </TouchableOpacity>
+                <View style={styles.headerTitleContainer}>
+                    <Text style={styles.headerTitleText}>Fluxo de Receita</Text>
                 </View>
-            </Animated.View>
+                <View style={styles.spacer} />
+            </LinearGradient>
 
-            {/* Highlights Row */}
-            {data.highlights && (
-                <Animated.View entering={FadeInDown.duration(500).delay(100)} style={styles.highlightsRow}>
-                    {data.highlights.map((h: any, i: number) => (
-                        <View key={i} style={[styles.highlightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                            <Text style={[styles.highlightLabel, { color: colors.subText }]}>{h.label}</Text>
-                            <Text style={[styles.highlightValue, { color: colors.text }]}>{h.value}</Text>
-                        </View>
-                    ))}
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={{ padding: 20, paddingBottom: 60 }}
+                showsVerticalScrollIndicator={false}
+            >
+
+                {/* Hero Metric */}
+                <Animated.View entering={FadeInDown.duration(400)}>
+                    <Text style={[styles.title, { color: colors.text }]}>{data.title}</Text>
+                    <Text style={[styles.description, { color: colors.subText }]}>{data.description}</Text>
+
+                    <View style={[styles.heroCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                        <Text style={[styles.mainMetric, { color: colors.text }]}>{data.main_metric}</Text>
+                        <Text style={[styles.subMetric, { color: colors.subText }]}>{data.secondary_metric}</Text>
+                    </View>
                 </Animated.View>
-            )}
 
-            {/* Full 30-Day Chart */}
-            <Animated.View entering={FadeInDown.duration(500).delay(200)}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>Gráfico Diário</Text>
-                <View style={[styles.chartBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 4 }}>
-                        <View style={styles.chartBars}>
-                            {chartData.map((day: any, idx: number) => {
-                                const height = (day.value / maxVal) * 120;
-                                const isSelected = selectedBar === idx;
+                {/* Highlights Row */}
+                {data.highlights && (
+                    <Animated.View entering={FadeInDown.duration(500).delay(100)} style={styles.highlightsRow}>
+                        {data.highlights.map((h: any, i: number) => (
+                            <View key={i} style={[styles.highlightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                                <Text style={[styles.highlightLabel, { color: colors.subText }]}>{h.label}</Text>
+                                <Text style={[styles.highlightValue, { color: colors.text }]}>{h.value}</Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+                )}
+
+                {/* Full 30-Day Chart */}
+                <Animated.View entering={FadeInDown.duration(500).delay(200)}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Gráfico Diário</Text>
+                    <View style={[styles.chartBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 4 }}>
+                            <View style={styles.chartBars}>
+                                {chartData.map((day: any, idx: number) => {
+                                    const height = (day.value / maxVal) * 120;
+                                    const isSelected = selectedBar === idx;
+                                    return (
+                                        <TouchableOpacity
+                                            key={idx}
+                                            style={styles.chartColumn}
+                                            activeOpacity={0.7}
+                                            onPress={() => {
+                                                Haptics.selectionAsync();
+                                                setSelectedBar(isSelected ? null : idx);
+                                            }}
+                                        >
+                                            {isSelected && day.value > 0 && (
+                                                <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)} style={styles.tooltip}>
+                                                    <Text style={styles.tooltipText}>
+                                                        R$ {day.value > 1000 ? (day.value / 1000).toFixed(1) + 'k' : day.value.toFixed(0)}
+                                                    </Text>
+                                                </Animated.View>
+                                            )}
+                                            <View style={[
+                                                styles.bar,
+                                                {
+                                                    height: Math.max(3, height),
+                                                    backgroundColor: isSelected ? '#CE9FFC' : (day.value === 0 ? '#EA545530' : '#7367F0'),
+                                                    width: isSelected ? 12 : 8,
+                                                }
+                                            ]} />
+                                            <Text style={[styles.dayLabel, { color: colors.subText, fontSize: 8 }]}>
+                                                {idx % 3 === 0 ? day.day : ''}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    );
+                                })}
+                            </View>
+                        </ScrollView>
+                    </View>
+                </Animated.View>
+
+                {/* Top Services */}
+                {data.top_services && data.top_services.length > 0 && (
+                    <Animated.View entering={FadeInDown.duration(500).delay(350)}>
+                        <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}>
+                            🏆 Top Serviços do Mês
+                        </Text>
+                        <View style={[styles.topServicesCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                            {data.top_services.map((svc: any, i: number) => {
+                                const svcMax = Math.max(...data.top_services.map((s: any) => s.earned), 1);
+                                const pct = (svc.earned / svcMax) * 100;
+                                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
                                 return (
-                                    <TouchableOpacity
-                                        key={idx}
-                                        style={styles.chartColumn}
-                                        activeOpacity={0.7}
-                                        onPress={() => {
-                                            Haptics.selectionAsync();
-                                            setSelectedBar(isSelected ? null : idx);
-                                        }}
-                                    >
-                                        {isSelected && day.value > 0 && (
-                                            <Animated.View entering={FadeIn.duration(200)} exiting={FadeOut.duration(200)} style={styles.tooltip}>
-                                                <Text style={styles.tooltipText}>
-                                                    R$ {day.value > 1000 ? (day.value / 1000).toFixed(1) + 'k' : day.value.toFixed(0)}
-                                                </Text>
-                                            </Animated.View>
-                                        )}
-                                        <View style={[
-                                            styles.bar,
-                                            {
-                                                height: Math.max(3, height),
-                                                backgroundColor: isSelected ? '#CE9FFC' : (day.value === 0 ? '#EA545530' : '#7367F0'),
-                                                width: isSelected ? 12 : 8,
-                                            }
-                                        ]} />
-                                        <Text style={[styles.dayLabel, { color: colors.subText, fontSize: 8 }]}>
-                                            {idx % 3 === 0 ? day.day : ''}
-                                        </Text>
-                                    </TouchableOpacity>
+                                    <View key={i} style={styles.svcRow}>
+                                        <View style={styles.svcLabelRow}>
+                                            <Text style={[styles.svcName, { color: colors.text }]}>
+                                                {medal} {svc.name}
+                                            </Text>
+                                            <Text style={[styles.svcEarned, { color: colors.text }]}>
+                                                R$ {svc.earned.toFixed(2)} ({svc.qty}x)
+                                            </Text>
+                                        </View>
+                                        <View style={[styles.svcBarBg, { backgroundColor: colors.border + '25' }]}>
+                                            <View style={[styles.svcBarFill, { width: `${pct}%`, backgroundColor: i === 0 ? '#7367F0' : i === 1 ? '#28C76F' : '#FF9F43' }]} />
+                                        </View>
+                                    </View>
                                 );
                             })}
                         </View>
-                    </ScrollView>
-                </View>
-            </Animated.View>
+                    </Animated.View>
+                )}
 
-            {/* Top Services */}
-            {data.top_services && data.top_services.length > 0 && (
-                <Animated.View entering={FadeInDown.duration(500).delay(350)}>
-                    <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 24 }]}>
-                        🏆 Top Serviços do Mês
-                    </Text>
-                    <View style={[styles.topServicesCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                        {data.top_services.map((svc: any, i: number) => {
-                            const svcMax = Math.max(...data.top_services.map((s: any) => s.earned), 1);
-                            const pct = (svc.earned / svcMax) * 100;
-                            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
-                            return (
-                                <View key={i} style={styles.svcRow}>
-                                    <View style={styles.svcLabelRow}>
-                                        <Text style={[styles.svcName, { color: colors.text }]}>
-                                            {medal} {svc.name}
-                                        </Text>
-                                        <Text style={[styles.svcEarned, { color: colors.text }]}>
-                                            R$ {svc.earned.toFixed(2)} ({svc.qty}x)
-                                        </Text>
-                                    </View>
-                                    <View style={[styles.svcBarBg, { backgroundColor: colors.border + '25' }]}>
-                                        <View style={[styles.svcBarFill, { width: `${pct}%`, backgroundColor: i === 0 ? '#7367F0' : i === 1 ? '#28C76F' : '#FF9F43' }]} />
-                                    </View>
-                                </View>
-                            );
-                        })}
-                    </View>
-                </Animated.View>
-            )}
-
-            {/* IA Insights */}
-            {data.insights && data.insights.length > 0 && (
-                <Animated.View entering={FadeInDown.duration(500).delay(500)} style={{ marginTop: 24 }}>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>🤖 Análise Ghotme IA</Text>
-                    {data.insights.map((insight: string, i: number) => (
-                        <View key={i} style={[styles.insightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                            <Text style={[styles.insightHeader, { color: '#7367F0' }]}>Ghotme IA diz:</Text>
-                            <Text style={[styles.insightText, { color: colors.text, opacity: 0.9 }]}>{insight}</Text>
-                        </View>
-                    ))}
-                </Animated.View>
-            )}
-        </ScrollView>
+                {/* IA Insights */}
+                {data.insights && data.insights.length > 0 && (
+                    <Animated.View entering={FadeInDown.duration(500).delay(500)} style={{ marginTop: 24 }}>
+                        <Text style={[styles.sectionTitle, { color: colors.text }]}>🤖 Análise Ghotme IA</Text>
+                        {data.insights.map((insight: string, i: number) => (
+                            <View key={i} style={[styles.insightCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                                <Text style={[styles.insightHeader, { color: '#7367F0' }]}>Ghotme IA diz:</Text>
+                                <Text style={[styles.insightText, { color: colors.text, opacity: 0.9 }]}>{insight}</Text>
+                            </View>
+                        ))}
+                    </Animated.View>
+                )}
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     container: { flex: 1 },
+    header: {
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+        paddingHorizontal: 15, paddingBottom: 15, zIndex: 10,
+    },
+    backBtn: { padding: 5, width: 40 },
+    headerTitleContainer: { flex: 1, alignItems: 'center' },
+    headerTitleText: { fontSize: 18, fontWeight: 'bold', color: '#fff' },
+    spacer: { width: 40 },
+
     title: { fontSize: 22, fontWeight: 'bold', marginBottom: 6, letterSpacing: -0.5 },
     description: { fontSize: 13, marginBottom: 20, opacity: 0.8 },
     heroCard: {

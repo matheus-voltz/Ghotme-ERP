@@ -49,6 +49,113 @@
       <input type="hidden" name="ordem_servico_id" value="{{ $selectedOs->id }}">
       @endif
 
+      @if(get_current_niche() === 'food_service')
+      {{-- INTERFACE DE FICHA DE PREPARO (FOOD SERVICE) --}}
+      <div class="card mb-4 border-primary border-top border-3">
+        <div class="card-header pb-0">
+          <h4 class="mb-1 text-primary"><i class="ti tabler-chef-hat me-2"></i> Ficha de Preparo</h4>
+          <p class="text-muted mb-0">Controle de qualidade e montagem do pedido.</p>
+        </div>
+        <div class="card-body mt-4">
+          <div class="row bg-light p-3 rounded mb-4">
+            <div class="col-md-6 mb-3 mb-md-0">
+              <label class="form-label fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Mesa / Identificador</label>
+              @if($selectedOs)
+              <input type="hidden" name="veiculo_id" value="{{ $selectedOs->veiculo_id }}">
+              <div class="fs-5 fw-bold text-dark">{{ ($selectedOs->veiculo->placa ?? 'N/A') . ' - ' . ($selectedOs->veiculo->modelo ?? 'Sem Mesa') }}</div>
+              @else
+              <select name="veiculo_id" class="form-select select2">
+                <option value="">Selecione a Mesa</option>
+                @foreach($vehicles as $vehicle)
+                <option value="{{ $vehicle->id }}">{{ $vehicle->placa }} - {{ $vehicle->modelo }}</option>
+                @endforeach
+              </select>
+              @endif
+            </div>
+            <div class="col-md-6">
+               <label class="form-label fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 1px;">Observações do Pedido</label>
+               <div class="text-danger fw-bold">{{ $selectedOs->description ?? 'Nenhuma observação especial.' }}</div>
+            </div>
+            {{-- Campos ocultos obrigatórios para o banco --}}
+            <input type="hidden" name="km_current" value="0">
+            <input type="hidden" name="fuel_level" value="N/A">
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Etapas / Ingredientes</h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="btnAddChecklistItem">
+              <i class="ti tabler-plus me-1"></i> Adicionar Etapa
+            </button>
+          </div>
+
+          <div class="table-responsive mb-4">
+            <table class="table table-hover border" id="checklistTable">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 40%;">Ingrediente / Processo</th>
+                  <th style="width: 25%;">Status</th>
+                  <th>Anotação da Cozinha</th>
+                  <th style="width: 50px;"></th>
+                </tr>
+              </thead>
+              <tbody id="checklistContainer">
+                <!-- Itens via JS -->
+              </tbody>
+            </table>
+          </div>
+          <div id="emptyState" class="text-center py-5 text-muted bg-label-secondary rounded mb-4">
+            <i class="ti tabler-salad display-6 mb-2 opacity-50"></i>
+            <p class="mb-0">Nenhuma etapa de preparo definida.</p>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold">Observações Internas (Chefe de Cozinha)</label>
+            <textarea name="notes" class="form-control bg-light" rows="2" placeholder="Ex: Ponto da carne estava perfeito, embalagem reforçada..."></textarea>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                <i class="ti tabler-check me-2"></i> Concluir Ficha de Preparo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Template Oculto para Food Service -->
+      <template id="checklistItemTemplate">
+        <tr>
+          <td>
+            <select name="items[INDEX][id]" class="form-select border-0 bg-light item-select" required>
+              <option value="">Selecione o Item...</option>
+              @foreach($checklistItems as $item)
+              <option value="{{ $item->id }}">{{ $item->name }}</option>
+              @endforeach
+            </select>
+          </td>
+          <td>
+            <div class="btn-group w-100 shadow-none" role="group">
+              <input type="radio" class="btn-check status-ok" name="items[INDEX][status]" id="ok-INDEX" value="ok" checked>
+              <label class="btn btn-outline-success btn-sm" for="ok-INDEX"><i class="ti tabler-check"></i> Feito</label>
+
+              <input type="radio" class="btn-check status-na" name="items[INDEX][status]" id="na-INDEX" value="na">
+              <label class="btn btn-outline-warning btn-sm" for="na-INDEX"><i class="ti tabler-clock"></i> Pendente</label>
+
+              {{-- Mantemos o 'not_ok' oculto/adaptado para não quebrar o banco, caso seja necessário reportar perda --}}
+              <input type="radio" class="btn-check status-nok d-none" name="items[INDEX][status]" id="nok-INDEX" value="not_ok">
+            </div>
+          </td>
+          <td>
+            <input type="text" name="items[INDEX][observations]" class="form-control border-0 bg-light" placeholder="Ex: Adicionado extra...">
+            <input type="file" name="items[INDEX][photo]" class="d-none">
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-sm btn-text-danger rounded-circle p-0 remove-item" style="width: 30px; height: 30px;"><i class="ti tabler-x"></i></button>
+          </td>
+        </tr>
+      </template>
+
+      @else
+      {{-- INTERFACE PADRÃO (OFICINA / OUTROS) --}}
       <div class="card mb-4">
         <div class="card-header">
           <h5 class="mb-0">Dados do {{ niche('entity') }}</h5>
@@ -59,7 +166,7 @@
               <label class="form-label">{{ niche('entity') }}</label>
               @if($selectedOs)
               <input type="hidden" name="veiculo_id" value="{{ $selectedOs->veiculo_id }}">
-              <input type="text" class="form-control" value="{{ $selectedOs->veiculo->placa }} - {{ $selectedOs->veiculo->modelo }}" readonly>
+              <input type="text" class="form-control" value="{{ ($selectedOs->veiculo->placa ?? 'N/A') . ' - ' . ($selectedOs->veiculo->modelo ?? 'Sem Entidade') }}" readonly>
               @else
               <select name="veiculo_id" class="form-select select2" required>
                 <option value="">Selecione um {{ niche('entity') }}</option>
@@ -69,6 +176,7 @@
               </select>
               @endif
             </div>
+            
             <div class="col-md-3 mb-3">
               <label class="form-label">{{ niche('metric') }} Atual</label>
               <input type="number" name="km_current" class="form-control" placeholder="0" required value="{{ $selectedOs->km_entry ?? '' }}">
@@ -196,6 +304,8 @@
       <div class="d-flex justify-content-end">
         <button type="submit" class="btn btn-primary btn-lg">Salvar Checklist</button>
       </div>
+      @endif
+
     </form>
   </div>
 </div>

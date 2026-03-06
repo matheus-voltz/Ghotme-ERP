@@ -16,8 +16,10 @@ class OrdemServicoResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'client' => $this->client ? ($this->client->name ?? $this->client->company_name) : '-',
-            'vehicle' => $this->veiculo ? "{$this->veiculo->placa} - {$this->veiculo->modelo}" : '-',
+            'client' => $this->client_name,
+            'vehicle' => $this->veiculo ? "{$this->veiculo->placa} - {$this->veiculo->modelo}" : (
+                $this->description ? \Illuminate\Support\Str::limit($this->description, 20) : "Balcão #{$this->id}"
+            ),
             'opened_by' => $this->user->name ?? 'Sistema',
             'status' => $this->status,
             'status_label' => $this->getStatusLabel($this->status),

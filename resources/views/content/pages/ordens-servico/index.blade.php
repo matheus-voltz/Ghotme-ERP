@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', __('Service Orders'))
+@section('title', niche('entities'))
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss'])
@@ -13,13 +13,13 @@
 @section('content')
 <div class="card">
     <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-        <h5 class="card-title mb-0">{{ __('Service Orders') }}</h5>
+        <h5 class="card-title mb-0">{{ niche('entities') }}</h5>
         <a href="{{ route('ordens-servico.create') }}" class="btn btn-primary">
-            <i class="ti tabler-plus me-1"></i> {{ __('Create OS') }}
+            <i class="ti tabler-plus me-1"></i> Nova {{ niche('entity') }}
         </a>
     </div>
-    <div class="card-datatable table-responsive">
-        <table class="datatables-os table border-top">
+    <div class="card-datatable table-responsive p-2">
+        <table class="datatables-os table table-hover border-top">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -78,15 +78,18 @@
                                 running: 'info',
                                 canceled: 'danger'
                             };
+                            const currentNiche = "{{ get_current_niche() }}";
                             const statusTranslations = {
-                                pending: 'Pendente',
-                                in_progress: 'Em Execução',
+                                pending: currentNiche === 'food_service' ? 'Pendente' : 'Pendente',
+                                in_progress: currentNiche === 'food_service' ? 'Preparando' : 'Em Execução',
                                 finalized: 'Finalizada',
-                                completed: 'Pronto p/ Retirada',
-                                running: 'Em Andamento',
-                                canceled: 'Cancelada'
+                                completed: currentNiche === 'food_service' ? 'Pronto / Entregue' : 'Pronto p/ Retirada',
+                                running: currentNiche === 'food_service' ? 'Na Cozinha' : 'Em Andamento',
+                                canceled: 'Cancelada',
+                                paid: 'Finalizado / Pago',
+                                awaiting_approval: currentNiche === 'food_service' ? 'Aguard. Pagto' : 'Aguardando Aprovação'
                             };
-                            return `<span class="badge bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
+                            return `<span class="badge badge-soft bg-label-${colors[data] || 'secondary'}">${statusTranslations[data] || data}</span>`;
                         }
                     },
                     {
@@ -96,12 +99,26 @@
                     {
                         targets: 7,
                         render: (data, type, full) => {
+                            const isFood = "{{ get_current_niche() }}" === 'food_service';
                             let html = `<div class="d-flex gap-2">`;
-                            html += `<a href="/ordens-servico/${data}/edit" class="btn btn-sm btn-primary" title="{{ __('Edit') }}"><i class="ti tabler-edit"></i></a>`;
+                            
+                            // Botão Detalhes / Mesa
+                            const editTitle = isFood ? 'Ver Itens / Mesa' : "{{ __('Edit') }}";
+                            const editIcon = isFood ? 'tabler-tools-kitchen-2' : 'tabler-edit';
+                            html += `<a href="/ordens-servico/${data}/edit" class="btn btn-sm btn-primary" title="${editTitle}"><i class="ti ${editIcon}"></i></a>`;
+                            
+                            // Botão Finalizar / Entregar
                             if (full.status !== 'finalized' && full.status !== 'paid') {
-                                html += `<button class="btn btn-sm btn-success finalize-os" data-id="${data}" title="{{ __('Finalize') }}"><i class="ti tabler-check"></i></button>`;
+                                const finalizeTitle = isFood ? 'Concluir / Entregar' : "{{ __('Finalize') }}";
+                                html += `<button class="btn btn-sm btn-success finalize-os" data-id="${data}" title="${finalizeTitle}"><i class="ti tabler-check"></i></button>`;
                             }
-                            html += `<a href="/ordens-servico/checklist/create?os_id=${data}" class="btn btn-sm btn-info" title="{{ __('Checklist') }}"><i class="ti tabler-clipboard-check"></i></a>`;
+
+                            // Botão Ficha de Preparo / Imprimir Comanda
+                            const ticketTitle = isFood ? 'Imprimir Comanda' : 'Checklist/Vistoria';
+                            const ticketIcon = isFood ? 'tabler-printer' : 'tabler-clipboard-check';
+                            const ticketUrl = isFood ? `/ordens-servico/${data}/print-order` : `/ordens-servico/checklist/create?os_id=${data}`;
+                            html += `<a href="${ticketUrl}" target="_blank" class="btn btn-sm btn-info" title="${ticketTitle}"><i class="ti ${ticketIcon}"></i></a>`;
+                            
                             html += `</div>`;
                             return html;
                         }
@@ -129,8 +146,8 @@
         // Prompt para impressão de etiqueta se acabou de criar OS
         @if(session('just_created_os'))
         Swal.fire({
-            title: 'OS Criada com Sucesso!',
-            text: 'Deseja gerar a etiqueta com QR Code para esta Ordem de Serviço?',
+            title: '{{ niche("entity") }} Criada com Sucesso!',
+            text: 'Deseja gerar a etiqueta com QR Code para este {{ niche("entity") }}?',
             icon: 'success',
             showCancelButton: true,
             confirmButtonText: 'Sim, Gerar Etiqueta',

@@ -34,8 +34,11 @@ $primaryColorCSS = Helpers::generatePrimaryColorCSS($configData['color']);
 
 @endphp
 
+@php
+$currentNiche = get_current_niche();
+@endphp
 <html lang="{{ session()->get('locale') ?? app()->getLocale() }}"
-  class="{{ $navbarType ?? '' }} {{ $contentLayout ?? '' }} {{ $menuFixed ?? '' }} {{ $menuCollapsed ?? '' }} {{ $footerFixed ?? '' }} {{ $customizerHidden ?? '' }}"
+  class="{{ $navbarType ?? '' }} {{ $contentLayout ?? '' }} {{ $menuFixed ?? '' }} {{ $menuCollapsed ?? '' }} {{ $footerFixed ?? '' }} {{ $customizerHidden ?? '' }} niche-{{ $currentNiche }}"
   dir="{{ $configData['textDirection'] }}" data-skin="{{ $skinName }}" data-assets-path="{{ asset('/assets') . '/' }}"
   data-base-url="{{ url('/') }}" data-framework="laravel" data-template="{{ $configData['layout'] }}-menu-template"
   data-bs-theme="{{ $configData['theme'] }}" @if ($isAdminLayout && $semiDarkEnabled) data-semidark-menu="true" @endif>
@@ -92,6 +95,47 @@ $primaryColorCSS = Helpers::generatePrimaryColorCSS($configData['color']);
   <!-- Include Scripts for customizer, helper, analytics, config -->
   <!-- $isFront is used to append the front layout scriptsIncludes only on the front layout otherwise the variable will be blank -->
   @include('layouts/sections/scriptsIncludes' . $isFront)
+
+  <style>
+    /* Global Premium UI/UX Adjustments */
+    .shadow-premium {
+      box-shadow: 0 4px 24px 0 rgba(34, 41, 47, 0.08) !important;
+    }
+
+    .card {
+      border-radius: 16px !important;
+      transition: all 0.25s ease;
+      border: none !important;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px 0 rgba(34, 41, 47, 0.12) !important;
+    }
+
+    .btn {
+      border-radius: 12px !important;
+    }
+
+    .table-hover tbody tr {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border-radius: 8px;
+    }
+
+    .table-hover tbody tr:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+      background-color: rgba(115, 103, 240, 0.04) !important;
+      z-index: 10;
+      position: relative;
+    }
+
+    .badge-soft {
+      border-radius: 8px;
+      padding: 0.5em 0.8em;
+      font-weight: 600;
+    }
+  </style>
 </head>
 
 <body>

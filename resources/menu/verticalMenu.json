@@ -31,6 +31,13 @@
       "slug": "dashboard"
     },
     {
+      "url": "/pos",
+      "name": "Balcão de Vendas (PDV)",
+      "icon": "menu-icon icon-base ti tabler-shopping-cart",
+      "slug": "menu.pos",
+      "niche": "food_service"
+    },
+    {
       "url": "/ai-consultant",
       "name": "Consultor IA",
       "icon": "menu-icon icon-base ti tabler-robot",
@@ -46,18 +53,21 @@
       "url": "/calendar",
       "name": "Calendar",
       "icon": "menu-icon icon-base ti tabler-calendar",
-      "slug": "calendar"
+      "slug": "calendar",
+      "niche_exclude": "food_service"
     },
     {
       "url": "/kanban",
       "name": "Kanban",
       "icon": "menu-icon icon-base ti tabler-layout-kanban",
-      "slug": "kanban"
+      "slug": "kanban",
+      "niche_exclude": "food_service"
     },
     {
       "name": "Service Orders",
       "icon": "menu-icon icon-base ti tabler-file",
       "slug": "ordens",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/ordens-servico",
@@ -77,9 +87,33 @@
       ]
     },
     {
+      "name": "Pedidos",
+      "icon": "menu-icon icon-base ti tabler-tools-kitchen-2",
+      "slug": "pedidos",
+      "niche": "food_service",
+      "submenu": [
+        {
+          "url": "/ordens-servico",
+          "name": "Cozinha (Ativos)",
+          "slug": "ordens-servico"
+        },
+        {
+          "url": "/ordens-servico/create",
+          "name": "Novo Pedido",
+          "slug": "ordens-servico.create"
+        },
+        {
+          "url": "/ordens-servico/checklist",
+          "name": "Ingredientes/Preparo",
+          "slug": "ordens-servico.checklist"
+        }
+      ]
+    },
+    {
       "name": "Budgets",
       "icon": "menu-icon icon-base ti tabler-file-dollar",
       "slug": "budgets",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/budgets/pending",
@@ -104,7 +138,7 @@
       ]
     },
     {
-      "name": "Customers & Entities",
+      "name": "Clientes",
       "icon": "menu-icon icon-base ti tabler-users",
       "slug": [
         "{niche_clients_slug}",
@@ -122,24 +156,28 @@
         {
           "url": "/{niche_entities_slug}",
           "name": "Vehicles",
-          "slug": "{niche_entities_slug}"
+          "slug": "{niche_entities_slug}",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/fleet-management",
           "name": "Gestão de Frotas / B2B",
           "slug": "fleet.management",
-          "feature": "fleet_management"
+          "feature": "fleet_management",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/maintenance-contracts",
           "name": "Contratos de Manutenção",
           "slug": "maintenance-contracts",
-          "feature": "maintenance_contracts"
+          "feature": "maintenance_contracts",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/{niche_slug}-history",
           "name": "Vehicle history",
-          "slug": "{niche_slug}-history"
+          "slug": "{niche_slug}-history",
+          "niche_exclude": "food_service"
         }
       ]
     },
@@ -190,7 +228,8 @@
           "url": "/inventory/purchase-orders",
           "name": "Suprimento Automático",
           "slug": "inventory.purchase-orders",
-          "feature": "auto_supply"
+          "feature": "auto_supply",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/inventory/adjustments",
@@ -217,18 +256,27 @@
         {
           "url": "/services/table",
           "name": "Tabela de serviços",
-          "slug": "services.table"
+          "slug": "services.table",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/services/packages",
           "name": "Pacotes de serviço",
-          "slug": "services.packages"
+          "slug": "services.packages",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/services/plans",
           "name": "Planos de Assinatura",
           "slug": "services.plans",
-          "feature": "recurring_plans"
+          "feature": "recurring_plans",
+          "niche_exclude": "food_service"
+        },
+        {
+          "url": "/menu/manage",
+          "name": "Gestão de Cardápio",
+          "slug": "menu.manage",
+          "niche": "food_service"
         }
       ]
     },
@@ -237,6 +285,12 @@
       "icon": "menu-icon icon-base ti tabler-wallet",
       "slug": "finance",
       "submenu": [
+        {
+          "url": "/cash-register",
+          "name": "Frente de Caixa (PDV)",
+          "slug": "cash-register.index",
+          "niche": "food_service"
+        },
         {
           "url": "/finance/accounts-receivable",
           "name": "Contas a receber",
@@ -320,7 +374,7 @@
         },
         {
           "url": "/reports/mechanic-performance",
-          "name": "Desempenho por mecânico",
+          "name": "Desempenho do Funcionário",
           "slug": "reports.mechanic-performance"
         },
         {

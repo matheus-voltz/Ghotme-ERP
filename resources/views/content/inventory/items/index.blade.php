@@ -4,31 +4,65 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-  'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-  'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
-  'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-  'resources/assets/vendor/libs/animate-css/animate.scss', 
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+'resources/assets/vendor/libs/animate-css/animate.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/moment/moment.js',
-  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-  'resources/assets/vendor/libs/select2/select2.js', 
-  'resources/assets/vendor/libs/@form-validation/popular.js',
-  'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
-  'resources/assets/vendor/libs/@form-validation/auto-focus.js', 
-  'resources/assets/vendor/libs/cleave-zen/cleave-zen.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/moment/moment.js',
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/@form-validation/popular.js',
+'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
+'resources/assets/vendor/libs/@form-validation/auto-focus.js',
+'resources/assets/vendor/libs/cleave-zen/cleave-zen.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('page-script')
 @vite(['resources/js/inventory-items.js'])
+<script>
+  window.inventoryTranslations = {
+    // ... (traduções existentes)
+  };
+
+  // Immediate Image Preview Logic
+  document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('upload');
+    const previewImg = document.getElementById('uploadedAvatar');
+    const resetBtn = document.querySelector('.account-image-reset');
+    const defaultImg = "{{ asset('assets/img/elements/food-placeholder.png') }}";
+
+    if (fileInput && previewImg) {
+      fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImg.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+    }
+
+    if (resetBtn && fileInput && previewImg) {
+      resetBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        fileInput.value = '';
+        previewImg.src = defaultImg;
+      });
+    }
+  });
+</script>
 @endsection
 
 @section('content')
@@ -54,7 +88,7 @@
       </thead>
     </table>
   </div>
-  
+
   <!-- Offcanvas to add new item -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasAddItems" aria-labelledby="offcanvasAddItemsLabel">
     <div class="offcanvas-header border-bottom">
@@ -62,50 +96,69 @@
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
-      <form class="add-new-items pt-0" id="addNewItemsForm">
+      <form class="add-new-items pt-0" id="addNewItemsForm" enctype="multipart/form-data">
         @csrf
         <input type="hidden" name="id" id="item_id">
-        
+
+        <div class="mb-6">
+          <label class="form-label d-block">{{ __('Item Photo') }}</label>
+          <div class="d-flex align-items-start align-items-sm-center gap-4">
+            <img src="{{ asset('assets/img/elements/food-placeholder.png') }}" alt="product-image" class="d-block rounded" height="100" width="100" id="uploadedAvatar" style="object-fit: cover;" />
+            <div class="button-wrapper">
+              <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
+                <span class="d-none d-sm-block">{{ __('Upload new photo') }}</span>
+                <i class="ti tabler-upload d-block d-sm-none"></i>
+              </label>
+              <input type="file" id="upload" name="image" class="account-file-input" hidden accept="image/png, image/jpeg, image/jpg, image/gif, image/webp" />
+              <button type="button" class="btn btn-label-secondary account-image-reset mb-4">
+                <i class="ti tabler-refresh-dot d-block d-sm-none"></i>
+                <span class="d-none d-sm-block">Reset</span>
+              </button>
+              <div class="text-muted small">JPG, PNG, GIF ou WEBP. Máx 5MB.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-item-name">{{ __('Item Name') }}</label>
-          <input type="text" class="form-control" id="add-item-name" placeholder="Ex: Óleo Motor 5W30" name="name" aria-label="Nome do Item" />
+          <input type="text" class="form-control" id="add-item-name" placeholder="Ex: Óleo Motor 5W30" name="name" aria-label="{{ __('Item Name') }}" />
         </div>
-        
+
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-item-sku">{{ __('SKU') }}</label>
           <input type="text" id="add-item-sku" class="form-control" placeholder="Ex: OLEO-5W30" aria-label="SKU" name="sku" />
         </div>
-        
+
         <div class="row mb-6">
-            <div class="col-6 form-control-validation">
-                <label class="form-label" for="add-item-cost">{{ __('Cost') }} (R$)</label>
-                <input type="number" step="0.01" id="add-item-cost" class="form-control" placeholder="0.00" name="cost_price" />
-            </div>
-            <div class="col-6 form-control-validation">
-                <label class="form-label" for="add-item-price">{{ __('Selling Price') }} (R$)</label>
-                <input type="number" step="0.01" id="add-item-price" class="form-control" placeholder="0.00" name="selling_price" />
-            </div>
+          <div class="col-6 form-control-validation">
+            <label class="form-label" for="add-item-cost">{{ __('Cost') }} (R$)</label>
+            <input type="number" step="0.01" id="add-item-cost" class="form-control" placeholder="0.00" name="cost_price" />
+          </div>
+          <div class="col-6 form-control-validation">
+            <label class="form-label" for="add-item-price">{{ __('Selling Price') }} (R$)</label>
+            <input type="number" step="0.01" id="add-item-price" class="form-control" placeholder="0.00" name="selling_price" />
+          </div>
         </div>
 
         <div class="row mb-6">
-            <div class="col-6 form-control-validation">
-                <label class="form-label" for="add-item-quantity">{{ __('Quantity') }}</label>
-                <input type="number" id="add-item-quantity" class="form-control" placeholder="0" name="quantity" />
-            </div>
-            <div class="col-6 form-control-validation">
-                <label class="form-label" for="add-item-min-quantity">{{ __('Min Stock') }}</label>
-                <input type="number" id="add-item-min-quantity" class="form-control" placeholder="0" name="min_quantity" />
-            </div>
+          <div class="col-6 form-control-validation">
+            <label class="form-label" for="add-item-quantity">{{ __('Quantity') }}</label>
+            <input type="number" id="add-item-quantity" class="form-control" placeholder="0" name="quantity" />
+          </div>
+          <div class="col-6 form-control-validation">
+            <label class="form-label" for="add-item-min-quantity">{{ __('Min Stock') }}</label>
+            <input type="number" id="add-item-min-quantity" class="form-control" placeholder="0" name="min_quantity" />
+          </div>
         </div>
-        
+
         <div class="mb-6 form-control-validation">
           <label class="form-label" for="add-item-unit">{{ __('Unit') }}</label>
           <select id="add-item-unit" class="form-select" name="unit">
-            <option value="un">Unidade (un)</option>
-            <option value="kg">Quilo (kg)</option>
-            <option value="l">Litro (l)</option>
-            <option value="m">Metro (m)</option>
-            <option value="cx">Caixa (cx)</option>
+            <option value="un">{{ __('Unit (un)') }}</option>
+            <option value="kg">{{ __('Kilo (kg)') }}</option>
+            <option value="l">{{ __('Liter (l)') }}</option>
+            <option value="m">{{ __('Meter (m)') }}</option>
+            <option value="cx">{{ __('Box (cx)') }}</option>
           </select>
         </div>
 
@@ -114,11 +167,21 @@
           <select id="add-item-supplier" class="select2 form-select" name="supplier_id">
             <option value="">{{ __('Select') }}</option>
             @foreach($suppliers as $supplier)
-                <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+            <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
             @endforeach
           </select>
         </div>
-        
+
+        <div class="mb-6">
+          <label class="form-label" for="add-item-category">{{ __('Category') }}</label>
+          <select id="add-item-category" class="select2 form-select" name="menu_category_id">
+            <option value="">{{ __('Select Category') }}</option>
+            @foreach($categories as $category)
+            <option value="{{ $category->id }}">{{ $category->name }}</option>
+            @endforeach
+          </select>
+        </div>
+
         <div class="mb-6">
           <label class="form-label" for="add-item-location">{{ __('Location') }}</label>
           <input type="text" id="add-item-location" class="form-control" placeholder="Ex: Prateleira A1" name="location" />
@@ -128,7 +191,17 @@
           <label class="form-label" for="add-item-description">{{ __('Description') }}</label>
           <textarea id="add-item-description" class="form-control" name="description" rows="3"></textarea>
         </div>
-        
+
+        @if(get_current_niche() === 'food_service')
+        <div id="recipe-section" class="d-none mt-4 border-top pt-4">
+          <h6 class="mb-3 text-primary"><i class="ti tabler-recipe me-1"></i> {{ __('Recipe Card (Technique Sheet)') }}</h6>
+          <div id="livewire-recipe-container">
+            <!-- O componente será injetado aqui via JS ao editar -->
+            <p class="text-muted small">{{ __('Save the item first to enable ingredient configuration.') }}</p>
+          </div>
+        </div>
+        @endif
+
         <button type="submit" class="btn btn-primary me-3 data-submit">{{ __('Save') }}</button>
         <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">{{ __('Cancel') }}</button>
       </form>
@@ -140,8 +213,8 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Anunciar no Mercado Livre</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">{{ __('Publish on Mercado Livre') }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ __('Close') }}"></button>
         </div>
         <form id="formPublishMeli">
           @csrf
@@ -149,23 +222,23 @@
           <input type="hidden" name="type" value="product">
           <div class="modal-body">
             <div class="mb-3">
-              <label class="form-label">Nome do Produto</label>
+              <label class="form-label">{{ __('Item Name') }}</label>
               <input type="text" id="publish_item_name" class="form-control" readonly>
             </div>
             <div class="mb-3">
-              <label class="form-label">Preço no Mercado Livre (R$)</label>
+              <label class="form-label">{{ __('Price on Mercado Livre') }} (R$)</label>
               <input type="number" step="0.01" name="price" id="publish_item_price" class="form-control" required>
-              <small class="text-muted">Sugestão: Preço de venda atual.</small>
+              <small class="text-muted">{{ __('Suggestion: Current selling price.') }}</small>
             </div>
             <div class="mb-3">
-              <label class="form-label">ID da Categoria (ML)</label>
+              <label class="form-label">{{ __('Category ID (ML)') }}</label>
               <input type="text" name="category_id" class="form-control" placeholder="Ex: MLB1234" required>
-              <small><a href="https://developers.mercadolibre.com.br/pt_br/categorias-e-atributos" target="_blank">Como achar a categoria?</a></small>
+              <small><a href="https://developers.mercadolibre.com.br/pt_br/categorias-e-atributos" target="_blank">{{ __('How to find the category?') }}</a></small>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-warning">Publicar Agora</button>
+            <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+            <button type="submit" class="btn btn-warning">{{ __('Publish Now') }}</button>
           </div>
         </form>
       </div>

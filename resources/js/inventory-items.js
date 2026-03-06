@@ -14,14 +14,16 @@ document.addEventListener('DOMContentLoaded', function (e) {
 
     // Variable declaration for table
     const dt_items_table = document.querySelector('.datatables-items'),
-        offCanvasForm = document.getElementById('offcanvasAddItems');
+        offCanvasForm = document.getElementById('offcanvasAddItems'),
+        t = window.inventoryTranslations || {},
+        uploadedAvatar = document.getElementById('uploadedAvatar');
 
     // Select2 initialization
     var select2 = $('.select2');
     if (select2.length) {
         var $this = select2;
         $this.wrap('<div class="position-relative"></div>').select2({
-            placeholder: 'Selecione',
+            placeholder: t['Select'] || 'Selecione',
             dropdownParent: $this.parent()
         });
     }
@@ -127,23 +129,23 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     render: function (data, type, full, meta) {
                         const isActive = full.is_active;
                         return `${isActive
-                            ? '<span class="badge bg-success">Ativo</span>'
-                            : '<span class="badge bg-danger">Inativo</span>'
+                            ? `<span class="badge bg-success">${t['Active'] || 'Ativo'}</span>`
+                            : `<span class="badge bg-danger">${t['Inactive'] || 'Inativo'}</span>`
                             }`;
                     }
                 },
                 {
                     // Actions
                     targets: 8,
-                    title: 'Ações',
+                    title: t['Actions'] || 'Ações',
                     searchable: false,
                     orderable: false,
                     render: function (data, type, full, meta) {
                         return (
                             '<div class="d-flex align-items-center gap-4">' +
-                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddItems" title="Editar"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
-                            `<button class="btn btn-sm btn-icon publish-meli" data-id="${full.id}" data-name="${full.name}" data-price="${full.selling_price}" title="Anunciar no Mercado Livre"><i class="icon-base ti tabler-share icon-22px text-warning"></i></button>` +
-                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="Excluir"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
+                            `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddItems" title="${t['Edit'] || 'Editar'}"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
+                            `<button class="btn btn-sm btn-icon publish-meli" data-id="${full.id}" data-name="${full.name}" data-price="${full.selling_price}" title="${t['Publish on Mercado Livre'] || 'Anunciar no Mercado Livre'}"><i class="icon-base ti tabler-share icon-22px text-warning"></i></button>` +
+                            `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="${t['Delete'] || 'Excluir'}"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
                             '</div>'
                         );
                     }
@@ -166,14 +168,14 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     features: [
                         {
                             search: {
-                                placeholder: 'Procurar item',
+                                placeholder: t['Search Item'] || 'Procurar item',
                                 text: '_INPUT_'
                             }
                         },
                         {
                             buttons: [
                                 {
-                                    text: '<i class="icon-base ti tabler-plus icon-sm me-0 me-sm-2"></i><span class="d-none d-sm-inline-block">Adicionar Item</span>',
+                                    text: `<i class="icon-base ti tabler-plus icon-sm me-0 me-sm-2"></i><span class="d-none d-sm-inline-block">${t['Add Item'] || 'Adicionar Item'}</span>`,
                                     className: 'add-new btn btn-primary',
                                     attr: {
                                         'data-bs-toggle': 'offcanvas',
@@ -189,7 +191,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     features: [
                         {
                             info: {
-                                text: 'Showing _START_ to _END_ of _TOTAL_ entries'
+                                text: t['Showing _START_ to _END_ of _TOTAL_ entries'] || 'Showing _START_ to _END_ of _TOTAL_ entries'
                             }
                         }
                     ]
@@ -210,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     display: DataTable.Responsive.display.modal({
                         header: function (row) {
                             const data = row.data();
-                            return 'Detalhes de ' + data.name;
+                            return (t['Details of'] || 'Detalhes de') + ' ' + data.name;
                         }
                     }),
                     type: 'column',
@@ -255,11 +257,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 const id = deleteBtn.dataset.id;
 
                 Swal.fire({
-                    title: 'Você tem certeza?',
-                    text: "Você não poderá reverter isso!",
+                    title: t['Are you sure?'] || 'Você tem certeza?',
+                    text: t["You won't be able to revert this!"] || "Você não poderá reverter isso!",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Sim, exclua!',
+                    confirmButtonText: t['Yes, delete it!'] || 'Sim, exclua!',
                     customClass: {
                         confirmButton: 'btn btn-primary me-3',
                         cancelButton: 'btn btn-label-secondary'
@@ -279,8 +281,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
                                     dt_items.draw();
                                     Swal.fire({
                                         icon: 'success',
-                                        title: 'Excluído!',
-                                        text: 'O item foi excluído!',
+                                        title: t['Deleted!'] || 'Excluído!',
+                                        text: t['The item has been deleted!'] || 'O item foi excluído!',
                                         customClass: { confirmButton: 'btn btn-success' }
                                     });
                                 } else {
@@ -302,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 const id = editBtn.dataset.id;
 
                 // changing the title of offcanvas
-                document.getElementById('offcanvasAddItemsLabel').innerHTML = 'Editar Item';
+                document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Edit Item'] || 'Editar Item';
 
                 // get data
                 fetch(`${baseUrl}inventory/items/${id}/edit`)
@@ -310,6 +312,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     .then(data => {
                         document.getElementById('item_id').value = data.id;
                         document.getElementById('add-item-name').value = data.name;
+                        
+                        if (data.main_image) {
+                            uploadedAvatar.src = baseUrl + 'storage/' + data.main_image.path;
+                        } else {
+                            uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
+                        }
                         document.getElementById('add-item-sku').value = data.sku || '';
                         document.getElementById('add-item-cost').value = data.cost_price;
                         document.getElementById('add-item-price').value = data.selling_price;
@@ -323,6 +331,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         if ($supplier.length && $supplier.hasClass('select2-hidden-accessible')) {
                             $supplier.val(data.supplier_id).trigger('change');
                         }
+
+                        const $category = $('#add-item-category');
+                        if ($category.length && $category.hasClass('select2-hidden-accessible')) {
+                            $category.val(data.menu_category_id).trigger('change');
+                        }
                     });
             }
         });
@@ -332,7 +345,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
         if (addNewBtn) {
             addNewBtn.addEventListener('click', function () {
                 document.getElementById('item_id').value = '';
-                document.getElementById('offcanvasAddItemsLabel').innerHTML = 'Adicionar Item';
+                uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
+                document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Add Item'] || 'Adicionar Item';
                 document.getElementById('addNewItemsForm').reset();
                 $('#add-item-supplier').val(null).trigger('change');
             });
@@ -367,12 +381,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
     if (addNewItemsForm) {
         const fv = FormValidation.formValidation(addNewItemsForm, {
             fields: {
-                name: { validators: { notEmpty: { message: 'Por favor preencha o nome do item' } } },
-                cost_price: { validators: { notEmpty: { message: 'Por favor preencha o custo' } } },
-                selling_price: { validators: { notEmpty: { message: 'Por favor preencha o preço de venda' } } },
-                quantity: { validators: { notEmpty: { message: 'Por favor preencha a quantidade' } } },
-                min_quantity: { validators: { notEmpty: { message: 'Por favor preencha o estoque mínimo' } } },
-                unit: { validators: { notEmpty: { message: 'Por favor preencha a unidade' } } }
+                name: { validators: { notEmpty: { message: t['Please fill in the item name'] || 'Por favor preencha o nome do item' } } },
+                cost_price: { validators: { notEmpty: { message: t['Please fill in the cost'] || 'Por favor preencha o custo' } } },
+                selling_price: { validators: { notEmpty: { message: t['Please fill in the selling price'] || 'Por favor preencha o preço de venda' } } },
+                quantity: { validators: { notEmpty: { message: t['Please fill in the quantity'] || 'Por favor preencha a quantidade' } } },
+                min_quantity: { validators: { notEmpty: { message: t['Please fill in the minimum stock'] || 'Por favor preencha o estoque mínimo' } } },
+                unit: { validators: { notEmpty: { message: t['Please fill in the unit'] || 'Por favor preencha a unidade' } } }
             },
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),
@@ -385,37 +399,33 @@ document.addEventListener('DOMContentLoaded', function (e) {
             }
         }).on('core.form.valid', function () {
             const formData = new FormData(addNewItemsForm);
-            const formDataObj = {};
-            formData.forEach((value, key) => formDataObj[key] = value);
-
-            // Determine method (POST or PUT) based on ID existence
-            const id = formDataObj['id'];
+            
+            // Determine method (POST or spoofed PUT) based on ID existence
+            const id = formData.get('id');
             const url = id ? `${baseUrl}inventory/items/${id}` : `${baseUrl}inventory/items`;
-            const method = id ? 'PUT' : 'POST';
-
-            const searchParams = new URLSearchParams();
-            for (const [key, value] of Object.entries(formDataObj)) {
-                searchParams.append(key, value);
+            
+            if (id) {
+                formData.append('_method', 'PUT');
             }
 
             fetch(url, {
-                method: method,
+                method: 'POST', // Use POST with _method spoofing for file uploads in PUT requests
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Accept': 'application/json'
                 },
-                body: searchParams.toString()
+                body: formData
             })
                 .then(async response => {
                     const data = await response.json();
                     if (!response.ok) {
                         if (response.status === 422 && data.errors) {
                             // Limpar erros anteriores
-                            addNewItemForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                            addNewItemForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
+                            addNewItemsForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+                            addNewItemsForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
 
                             Object.keys(data.errors).forEach(key => {
-                                const input = addNewItemForm.querySelector(`[name="${key}"]`);
+                                const input = addNewItemsForm.querySelector(`[name="${key}"]`);
                                 if (input) {
                                     input.classList.add('is-invalid');
                                     const feedback = document.createElement('div');
@@ -441,11 +451,11 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     if (!id) { // Só pergunta se for um novo item
                         Swal.fire({
                             icon: 'success',
-                            title: 'Item Criado!',
-                            text: 'Deseja gerar a etiqueta com QR Code para este item agora?',
+                            title: t['Item Created!'] || 'Item Criado!',
+                            text: t['Do you want to generate the QR Code label for this item now?'] || 'Deseja gerar a etiqueta com QR Code para este item agora?',
                             showCancelButton: true,
-                            confirmButtonText: 'Sim, Gerar Etiqueta',
-                            cancelButtonText: 'Agora Não',
+                            confirmButtonText: t['Yes, Generate Label'] || 'Sim, Gerar Etiqueta',
+                            cancelButtonText: t['Not Now'] || 'Agora Não',
                             customClass: {
                                 confirmButton: 'btn btn-primary me-3',
                                 cancelButton: 'btn btn-label-secondary'
@@ -459,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     } else {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Atualizado!',
+                            title: t['Updated!'] || 'Atualizado!',
                             text: data.message,
                             customClass: { confirmButton: 'btn btn-success' }
                         });
@@ -475,6 +485,27 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         });
                     }
                 });
+        });
+
+        offCanvasForm.addEventListener('show.bs.offcanvas', function () {
+            const itemId = document.getElementById('item_id').value;
+            const recipeSection = document.getElementById('recipe-section');
+            const recipeContainer = document.getElementById('livewire-recipe-container');
+
+            if (recipeSection) {
+                if (itemId) {
+                    recipeSection.classList.remove('d-none');
+                    // Injeta o componente Livewire dinamicamente
+                    recipeContainer.innerHTML = `<livewire:product-recipe-manager :product-id="${itemId}" :key="${itemId}" />`;
+                    // Força o Livewire a re-escanear o DOM
+                    if (window.Livewire) {
+                        window.Livewire.rescan();
+                    }
+                } else {
+                    recipeSection.classList.add('d-none');
+                    recipeContainer.innerHTML = `<p class="text-muted small">${t['Save the item first to enable ingredient configuration.'] || 'Salve o item primeiro para liberar a configuração de ingredientes.'}</p>`;
+                }
+            }
         });
 
         offCanvasForm.addEventListener('hidden.bs.offcanvas', function () {
@@ -505,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
             e.preventDefault();
             const submitBtn = formPublishMeli.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Publicando...';
+            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${t['Publishing...'] || 'Publicando...'}`;
 
             const formData = new FormData(formPublishMeli);
 
@@ -519,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 .then(response => response.json())
                 .then(data => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Publicar Agora';
+                    submitBtn.innerHTML = t['Publish Now'] || 'Publicar Agora';
 
                     if (data.success) {
                         const modalElement = document.getElementById('modalPublishMeli');
@@ -527,12 +558,12 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         modalInstance.hide();
 
                         Swal.fire({
-                            title: 'Sucesso!',
+                            title: t['Success!'] || 'Sucesso!',
                             text: data.message,
                             icon: 'success',
-                            confirmButtonText: 'Ver Anúncio',
+                            confirmButtonText: t['View Ad'] || 'Ver Anúncio',
                             showCancelButton: true,
-                            cancelButtonText: 'Fechar'
+                            cancelButtonText: t['Close'] || 'Fechar'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 window.open(data.url, '_blank');
@@ -540,21 +571,21 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         });
                     } else {
                         Swal.fire({
-                            title: 'Erro!',
+                            title: t['Error!'] || 'Erro!',
                             text: data.message,
                             icon: 'error',
-                            confirmButtonText: 'Entendido'
+                            confirmButtonText: t['Understood'] || 'Entendido'
                         });
                     }
                 })
                 .catch(err => {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = 'Publicar Agora';
+                    submitBtn.innerHTML = t['Publish Now'] || 'Publicar Agora';
                     Swal.fire({
-                        title: 'Erro!',
+                        title: t['Error!'] || 'Erro!',
                         text: 'Erro ao tentar se conectar com o servidor.',
                         icon: 'error',
-                        confirmButtonText: 'Entendido'
+                        confirmButtonText: t['Understood'] || 'Entendido'
                     });
                 });
         });

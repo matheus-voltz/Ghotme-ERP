@@ -217,16 +217,12 @@ $configData = Helper::appClasses();
                 })
                 .then(res => res.json())
                 .then(data => {
-                    typing.style.display = 'none';
-                    btnSend.disabled = false;
-
-                    if (data.success) {
-                        const aiDiv = document.createElement('div');
-                        aiDiv.className = 'chat-message assistant animate__animated animate__fadeInLeft';
-                        aiDiv.innerHTML = formatContent(data.message);
-                        history.appendChild(aiDiv);
-                        scrollToBottom();
+                    if (data.success && data.pending) {
+                        // Inicia polling para verificar a nova mensagem
+                        startPollingForNewMessages();
                     } else {
+                        typing.style.display = 'none';
+                        btnSend.disabled = false;
                         Swal.fire({
                             icon: 'error',
                             title: 'Ops!',
@@ -240,6 +236,35 @@ $configData = Helper::appClasses();
                     console.error(err);
                 });
         });
+
+        // Polling para checar novas mensagens da IA a cada 3s
+        function startPollingForNewMessages() {
+            let lastMessageCount = document.querySelectorAll('.chat-message').length;
+
+            const interval = setInterval(() => {
+                fetch('{{ route("ai-consultant.check-messages", $chat->id) }}')
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.messages.length > lastMessageCount) {
+                            clearInterval(interval);
+                            typing.style.display = 'none';
+                            btnSend.disabled = false;
+
+                            const newMsgs = data.messages.slice(lastMessageCount);
+                            newMsgs.forEach(msg => {
+                                const aiDiv = document.createElement('div');
+                                aiDiv.className = 'chat-message ' + msg.role + ' animate__animated animate__fadeInLeft';
+                                aiDiv.innerHTML = formatContent(msg.content);
+                                history.appendChild(aiDiv);
+                            });
+                            scrollToBottom();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Polling error:', err);
+                    });
+            }, 3000); // 3 segundos
+        }
     });
 </script>
 @endsection
