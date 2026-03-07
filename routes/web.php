@@ -178,6 +178,7 @@ Route::middleware([
 
     Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
     Route::get('/dashboard/stats', [HomePage::class, 'getStats'])->name('dashboard.stats');
+    Route::post('/dashboard/ai-analysis', [HomePage::class, 'aiAnalysis'])->name('dashboard.ai-analysis');
 
     // Service Orders
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
@@ -194,6 +195,8 @@ Route::middleware([
     Route::delete('/ordens-servico/item/{id}', [OrdemServicoController::class, 'removeItem'])->name('ordens-servico.remove-item');
     Route::delete('/ordens-servico/part/{id}', [OrdemServicoController::class, 'removePart'])->name('ordens-servico.remove-part');
     Route::get('/ordens-servico/{id}/print', [OrdemServicoController::class, 'print'])->name('ordens-servico.print');
+    Route::get('/ordens-servico/{id}/print-label', [OrdemServicoController::class, 'printLabel'])->name('ordens-servico.print-label');
+    Route::get('/ordens-servico/{id}/print-order', [OrdemServicoController::class, 'printOrder'])->name('ordens-servico.print-order');
     Route::get('/ordens-servico/{id}/whatsapp', [OrdemServicoController::class, 'sendWhatsApp'])->name('ordens-servico.whatsapp');
 
     // Checklist
@@ -481,6 +484,7 @@ Route::middleware([
     Route::get('/ai-consultant', [App\Http\Controllers\AiConsultantController::class, 'index'])->name('ai-consultant.index');
     Route::get('/ai-consultant/new', [App\Http\Controllers\AiConsultantController::class, 'createChat'])->name('ai-consultant.create');
     Route::get('/ai-consultant/{id}', [App\Http\Controllers\AiConsultantController::class, 'show'])->name('ai-consultant.show');
+    Route::get('/ai-consultant/{id}/check', [App\Http\Controllers\AiConsultantController::class, 'checkMessages'])->name('ai-consultant.check-messages');
     Route::post('/ai-consultant/{id}/send', [App\Http\Controllers\AiConsultantController::class, 'sendMessage'])->name('ai-consultant.send');
 
     // Print Templates
