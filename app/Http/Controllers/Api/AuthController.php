@@ -11,6 +11,12 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Tentativa de login API', [
+            'email_recebido' => $request->email,
+            'password_length' => strlen($request->password),
+            'user_agent' => $request->userAgent()
+        ]);
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -19,8 +25,13 @@ class AuthController extends Controller
         $email = trim($request->email);
         $user = User::where('email', $email)->first();
 
-        if (!$user || !\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
-            \Illuminate\Support\Facades\Log::warning('Login falhou para: ' . $request->email);
+        if (!$user) {
+            \Illuminate\Support\Facades\Log::warning('Login falhou: Usuário não encontrado (' . $email . ')');
+            return response()->json(['success' => false, 'message' => 'Credenciais inválidas'], 401);
+        }
+
+        if (!\Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            \Illuminate\Support\Facades\Log::warning('Login falhou: Senha incorreta para ' . $email);
             return response()->json(['success' => false, 'message' => 'Credenciais inválidas'], 401);
         }
 

@@ -14,7 +14,9 @@ class ReportController extends Controller
 {
     public function osStatus()
     {
-        $stats = OrdemServico::select('status', DB::raw('count(*) as total'))
+        $companyId = auth()->user()->company_id;
+        $stats = OrdemServico::where('company_id', $companyId)
+            ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
         return view('content.reports.os-status', compact('stats'));
@@ -22,7 +24,12 @@ class ReportController extends Controller
 
     public function consumedStock()
     {
+        $companyId = auth()->user()->company_id;
         $mostUsedParts = OrdemServicoPart::select('inventory_item_id', DB::raw('SUM(quantity) as total_qty'))
+            ->whereHas('ordemServico', function($q) use ($companyId) {
+                $q->where('company_id', $companyId);
+            })
+            ->whereHas('part') // Garante que o item ainda existe no estoque
             ->with('part')
             ->groupBy('inventory_item_id')
             ->orderBy('total_qty', 'desc')
@@ -36,18 +43,16 @@ class ReportController extends Controller
      */
     public function revenue()
     {
+        $companyId = auth()->user()->company_id;
         // Fetch finalized OS with relations needed for calculation
-        $osFinalizadas = OrdemServico::with(['items', 'parts'])
+        $osFinalizadas = OrdemServico::where('company_id', $companyId)
+            ->with(['items', 'parts', 'client'])
             ->where('status', 'finalized')
             ->orderBy('created_at', 'desc')
             ->get();
 
         // Calculate total via PHP Accessor (items + parts)
         $totalGeral = $osFinalizadas->sum('total');
-
-        // Optional: Group by Month if needed for charts later
-        // $monthlyRevenue = $osFinalizadas->groupBy(fn($os) => $os->created_at->format('Y-m'))
-        //    ->map(fn($group) => $group->sum('total'));
 
         return view('content.reports.revenue', compact('osFinalizadas', 'totalGeral'));
     }
@@ -57,12 +62,18 @@ class ReportController extends Controller
      */
     public function mechanicPerformance()
     {
-        $mechanics = User::withCount(['ordensServico as total_os' => function ($query) {
-            $query->where('status', 'finalized');
-        }])
+        $companyId = auth()->user()->company_id;
+        $mechanics = User::where('company_id', $companyId)
+            ->withCount(['ordensServico as total_os' => function ($query) use ($companyId) {
+                $query->where('status', 'finalized')->where('company_id', $companyId);
+            }])
             ->get()
-            ->map(function ($user) {
-                $os = OrdemServico::where('user_id', $user->id)->where('status', 'finalized')->with(['items', 'parts'])->get();
+            ->map(function ($user) use ($companyId) {
+                $os = OrdemServico::where('user_id', $user->id)
+                    ->where('company_id', $companyId)
+                    ->where('status', 'finalized')
+                    ->with(['items', 'parts'])
+                    ->get();
                 $user->revenue_generated = $os->sum->total;
                 return $user;
             })
@@ -76,11 +87,14 @@ class ReportController extends Controller
      */
     public function averageTime()
     {
-        $avgTime = OrdemServico::where('status', 'finalized')
+        $companyId = auth()->user()->company_id;
+        $avgTime = OrdemServico::where('company_id', $companyId)
+            ->where('status', 'finalized')
             ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as avg_hours'))
             ->first()->avg_hours;
 
-        $osList = OrdemServico::where('status', 'finalized')
+        $osList = OrdemServico::where('company_id', $companyId)
+            ->where('status', 'finalized')
             ->with(['client', 'veiculo'])
             ->orderBy('updated_at', 'desc')
             ->limit(20)
@@ -94,16 +108,16 @@ class ReportController extends Controller
      */
     public function costPerService()
     {
+        $companyId = auth()->user()->company_id;
         // Agrupa os itens de OS (finalizadas) por serviço
-        // Calcula quantas vezes foi usado e o valor total gerado
         $servicesReport = \App\Models\OrdemServicoItem::select(
             'service_id',
             DB::raw('count(*) as total_count'),
             DB::raw('sum(quantity) as total_qty'),
             DB::raw('sum(quantity * price) as total_revenue')
         )
-            ->whereHas('ordemServico', function ($q) {
-                $q->where('status', 'finalized');
+            ->whereHas('ordemServico', function ($q) use ($companyId) {
+                $q->where('status', 'finalized')->where('company_id', $companyId);
             })
             ->whereHas('service') // Garante que o serviço ainda existe
             ->with('service')
@@ -119,11 +133,7 @@ class ReportController extends Controller
      */
     public function averageTimePerService()
     {
-        // Precisamos calcular o tempo médio que cada TIPO de serviço leva
-        // Como o tempo é registrado na OS inteira, faremos uma estimativa baseada nas OS que contém esse serviço
-        // Ou, se houver um campo de tempo no item, melhor ainda. 
-        // Assumindo que o tempo é da OS:
-
+        $companyId = auth()->user()->company_id;
         $servicesTime = \App\Models\OrdemServicoItem::select(
             'service_id',
             DB::raw('count(*) as total_executions'),
@@ -131,6 +141,7 @@ class ReportController extends Controller
         )
             ->join('ordem_servicos', 'ordem_servico_items.ordem_servico_id', '=', 'ordem_servicos.id')
             ->where('ordem_servicos.status', 'finalized')
+            ->where('ordem_servicos.company_id', $companyId)
             ->whereHas('service')
             ->with('service')
             ->groupBy('service_id')
@@ -142,7 +153,9 @@ class ReportController extends Controller
 
     public function getOsStatusData()
     {
-        $data = OrdemServico::select('status', DB::raw('count(*) as total'))
+        $companyId = auth()->user()->company_id;
+        $data = OrdemServico::where('company_id', $companyId)
+            ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->get();
         return response()->json($data);

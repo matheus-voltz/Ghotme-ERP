@@ -20,6 +20,9 @@ class PurchaseOrderController extends Controller
 
         // Itens que precisam de reposição
         $lowStockItems = InventoryItem::where('company_id', $companyId)
+            ->when(get_current_niche() === 'food_service', function($q) {
+                return $q->where('is_ingredient', true);
+            })
             ->whereRaw('quantity <= min_quantity')
             ->with('supplier')
             ->get();

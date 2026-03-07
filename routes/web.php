@@ -1,5 +1,5 @@
 <?php
-
+use App\Http\Controllers\IFoodController;
 use App\Http\Controllers\OrdemServicoController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -155,6 +155,10 @@ Route::middleware([
     App\Http\Middleware\CheckTrialStatus::class,
 ])->group(function () {
 
+    // General Routes
+    Route::get('/whats-new', [App\Http\Controllers\SystemUpdateController::class, 'index'])->name('whats-new');
+    Route::get('/ifood/orders', [IFoodController::class, 'index'])->name('ifood.orders');
+
     // Newsletter Admin
     Route::get('/admin/newsletter', [App\Http\Controllers\NewsletterAdminController::class, 'index'])->name('newsletter.admin.index');
     Route::get('/admin/newsletter/create', [App\Http\Controllers\NewsletterAdminController::class, 'create'])->name('newsletter.admin.create');
@@ -168,42 +172,32 @@ Route::middleware([
         Route::post('/master/ai-analysis', [App\Http\Controllers\MasterPortalController::class, 'aiAnalysis'])->name('master.ai-analysis');
         Route::get('/master/errors', [App\Http\Controllers\MasterPortalController::class, 'errors'])->name('master.errors');
         Route::delete('/master/errors/{id}', [App\Http\Controllers\MasterPortalController::class, 'destroyError'])->name('master.errors.destroy');
-        Route::post('/master/errors/clear', [App\Http\Controllers\MasterPortalController::class, 'clearErrors'])->name('master.errors.clear');
         Route::get('/master/companies', [App\Http\Controllers\MasterPortalController::class, 'companies'])->name('master.companies');
-        Route::post('/master/companies/{id}', [App\Http\Controllers\MasterPortalController::class, 'updateCompany'])->name('master.companies.update');
-        Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
-        Route::get('/master/newsletter/create', [App\Http\Controllers\MasterPortalController::class, 'createNewsletter'])->name('master.newsletter.create');
-        Route::post('/master/newsletter/send', [App\Http\Controllers\MasterPortalController::class, 'sendNewsletter'])->name('master.newsletter.send');
-        Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
+        Route::post('/master/companies/{id}/toggle-status', [App\Http\Controllers\MasterPortalController::class, 'toggleCompanyStatus'])->name('master.companies.toggle-status');
     });
 
-    // Sales Hub Admin
-    Route::get('/admin/sales-hub', [App\Http\Controllers\SalesHubController::class, 'index'])->name('sales-hub.index');
-    Route::post('/admin/sales-hub/ai-insight', [App\Http\Controllers\SalesHubController::class, 'getAiInsight'])->name('sales-hub.ai-insight');
-    Route::post('/admin/sales-hub/follow-up-insight', [App\Http\Controllers\SalesHubController::class, 'getFollowUpAiInsight'])->name('sales-hub.follow-up-insight');
-
-    // Appointments Management
-    Route::get('/appointments', [App\Http\Controllers\AppointmentController::class, 'index'])->name('appointments.index');
-    Route::post('/appointments/{id}/confirm', [App\Http\Controllers\AppointmentController::class, 'confirm'])->name('appointments.confirm');
-    Route::post('/appointments/{id}/cancel', [App\Http\Controllers\AppointmentController::class, 'cancel'])->name('appointments.cancel');
-
-    // Dashboard e Novidades
     Route::get('/dashboard', [HomePage::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/ai-analysis', [HomePage::class, 'aiAnalysis'])->name('dashboard.ai-analysis');
-    Route::get('/whats-new', [App\Http\Controllers\SystemUpdateController::class, 'index'])->name('whats-new');
+    Route::get('/dashboard/stats', [HomePage::class, 'getStats'])->name('dashboard.stats');
+
+    // Service Orders
     Route::get('/ordens-servico', [OrdemServicoController::class, 'index'])->name('ordens-servico');
-    Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');
     Route::get('/ordens-servico/data', [OrdemServicoController::class, 'dataBase'])->name('ordens-servico.data');
+    Route::get('/ordens-servico/create', [OrdemServicoController::class, 'create'])->name('ordens-servico.create');
     Route::post('/ordens-servico', [OrdemServicoController::class, 'store'])->name('ordens-servico.store');
-    Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
+    Route::get('/ordens-servico/{id}', [OrdemServicoController::class, 'show'])->name('ordens-servico.show');
     Route::get('/ordens-servico/{id}/edit', [OrdemServicoController::class, 'edit'])->name('ordens-servico.edit');
     Route::put('/ordens-servico/{id}', [OrdemServicoController::class, 'update'])->name('ordens-servico.update');
-    Route::get('/ordens-servico/{id}/print-label', [OrdemServicoController::class, 'printLabel'])->name('ordens-servico.print-label');
-    Route::get('/ordens-servico/{id}/print-order', [OrdemServicoController::class, 'printOrder'])->name('ordens-servico.print-order');
-    Route::get('/api/get-vehicles/{clientId}', [OrdemServicoController::class, 'getVehiclesByClient']);
+    Route::post('/ordens-servico/{id}/status', [OrdemServicoController::class, 'updateStatus'])->name('ordens-servico.status');
+    Route::post('/ordens-servico/{id}/payment', [OrdemServicoController::class, 'receivePayment'])->name('ordens-servico.payment');
+    Route::post('/ordens-servico/{id}/items', [OrdemServicoController::class, 'addItem'])->name('ordens-servico.add-item');
+    Route::post('/ordens-servico/{id}/parts', [OrdemServicoController::class, 'addPart'])->name('ordens-servico.add-part');
+    Route::delete('/ordens-servico/item/{id}', [OrdemServicoController::class, 'removeItem'])->name('ordens-servico.remove-item');
+    Route::delete('/ordens-servico/part/{id}', [OrdemServicoController::class, 'removePart'])->name('ordens-servico.remove-part');
+    Route::get('/ordens-servico/{id}/print', [OrdemServicoController::class, 'print'])->name('ordens-servico.print');
+    Route::get('/ordens-servico/{id}/whatsapp', [OrdemServicoController::class, 'sendWhatsApp'])->name('ordens-servico.whatsapp');
 
+    // Checklist
     Route::get('/ordens-servico/checklist', [VehicleChecklistController::class, 'index'])->name('ordens-servico.checklist');
-    Route::get('/ordens-servico/checklist/create', [VehicleChecklistController::class, 'create'])->name('ordens-servico.checklist.create');
     Route::post('/ordens-servico/checklist', [VehicleChecklistController::class, 'store'])->name('ordens-servico.checklist.store');
     Route::get('/ordens-servico/checklist/{id}', [VehicleChecklistController::class, 'show'])->name('ordens-servico.checklist.show');
 
@@ -379,6 +373,13 @@ Route::middleware([
     Route::post('/menu/categories', [App\Http\Controllers\MenuController::class, 'storeCategory'])->name('menu.categories.store');
     Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
 
+    // Recipes / Ficha Técnica (Food Service)
+    Route::get('/inventory/recipes', [App\Http\Controllers\RecipeController::class, 'index'])->name('recipes.index');
+    Route::get('/inventory/recipes/{id}', [App\Http\Controllers\RecipeController::class, 'show'])->name('recipes.show');
+    Route::post('/inventory/recipes', [App\Http\Controllers\RecipeController::class, 'store'])->name('recipes.store');
+    Route::put('/inventory/recipes/{id}', [App\Http\Controllers\RecipeController::class, 'update'])->name('recipes.update');
+    Route::delete('/inventory/recipes/{id}/{ingredientId}', [App\Http\Controllers\RecipeController::class, 'destroy'])->name('recipes.destroy');
+
     // Quick Sales (POS)
     Route::get('/pos', [App\Http\Controllers\PdvController::class, 'index'])->name('menu.pos');
 
@@ -390,6 +391,7 @@ Route::middleware([
     Route::post('/finance/transactions/{id}/pay', [FinanceController::class, 'markAsPaid'])->name('finance.transactions.pay');
     Route::delete('/finance/transactions/{id}', [FinanceController::class, 'destroy'])->name('finance.transactions.destroy');
 
+    // Cash Flow
     Route::get('/finance/cash-flow', [FinanceController::class, 'cashFlow'])->name('finance.cash-flow');
     Route::get('/finance/transaction/{id}/pdf', [FinanceController::class, 'downloadPdf'])->name('finance.transaction.pdf');
 
@@ -436,6 +438,10 @@ Route::middleware([
     // Settings
     Route::get('/settings/company-data', [CompanySettingController::class, 'index'])->name('settings.company-data');
     Route::post('/settings/company-data', [CompanySettingController::class, 'update'])->name('settings.company-data.update');
+
+    // Food Service Specific Settings
+    Route::get('/settings/food-service', [App\Http\Controllers\FoodServiceSettingsController::class, 'index'])->name('settings.food-service');
+    Route::put('/settings/food-service', [App\Http\Controllers\FoodServiceSettingsController::class, 'update'])->name('settings.food-service.update');
 
     // Custom Fields
     Route::get('/settings/custom-fields', [App\Http\Controllers\CustomFieldController::class, 'index'])->name('settings.custom-fields');

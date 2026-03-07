@@ -14,23 +14,54 @@ class ProductRecipeManager extends Component
     public $availableIngredients = [];
     public $selectedIngredientId = '';
     public $quantity = 1;
+    public $totalCost = 0;
 
-    public function mount($productId)
+    protected $listeners = ['load-product-recipe' => 'setProduct'];
+
+    public function mount($productId = null)
+    {
+        if ($productId) {
+            $this->setProduct($productId);
+        }
+    }
+
+    public function setProduct($productId)
     {
         $this->productId = $productId;
         $this->loadRecipe();
         $this->loadAvailableIngredients();
+        $this->calculateTotalCost();
     }
 
     public function loadRecipe()
     {
+        if (!$this->productId) return;
         $this->ingredients = ProductRecipe::with('ingredient')
             ->where('product_id', $this->productId)
             ->get();
+        $this->calculateTotalCost();
+    }
+
+    public function calculateTotalCost()
+    {
+        $this->totalCost = 0;
+        foreach ($this->ingredients as $row) {
+            $this->totalCost += $row->quantity * ($row->ingredient->cost_price ?? 0);
+        }
+
+        // Atualiza o custo no produto final no estoque
+        if ($this->productId) {
+            $product = InventoryItem::find($this->productId);
+            if ($product && $product->cost_price != $this->totalCost) {
+                $product->cost_price = $this->totalCost;
+                $product->save();
+            }
+        }
     }
 
     public function loadAvailableIngredients()
     {
+        if (!$this->productId) return;
         // Pega todos os itens da empresa, menos o próprio produto
         $this->availableIngredients = InventoryItem::where('company_id', Auth::user()->company_id)
             ->where('id', '!=', $this->productId)

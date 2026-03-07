@@ -1,0 +1,15 @@
+appId: com.nazuki854.ghotme.app
+---
+- launchApp:
+    clearState: true
+- tapOn: "Faça login com sua conta" # Ou texto equivalente na tela
+- tapOn: "Seu E-mail"
+- inputText: "matheus@ghotme.com" 
+- tapOn: "Sua Senha"
+- inputText: "123456"
+- hideKeyboard
+- tapOn: "Acessar Sistema"
+- assertVisible: "Visão Geral" # Verifica se entrou na home e carregou o layout
+- swipe:
+    direction: UP
+- assertVisible: "Configurações" # Navegação pela Home

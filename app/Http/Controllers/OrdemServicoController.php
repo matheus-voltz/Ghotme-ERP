@@ -179,8 +179,14 @@ class OrdemServicoController extends Controller
 
     public function edit($id)
     {
-        $order = OrdemServico::with(['items', 'parts'])->findOrFail($id);
-        $client = $order->client; // Pega apenas o cliente da OS atual
+        $order = OrdemServico::with(['items', 'parts.inventoryItem', 'veiculo', 'client'])->findOrFail($id);
+        
+        // Se for Food Service, carrega a tela simplificada de Monitor de Cozinha
+        if (get_current_niche() === 'food_service') {
+            return view('content.pages.ordens-servico.edit-food', compact('order'));
+        }
+
+        $client = $order->client;
         $services = Service::where('is_active', true)->get();
         $parts = InventoryItem::where('is_active', true)->get();
         $vehicles = Vehicles::where('cliente_id', $order->client_id)->get();

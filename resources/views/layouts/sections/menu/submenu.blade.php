@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Route;
   $user = auth()->user();
   @endphp
 
+  {{-- niche check --}}
+  @php
+  $currentNiche = get_current_niche();
+  if (isset($submenu->niche) && $currentNiche !== $submenu->niche) continue;
+  if (isset($submenu->niche_exclude) && $currentNiche === $submenu->niche_exclude) continue;
+  @endphp
+
   {{-- feature plan check --}}
   @if (isset($submenu->feature))
   @if (!$user || !$user->hasFeature($submenu->feature))

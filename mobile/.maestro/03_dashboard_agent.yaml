@@ -1,0 +1,25 @@
+appId: com.nazuki854.ghotme.app
+---
+- launchApp:
+    clearState: false
+- tapOn: "Início"
+- assertVisible: "Ghotme IA"
+- tapOn: "Início" # scroll to top if needed
+- swipe:
+    direction: UP
+- tapOn: "Ghotme IA" # Aquele botão flutuante
+- assertVisible: "Analisando seus dados..."
+# Wait for the AI to respond
+- extendedWaitUntil:
+    visible: "Ghotme IA" # Assuming top header or chat bubbles
+    timeout: 10000
+- tapOn: "Como está meu faturamento este mês?"
+- extendedWaitUntil:
+    notVisible: "Analisando seus dados..."
+    timeout: 15000
+- swipe:
+    direction: UP
+- tapOn:
+    id: "back-button"
+    optional: true
+- tapOn: "Início"

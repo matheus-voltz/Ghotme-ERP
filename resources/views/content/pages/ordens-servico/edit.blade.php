@@ -41,42 +41,37 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">{{ niche('entity') }} ({{ get_current_niche() === 'food_service' ? 'Opcional' : 'Obrigatório' }})</label>
+                            <label class="form-label">{{ get_current_niche() === 'food_service' ? 'Mesa / Senha' : niche('entity') }}</label>
                             <select name="veiculo_id" id="veiculo_id" class="select2 form-select" {{ get_current_niche() === 'food_service' ? '' : 'required' }}>
-                                <option value="">{{ get_current_niche() === 'food_service' ? 'Sem Mesa / Senha' : 'Selecione o ' . niche('entity') }}</option>
+                                <option value="">{{ get_current_niche() === 'food_service' ? 'Sem Mesa (Balcão)' : 'Selecione o ' . niche('entity') }}</option>
                                 @foreach($vehicles as $vehicle)
                                 <option value="{{ $vehicle->id }}" {{ ($order->veiculo_id ?? 0) == $vehicle->id ? 'selected' : '' }}>
-                                    {{ $vehicle->placa }} - {{ $vehicle->modelo }}
+                                    {{ $vehicle->placa }} {{ $vehicle->modelo }}
                                 </option>
                                 @endforeach
                             </select>
-                            @if(get_current_niche() === 'food_service')
-                            <small class="text-muted">Dica: Use para Mesa ou Senha.</small>
-                            @endif
                         </div>
                     </div>
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">Status</label>
+                            <label class="form-label">Status do Pedido</label>
                             <select name="status" class="form-select">
-                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Aguardando Início</option>
-                                <option value="approved" {{ $order->status == 'approved' ? 'selected' : '' }}>Aprovado</option>
-                                <option value="in_progress" {{ $order->status == 'in_progress' ? 'selected' : '' }}>Em Execução</option>
-                                <option value="testing" {{ $order->status == 'testing' ? 'selected' : '' }}>Em Teste</option>
-                                <option value="cleaning" {{ $order->status == 'cleaning' ? 'selected' : '' }}>Lavagem</option>
-                                <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Concluído</option>
-                                <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>Pago</option>
+                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Na Fila (Pendente)</option>
+                                <option value="in_progress" {{ $order->status == 'in_progress' ? 'selected' : '' }}>Em Preparo</option>
+                                <option value="completed" {{ $order->status == 'completed' ? 'selected' : '' }}>Pronto para Entrega</option>
+                                <option value="paid" {{ $order->status == 'paid' ? 'selected' : '' }}>Finalizado / Pago</option>
                             </select>
                         </div>
                     </div>
                     <div class="mb-0">
-                        <label class="form-label">Descrição Geral do Problema / Relato do Cliente</label>
-                        <textarea name="description" class="form-control" rows="3">{{ $order->description }}</textarea>
+                        <label class="form-label">{{ get_current_niche() === 'food_service' ? 'Observações do Pedido (Ex: Sem cebola, Mal passado)' : 'Descrição Geral do Problema' }}</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Digite aqui observações importantes para a cozinha...">{{ $order->description }}</textarea>
                     </div>
                 </div>
             </div>
 
-            <!-- Serviços -->
+            @if(get_current_niche() !== 'food_service')
+            <!-- Serviços (Apenas para outros nichos) -->
             <div class="card mb-4">
                 <div class="card-header border-bottom">
                     <h5 class="card-title mb-0">Serviços (Mão de Obra)</h5>
@@ -120,11 +115,12 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                     </div>
                 </div>
             </div>
+            @endif
 
-            <!-- Peças -->
+            <!-- Itens do Pedido (Lanches, Bebidas...) -->
             <div class="card">
                 <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">{{ niche('inventory_items') }} e Insumos</h5>
+                    <h5 class="card-title mb-0">{{ get_current_niche() === 'food_service' ? 'Itens do Pedido' : niche('inventory_items') }}</h5>
                 </div>
                 <div class="card-body pt-4">
                     <div class="table-responsive">
@@ -132,7 +128,7 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                             <thead>
                                 <tr>
                                     <th width="50">Add</th>
-                                    <th>{{ niche('entity') === 'Pedido' ? 'Ingrediente' : 'Peça' }}</th>
+                                    <th>{{ get_current_niche() === 'food_service' ? 'Produto' : 'Item' }}</th>
                                     <th>Venda Un.</th>
                                     <th>Qtd</th>
                                 </tr>
@@ -143,11 +139,11 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                                 $hasPart = $existingParts->has($part->id);
                                 $pItem = $hasPart ? $existingParts->get($part->id) : null;
                                 @endphp
-                                <tr class="{{ $hasPart ? 'table-warning' : '' }}">
+                                <tr class="{{ $hasPart ? (get_current_niche() === 'food_service' ? 'table-primary' : 'table-warning') : '' }}">
                                     <td>
                                         <input type="checkbox" name="parts[{{ $part->id }}][selected]" class="form-check-input" {{ $hasPart ? 'checked' : '' }}>
                                     </td>
-                                    <td>{{ $part->name }} <small>(Estoque: {{ $part->quantity }})</small></td>
+                                    <td>{{ $part->name }} @if(get_current_niche() !== 'food_service') <small>(Estoque: {{ $part->quantity }})</small> @endif</td>
                                     <td>
                                         <input type="number" step="0.01" name="parts[{{ $part->id }}][price]"
                                             value="{{ $hasPart ? $pItem->price : $part->selling_price }}"
@@ -169,7 +165,38 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
 
         <!-- Coluna Direita: Resumo -->
         <div class="col-md-4">
-            <!-- Card de Faturamento / NF-e -->
+            <!-- Card de Status do Preparo -->
+            <div class="card mb-4">
+                <div class="card-header border-bottom">
+                    <h5 class="card-title mb-0">Status do Preparo</h5>
+                </div>
+                <div class="card-body pt-4 text-center">
+                    @php
+                    $statusColor = match($order->status) {
+                        'pending' => 'warning',
+                        'in_progress' => 'info',
+                        'completed' => 'success',
+                        'paid' => 'primary',
+                        default => 'secondary'
+                    };
+                    $statusLabel = match($order->status) {
+                        'pending' => 'Na Fila',
+                        'in_progress' => 'Preparando',
+                        'completed' => 'Pronto p/ Entrega',
+                        'paid' => 'Entregue / Pago',
+                        default => $order->status
+                    };
+                    @endphp
+                    <div class="mb-3">
+                        <span class="badge bg-label-{{ $statusColor }} fs-5 px-4 py-2">{{ $statusLabel }}</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">Salvar Alterações</button>
+                    <a href="{{ route('ordens-servico') }}" class="btn btn-label-secondary w-100">Voltar ao Monitor</a>
+                </div>
+            </div>
+
+            <!-- Card de Faturamento / NF-e (Oculto para Food Service por enquanto, a menos que necessário) -->
+            @if(get_current_niche() !== 'food_service')
             <div class="card mb-4 border-primary">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Faturamento / NF-e</h5>
@@ -201,19 +228,10 @@ $existingParts = $order->parts->keyBy('inventory_item_id');
                     @endif
                 </div>
             </div>
+            @endif
 
-            <div class="card mb-4">
-                <div class="card-header border-bottom">
-                    <h5 class="card-title mb-0">Ações</h5>
-                </div>
-                <div class="card-body pt-4">
-                    <button type="submit" class="btn btn-primary w-100 mb-3">Salvar Alterações</button>
-                    <a href="{{ route('ordens-servico') }}" class="btn btn-label-secondary w-100">Cancelar</a>
-                </div>
-            </div>
-
-            <!-- Card de Vistoria Visual -->
-            @if($order->inspection && $order->inspection->damagePoints->isNotEmpty())
+            <!-- Card de Vistoria Visual (Oculto para Food Service) -->
+            @if(get_current_niche() !== 'food_service' && $order->inspection && $order->inspection->damagePoints->isNotEmpty())
             <div class="card">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Fotos da Vistoria</h5>

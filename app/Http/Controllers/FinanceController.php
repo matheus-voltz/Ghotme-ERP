@@ -8,6 +8,7 @@ use App\Models\PaymentMethod;
 use App\Models\Clients;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class FinanceController extends Controller
 {
@@ -15,14 +16,30 @@ class FinanceController extends Controller
     {
         $clients = Clients::all();
         $paymentMethods = PaymentMethod::where('is_active', true)->get();
-        return view('content.finance.receivables.index', compact('clients', 'paymentMethods'));
+        
+        $stats = [
+            'pending' => FinancialTransaction::where('type', 'in')->where('status', 'pending')->sum('amount'),
+            'overdue' => FinancialTransaction::where('type', 'in')->where('status', 'pending')->where('due_date', '<', Carbon::today())->sum('amount'),
+            'paid_today' => FinancialTransaction::where('type', 'in')->where('status', 'paid')->whereDate('paid_at', Carbon::today())->sum('amount'),
+            'monthly_total' => FinancialTransaction::where('type', 'in')->whereMonth('due_date', Carbon::now()->month)->whereYear('due_date', Carbon::now()->year)->sum('amount'),
+        ];
+        
+        return view('content.finance.receivables.index', compact('clients', 'paymentMethods', 'stats'));
     }
 
     public function payables()
     {
         $suppliers = Supplier::all();
         $paymentMethods = PaymentMethod::where('is_active', true)->get();
-        return view('content.finance.payables.index', compact('suppliers', 'paymentMethods'));
+        
+        $stats = [
+            'pending' => FinancialTransaction::where('type', 'out')->where('status', 'pending')->sum('amount'),
+            'overdue' => FinancialTransaction::where('type', 'out')->where('status', 'pending')->where('due_date', '<', Carbon::today())->sum('amount'),
+            'paid_today' => FinancialTransaction::where('type', 'out')->where('status', 'paid')->whereDate('paid_at', Carbon::today())->sum('amount'),
+            'monthly_total' => FinancialTransaction::where('type', 'out')->whereMonth('due_date', Carbon::now()->month)->whereYear('due_date', Carbon::now()->year)->sum('amount'),
+        ];
+        
+        return view('content.finance.payables.index', compact('suppliers', 'paymentMethods', 'stats'));
     }
 
     public function dataBase(Request $request)
@@ -73,16 +90,17 @@ class FinanceController extends Controller
             'amount' => 'required|numeric|min:0',
             'type' => 'required|in:in,out',
             'due_date' => 'required|date',
-            'client_id' => 'nullable|exists:clients,id',
             'supplier_id' => 'nullable|exists:suppliers,id',
+            'client_id' => 'nullable|exists:clients,id',
+            'payment_method_id' => 'required|exists:payment_methods,id',
             'category' => 'nullable|string',
-            'payment_method_id' => 'nullable|exists:payment_methods,id',
         ]);
 
-        $validated['user_id'] = Auth::id();
-        $transaction = FinancialTransaction::create($validated);
+        $validated['status'] = 'pending';
+        
+        FinancialTransaction::create($validated);
 
-        return response()->json(['success' => true, 'message' => 'Lançamento realizado!', 'data' => $transaction]);
+        return response()->json(['success' => true]);
     }
 
     public function markAsPaid($id)
@@ -93,14 +111,15 @@ class FinanceController extends Controller
             'paid_at' => now()
         ]);
 
-        return response()->json(['success' => true, 'message' => 'Pagamento confirmado!']);
+        return response()->json(['success' => true]);
     }
 
     public function destroy($id)
     {
         $transaction = FinancialTransaction::findOrFail($id);
         $transaction->delete();
-        return response()->json(['success' => true, 'message' => 'Lançamento removido!']);
+
+        return response()->json(['success' => true]);
     }
 
     public function cashFlow()
@@ -108,32 +127,13 @@ class FinanceController extends Controller
         $incomes = FinancialTransaction::where('type', 'in')->where('status', 'paid')->sum('amount');
         $expenses = FinancialTransaction::where('type', 'out')->where('status', 'paid')->sum('amount');
         $balance = $incomes - $expenses;
-
-        $recentTransactions = FinancialTransaction::with(['client', 'supplier'])
-            ->where('status', 'paid')
+        
+        $recentTransactions = FinancialTransaction::where('status', 'paid')
+            ->with(['client', 'supplier'])
             ->orderBy('paid_at', 'desc')
             ->limit(10)
             ->get();
 
         return view('content.finance.cash-flow.index', compact('incomes', 'expenses', 'balance', 'recentTransactions'));
-    }
-
-    public function downloadPdf($id)
-    {
-        $transaction = FinancialTransaction::with(['client', 'company'])->findOrFail($id);
-        $company = \App\Models\Company::find(Auth::user()->company_id);
-
-        $data = [
-            'transaction' => $transaction,
-            'company' => $company
-        ];
-
-        // Se o DomPDF estiver instalado, gera o PDF. Caso contrário, mostra o HTML para teste.
-        if (class_exists('\Barryvdh\DomPDF\Facade\Pdf')) {
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('content.finance.pdf.transaction-invoice', $data);
-            return $pdf->download("Fatura-{$id}.pdf");
-        }
-
-        return view('content.finance.pdf.transaction-invoice', $data);
     }
 }

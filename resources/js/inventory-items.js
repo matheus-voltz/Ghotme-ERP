@@ -12,28 +12,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
     bodyBg = config.colors.bodyBg;
     headingColor = config.colors.headingColor;
 
-    // Variable declaration for table
-    const dt_items_table = document.querySelector('.datatables-items'),
-        offCanvasForm = document.getElementById('offcanvasAddItems'),
-        t = window.inventoryTranslations || {},
-        uploadedAvatar = document.getElementById('uploadedAvatar');
+    const dt_items_table = document.querySelector('.datatables-items');
+    const offCanvasForm = document.getElementById('offcanvasAddItems');
 
-    // Select2 initialization
-    var select2 = $('.select2');
-    if (select2.length) {
-        var $this = select2;
-        $this.wrap('<div class="position-relative"></div>').select2({
-            placeholder: t['Select'] || 'Selecione',
-            dropdownParent: $this.parent()
-        });
-    }
-
-    // ajax setup
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
+    const t = window.inventoryTranslations || {};
 
     // Items datatable
     if (dt_items_table) {
@@ -42,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
             serverSide: true,
             ajax: {
                 url: baseUrl + 'inventory/items-list',
+                data: function (d) {
+                    d.type = $('.filter-type-btn.active').data('type') || 'all';
+                },
                 dataSrc: function (json) {
                     if (typeof json.recordsTotal !== 'number') json.recordsTotal = 0;
                     if (typeof json.recordsFiltered !== 'number') json.recordsFiltered = 0;
@@ -56,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 { data: 'sku' },
                 { data: 'quantity' },
                 { data: 'selling_price' },
-                { data: 'location' },
+                { data: 'profit' },
                 { data: 'is_active' },
                 { data: 'action' }
             ],
@@ -81,22 +66,33 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     }
                 },
                 {
-                    // Name
+                    // Item (Name + Category + Type)
                     targets: 2,
                     responsivePriority: 4,
                     render: function (data, type, full, meta) {
-                        return `<span class="fw-medium">${full.name}</span>`;
+                        const typeBadge = full.is_ingredient
+                            ? '<span class="badge bg-label-warning me-1" style="font-size: 0.65rem;">INSUMO</span>'
+                            : '<span class="badge bg-label-info me-1" style="font-size: 0.65rem;">VENDA</span>';
+
+                        return `
+                        <div class="d-flex flex-column">
+                            <span class="fw-medium text-heading text-truncate">${full.name}</span>
+                            <div class="d-flex align-items-center mt-1">
+                                ${typeBadge}
+                                <small class="text-muted text-truncate">${full.category_name}</small>
+                            </div>
+                        </div>`;
                     }
                 },
                 {
                     // SKU
                     targets: 3,
                     render: function (data, type, full, meta) {
-                        return full.sku || '-';
+                        return `<span class="text-muted small">${full.sku || '-'}</span>`;
                     }
                 },
                 {
-                    // Quantity
+                    // Stock (Qty + Unit)
                     targets: 4,
                     render: function (data, type, full, meta) {
                         const qty = full.quantity;
@@ -105,21 +101,54 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         if (qty <= min) color = 'danger';
                         else if (qty <= min * 1.2) color = 'warning';
 
-                        return `<span class="badge bg-label-${color}">${qty}</span>`;
+                        return `
+                        <div class="d-flex flex-column align-items-start">
+                            <span class="badge bg-label-${color}">${qty} ${full.unit}</span>
+                            <small class="text-muted mt-1" style="font-size: 0.7rem;">Mín: ${min}</small>
+                        </div>`;
                     }
                 },
                 {
-                    // Selling Price
+                    // Cost / Sale Price
                     targets: 5,
                     render: function (data, type, full, meta) {
-                        return `R$ ${parseFloat(full.selling_price).toFixed(2)}`;
+                        const cost = parseFloat(full.cost_price).toFixed(2);
+                        const sale = parseFloat(full.selling_price).toFixed(2);
+
+                        return `
+                        <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between gap-3">
+                                <small class="text-muted small">Custo:</small>
+                                <span class="fw-medium small">R$ ${cost}</span>
+                            </div>
+                            ${full.is_for_sale ? `
+                            <div class="d-flex justify-content-between gap-3">
+                                <small class="text-primary font-weight-bold small">Venda:</small>
+                                <span class="fw-bold small text-primary">R$ ${sale}</span>
+                            </div>` : '<small class="text-muted italic small">Apenas uso interno</small>'}
+                        </div>`;
                     }
                 },
                 {
-                    // Location
+                    // Profit / Margin (Automatic Calculation)
                     targets: 6,
                     render: function (data, type, full, meta) {
-                        return full.location || '-';
+                        if (!full.is_for_sale || parseFloat(full.selling_price) <= 0) return '<span class="text-muted small">-</span>';
+                        
+                        const cost = parseFloat(full.cost_price);
+                        const sale = parseFloat(full.selling_price);
+                        const profit = sale - cost;
+                        const margin = ((sale - cost) / sale) * 100;
+                        
+                        let color = 'success';
+                        if (margin < 20) color = 'danger';
+                        else if (margin < 40) color = 'warning';
+
+                        return `
+                            <div class="d-flex flex-column">
+                                <span class="fw-bold text-${color} small">R$ ${profit.toFixed(2)}</span>
+                                <small class="text-${color}" style="font-size: 0.7rem;">${margin.toFixed(1)}% margem</small>
+                            </div>`;
                     }
                 },
                 {
@@ -144,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function (e) {
                         return (
                             '<div class="d-flex align-items-center gap-4">' +
                             `<button class="btn btn-sm btn-icon edit-record" data-id="${full.id}" data-bs-toggle="offcanvas" data-bs-target="#offcanvasAddItems" title="${t['Edit'] || 'Editar'}"><i class="icon-base ti tabler-edit icon-22px"></i></button>` +
-                            `<button class="btn btn-sm btn-icon publish-meli" data-id="${full.id}" data-name="${full.name}" data-price="${full.selling_price}" title="${t['Publish on Mercado Livre'] || 'Anunciar no Mercado Livre'}"><i class="icon-base ti tabler-share icon-22px text-warning"></i></button>` +
                             `<button class="btn btn-sm btn-icon delete-record" data-id="${full.id}" title="${t['Delete'] || 'Excluir'}"><i class="icon-base ti tabler-trash icon-22px"></i></button>` +
                             '</div>'
                         );
@@ -176,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                             buttons: [
                                 {
                                     text: `<i class="icon-base ti tabler-plus icon-sm me-0 me-sm-2"></i><span class="d-none d-sm-inline-block">${t['Add Item'] || 'Adicionar Item'}</span>`,
-                                    className: 'add-new btn btn-primary',
+                                    className: 'add-new btn btn-primary ms-3',
                                     attr: {
                                         'data-bs-toggle': 'offcanvas',
                                         'data-bs-target': '#offcanvasAddItems'
@@ -197,397 +225,205 @@ document.addEventListener('DOMContentLoaded', function (e) {
                     ]
                 },
                 bottomEnd: 'paging'
-            },
-            displayLength: 10,
-            language: {
-                paginate: {
-                    first: '<i class="icon-base ti tabler-chevrons-left scaleX-n1-rtl icon-18px"></i>',
-                    last: '<i class="icon-base ti tabler-chevrons-right scaleX-n1-rtl icon-18px"></i>',
-                    next: '<i class="icon-base ti tabler-chevron-right scaleX-n1-rtl icon-18px"></i>',
-                    previous: '<i class="icon-base ti tabler-chevron-left scaleX-n1-rtl icon-18px"></i>'
-                }
-            },
-            responsive: {
-                details: {
-                    display: DataTable.Responsive.display.modal({
-                        header: function (row) {
-                            const data = row.data();
-                            return (t['Details of'] || 'Detalhes de') + ' ' + data.name;
-                        }
-                    }),
-                    type: 'column',
-                    renderer: function (api, rowIdx, columns) {
-                        const data = columns
-                            .map(function (col) {
-                                return col.title !== ''
-                                    ? `<tr data-dt-row="${col.rowIndex}" data-dt-column="${col.columnIndex}">
-                      <td>${col.title}:</td>
-                      <td>${col.data}</td>
-                    </tr>`
-                                    : '';
-                            })
-                            .join('');
-
-                        if (data) {
-                            const div = document.createElement('div');
-                            div.classList.add('table-responsive');
-                            const table = document.createElement('table');
-                            div.appendChild(table);
-                            table.classList.add('table');
-                            const tbody = document.createElement('tbody');
-                            tbody.innerHTML = data;
-                            table.appendChild(tbody);
-                            return div;
-                        }
-                        return false;
-                    }
-                }
-            },
-            initComplete: function () {
-                document.querySelectorAll('.dt-buttons .btn').forEach(btn => {
-                    btn.classList.remove('btn-secondary');
-                });
             }
+        });
+
+        // Filter buttons logic
+        $('.filter-type-btn').on('click', function () {
+            $('.filter-type-btn').removeClass('active btn-primary').addClass('btn-label-secondary');
+            $(this).addClass('active btn-primary').removeClass('btn-label-secondary');
+            dt_items.draw();
         });
 
         // Delete Record
-        document.addEventListener('click', function (e) {
-            if (e.target.closest('.delete-record')) {
-                const deleteBtn = e.target.closest('.delete-record');
-                const id = deleteBtn.dataset.id;
-
-                Swal.fire({
-                    title: t['Are you sure?'] || 'Você tem certeza?',
-                    text: t["You won't be able to revert this!"] || "Você não poderá reverter isso!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: t['Yes, delete it!'] || 'Sim, exclua!',
-                    customClass: {
-                        confirmButton: 'btn btn-primary me-3',
-                        cancelButton: 'btn btn-label-secondary'
-                    },
-                    buttonsStyling: false
-                }).then(function (result) {
-                    if (result.value) {
-                        fetch(`${baseUrl}inventory/items/${id}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                            .then(response => {
-                                if (response.ok) {
-                                    dt_items.draw();
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: t['Deleted!'] || 'Excluído!',
-                                        text: t['The item has been deleted!'] || 'O item foi excluído!',
-                                        customClass: { confirmButton: 'btn btn-success' }
-                                    });
-                                } else {
-                                    throw new Error('Delete failed');
+        $(document).on('click', '.delete-record', function () {
+            const id = $(this).data('id');
+            Swal.fire({
+                title: t['Are you sure?'] || 'Tem certeza?',
+                text: t["You won't be able to revert this!"] || "Você não poderá reverter isso!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: t['Yes, delete it!'] || 'Sim, excluir!',
+                cancelButtonText: t['Cancel'] || 'Cancelar',
+                customClass: {
+                    confirmButton: 'btn btn-primary me-3',
+                    cancelButton: 'btn btn-label-secondary'
+                },
+                buttonsStyling: false
+            }).then(function (result) {
+                if (result.value) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: `${baseUrl}inventory/items/${id}`,
+                        success: function () {
+                            dt_items.draw();
+                            Swal.fire({
+                                icon: 'success',
+                                title: t['Deleted!'] || 'Excluído!',
+                                text: t['Item has been deleted.'] || 'O item foi excluído.',
+                                customClass: {
+                                    confirmButton: 'btn btn-success'
                                 }
-                            })
-                            .catch(error => {
-                                console.log(error);
                             });
-                    }
-                });
-            }
-        });
-
-        // edit record
-        document.addEventListener('click', function (e) {
-            if (e.target.closest('.edit-record')) {
-                const editBtn = e.target.closest('.edit-record');
-                const id = editBtn.dataset.id;
-
-                // changing the title of offcanvas
-                document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Edit Item'] || 'Editar Item';
-
-                // get data
-                fetch(`${baseUrl}inventory/items/${id}/edit`)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('item_id').value = data.id;
-                        document.getElementById('add-item-name').value = data.name;
-                        
-                        if (data.main_image) {
-                            uploadedAvatar.src = baseUrl + 'storage/' + data.main_image.path;
-                        } else {
-                            uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
-                        }
-                        document.getElementById('add-item-sku').value = data.sku || '';
-                        document.getElementById('add-item-cost').value = data.cost_price;
-                        document.getElementById('add-item-price').value = data.selling_price;
-                        document.getElementById('add-item-quantity').value = data.quantity;
-                        document.getElementById('add-item-min-quantity').value = data.min_quantity;
-                        document.getElementById('add-item-unit').value = data.unit;
-                        document.getElementById('add-item-location').value = data.location || '';
-                        document.getElementById('add-item-description').value = data.description || '';
-
-                        const $supplier = $('#add-item-supplier');
-                        if ($supplier.length && $supplier.hasClass('select2-hidden-accessible')) {
-                            $supplier.val(data.supplier_id).trigger('change');
-                        }
-
-                        const $category = $('#add-item-category');
-                        if ($category.length && $category.hasClass('select2-hidden-accessible')) {
-                            $category.val(data.menu_category_id).trigger('change');
+                        },
+                        error: function () {
+                            Swal.fire({
+                                title: t['Error!'] || 'Erro!',
+                                text: t['Error deleting item.'] || 'Erro ao excluir item.',
+                                icon: 'error',
+                                confirmButtonText: t['Understood'] || 'Entendido'
+                            });
                         }
                     });
-            }
+                }
+            });
         });
 
-        // Reset form when adding new
-        const addNewBtn = document.querySelector('.add-new');
-        if (addNewBtn) {
-            addNewBtn.addEventListener('click', function () {
-                document.getElementById('item_id').value = '';
-                uploadedAvatar.src = baseUrl + 'assets/img/elements/food-placeholder.png';
-                document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Add Item'] || 'Adicionar Item';
-                document.getElementById('addNewItemsForm').reset();
-                $('#add-item-supplier').val(null).trigger('change');
-            });
-        }
+        // Edit Record
+        $(document).on('click', '.edit-record', function () {
+            const id = $(this).data('id');
+            const offcanvasTitle = document.getElementById('offcanvasAddItemsLabel');
+            offcanvasTitle.innerHTML = t['Edit Item'] || 'Editar Item';
 
-        // Timeout for styles
-        setTimeout(() => {
-            // ... same style adjustments ...
-            const elementsToModify = [
-                { selector: '.dt-buttons .btn', classToRemove: 'btn-secondary' },
-                { selector: '.dt-search .form-control', classToRemove: 'form-control-sm' },
-                { selector: '.dt-length .form-select', classToRemove: 'form-select-sm', classToAdd: 'ms-0' },
-                { selector: '.dt-length', classToAdd: 'mb-md-6 mb-0' },
-                {
-                    selector: '.dt-layout-end',
-                    classToRemove: 'justify-content-between',
-                    classToAdd: 'd-flex gap-md-4 justify-content-md-between justify-content-center gap-2 flex-wrap'
-                },
-                { selector: '.dt-buttons', classToAdd: 'd-flex gap-4 mb-md-0 mb-4' }
-            ];
-            elementsToModify.forEach(({ selector, classToRemove, classToAdd }) => {
-                document.querySelectorAll(selector).forEach(element => {
-                    if (classToRemove) classToRemove.split(' ').forEach(className => element.classList.remove(className));
-                    if (classToAdd) classToAdd.split(' ').forEach(className => element.classList.add(className));
-                });
+            $.get(`${baseUrl}inventory/items/${id}/edit`, function (data) {
+                $('#item_id').val(data.id);
+                $('#add-item-name').val(data.name);
+                $('#add-item-sku').val(data.sku);
+                $('#add-item-description').val(data.description);
+                $('#add-item-cost').val(data.cost_price);
+                $('#add-item-selling').val(data.selling_price);
+                $('#add-item-quantity').val(data.quantity);
+                $('#add-item-min-quantity').val(data.min_quantity);
+                $('#add-item-unit').val(data.unit).trigger('change');
+                $('#add-item-supplier').val(data.supplier_id).trigger('change');
+                $('#add-item-location').val(data.location);
+                
+                const $category = $('#add-item-category');
+                if ($category.length) {
+                    $category.val(data.menu_category_id).trigger('change');
+                }
+
+                // Checkboxes
+                $('#add-item-is-ingredient').prop('checked', data.is_ingredient == 1);
+                $('#add-item-is-for-sale').prop('checked', data.is_for_sale == 1);
             });
-        }, 100);
+        });
     }
 
-    // Form Validation
-    const addNewItemsForm = document.getElementById('addNewItemsForm');
-    if (addNewItemsForm) {
-        const fv = FormValidation.formValidation(addNewItemsForm, {
-            fields: {
-                name: { validators: { notEmpty: { message: t['Please fill in the item name'] || 'Por favor preencha o nome do item' } } },
-                cost_price: { validators: { notEmpty: { message: t['Please fill in the cost'] || 'Por favor preencha o custo' } } },
-                selling_price: { validators: { notEmpty: { message: t['Please fill in the selling price'] || 'Por favor preencha o preço de venda' } } },
-                quantity: { validators: { notEmpty: { message: t['Please fill in the quantity'] || 'Por favor preencha a quantidade' } } },
-                min_quantity: { validators: { notEmpty: { message: t['Please fill in the minimum stock'] || 'Por favor preencha o estoque mínimo' } } },
-                unit: { validators: { notEmpty: { message: t['Please fill in the unit'] || 'Por favor preencha a unidade' } } }
-            },
-            plugins: {
-                trigger: new FormValidation.plugins.Trigger(),
-                bootstrap5: new FormValidation.plugins.Bootstrap5({
-                    eleValidClass: '',
-                    rowSelector: '.mb-6'
-                }),
-                submitButton: new FormValidation.plugins.SubmitButton(),
-                autoFocus: new FormValidation.plugins.AutoFocus()
-            }
-        }).on('core.form.valid', function () {
-            const formData = new FormData(addNewItemsForm);
-            
-            // Determine method (POST or spoofed PUT) based on ID existence
-            const id = formData.get('id');
-            const url = id ? `${baseUrl}inventory/items/${id}` : `${baseUrl}inventory/items`;
-            
-            if (id) {
-                formData.append('_method', 'PUT');
-            }
-
-            fetch(url, {
-                method: 'POST', // Use POST with _method spoofing for file uploads in PUT requests
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-                .then(async response => {
-                    const data = await response.json();
-                    if (!response.ok) {
-                        if (response.status === 422 && data.errors) {
-                            // Limpar erros anteriores
-                            addNewItemsForm.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-                            addNewItemsForm.querySelectorAll('.invalid-feedback').forEach(el => el.remove());
-
-                            Object.keys(data.errors).forEach(key => {
-                                const input = addNewItemsForm.querySelector(`[name="${key}"]`);
-                                if (input) {
-                                    input.classList.add('is-invalid');
-                                    const feedback = document.createElement('div');
-                                    feedback.className = 'invalid-feedback';
-                                    feedback.innerText = data.errors[key][0];
-
-                                    if (input.nextElementSibling && input.nextElementSibling.classList.contains('select2-container')) {
-                                        input.nextElementSibling.after(feedback);
-                                    } else {
-                                        input.after(feedback);
-                                    }
-                                }
-                            });
-                            return; // Encerra sem fechar o offcanvas
-                        }
-                        throw new Error(data.message || 'Erro inesperado');
-                    }
-
-                    dt_items_table && new DataTable(dt_items_table).draw();
-                    const offcanvasInstance = bootstrap.Offcanvas.getInstance(offCanvasForm);
-                    offcanvasInstance && offcanvasInstance.hide();
-
-                    if (!id) { // Só pergunta se for um novo item
-                        Swal.fire({
-                            icon: 'success',
-                            title: t['Item Created!'] || 'Item Criado!',
-                            text: t['Do you want to generate the QR Code label for this item now?'] || 'Deseja gerar a etiqueta com QR Code para este item agora?',
-                            showCancelButton: true,
-                            confirmButtonText: t['Yes, Generate Label'] || 'Sim, Gerar Etiqueta',
-                            cancelButtonText: t['Not Now'] || 'Agora Não',
-                            customClass: {
-                                confirmButton: 'btn btn-primary me-3',
-                                cancelButton: 'btn btn-label-secondary'
-                            },
-                            buttonsStyling: false
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.open(baseUrl + "inventory/items/" + data.data.id + "/print-label", "_blank");
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: 'success',
-                            title: t['Updated!'] || 'Atualizado!',
-                            text: data.message,
-                            customClass: { confirmButton: 'btn btn-success' }
-                        });
-                    }
-                })
-                .catch(err => {
-                    if (err.message) {
-                        Swal.fire({
-                            title: 'Erro!',
-                            text: err.message,
-                            icon: 'error',
-                            customClass: { confirmButton: 'btn btn-success' }
-                        });
-                    }
-                });
+    // Select2 initialization
+    var select2 = $('.select2');
+    if (select2.length) {
+        select2.each(function () {
+            var $this = $(this);
+            $this.wrap('<div class="position-relative"></div>').select2({
+                placeholder: $this.find('option:first').text() || t['Select'] || 'Selecione',
+                dropdownParent: $this.parent(),
+                allowClear: true,
+                language: {
+                    noResults: function () { return t['No results found'] || "Nenhum resultado encontrado"; },
+                    searching: function () { return t['Searching...'] || "Procurando..."; },
+                    loadingMore: function () { return t['Loading more results...'] || "Carregando mais resultados..."; }
+                }
+            });
         });
+    }
 
+    if (offCanvasForm) {
         offCanvasForm.addEventListener('show.bs.offcanvas', function () {
             const itemId = document.getElementById('item_id').value;
             const recipeSection = document.getElementById('recipe-section');
-            const recipeContainer = document.getElementById('livewire-recipe-container');
+            
+            // Re-init select2 inside offcanvas
+            $('#offcanvasAddItems .select2').each(function () {
+                var $this = $(this);
+                if ($this.hasClass('select2-hidden-accessible')) {
+                    $this.select2('destroy');
+                }
+                $this.wrap('<div class="position-relative"></div>').select2({
+                    placeholder: $this.find('option:first').text() || t['Select'] || 'Selecione',
+                    dropdownParent: $this.parent(),
+                    allowClear: true,
+                    language: {
+                        noResults: function () { return t['No results found'] || "Nenhum resultado encontrado"; },
+                        searching: function () { return t['Searching...'] || "Procurando..."; },
+                        loadingMore: function () { return t['Loading more results...'] || "Carregando mais resultados..."; }
+                    }
+                });
+            });
 
             if (recipeSection) {
                 if (itemId) {
                     recipeSection.classList.remove('d-none');
-                    // Injeta o componente Livewire dinamicamente
-                    recipeContainer.innerHTML = `<livewire:product-recipe-manager :product-id="${itemId}" :key="${itemId}" />`;
-                    // Força o Livewire a re-escanear o DOM
                     if (window.Livewire) {
-                        window.Livewire.rescan();
+                        window.Livewire.dispatch('load-product-recipe', { productId: itemId });
                     }
                 } else {
                     recipeSection.classList.add('d-none');
-                    recipeContainer.innerHTML = `<p class="text-muted small">${t['Save the item first to enable ingredient configuration.'] || 'Salve o item primeiro para liberar a configuração de ingredientes.'}</p>`;
                 }
             }
         });
 
         offCanvasForm.addEventListener('hidden.bs.offcanvas', function () {
-            fv.resetForm(true);
+            document.getElementById('item_id').value = '';
+            document.getElementById('offcanvasAddItemsLabel').innerHTML = t['Add Item'] || 'Adicionar Item';
+            $('#recipe-section').addClass('d-none');
+            // Reset form
+            document.getElementById('addNewItemForm').reset();
+            $('.select2').val('').trigger('change');
         });
     }
 
-    // Mercado Livre Publication Logic
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.publish-meli')) {
-            const btn = e.target.closest('.publish-meli');
-            const id = btn.dataset.id;
-            const name = btn.dataset.name;
-            const price = btn.dataset.price;
-
-            document.getElementById('publish_item_id').value = id;
-            document.getElementById('publish_item_name').value = name;
-            document.getElementById('publish_item_price').value = price;
-
-            const modal = new bootstrap.Modal(document.getElementById('modalPublishMeli'));
-            modal.show();
+    // ajax setup
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
 
-    const formPublishMeli = document.getElementById('formPublishMeli');
-    if (formPublishMeli) {
-        formPublishMeli.addEventListener('submit', function (e) {
+    // Form Submission
+    const addNewItemForm = document.getElementById('addNewItemForm');
+    if (addNewItemForm) {
+        addNewItemForm.addEventListener('submit', function (e) {
             e.preventDefault();
-            const submitBtn = formPublishMeli.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span> ${t['Publishing...'] || 'Publicando...'}`;
+            const itemId = document.getElementById('item_id').value;
+            const url = itemId ? `${baseUrl}inventory/items/${itemId}` : `${baseUrl}inventory/items`;
+            const method = itemId ? 'POST' : 'POST'; // We use POST with _method PUT for updates
 
-            const formData = new FormData(formPublishMeli);
+            let formData = new FormData(this);
+            if (itemId) {
+                formData.append('_method', 'PUT');
+            }
 
-            fetch(`${baseUrl}meli/publish`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    bootstrap.Offcanvas.getInstance(offCanvasForm).hide();
+                    const dt = new DataTable(dt_items_table);
+                    dt.draw();
+                    Swal.fire({
+                        title: t['Success!'] || 'Sucesso!',
+                        text: itemId ? (t['Item updated successfully!'] || 'Item atualizado com sucesso!') : (t['Item added successfully!'] || 'Item adicionado com sucesso!'),
+                        icon: 'success',
+                        confirmButtonText: t['Understood'] || 'Entendido'
+                    });
                 },
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = t['Publish Now'] || 'Publicar Agora';
-
-                    if (data.success) {
-                        const modalElement = document.getElementById('modalPublishMeli');
-                        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                        modalInstance.hide();
-
-                        Swal.fire({
-                            title: t['Success!'] || 'Sucesso!',
-                            text: data.message,
-                            icon: 'success',
-                            confirmButtonText: t['View Ad'] || 'Ver Anúncio',
-                            showCancelButton: true,
-                            cancelButtonText: t['Close'] || 'Fechar'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.open(data.url, '_blank');
-                            }
-                        });
-                    } else {
-                        Swal.fire({
-                            title: t['Error!'] || 'Erro!',
-                            text: data.message,
-                            icon: 'error',
-                            confirmButtonText: t['Understood'] || 'Entendido'
-                        });
+                error: function (xhr) {
+                    let errorMessage = 'Erro ao salvar item.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
                     }
-                })
-                .catch(err => {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = t['Publish Now'] || 'Publicar Agora';
                     Swal.fire({
                         title: t['Error!'] || 'Erro!',
-                        text: 'Erro ao tentar se conectar com o servidor.',
+                        text: errorMessage,
                         icon: 'error',
                         confirmButtonText: t['Understood'] || 'Entendido'
                     });
-                });
+                }
+            });
         });
     }
 });

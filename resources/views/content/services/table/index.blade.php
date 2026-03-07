@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Tabela de Serviços')
+@section('title', niche('services'))
 
 @section('vendor-style')
 @vite([
@@ -29,16 +29,20 @@
 @section('content')
 <div class="card">
   <div class="card-header border-bottom">
-    <h5 class="card-title mb-0">Tabela de Serviços (Mão de Obra)</h5>
+    <h5 class="card-title mb-0">{{ niche('services') }}</h5>
   </div>
   <div class="card-datatable table-responsive">
-    <table class="datatables-services table border-top">
+    <table class="datatables-services table border-top"
+      data-label-service="{{ niche('service') }}"
+      data-label-services="{{ niche('services') }}"
+      data-label-price="{{ niche('service_price') }}"
+      data-label-time="{{ niche('estimated_time') }}">
       <thead>
         <tr>
           <th>#</th>
-          <th>Serviço</th>
-          <th>Preço (R$)</th>
-          <th>Tempo Est.</th>
+          <th>{{ niche('service') }}</th>
+          <th>{{ niche('service_price') }} (R$)</th>
+          <th>{{ niche('estimated_time') }}</th>
           <th>Status</th>
           <th>Ações</th>
         </tr>
@@ -49,7 +53,7 @@
   <!-- Offcanvas Adicionar/Editar -->
   <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasService" aria-labelledby="offcanvasServiceLabel">
     <div class="offcanvas-header border-bottom">
-      <h5 id="offcanvasServiceLabel" class="offcanvas-title">Adicionar Serviço</h5>
+      <h5 id="offcanvasServiceLabel" class="offcanvas-title">{{ __('Adicionar') }} {{ niche('service') }}</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
@@ -57,15 +61,15 @@
         @csrf
         <input type="hidden" name="id" id="service_id">
         <div class="mb-6">
-          <label class="form-label" for="service-name">Nome do Serviço</label>
-          <input type="text" class="form-control" id="service-name" name="name" placeholder="Ex: Alinhamento e Balanceamento" required />
+          <label class="form-label" for="service-name">{{ __('Nome do') }} {{ niche('service') }}</label>
+          <input type="text" class="form-control" id="service-name" name="name" placeholder="{{ niche('service') }}" required />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="service-price">Preço da Mão de Obra (R$)</label>
+          <label class="form-label" for="service-price">{{ niche('service_price') }} (R$)</label>
           <input type="number" step="0.01" class="form-control" id="service-price" name="price" placeholder="0.00" required />
         </div>
         <div class="mb-6">
-          <label class="form-label" for="service-time">Tempo Estimado (minutos)</label>
+          <label class="form-label" for="service-time">{{ niche('estimated_time') }} (minutos)</label>
           <input type="number" class="form-control" id="service-time" name="estimated_time" placeholder="60" />
         </div>
         <div class="mb-6">
@@ -111,7 +115,7 @@
             <input type="text" class="form-control" id="ingredient-unit" placeholder="KG" required>
           </div>
           <div class="col-md-2 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100"><i class="ti tabler-plus"></i> Add</button>
+            <button type="submit" class="btn btn-primary w-100"><i class="ti tabler-plus"></i> {{ __('Add') }}</button>
           </div>
         </form>
 
@@ -121,13 +125,22 @@
             <thead class="table-light">
               <tr>
                 <th>Insumo</th>
-                <th>Quantidade Gasta (Medida)</th>
+                <th>Qtd. Gasta</th>
+                <th>Custo Unit.</th>
+                <th>Subtotal</th>
                 <th class="text-center">Ações</th>
               </tr>
             </thead>
             <tbody id="ingredients-table-body">
               <!-- Conteúdo gerado via JS -->
             </tbody>
+            <tfoot id="ingredients-table-footer" class="table-light fw-bold" style="display: none;">
+              <tr>
+                <td colspan="3" class="text-end text-uppercase">Custo Total de Produção:</td>
+                <td id="total-recipe-cost" class="text-primary text-nowrap">R$ 0,00</td>
+                <td></td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -211,32 +224,47 @@
 
   function loadIngredients(serviceId) {
     const tbody = document.getElementById('ingredients-table-body');
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Carregando...</td></tr>';
+    const tfoot = document.getElementById('ingredients-table-footer');
+    const totalCostSpan = document.getElementById('total-recipe-cost');
+
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border spinner-border-sm text-primary"></div> Carregando...</td></tr>';
+    tfoot.style.display = 'none';
 
     fetch(`/services/${serviceId}/ingredients`)
       .then(res => res.json())
       .then(data => {
         tbody.innerHTML = '';
         if (data.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-3">Nenhum insumo vinculado. Este produto não dará baixa no estoque automaticamente.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Nenhum insumo vinculado. Este produto não dará baixa no estoque automaticamente.</td></tr>';
           return;
         }
 
         let html = '';
+        let totalRecipeCost = 0;
+
         data.forEach(ing => {
+          const cost = parseFloat(ing.cost_price || 0);
+          const subtotal = parseFloat(ing.subtotal || 0);
+          totalRecipeCost += subtotal;
+
           html += `
-                        <tr>
-                            <td>${ing.inventory_item_name}</td>
-                            <td>${ing.quantity} ${ing.unit_of_measure}</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-icon btn-outline-danger" onclick="removeIngredient(${serviceId}, ${ing.id})">
-                                    <i class="ti tabler-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+            <tr>
+              <td>${ing.inventory_item_name}</td>
+              <td class="text-nowrap">${ing.quantity} ${ing.unit_of_measure}</td>
+              <td class="text-nowrap">R$ ${cost.toFixed(2)}</td>
+              <td class="text-nowrap fw-medium text-heading">R$ ${subtotal.toFixed(2)}</td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-icon btn-outline-danger" onclick="removeIngredient(${serviceId}, ${ing.id})">
+                  <i class="ti tabler-trash"></i>
+                </button>
+              </td>
+            </tr>
+          `;
         });
+
         tbody.innerHTML = html;
+        totalCostSpan.innerText = `R$ ${totalRecipeCost.toFixed(2)}`;
+        tfoot.style.display = 'table-footer-group';
       });
   }
 

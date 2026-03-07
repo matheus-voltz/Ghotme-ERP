@@ -108,7 +108,11 @@ $configData = Helper::appClasses();
         width: 100%;
         height: 120px;
         overflow: hidden;
-        background: #eee;
+        background: var(--pos-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid var(--pos-border);
     }
 
     .product-card img {
@@ -375,7 +379,11 @@ $configData = Helper::appClasses();
                 data-price="{{ $item->selling_price }}"
                 data-category="{{ $cat->id }}">
                 <div class="img-container">
-                    <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/elements/food-placeholder.png') }}" alt="{{ $item->name }}">
+                    @if($item->mainImage)
+                    <img src="{{ asset('storage/'.$item->mainImage->path) }}" alt="{{ $item->name }}" onerror="this.src='{{ asset('assets/img/front-pages/misc/product-image.png') }}';">
+                    @else
+                    <img src="{{ asset('assets/img/front-pages/misc/product-image.png') }}" alt="{{ $item->name }}" style="opacity: 0.5; object-fit: contain; padding: 10px;">
+                    @endif
                 </div>
                 <div class="product-card-body">
                     <div class="product-name" title="{{ $item->name }}">{{ $item->name }}</div>
@@ -443,18 +451,15 @@ $configData = Helper::appClasses();
             </div>
 
             <div class="payment-grid">
-                <div class="pay-opt selected" data-method="money">
-                    <i class="ti tabler-cash"></i> Dinheiro
+                @forelse($paymentMethods as $index => $method)
+                <div class="pay-opt {{ $index === 0 ? 'selected' : '' }}" data-method="{{ $method->id }}" data-name="{{ $method->name }}">
+                    <i class="ti {{ $method->icon ?? 'tabler-credit-card' }}"></i> {{ $method->name }}
                 </div>
-                <div class="pay-opt" data-method="pix">
-                    <i class="ti tabler-qrcode"></i> PIX
+                @empty
+                <div class="col-12 text-center">
+                    <small class="text-danger">Nenhuma forma de pagamento ativa. <a href="{{ route('finance.payment-methods') }}">Cadastrar agora</a></small>
                 </div>
-                <div class="pay-opt" data-method="debit">
-                    <i class="ti tabler-credit-card"></i> Débito
-                </div>
-                <div class="pay-opt" data-method="credit">
-                    <i class="ti tabler-credit-card"></i> Crédito
-                </div>
+                @endforelse
             </div>
 
             <button class="btn btn-primary btn-checkout-pos" id="btn-checkout" disabled>
@@ -572,12 +577,15 @@ $configData = Helper::appClasses();
         // Final checkout submission
         checkoutBtn.addEventListener('click', () => {
             const clientId = $('#client_select').val();
-            const paymentMethod = document.querySelector('.pay-opt.selected').dataset.method;
+            const selectedOpt = document.querySelector('.pay-opt.selected');
+            
+            if (!selectedOpt) {
+                Swal.fire("Atenção", "Selecione uma forma de pagamento", "warning");
+                return;
+            }
 
-            let methodLabel = 'Dinheiro';
-            if (paymentMethod === 'pix') methodLabel = 'PIX';
-            if (paymentMethod === 'debit') methodLabel = 'Débito';
-            if (paymentMethod === 'credit') methodLabel = 'Crédito';
+            const paymentMethodId = selectedOpt.dataset.method;
+            const methodLabel = selectedOpt.dataset.name;
 
             Swal.fire({
                 title: "Confirmar Pedido",
@@ -608,7 +616,7 @@ $configData = Helper::appClasses();
                             body: JSON.stringify({
                                 client_id: clientId || 1,
                                 status: 'finalized',
-                                payment_method: paymentMethod,
+                                payment_method_id: paymentMethodId,
                                 description: 'VENDA PDV - ' + methodLabel,
                                 parts: parts
                             })

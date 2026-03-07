@@ -53,8 +53,8 @@
               </td>
               <td>R$ {{ number_format($product->selling_price, 2, ',', '.') }}</td>
               <td>
-                @if($product->recipe_count > 0)
-                  <span class="badge bg-label-success">{{ $product->recipe_count }} ingrediente(s)</span>
+                @if($product->ingredients_count > 0)
+                  <span class="badge bg-label-success">{{ $product->ingredients_count }} ingrediente(s)</span>
                 @else
                   <span class="badge bg-label-warning">Sem ficha</span>
                 @endif
@@ -62,7 +62,7 @@
               <td>
                 <a href="{{ route('recipes.show', $product->id) }}" class="btn btn-sm btn-primary">
                   <i class="ti tabler-edit me-1"></i>
-                  {{ $product->recipe_count > 0 ? 'Editar Ficha' : 'Criar Ficha' }}
+                  {{ $product->ingredients_count > 0 ? 'Editar Ficha' : 'Criar Ficha' }}
                 </a>
               </td>
             </tr>

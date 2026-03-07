@@ -7,15 +7,15 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header border-bottom d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Peças e Itens Mais Utilizados (Top 15)</h5>
-                <small class="text-muted">Baseado em todas as Ordens de Serviço</small>
+                <h5 class="card-title mb-0">Produtos e Insumos Mais Utilizados (Top 15)</h5>
+                <small class="text-muted">Baseado em todas as vendas e pedidos</small>
             </div>
             <div class="table-responsive">
                 <table class="table table-hover table-striped">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Item / Peça</th>
+                            <th>Insumo / Produto</th>
                             <th>Quantidade Total Usada</th>
                             <th>Estoque Atual</th>
                             <th>Status de Reposição</th>

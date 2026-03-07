@@ -69,6 +69,9 @@ class AiToolsService
     public function getLowStockItems()
     {
         $items = InventoryItem::where('company_id', $this->companyId)
+            ->when(get_current_niche() === 'food_service', function($q) {
+                return $q->where('is_ingredient', true);
+            })
             ->whereRaw('quantity <= min_quantity')
             ->where('is_active', true)
             ->select('name', 'sku', 'quantity', 'min_quantity')

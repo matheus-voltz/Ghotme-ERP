@@ -38,7 +38,7 @@ const getStatusTranslations = (niche: string) => {
 };
 
 // Componente de Item do Cronômetro Memoizado para Performance
-const TimerItem = memo(({ item, elapsed, isToggling, onToggle, onComplete, colors, pulseAnim, formatTime }: any) => {
+const TimerItem = memo(function TimerItem({ item, elapsed, isToggling, onToggle, onComplete, colors, pulseAnim, formatTime }: any) {
     const isRunning = item.status === 'in_progress';
     const isDone = item.status === 'completed';
 

@@ -12,7 +12,7 @@
   <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Importar Estoque (Peças/Itens)</h5>
+        <h5 class="mb-0">Importar {{ niche('inventory_items') }}</h5>
         <a href="{{ route('settings.import.template', 'inventory') }}" class="btn btn-sm btn-outline-secondary">
           <i class="ti tabler-download me-1"></i> Baixar Modelo CSV
         </a>
@@ -27,7 +27,7 @@
             <input type="file" name="file" class="form-control" accept=".csv" required />
           </div>
           <button type="submit" class="btn btn-primary w-100">
-            <i class="ti tabler-upload me-1"></i> Iniciar Importação de Estoque
+            <i class="ti tabler-upload me-1"></i> Iniciar Importação
           </button>
         </form>
       </div>
@@ -38,7 +38,7 @@
   <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Importar Clientes (CRM)</h5>
+        <h5 class="mb-0">Importar Clientes</h5>
         <a href="{{ route('settings.import.template', 'clients') }}" class="btn btn-sm btn-outline-secondary">
           <i class="ti tabler-download me-1"></i> Baixar Modelo CSV
         </a>
@@ -64,13 +64,13 @@
   <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Importar Serviços</h5>
+        <h5 class="mb-0">Importar {{ niche('service_label') ?? 'Serviços' }}</h5>
         <a href="{{ route('settings.import.template', 'services') }}" class="btn btn-sm btn-outline-secondary">
           <i class="ti tabler-download me-1"></i> Baixar Modelo CSV
         </a>
       </div>
       <div class="card-body">
-        <p class="text-muted small">Importe sua tabela de preços de mão de obra. Inclua nome, descrição, preço e tempo estimado.</p>
+        <p class="text-muted small">Importe sua tabela de preços. Inclua nome, descrição, preço e tempo estimado.</p>
         
         <form action="{{ route('settings.import.services') }}" method="POST" enctype="multipart/form-data">
           @csrf
@@ -79,14 +79,15 @@
             <input type="file" name="file" class="form-control" accept=".csv" required />
           </div>
           <button type="submit" class="btn btn-primary w-100">
-            <i class="ti tabler-upload me-1"></i> Iniciar Importação de Serviços
+            <i class="ti tabler-upload me-1"></i> Iniciar Importação
           </button>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Importar Veículos -->
+  @if(get_current_niche() !== 'food_service')
+  <!-- Importar Ativos (Veículos, Pets, etc) -->
   <div class="col-md-6">
     <div class="card mb-4">
       <div class="card-header d-flex justify-content-between align-items-center">
@@ -111,6 +112,7 @@
       </div>
     </div>
   </div>
+  @endif
 
   <!-- Instruções -->
   <div class="col-12">

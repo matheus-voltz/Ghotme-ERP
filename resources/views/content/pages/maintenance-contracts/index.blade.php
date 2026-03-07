@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Contratos de Manutenção')
+@section('title', get_current_niche() === 'food_service' ? 'Planos e Mensalistas' : 'Contratos de Manutenção')
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/select2/select2.scss'])
@@ -12,14 +12,14 @@
 
 @section('content')
 <h4 class="fw-bold py-3 mb-4">
-  <span class="text-muted fw-light">Clientes /</span> Contratos de Manutenção
+  <span class="text-muted fw-light">{{ get_current_niche() === 'food_service' ? 'Estabelecimento' : 'Clientes' }} /</span> {{ get_current_niche() === 'food_service' ? 'Planos e Mensalistas' : 'Contratos de Manutenção' }}
 </h4>
 
 <div class="row">
   <!-- Formulário de Criação -->
   <div class="col-md-4">
     <div class="card mb-4">
-      <h5 class="card-header">Novo Contrato de Recorrência</h5>
+      <h5 class="card-header">{{ get_current_niche() === 'food_service' ? 'Novo Plano de Assinatura' : 'Novo Contrato de Recorrência' }}</h5>
       <div class="card-body">
         <form action="{{ route('maintenance-contracts.store') }}" method="POST">
           @csrf
@@ -33,11 +33,11 @@
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">Título do Contrato</label>
-            <input type="text" name="title" class="form-control" placeholder="Ex: Manutenção Mensal Ar Condicionado" required />
+            <label class="form-label">Título do Plano</label>
+            <input type="text" name="title" class="form-control" placeholder="Ex: Mensalidade Marmitas Fit" required />
           </div>
           <div class="mb-3">
-            <label class="form-label">Valor Mensal (R$)</label>
+            <label class="form-label">Valor Recorrente (R$)</label>
             <input type="number" step="0.01" name="amount" class="form-control" placeholder="0.00" required />
           </div>
           <div class="row">
@@ -61,10 +61,10 @@
           <div class="mb-3">
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" name="auto_generate_os" id="auto_generate_os" value="1" checked>
-              <label class="form-check-label" for="auto_generate_os">Gerar OS automática a cada mês</label>
+              <label class="form-check-label" for="auto_generate_os">{{ get_current_niche() === 'food_service' ? 'Gerar pedido automático a cada mês' : 'Gerar OS automática a cada mês' }}</label>
             </div>
           </div>
-          <button type="submit" class="btn btn-primary w-100">Ativar Contrato</button>
+          <button type="submit" class="btn btn-primary w-100">Ativar Plano</button>
         </form>
       </div>
     </div>
@@ -73,13 +73,13 @@
   <!-- Lista de Contratos -->
   <div class="col-md-8">
     <div class="card">
-      <h5 class="card-header">Contratos Ativos</h5>
+      <h5 class="card-header">{{ get_current_niche() === 'food_service' ? 'Assinaturas Ativas' : 'Contratos Ativos' }}</h5>
       <div class="table-responsive text-nowrap">
         <table class="table table-hover">
           <thead>
             <tr>
               <th>Cliente</th>
-              <th>Título / Valor</th>
+              <th>Plano / Valor</th>
               <th>Próximo Venc.</th>
               <th>Status</th>
               <th>Ações</th>
@@ -111,7 +111,7 @@
             </tr>
             @empty
             <tr>
-              <td colspan="5" class="text-center p-4 text-muted">Nenhum contrato recorrente cadastrado.</td>
+              <td colspan="5" class="text-center p-4 text-muted">Nenhum registro de assinatura encontrado.</td>
             </tr>
             @endforelse
           </tbody>

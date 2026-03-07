@@ -10,9 +10,11 @@ class RecipeController extends Controller
 {
     public function index()
     {
-        $products = InventoryItem::where('is_active', true)
-            ->where('is_ingredient', false)
-            ->withCount('recipe')
+        $products = InventoryItem::where('company_id', auth()->user()->company_id)
+            ->where('is_active', true)
+            ->where('is_for_sale', true) // Produtos de venda
+            ->where('is_ingredient', false) // Que não são apenas insumos
+            ->withCount('ingredients') // Conta a relação correta ProductRecipe
             ->get();
 
         return view('content.recipes.index', compact('products'));

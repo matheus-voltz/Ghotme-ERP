@@ -32,19 +32,24 @@
                     <th>Ingrediente</th>
                     <th class="text-center">Qtd</th>
                     <th class="text-center">Unidade</th>
+                    <th class="text-end">Custo Un.</th>
+                    <th class="text-end">Custo Total</th>
                     <th class="text-end">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($ingredients as $row)
+                @php $rowCost = $row->quantity * ($row->ingredient->cost_price ?? 0); @endphp
                 <tr>
                     <td>
                         <div class="d-flex align-items-center">
-                            <span class="fw-bold">{{ $row->ingredient->name }}</span>
+                            <span class="fw-bold text-heading">{{ $row->ingredient->name }}</span>
                         </div>
                     </td>
                     <td class="text-center fw-bold text-primary">{{ number_format($row->quantity, 3, ',', '.') }}</td>
                     <td class="text-center small">{{ $row->ingredient->unit }}</td>
+                    <td class="text-end text-muted small">R$ {{ number_format($row->ingredient->cost_price ?? 0, 2, ',', '.') }}</td>
+                    <td class="text-end fw-bold">R$ {{ number_format($rowCost, 2, ',', '.') }}</td>
                     <td class="text-end">
                         <button type="button" wire:click="removeIngredient({{ $row->id }})" class="btn btn-sm btn-icon btn-label-danger">
                             <i class="ti tabler-trash"></i>
@@ -53,12 +58,21 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="4" class="text-center py-4 text-muted">
+                    <td colspan="6" class="text-center py-4 text-muted">
                         Nenhum ingrediente configurado. Este item será baixado apenas como unidade simples.
                     </td>
                 </tr>
                 @endforelse
             </tbody>
+            @if(count($ingredients) > 0)
+            <tfoot class="table-light border-top">
+                <tr>
+                    <td colspan="4" class="text-end fw-bold py-3 text-uppercase">Custo Total de Preparo:</td>
+                    <td class="text-end fw-bold text-primary fs-5 py-3">R$ {{ number_format($totalCost, 2, ',', '.') }}</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            @endif
         </table>
     </div>
 </div>

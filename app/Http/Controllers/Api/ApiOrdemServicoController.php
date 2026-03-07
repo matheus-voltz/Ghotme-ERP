@@ -381,7 +381,7 @@ class ApiOrdemServicoController extends Controller
 
             // Criar FinancialTransaction
             $pm = \App\Models\PaymentMethod::firstOrCreate(
-                ['type' => 'pix'],
+                ['type' => 'pix', 'company_id' => $os->company_id],
                 ['name' => 'PIX', 'is_active' => true]
             );
 

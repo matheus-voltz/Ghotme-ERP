@@ -31,7 +31,45 @@
 @vite(['resources/js/inventory-items.js'])
 <script>
   window.inventoryTranslations = {
-    // ... (traduções existentes)
+    'Select': '{{ __("Select") }}',
+    'Active': '{{ __("Active") }}',
+    'Inactive': '{{ __("Inactive") }}',
+    'Actions': '{{ __("Actions") }}',
+    'Edit': '{{ __("Edit") }}',
+    'Publish on Mercado Livre': '{{ __("Publish on Mercado Livre") }}',
+    'Delete': '{{ __("Delete") }}',
+    'Search Item': '{{ __("Search Item") }}',
+    'Add Item': '{{ __("Add Item") }}',
+    'Showing _START_ to _END_ of _TOTAL_ entries': '{{ __("Showing _START_ to _END_ of _TOTAL_ entries") }}',
+    'Details of': '{{ __("Details of") }}',
+    'Are you sure?': '{{ __("Are you sure?") }}',
+    'You won\'t be able to revert this!': '{{ __("You won\'t be able to revert this!") }}',
+    'Yes, delete it!': '{{ __("Yes, delete it!") }}',
+    'Deleted!': '{{ __("Deleted!") }}',
+    'The item has been deleted!': '{{ __("The item has been deleted!") }}',
+    'Edit Item': '{{ __("Edit Item") }}',
+    'Please fill in the item name': '{{ __("Please fill in the item name") }}',
+    'Please fill in the cost': '{{ __("Please fill in the cost") }}',
+    'Please fill in the selling price': '{{ __("Please fill in the selling price") }}',
+    'Please fill in the quantity': '{{ __("Please fill in the quantity") }}',
+    'Please fill in the minimum stock': '{{ __("Please fill in the minimum stock") }}',
+    'Please fill in the unit': '{{ __("Please fill in the unit") }}',
+    'Item Created!': '{{ __("Item Created!") }}',
+    'Do you want to generate the QR Code label for this item now?': '{{ __("Do you want to generate the QR Code label for this item now?") }}',
+    'Yes, Generate Label': '{{ __("Yes, Generate Label") }}',
+    'Not Now': '{{ __("Not Now") }}',
+    'Updated!': '{{ __("Updated!") }}',
+    'Save the item first to enable ingredient configuration.': '{{ __("Save the item first to enable ingredient configuration.") }}',
+    'Publishing...': '{{ __("Publishing...") }}',
+    'Publish Now': '{{ __("Publish Now") }}',
+    'Success!': '{{ __("Success!") }}',
+    'View Ad': '{{ __("View Ad") }}',
+    'Close': '{{ __("Close") }}',
+    'Error!': '{{ __("Error!") }}',
+    'Understood': '{{ __("Understood") }}',
+    'Searching...': '{{ __("Searching...") }}',
+    'No results found': '{{ __("No results found") }}',
+    'Loading more results...': '{{ __("Loading more results...") }}'
   };
 
   // Immediate Image Preview Logic
@@ -70,22 +108,41 @@
 <div class="card">
   <div class="card-header border-bottom">
     <h5 class="card-title mb-0">{{ __('Inventory Items') }}</h5>
+  <!-- Abas de Filtro de Estoque -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="nav-align-top">
+        <ul class="nav nav-pills mb-3" role="tablist">
+          <li class="nav-item">
+            <button type="button" class="nav-link active filter-type-btn" data-type="all" role="tab"><i class="ti tabler-layout-grid me-1"></i> Todos</button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link filter-type-btn" data-type="sale" role="tab"><i class="ti tabler-shopping-cart me-1"></i> Produtos de Venda</button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link filter-type-btn" data-type="ingredient" role="tab"><i class="ti tabler-tools-kitchen-2 me-1"></i> Insumos/Ingredientes</button>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <div class="card-datatable table-responsive">
-    <table class="datatables-items table border-top">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Id</th>
-          <th>{{ __('Item Name') }}</th>
-          <th>{{ __('SKU') }}</th>
-          <th>{{ __('Quantity') }}</th>
-          <th>{{ __('Selling Price') }}</th>
-          <th>{{ __('Location') }}</th>
-          <th>{{ __('Status') }}</th>
-          <th>{{ __('Actions') }}</th>
-        </tr>
-      </thead>
+
+  <div class="card">
+    <div class="card-datatable table-responsive">
+      <table class="datatables-items table border-top">
+        <thead>
+          <tr>
+            <th></th>
+            <th>#</th>
+            <th>{{ __('Item') }}</th>
+            <th>{{ __('SKU') }}</th>
+            <th>{{ __('Stock') }}</th>
+            <th>{{ __('Cost/Sale') }}</th>
+            <th>{{ __('Profit/Margin') }}</th>
+            <th>{{ __('Status') }}</th>
+            <th>{{ __('Actions') }}</th>
+          </tr>
+        </thead>
     </table>
   </div>
 
@@ -163,6 +220,26 @@
         </div>
 
         <div class="mb-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="add-item-is-ingredient" name="is_ingredient" value="1">
+            <label class="form-check-label" for="add-item-is-ingredient">{{ __('This item is an ingredient/input') }}</label>
+          </div>
+          <small class="text-muted">{{ __('Used for recipe configuration (Food Service)') }}</small>
+        </div>
+
+        @if(get_current_niche() === 'food_service')
+        <div class="mb-6">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="add-item-is-for-sale" name="is_for_sale" value="1" checked>
+            <label class="form-check-label" for="add-item-is-for-sale">{{ __('Available for Sale?') }}</label>
+          </div>
+          <small class="text-muted">{{ __('If unchecked, selling price is not required.') }}</small>
+        </div>
+        @else
+        <input type="hidden" name="is_for_sale" value="1" id="add-item-is-for-sale">
+        @endif
+
+        <div class="mb-6">
           <label class="form-label" for="add-item-supplier">{{ __('Supplier') }}</label>
           <select id="add-item-supplier" class="select2 form-select" name="supplier_id">
             <option value="">{{ __('Select') }}</option>
@@ -196,8 +273,7 @@
         <div id="recipe-section" class="d-none mt-4 border-top pt-4">
           <h6 class="mb-3 text-primary"><i class="ti tabler-recipe me-1"></i> {{ __('Recipe Card (Technique Sheet)') }}</h6>
           <div id="livewire-recipe-container">
-            <!-- O componente será injetado aqui via JS ao editar -->
-            <p class="text-muted small">{{ __('Save the item first to enable ingredient configuration.') }}</p>
+            @livewire('product-recipe-manager')
           </div>
         </div>
         @endif

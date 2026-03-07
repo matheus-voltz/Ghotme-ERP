@@ -72,7 +72,7 @@
                 <tr>
                     <td><strong>#{{ $os->id }}</strong></td>
                     <td>{{ $os->updated_at->format('d/m/Y') }}</td>
-                    <td>{{ $os->client->name ?? $os->client->company_name }}</td>
+                    <td>{{ $os->client?->name ?? $os->client?->company_name ?? "Balcão / Não informado" }}</td>
                     <td class="text-success fw-bold">R$ {{ number_format($os->total, 2, ',', '.') }}</td>
                 </tr>
                 @endforeach

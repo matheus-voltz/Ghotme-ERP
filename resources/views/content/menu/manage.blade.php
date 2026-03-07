@@ -63,7 +63,10 @@
                 <div class="card mb-3 menu-item-card border shadow-none" draggable="true" data-id="{{ $item->id }}">
                     <div class="card-body p-3">
                         <div class="d-flex gap-3">
-                            <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/elements/food-placeholder.png') }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                            <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/front-pages/misc/product-image.png') }}" 
+                                 class="rounded" 
+                                 style="width: 50px; height: 50px; object-fit: cover; {{ !$item->mainImage ? 'opacity: 0.5;' : '' }}"
+                                 onerror="this.src='{{ asset('assets/img/front-pages/misc/product-image.png') }}';">
                             <div>
                                 <h6 class="mb-0">{{ $item->name }}</h6>
                                 <small class="text-primary">R$ {{ number_format($item->selling_price, 2, ',', '.') }}</small>
@@ -96,7 +99,10 @@
                             <div class="card-body p-3">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-3">
-                                        <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/elements/food-placeholder.png') }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/front-pages/misc/product-image.png') }}" 
+                                             class="rounded" 
+                                             style="width: 40px; height: 40px; object-fit: cover; {{ !$item->mainImage ? 'opacity: 0.5;' : '' }}"
+                                             onerror="this.src='{{ asset('assets/img/front-pages/misc/product-image.png') }}';">
                                         <div>
                                             <h6 class="mb-0">{{ $item->name }}</h6>
                                             <small class="text-muted">Venda: R$ {{ number_format($item->selling_price, 2, ',', '.') }}</small>

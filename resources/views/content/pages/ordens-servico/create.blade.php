@@ -59,9 +59,9 @@
     <div class="col-md-8">
         <div class="card mb-4">
             <div class="card-body">
-                <div class="input-group input-group-merge shadow-none border-bottom mb-4">
-                    <span class="input-group-text"><i class="ti tabler-search"></i></span>
-                    <input type="text" id="posSearch" class="form-control form-control-lg border-0" placeholder="Pesquisar lanche, bebida ou adicional...">
+                <div class="input-group input-group-merge shadow-sm mb-4 border rounded-pill overflow-hidden">
+                    <span class="input-group-text border-0 bg-white ms-2"><i class="ti tabler-search fs-4 text-muted"></i></span>
+                    <input type="text" id="posSearch" class="form-control form-control-lg border-0 ps-2" placeholder="Pesquisar lanche, bebida ou adicional..." style="box-shadow: none !important;">
                 </div>
 
                 <div class="category-nav mb-4">
@@ -79,7 +79,10 @@
                         <div class="col-md-4 col-6 pos-item" data-category="{{ $cat->id }}" data-search="{{ strtolower($item->name) }}">
                             <div class="card pos-product-card h-100 shadow-none" onclick="addToCart('{{ $item->id }}', '{{ $item->name }}', {{ $item->selling_price }})">
                                 <div class="card-body p-3 text-center">
-                                    <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/elements/food-placeholder.png') }}" class="rounded mb-3" style="width: 100%; height: 100px; object-fit: cover;">
+                                    <img src="{{ $item->mainImage ? asset('storage/'.$item->mainImage->path) : asset('assets/img/front-pages/misc/product-image.png') }}" 
+                                         class="rounded mb-3" 
+                                         style="width: 100%; height: 100px; object-fit: cover; {{ !$item->mainImage ? 'opacity: 0.5;' : '' }}"
+                                         onerror="this.src='{{ asset('assets/img/front-pages/misc/product-image.png') }}';">
                                     <h6 class="mb-1 text-truncate">{{ $item->name }}</h6>
                                     <span class="badge bg-label-primary">R$ {{ number_format($item->selling_price, 2, ',', '.') }}</span>
                                 </div>
@@ -380,30 +383,49 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        $('#client_id_std').select2({
-            placeholder: "Buscar cliente...",
-            ajax: {
-                url: '/api/clients/search',
-                dataType: 'json',
-                delay: 250,
-                data: params => ({ q: params.term }),
-                processResults: data => ({ results: data.results }),
-                cache: true
-            }
+        const posSearch = document.getElementById('posSearch');
+        const posGrid = document.getElementById('posGrid');
+        const posItems = document.querySelectorAll('.pos-item');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+
+        if (posSearch) {
+            posSearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                const activeCategory = document.querySelector('.category-btn.btn-primary').dataset.category;
+                
+                posItems.forEach(item => {
+                    const search = item.dataset.search;
+                    const cat = item.dataset.category;
+                    const matchesQuery = search.includes(query);
+                    const matchesCat = (activeCategory === 'all' || cat === activeCategory);
+
+                    item.style.display = (matchesQuery && matchesCat) ? 'block' : 'none';
+                });
+            });
+        }
+
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                categoryBtns.forEach(b => {
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-label-secondary');
+                });
+                this.classList.add('btn-primary');
+                this.classList.remove('btn-label-secondary');
+
+                const cat = this.dataset.category;
+                const query = posSearch ? posSearch.value.toLowerCase() : '';
+
+                posItems.forEach(item => {
+                    const matchesCat = (cat === 'all' || item.dataset.category === cat);
+                    const matchesQuery = item.dataset.search.includes(query);
+                    item.style.display = (matchesCat && matchesQuery) ? 'block' : 'none';
+                });
+            });
         });
 
-        $('#client_id_std').on('change', function() {
-            const clientId = $(this).val();
-            const vehicleSelect = $('#veiculo_id');
-            if (clientId) {
-                fetch(`/api/get-vehicles/${clientId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        let html = '<option value="">Selecione o {{ niche("entity") }}</option>';
-                        data.forEach(v => { html += `<option value="${v.id}">${v.placa} - ${v.modelo}</option>`; });
-                        vehicleSelect.html(html).prop('disabled', false);
-                    });
-            }
+        $('#client_id').select2({
+            placeholder: "Consumidor Final"
         });
     });
 </script>

@@ -1160,12 +1160,12 @@ function OriginalCreateOrder() {
                 const url = `whatsapp://send?text=${encodeURIComponent(message)}&phone=${phone}`;
                 Linking.openURL(url).catch(() => Alert.alert("Erro", "Não foi possível abrir o WhatsApp."));
             };
-            Alert.alert("Sucesso", "Pedido enviado! 🌭", [
+            Alert.alert("Sucesso", "Criado com sucesso!", [
                 { text: "Vistoria/Fotos", onPress: () => router.push({ pathname: '/os/checklist', params: { osId: response.data.id } }) },
                 { text: "WhatsApp 💬", onPress: () => { sendWhatsApp(); router.back(); } },
                 { text: "Concluído", onPress: () => router.back(), style: 'cancel' }
             ]);
-        } catch (error: any) { Alert.alert("Erro", error.response?.data?.message || "Erro ao criar pedido."); }
+        } catch (error: any) { Alert.alert("Erro", error.response?.data?.message || "Erro ao criar."); }
         finally { setLoading(false); }
     };
 
@@ -1173,7 +1173,7 @@ function OriginalCreateOrder() {
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={[orig.container, { backgroundColor: colors.background }]}>
             <View style={[orig.header, { backgroundColor: colors.card }]}>
                 <TouchableOpacity onPress={() => router.back()} style={orig.backButton}><Ionicons name="arrow-back" size={24} color={colors.text} /></TouchableOpacity>
-                <Text style={[orig.headerTitle, { color: colors.text }]}>Lançar Novo Pedido</Text>
+                <Text style={[orig.headerTitle, { color: colors.text }]}>{labels?.new_entity || 'Novo Registro'}</Text>
                 <View style={{ width: 32 }} />
             </View>
             <ScrollView contentContainerStyle={orig.scrollContent} showsVerticalScrollIndicator={false}>
@@ -1184,7 +1184,7 @@ function OriginalCreateOrder() {
                         <View style={[orig.inputContainer, { borderColor: colors.border, backgroundColor: colors.background }]}><TextInput style={[orig.input, { color: colors.text }]} placeholder="Ex: João da Silva" placeholderTextColor={colors.subText} value={customerName} onChangeText={setCustomerName} /></View>
                     </View>
                     <View style={orig.inputGroup}>
-                        <View style={orig.labelRow}><Ionicons name="restaurant-outline" size={16} color={colors.subText} /><Text style={[orig.label, { color: colors.subText }]}>Escolha o Lanche / Combo</Text></View>
+                        <View style={orig.labelRow}><Ionicons name="cube-outline" size={16} color={colors.subText} /><Text style={[orig.label, { color: colors.subText }]}>Serviço / Produto</Text></View>
                         <TouchableOpacity style={[orig.pickerWrapper, { borderColor: colors.border, backgroundColor: colors.background, paddingHorizontal: 15 }]} onPress={() => setShowProductModal(true)}>
                             <Text style={{ fontSize: 16, color: productId ? colors.text : colors.subText }}>{getSelectedProductName()}</Text>
                             <Ionicons name="search" size={20} color={colors.subText} style={{ position: 'absolute', right: 15 }} />
@@ -1198,14 +1198,14 @@ function OriginalCreateOrder() {
             </ScrollView>
             <View style={[orig.footer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
                 <TouchableOpacity style={[orig.submitButton, { backgroundColor: colors.primary, opacity: (loading || productsLoading) ? 0.7 : 1 }]} onPress={handleSubmit} disabled={loading || productsLoading}>
-                    {loading ? <ActivityIndicator color="#fff" /> : <><Ionicons name="checkmark-circle-outline" size={22} color="#fff" /><Text style={orig.submitButtonText}>Confirmar Pedido 🌭</Text></>}
+                    {loading ? <ActivityIndicator color="#fff" /> : <><Ionicons name="checkmark-circle-outline" size={22} color="#fff" /><Text style={orig.submitButtonText}>Confirmar</Text></>}
                 </TouchableOpacity>
             </View>
             {showProductModal && (
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 20, zIndex: 100 }]}>
                     <View style={{ backgroundColor: colors.card, borderRadius: 16, height: '80%', padding: 20 }}>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Escolher Lanche</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text }}>Escolher Item</Text>
                             <TouchableOpacity onPress={() => setShowProductModal(false)}><Ionicons name="close" size={24} color={colors.text} /></TouchableOpacity>
                         </View>
                         <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: colors.background, borderRadius: 10, paddingHorizontal: 10, marginBottom: 15, borderWidth: 1, borderColor: colors.border }}>
@@ -1226,7 +1226,7 @@ function OriginalCreateOrder() {
                                     <Text style={{ fontSize: 13, color: colors.subText }}>Disponível: {item.quantity}</Text>
                                 </View>
                             </TouchableOpacity>
-                        )} ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum lanche encontrado.</Text>} />
+                        )} ListEmptyComponent={<Text style={{ textAlign: 'center', marginTop: 20, color: colors.subText }}>Nenhum item encontrado.</Text>} />
                     </View>
                 </View>
             )}

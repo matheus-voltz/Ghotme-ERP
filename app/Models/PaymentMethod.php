@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentMethod extends Model
 {
-    protected $fillable = ['name', 'type', 'is_active'];
+    protected $fillable = ['company_id', 'name', 'type', 'is_active'];
 
     public function transactions(): HasMany
     {

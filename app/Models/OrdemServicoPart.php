@@ -17,4 +17,9 @@ class OrdemServicoPart extends Model
     {
         return $this->belongsTo(InventoryItem::class, 'inventory_item_id');
     }
+
+    public function ordemServico()
+    {
+        return $this->belongsTo(OrdemServico::class, 'ordem_servico_id');
+    }
 }

@@ -1,0 +1,25 @@
+appId: com.nazuki854.ghotme.app
+---
+- launchApp:
+    clearState: false # Assuming the user is logged in
+- tapOn: "Cardápio" # Ou tab do meio
+- assertVisible: "Cardápio" # Titulo no Header
+- tapOn: "Buscar por código ou nome" # Barra de busca (Placeholder fictício de Maestro vai achar se bater uma parte)
+- inputText: "Coca"
+- hideKeyboard
+- tapOn:
+    id: "com.nazuki854.ghotme.app:id/addBtn" # Pode usar id se estiver definido, mas vamos no texto
+    text: "Adicionar"
+    optional: true
+# Maestro is smart enough to find views by child text or just text, but we don't have accessibility IDs yet.
+- swipe:
+    direction: UP
+- tapOn: "Carrinho" # Bottom bar
+- assertVisible: "Cliente"
+- swipe:
+    direction: UP
+- tapOn:
+    text: "Maquininha"
+- tapOn: "Concluir Pedido"
+- assertVisible: "Na Cozinha"
+- tapOn: "+ Novo Pedido"

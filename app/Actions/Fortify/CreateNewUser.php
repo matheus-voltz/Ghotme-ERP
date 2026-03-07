@@ -57,6 +57,7 @@ class CreateNewUser implements CreatesNewUsers
                 'role' => 'admin', // Define como administrador da empresa
                 'permission' => 'all', // Permissão total
                 'trial_ends_at' => now()->addDays(30),
+                'email_verified_at' => now(), // Auto-verify email as per user rule
             ]);
         });
     }

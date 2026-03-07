@@ -52,6 +52,12 @@ return [
                     'Suspensão' => ['Amortecedores', 'Buchas', 'Pneus', 'Alinhamento'],
                     'Elétrica' => ['Bateria', 'Alternador', 'Lâmpadas', 'Motor de Arranque']
                 ],
+                'service' => 'Serviço',
+                'services' => 'Serviços',
+                'service_price' => 'Mão de Obra',
+                'estimated_time' => 'Tempo Est.',
+                'package' => 'Pacote',
+                'packages' => 'Pacotes',
             ],
             'icons' => [
                 'entity' => 'ti-car',
@@ -96,6 +102,12 @@ return [
                     'Suspensão' => ['Amortecedores', 'Buchas', 'Pneus', 'Alinhamento'],
                     'Elétrica' => ['Bateria', 'Alternador', 'Lâmpadas', 'Motor de Arranque']
                 ],
+                'service' => 'Serviço',
+                'services' => 'Serviços',
+                'service_price' => 'Mão de Obra',
+                'estimated_time' => 'Tempo Est.',
+                'package' => 'Pacote',
+                'packages' => 'Pacotes',
             ],
             'icons' => [
                 'entity' => 'ti-car',
@@ -229,6 +241,12 @@ return [
                 'budget_entity'   => 'Pré-pedido',
                 'budget_entities' => 'Pré-pedidos',
                 'new_budget'      => 'Novo Pré-pedido',
+                'service' => 'Prato/Combo',
+                'services' => 'Cardápio / Produtos',
+                'service_price' => 'Valor de Venda',
+                'estimated_time' => 'Preparo',
+                'package' => 'Combo',
+                'packages' => 'Combos',
             ],
             'icons' => [
                 'entity' => 'ti-tools-kitchen-2',

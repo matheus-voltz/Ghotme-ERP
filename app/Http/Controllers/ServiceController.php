@@ -119,11 +119,14 @@ class ServiceController extends Controller
             ->where('service_id', $id)
             ->get()
             ->map(function ($ing) {
+                $cost = $ing->inventoryItem ? $ing->inventoryItem->cost_price : 0;
                 return [
                     'id' => $ing->id,
                     'inventory_item_name' => $ing->inventoryItem ? $ing->inventoryItem->name : 'Desconhecido',
                     'quantity' => $ing->quantity,
                     'unit_of_measure' => $ing->unit_of_measure,
+                    'cost_price' => $cost,
+                    'subtotal' => $cost * $ing->quantity,
                 ];
             });
 

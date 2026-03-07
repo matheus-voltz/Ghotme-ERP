@@ -1,20 +1,20 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'Pacotes de Serviço')
+@section('title', niche('packages'))
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-  'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-  'resources/assets/vendor/libs/select2/select2.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
@@ -25,16 +25,20 @@
 @section('content')
 <div class="card">
   <div class="card-header border-bottom">
-    <h5 class="card-title mb-0">Pacotes de Serviço</h5>
+    <h5 class="card-title mb-0">{{ niche('packages') }}</h5>
   </div>
   <div class="card-datatable table-responsive">
-    <table class="datatables-packages table border-top">
+    <table class="datatables-packages table border-top"
+      data-label-package="{{ niche('package') }}"
+      data-label-packages="{{ niche('packages') }}"
+      data-label-service="{{ niche('service') }}"
+      data-label-parts="{{ niche('inventory_items') }}">
       <thead>
         <tr>
           <th>#</th>
-          <th>Nome do Pacote</th>
-          <th>Itens</th>
-          <th>Preço Total (R$)</th>
+          <th>{{ __('Nome do') }} {{ niche('package') }}</th>
+          <th>{{ __('Itens') }}</th>
+          <th>{{ __('Preço Total') }} (R$)</th>
           <th>Status</th>
           <th>Ações</th>
         </tr>
@@ -45,47 +49,47 @@
   <!-- Offcanvas Adicionar/Editar -->
   <div class="offcanvas offcanvas-end" style="width: 500px !important;" tabindex="-1" id="offcanvasPackage" aria-labelledby="offcanvasPackageLabel">
     <div class="offcanvas-header border-bottom">
-      <h5 id="offcanvasPackageLabel" class="offcanvas-title">Novo Pacote</h5>
+      <h5 id="offcanvasPackageLabel" class="offcanvas-title">{{ __('Novo') }} {{ niche('package') }}</h5>
       <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body mx-0 flex-grow-0 p-6 h-100">
       <form id="formPackage">
         @csrf
         <input type="hidden" name="id" id="package_id">
-        
+
         <div class="mb-6">
-          <label class="form-label">Nome do Pacote</label>
-          <input type="text" class="form-control" name="name" id="package-name" placeholder="Ex: Revisão Básica" required />
+          <label class="form-label">{{ __('Nome do') }} {{ niche('package') }}</label>
+          <input type="text" class="form-control" name="name" id="package-name" placeholder="{{ niche('package') }}" required />
         </div>
 
         <div class="mb-6">
-          <label class="form-label">Serviços Inclusos (Mão de obra)</label>
+          <label class="form-label">{{ niche('services') }} {{ __('Inclusos') }}</label>
           <select class="select2 form-select" name="services[]" id="package-services" multiple>
             @foreach($services as $service)
-              <option value="{{ $service->id }}">{{ $service->name }} (R$ {{ $service->price }})</option>
+            <option value="{{ $service->id }}">{{ $service->name }} (R$ {{ $service->price }})</option>
             @endforeach
           </select>
         </div>
 
         <div class="mb-6">
-          <label class="form-label">Peças Inclusas (Opcional)</label>
+          <label class="form-label">{{ niche('inventory_items') }} {{ __('Inclusos') }}</label>
           <div id="parts-container">
             <select class="select2 form-select mb-2" id="add-part-select">
-              <option value="">Adicionar Peça...</option>
+              <option value="">{{ __('Adicionar') }} {{ niche('inventory_items') }}...</option>
               @foreach($parts as $part)
-                <option value="{{ $part->id }}" data-name="{{ $part->name }}">
-                  {{ $part->name }} (Estoque: {{ $part->quantity }})
-                </option>
+              <option value="{{ $part->id }}" data-name="{{ $part->name }}">
+                {{ $part->name }} (Estoque: {{ $part->quantity }})
+              </option>
               @endforeach
             </select>
             <div id="selected-parts-list" class="mt-3">
-                <!-- Dinâmico -->
+              <!-- Dinâmico -->
             </div>
           </div>
         </div>
 
         <div class="mb-6">
-          <label class="form-label">Preço Fixo do Pacote (R$)</label>
+          <label class="form-label">{{ __('Preço Fixo do') }} {{ niche('package') }} (R$)</label>
           <input type="number" step="0.01" class="form-control" name="total_price" id="package-total-price" placeholder="Deixe vazio para somar itens" />
           <small class="text-muted">Se vazio, o sistema somará o preço individual de cada item.</small>
         </div>
@@ -95,7 +99,7 @@
           <textarea class="form-control" name="description" id="package-description" rows="2"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary me-3">Salvar Pacote</button>
+        <button type="submit" class="btn btn-primary me-3">{{ __('Salvar') }} {{ niche('package') }}</button>
         <button type="reset" class="btn btn-label-danger" data-bs-dismiss="offcanvas">Cancelar</button>
       </form>
     </div>

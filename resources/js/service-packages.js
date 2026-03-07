@@ -9,7 +9,13 @@ document.addEventListener('DOMContentLoaded', function (e) {
         offCanvasForm = document.getElementById('offcanvasPackage'),
         formPackage = document.getElementById('formPackage'),
         addPartSelect = $('#add-part-select'),
-        partsList = document.getElementById('selected-parts-list');
+        partsList = document.getElementById('selected-parts-list'),
+        labels = {
+            package: dt_table.dataset.labelPackage || 'Pacote',
+            packages: dt_table.dataset.labelPackages || 'Pacotes',
+            service: dt_table.dataset.labelService || 'serv.',
+            parts: dt_table.dataset.labelParts || 'peças'
+        };
 
     // Select2
     $('.select2').each(function () {
@@ -41,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
                 {
                     targets: 2,
                     render: function (data, type, full) {
-                        return `<small>${full.services_count} serv. / ${full.parts_count} peças</small>`;
+                        return `<small>${full.services_count} ${labels.service} / ${full.parts_count} ${labels.parts}</small>`;
                     }
                 },
                 {
@@ -70,10 +76,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
             layout: {
                 topEnd: {
                     features: [
-                        { search: { placeholder: 'Procurar pacote' } },
+                        { search: { placeholder: `Procurar ${labels.package.toLowerCase()}` } },
                         {
                             buttons: [{
-                                text: '<i class="ti tabler-plus me-1"></i> Criar Pacote',
+                                text: `<i class="ti tabler-plus me-1"></i> Criar ${labels.package}`,
                                 className: 'add-new btn btn-primary',
                                 attr: { 'data-bs-toggle': 'offcanvas', 'data-bs-target': '#offcanvasPackage' }
                             }]
@@ -120,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
-                document.getElementById('offcanvasPackageLabel').innerHTML = 'Editar Pacote';
+                document.getElementById('offcanvasPackageLabel').innerHTML = `Editar ${labels.package}`;
                 partsList.innerHTML = '';
 
                 fetch(`${baseUrl}services/packages/${id}/edit`)
@@ -145,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         if (addNewBtn) {
             addNewBtn.addEventListener('click', function () {
                 document.getElementById('package_id').value = '';
-                document.getElementById('offcanvasPackageLabel').innerHTML = 'Novo Pacote';
+                document.getElementById('offcanvasPackageLabel').innerHTML = `Novo ${labels.package}`;
                 formPackage.reset();
                 $('#package-services').val(null).trigger('change');
                 partsList.innerHTML = '';

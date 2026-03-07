@@ -59,7 +59,9 @@ if (!function_exists('niche_translate')) {
             'Contratos de Manutenção',
             'Maintenance Contracts',
             'Serviço',
-            'Serviços'
+            'Serviços',
+            'Pacote',
+            'Pacotes'
         ];
 
         $workshopReplacement = ($currentNiche === 'construction') ? 'Canteiro' : __('Empresa');
@@ -95,8 +97,14 @@ if (!function_exists('niche_translate')) {
             'Logotipo da ' . $workshopReplacement,
             __('Contratos de') . ' ' . $entities,
             'Maintenance Contracts',
-            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimento' : 'Serviço',
-            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimentos' : 'Serviços'
+            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimento' : (
+                $currentNiche === 'food_service' ? niche('service') : 'Serviço'
+            ),
+            in_array($currentNiche, ['pet', 'beauty_clinic']) ? 'Atendimentos' : (
+                $currentNiche === 'food_service' ? niche('services') : 'Serviços'
+            ),
+            niche('package') ?? 'Pacote',
+            niche('packages') ?? 'Pacotes'
         ];
 
         $string = str_ireplace($search, $replace, $string);

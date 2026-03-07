@@ -3,11 +3,18 @@
  */
 
 'use strict';
+console.log('Services Table JS loaded');
 
 document.addEventListener('DOMContentLoaded', function (e) {
     const dt_table = document.querySelector('.datatables-services'),
         offCanvasForm = document.getElementById('offcanvasService'),
-        formService = document.getElementById('formService');
+        formService = document.getElementById('formService'),
+        labels = {
+            service: dt_table.dataset.labelService || 'Serviço',
+            services: dt_table.dataset.labelServices || 'Serviços',
+            price: dt_table.dataset.labelPrice || 'Preço',
+            time: dt_table.dataset.labelTime || 'Tempo'
+        };
 
     if (dt_table) {
         const dt_services = new DataTable(dt_table, {
@@ -70,10 +77,10 @@ document.addEventListener('DOMContentLoaded', function (e) {
             layout: {
                 topEnd: {
                     features: [
-                        { search: { placeholder: 'Procurar serviço' } },
+                        { search: { placeholder: `Procurar ${labels.service.toLowerCase()}` } },
                         {
                             buttons: [{
-                                text: '<i class="ti tabler-plus me-1"></i> Adicionar Serviço',
+                                text: `<i class="ti tabler-plus me-1"></i> Adicionar ${labels.service}`,
                                 className: 'add-new btn btn-primary',
                                 attr: { 'data-bs-toggle': 'offcanvas', 'data-bs-target': '#offcanvasService' }
                             }]
@@ -115,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         document.addEventListener('click', function (e) {
             if (e.target.closest('.edit-record')) {
                 const id = e.target.closest('.edit-record').dataset.id;
-                document.getElementById('offcanvasServiceLabel').innerHTML = 'Editar Serviço';
+                document.getElementById('offcanvasServiceLabel').innerHTML = `Editar ${labels.service}`;
                 fetch(`${baseUrl}services/${id}/edit`)
                     .then(response => response.json())
                     .then(data => {
@@ -133,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function (e) {
         if (addNewBtn) {
             addNewBtn.addEventListener('click', function () {
                 document.getElementById('service_id').value = '';
-                document.getElementById('offcanvasServiceLabel').innerHTML = 'Adicionar Serviço';
+                document.getElementById('offcanvasServiceLabel').innerHTML = `Adicionar ${labels.service}`;
                 formService.reset();
             });
         }
@@ -143,8 +150,8 @@ document.addEventListener('DOMContentLoaded', function (e) {
     if (formService) {
         const fv = FormValidation.formValidation(formService, {
             fields: {
-                name: { validators: { notEmpty: { message: 'Nome é obrigatório' } } },
-                price: { validators: { notEmpty: { message: 'Preço é obrigatório' } } }
+                name: { validators: { notEmpty: { message: `${labels.service} é obrigatório` } } },
+                price: { validators: { notEmpty: { message: `${labels.price} é obrigatório` } } }
             },
             plugins: {
                 trigger: new FormValidation.plugins.Trigger(),

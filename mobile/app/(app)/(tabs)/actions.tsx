@@ -97,6 +97,7 @@ function OriginalActionsScreen({ colors, labels, niche }: any) {
         { id: 'scan', title: 'Ler QR Code', icon: 'scan-outline', color: '#4B4B4B', desc: 'Buscar por etiqueta' },
         { id: 'calendar', title: 'Agenda', icon: 'calendar-outline', color: '#FF9F43', desc: 'Ver agendamentos' },
         { id: 'parts', title: labels.inventory_items?.split('/')[0] || 'Peças/Produtos', icon: 'cube-outline', color: '#EA5455', desc: 'Consultar estoque' },
+        { id: 'payable', title: t('accounts_payable'), icon: 'cash-outline', color: '#EA5455', desc: 'Gerenciar contas' },
         { id: 'calculator', title: 'Calculadora', icon: 'calculator-outline', color: '#16a085', desc: 'Cálculo de margem' },
         { id: 'ai', title: 'Ghotme IA', icon: 'sparkles-outline', color: '#CE9FFC', desc: 'Consultor inteligente' },
     ];
@@ -110,6 +111,7 @@ function OriginalActionsScreen({ colors, labels, niche }: any) {
             'scan': '/screens/qr_scanner',
             'calendar': '/calendar',
             'parts': '/inventory',
+            'payable': '/finance/payable',
             'calculator': '/screens/cost_calculator',
             'ai': '/ai-consultant',
         };

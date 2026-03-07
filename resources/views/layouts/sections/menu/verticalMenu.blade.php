@@ -25,7 +25,7 @@ $configData = Helper::appClasses();
     <div class="menu-inner-shadow"></div>
 
     <ul class="menu-inner py-1">
-        @foreach ($menuData[0]->menu as $menu)
+        @foreach ($menuData[0]->menu ?? [] as $menu)
         {{-- plan and trial check --}}
         @php
         $user = auth()->user();

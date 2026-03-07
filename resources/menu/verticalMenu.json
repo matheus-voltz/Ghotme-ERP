@@ -31,11 +31,52 @@
       "slug": "dashboard"
     },
     {
-      "url": "/pos",
-      "name": "Balcão de Vendas (PDV)",
-      "icon": "menu-icon icon-base ti tabler-shopping-cart",
-      "slug": "menu.pos",
-      "niche": "food_service"
+      "name": "Estabelecimento",
+      "icon": "menu-icon icon-base ti tabler-tools-kitchen-2",
+      "slug": "food-service-management",
+      "niche": "food_service",
+      "submenu": [
+        {
+          "url": "/pos",
+          "name": "1. Balcão de Vendas (PDV)",
+          "slug": "menu.pos"
+        },
+        {
+          "url": "/ordens-servico",
+          "name": "2. Monitor de Cozinha",
+          "slug": "ordens-servico"
+        },
+        {
+          "url": "/inventory/items",
+          "name": "3. Estoque (Insumos/Itens)",
+          "slug": "inventory.items"
+        },
+        {
+          "url": "/menu/manage",
+          "name": "4. Gestão de Cardápio",
+          "slug": "menu.manage"
+        },
+        {
+          "url": "/ifood/orders",
+          "name": "5. Pedidos iFood",
+          "slug": "ifood.orders"
+        },
+        {
+          "url": "/inventory/recipes",
+          "name": "6. Fichas Técnicas",
+          "slug": "recipes.index"
+        },
+        {
+          "url": "/settings/food-service",
+          "name": "7. Configurações PDV",
+          "slug": "settings.food-service"
+        },
+        {
+          "url": "/maintenance-contracts",
+          "name": "8. Planos e Mensalistas",
+          "slug": "maintenance-contracts"
+        }
+      ]
     },
     {
       "url": "/ai-consultant",
@@ -47,7 +88,8 @@
       "url": "/appointments",
       "name": "Site Appointments",
       "icon": "menu-icon icon-base ti tabler-calendar-star",
-      "slug": "appointments.index"
+      "slug": "appointments.index",
+      "niche_exclude": "food_service"
     },
     {
       "url": "/calendar",
@@ -82,29 +124,6 @@
         {
           "url": "/ordens-servico/checklist",
           "name": "Entry Checklist",
-          "slug": "ordens-servico.checklist"
-        }
-      ]
-    },
-    {
-      "name": "Pedidos",
-      "icon": "menu-icon icon-base ti tabler-tools-kitchen-2",
-      "slug": "pedidos",
-      "niche": "food_service",
-      "submenu": [
-        {
-          "url": "/ordens-servico",
-          "name": "Cozinha (Ativos)",
-          "slug": "ordens-servico"
-        },
-        {
-          "url": "/ordens-servico/create",
-          "name": "Novo Pedido",
-          "slug": "ordens-servico.create"
-        },
-        {
-          "url": "/ordens-servico/checklist",
-          "name": "Ingredientes/Preparo",
           "slug": "ordens-servico.checklist"
         }
       ]
@@ -167,13 +186,6 @@
           "niche_exclude": "food_service"
         },
         {
-          "url": "/maintenance-contracts",
-          "name": "Contratos de Manutenção",
-          "slug": "maintenance-contracts",
-          "feature": "maintenance_contracts",
-          "niche_exclude": "food_service"
-        },
-        {
           "url": "/{niche_slug}-history",
           "name": "Vehicle history",
           "slug": "{niche_slug}-history",
@@ -183,7 +195,7 @@
     },
     {
       "url": "/admin/sales-hub",
-      "name": "Portal de Atendimento",
+      "name": "Pedidos por Chat",
       "icon": "menu-icon icon-base ti tabler-message-2-code",
       "slug": "sales-hub"
     },
@@ -208,6 +220,7 @@
       "name": "Estoque",
       "icon": "menu-icon icon-base ti tabler-box",
       "slug": "inventory",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/inventory/items",
@@ -252,18 +265,17 @@
       "name": "Serviços",
       "icon": "menu-icon icon-base ti tabler-tools",
       "slug": "services",
+      "niche_exclude": "food_service",
       "submenu": [
         {
           "url": "/services/table",
           "name": "Tabela de serviços",
-          "slug": "services.table",
-          "niche_exclude": "food_service"
+          "slug": "services.table"
         },
         {
           "url": "/services/packages",
           "name": "Pacotes de serviço",
-          "slug": "services.packages",
-          "niche_exclude": "food_service"
+          "slug": "services.packages"
         },
         {
           "url": "/services/plans",
@@ -271,12 +283,6 @@
           "slug": "services.plans",
           "feature": "recurring_plans",
           "niche_exclude": "food_service"
-        },
-        {
-          "url": "/menu/manage",
-          "name": "Gestão de Cardápio",
-          "slug": "menu.manage",
-          "niche": "food_service"
         }
       ]
     },
@@ -350,11 +356,12 @@
         {
           "url": "/reports/profitability",
           "name": "Real Profitability",
-          "slug": "reports.profitability"
+          "slug": "reports.profitability",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/reports/os-status",
-          "name": "OS por status",
+          "name": "Fluxo de Pedidos",
           "slug": "reports.os-status"
         },
         {
@@ -365,7 +372,8 @@
         {
           "url": "/reports/cost-per-service",
           "name": "Custo por serviço",
-          "slug": "reports.cost-per-service"
+          "slug": "reports.cost-per-service",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/reports/consumed-stock",
@@ -380,7 +388,8 @@
         {
           "url": "/reports/average-time-per-service",
           "name": "Tempo médio por serviço",
-          "slug": "reports.average-time"
+          "slug": "reports.average-time",
+          "niche_exclude": "food_service"
         }
       ]
     },
@@ -410,12 +419,14 @@
         {
           "url": "/settings/custom-checklist",
           "name": "Checklist personalizado",
-          "slug": "settings.custom-checklist"
+          "slug": "settings.custom-checklist",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/settings/custom-fields",
           "name": "Campos Personalizados",
-          "slug": "settings.custom-fields"
+          "slug": "settings.custom-fields",
+          "niche_exclude": "food_service"
         },
         {
           "url": "/settings/import",

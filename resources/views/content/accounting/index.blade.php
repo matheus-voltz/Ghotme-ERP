@@ -168,7 +168,7 @@
                             <tr>
                                 <td>{{ $order->updated_at->format('d/m') }}</td>
                                 <td>#{{ $order->id }}</td>
-                                <td>{{ $order->client->name }}</td>
+                                <td>{{ $order->client->name ?? $order->customer_name ?? __('Final Customer') }}</td>
                                 <td>R$ {{ number_format($order->total, 2, ',', '.') }}</td>
                                 <td><a href="{{ route('ordens-servico.edit', $order->id) }}" class="btn btn-xs btn-outline-primary">{{ __('View OS') }}</a></td>
                             </tr>

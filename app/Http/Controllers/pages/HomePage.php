@@ -338,7 +338,11 @@ class HomePage extends Controller
       'avgTicket' => $avgTicket,
       'retentionRate' => $retentionRate,
       'academyHighlights' => $academyHighlights,
-      'lowStockItems' => InventoryItem::where('company_id', $companyId)->whereRaw('quantity <= min_quantity')->count(),
+      'lowStockItems' => InventoryItem::where('company_id', $companyId)
+        ->when(get_current_niche() === 'food_service', function($q) {
+            return $q->where('is_ingredient', true);
+        })
+        ->whereRaw('quantity <= min_quantity')->count(),
       'pendingBudgets' => Budget::where('company_id', $companyId)->where('status', 'pending')->count(),
       'recentOS' => OrdemServico::where('company_id', $companyId)->with(['client', 'veiculo'])->orderBy('created_at', 'desc')->limit(5)->get(),
       'months' => $months,

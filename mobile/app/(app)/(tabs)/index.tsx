@@ -285,9 +285,10 @@ export default function DashboardScreen() {
         <Text style={[styles.sectionTitle, { color: colors.text, marginTop: 10, fontSize: 14, textTransform: 'uppercase', letterSpacing: 1 }]}>Ações Rápidas</Text>
         <View style={styles.quickActionsContainer}>
           {[
-            { icon: 'add-circle', label: niche === 'food_service' ? 'Novo Pedido' : 'Nova OS', color: '#7367F0', route: '/os/create' },
+            ...(niche === 'food_service' ? [{ icon: 'add-circle', label: 'Novo Pedido', color: '#7367F0', route: '/os/create' }] : []),
             { icon: 'person-add', label: 'Cliente', color: '#28C76F', route: '/clients/create' },
             { icon: 'cube', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
+            { icon: 'cash', label: 'Financeiro', color: '#EA5455', route: '/finance/payable' },
             ...(niche === 'food_service' ? [{ icon: 'receipt', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
             <Pressable
@@ -488,7 +489,7 @@ export default function DashboardScreen() {
         <View style={styles.quickActionsContainer}>
           {[
             ...(niche === 'food_service' ? [] : [{ icon: 'scan-outline', label: 'Vistoria', color: '#7367F0', route: '/os/checklist' }]),
-            { icon: 'add-circle-outline', label: niche === 'food_service' ? 'Novo Pedido' : 'Nova OS', color: '#28C76F', route: '/os/create' },
+            ...(niche === 'food_service' ? [{ icon: 'add-circle-outline', label: 'Novo Pedido', color: '#28C76F', route: '/os/create' }] : []),
             { icon: 'cube-outline', label: 'Estoque', color: '#FF9F43', route: '/inventory' },
             ...(niche === 'food_service' ? [{ icon: 'receipt-outline', label: 'Balcão', color: '#00CFE8', route: '/os/list' }] : [{ icon: 'calendar-outline', label: 'Agenda', color: '#00CFE8', route: '/calendar' }]),
           ].map((action, idx) => (
@@ -759,20 +760,22 @@ export default function DashboardScreen() {
       </ScrollView>
 
       {/* Floating Action Button */}
-      <Animated.View
-        entering={FadeInUp.delay(500).springify()}
-        style={styles.fabContainer}
-      >
-        <Pressable
-          style={({ pressed }) => [
-            styles.fab,
-            pressed && { transform: [{ scale: 0.95 }], opacity: 0.9 }
-          ]}
-          onPress={() => router.push('/os/create')}
+      {niche === 'food_service' && (
+        <Animated.View
+          entering={FadeInUp.delay(500).springify()}
+          style={styles.fabContainer}
         >
-          <Ionicons name="add" size={32} color="#fff" />
-        </Pressable>
-      </Animated.View>
+          <Pressable
+            style={({ pressed }) => [
+              styles.fab,
+              pressed && { transform: [{ scale: 0.95 }], opacity: 0.9 }
+            ]}
+            onPress={() => router.push('/os/create')}
+          >
+            <Ionicons name="add" size={32} color="#fff" />
+          </Pressable>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -1003,6 +1006,7 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     backgroundColor: '#fff',
     borderRadius: 16,

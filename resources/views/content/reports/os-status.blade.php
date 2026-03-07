@@ -1,6 +1,6 @@
 @extends('layouts/layoutMaster')
 
-@section('title', 'OS por Status')
+@section('title', get_current_niche() === 'food_service' ? 'Fluxo de Pedidos' : 'OS por Status')
 
 @section('vendor-style')
 @vite(['resources/assets/vendor/libs/apex-charts/apex-charts.scss'])
@@ -13,17 +13,27 @@
 @section('page-script')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const isFood = "{{ get_current_niche() === 'food_service' }}";
+    
     fetch('/reports/os-status-data')
         .then(res => res.json())
         .then(data => {
+            const statusLabels = {
+                'pending': isFood ? 'Na Fila' : 'Pendente',
+                'in_progress': isFood ? 'Em Preparo' : 'Executando',
+                'completed': isFood ? 'Pronto (Entrega)' : 'Concluído',
+                'paid': isFood ? 'Finalizado / Pago' : 'Pago',
+                'finalized': isFood ? 'Finalizado' : 'Finalizado'
+            };
+
             const options = {
                 chart: {
                     type: 'donut',
                     height: 400
                 },
-                labels: data.map(d => d.status.charAt(0).toUpperCase() + d.status.slice(1)),
+                labels: data.map(d => statusLabels[d.status] || d.status),
                 series: data.map(d => d.total),
-                colors: ['#ff9f43', '#7367f0', '#28c76f', '#ea5455', '#a1acb8'],
+                colors: ['#ff9f43', '#7367f0', '#28c76f', '#00cfe8', '#a1acb8'],
                 legend: { position: 'bottom' },
                 plotOptions: {
                     pie: {
@@ -32,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 show: true,
                                 total: {
                                     show: true,
-                                    label: 'Total de OS',
+                                    label: isFood ? 'Total de Pedidos' : 'Total de OS',
                                     formatter: function (w) {
                                         return w.globals.seriesTotals.reduce((a, b) => a + b, 0)
                                     }
@@ -53,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="col-md-6">
         <div class="card mb-6">
             <div class="card-header border-bottom">
-                <h5 class="card-title mb-0">Distribuição de Ordens de Serviço</h5>
+                <h5 class="card-title mb-0">{{ get_current_niche() === 'food_service' ? 'Saúde da Cozinha / Fluxo' : 'Distribuição de Ordens de Serviço' }}</h5>
             </div>
             <div class="card-body pt-4">
                 <div id="osStatusChart"></div>
@@ -76,11 +86,20 @@ document.addEventListener('DOMContentLoaded', function() {
                             </tr>
                         </thead>
                         <tbody>
-                            @php $total = $stats->sum('total'); @endphp
+                            @php 
+                            $total = $stats->sum('total');
+                            $statusLabels = [
+                                'pending' => get_current_niche() === 'food_service' ? 'Na Fila' : 'Pendente',
+                                'in_progress' => get_current_niche() === 'food_service' ? 'Em Preparo' : 'Executando',
+                                'completed' => get_current_niche() === 'food_service' ? 'Pronto (Entrega)' : 'Concluído',
+                                'paid' => get_current_niche() === 'food_service' ? 'Finalizado / Pago' : 'Pago',
+                                'finalized' => 'Finalizado'
+                            ];
+                            @endphp
                             @foreach($stats as $stat)
                             <tr>
                                 <td>
-                                    <span class="badge bg-label-primary">{{ ucfirst($stat->status) }}</span>
+                                    <span class="badge bg-label-primary">{{ $statusLabels[$stat->status] ?? ucfirst($stat->status) }}</span>
                                 </td>
                                 <td>{{ $stat->total }}</td>
                                 <td>{{ $total > 0 ? number_format(($stat->total / $total) * 100, 1) : 0 }}%</td>
