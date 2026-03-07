@@ -327,6 +327,62 @@ $configData = Helper::appClasses();
             width: 360px;
         }
     }
+
+    /* Otimizações Mobile PDV */
+    @media (max-width: 767.98px) {
+        .content-wrapper { padding: 0 !important; }
+        .container-xxl { padding: 0 !important; }
+        .pos-wrapper { flex-direction: column; height: calc(100vh - 100px); border-radius: 0; }
+        
+        .product-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 10px !important;
+        }
+        
+        .product-card .img-container { height: 100px !important; }
+        .product-name { font-size: 0.85rem !important; }
+        
+        .pos-cart-section {
+            position: fixed !important;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100% !important;
+            z-index: 1050;
+            height: 60px;
+            transition: all 0.3s ease;
+            border-left: 0 !important;
+            border-top: 1px solid var(--pos-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .pos-cart-section.expanded { height: 100vh !important; top: 0; }
+        
+        #mobile-cart-toggle {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--pos-primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            min-height: 60px;
+        }
+        
+        .cart-header, .px-4.pt-4, .cart-items-list, .cart-footer { display: none; }
+        .expanded .cart-header, .expanded .px-4.pt-4, .expanded .cart-items-list, .expanded .cart-footer { display: flex !important; }
+        .expanded .px-4.pt-4 { display: block !important; }
+        .expanded .cart-items-list { display: block !important; flex: 1; overflow-y: auto; }
+        .expanded #mobile-cart-toggle { border-radius: 0; }
+        .expanded #mobile-cart-toggle i.chevron { transform: rotate(180deg); }
+    }
+    
+    @media (min-width: 768px) {
+        #mobile-cart-toggle { display: none !important; }
+    }
 </style>
 @endsection
 
@@ -417,7 +473,14 @@ $configData = Helper::appClasses();
     </div>
 
     <!-- Sidebar with items and payment -->
-    <div class="pos-cart-section">
+    <div class="pos-cart-section" id="cartSection">
+        <!-- Header Mobile do Carrinho -->
+        <div id="mobile-cart-toggle">
+            <span><i class="ti tabler-shopping-cart me-2"></i> VER PEDIDO</span>
+            <span id="mobile-total-display">R$ 0,00</span>
+            <i class="ti tabler-chevron-up chevron"></i>
+        </div>
+
         <div class="cart-header">
             <h5 class="mb-0 fw-bold"><i class="ti tabler-shopping-cart-check me-2 text-primary"></i>Pedido Atual</h5>
             <button class="btn btn-sm btn-label-danger" id="btn-clear-cart">Limpar</button>
@@ -471,6 +534,16 @@ $configData = Helper::appClasses();
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const cartSection = document.getElementById('cartSection');
+        const mobileCartToggle = document.getElementById('mobile-cart-toggle');
+        const mobileTotalDisplay = document.getElementById('mobile-total-display');
+
+        if (mobileCartToggle) {
+            mobileCartToggle.addEventListener('click', function() {
+                cartSection.classList.toggle('expanded');
+            });
+        }
+
         let cart = [];
         const productCards = document.querySelectorAll('.product-card');
         const cartContainer = document.getElementById('cart-container');
@@ -534,6 +607,7 @@ $configData = Helper::appClasses();
                 cartContainer.appendChild(cartEmptyMsg);
                 subtotalLabel.innerText = 'R$ 0,00';
                 totalLabel.innerText = 'R$ 0,00';
+                if(mobileTotalDisplay) mobileTotalDisplay.innerText = 'R$ 0,00';
                 checkoutBtn.disabled = true;
                 return;
             }
@@ -564,6 +638,7 @@ $configData = Helper::appClasses();
             });
             subtotalLabel.innerText = formattedTotal;
             totalLabel.innerText = formattedTotal;
+            if(mobileTotalDisplay) mobileTotalDisplay.innerText = formattedTotal;
         }
 
         // Payment Selection indicator

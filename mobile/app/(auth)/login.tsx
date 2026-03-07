@@ -179,8 +179,9 @@ export default function LoginScreen() {
             triggerSuccess();
 
         } catch (error: any) {
-            console.error("Login Error:", error);
-            Alert.alert('Falha no Login', 'Verifique suas credenciais.');
+            console.error("Login Error Details:", error.response?.data);
+            const serverMsg = error.response?.data?.message || 'Verifique suas credenciais e conexão.';
+            Alert.alert('Falha no Login', `Erro: ${serverMsg}`);
             setLoading(false);
         }
     }

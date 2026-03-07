@@ -117,7 +117,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function signIn({ email, password }: any) {
         try {
-            const response = await api.post('/login', { email, password });
+            // Limpa qualquer autorização anterior para garantir login limpo
+            delete api.defaults.headers.common['Authorization'];
+            
+            const response = await api.post('/login', { 
+                email: email.trim(), 
+                password: password.trim() 
+            });
+            
             if (response.data.two_factor) return response.data;
             const { user, token } = response.data;
             await saveAuthData(user, token);

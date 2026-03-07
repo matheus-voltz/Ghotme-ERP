@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 // URL da API originária das Variáveis de Ambiente (.env)
-const DEV_URL = process.env.EXPO_PUBLIC_API_URL || 'http://10.0.0.171:8000/api';
-const PROD_URL = process.env.EXPO_PUBLIC_PROD_API_URL || 'https://ghotme.com.br/api';
+const DEV_URL = 'http://10.0.0.171:8000/api';
+const PROD_URL = 'https://ghotme.com.br/api';
 
 const api = axios.create({
     baseURL: __DEV__ ? DEV_URL : PROD_URL,
@@ -13,6 +13,8 @@ const api = axios.create({
         'Accept': 'application/json',
     },
 });
+
+console.log('App conectando em:', api.defaults.baseURL);
 
 api.interceptors.request.use(
     async (config) => {
