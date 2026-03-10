@@ -12,9 +12,9 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        // 'App\Events\SomeEvent' => [
-        //     'App\Listeners\SomeListener',
-        // ],
+        \App\Events\TransactionCreated::class => [
+            \App\Listeners\TriggerFinancialAudit::class,
+        ],
     ];
 
     /**

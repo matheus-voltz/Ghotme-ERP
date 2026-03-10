@@ -58,7 +58,7 @@ class PrepareDemoEnvironment extends Command
         }
 
         $this->info('Iniciando preparação do ambiente de demonstração...');
-        $faker = fake('pt_BR');
+        $faker = \Faker\Factory::create('pt_BR');
 
         // ==== PASSO 1: LIMPEZA ====
         if ($this->cleanDatabase() === false) {
