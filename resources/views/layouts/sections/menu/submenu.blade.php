@@ -24,31 +24,30 @@ use Illuminate\Support\Facades\Route;
   @endif
   @endif
 
-  {{-- active menu method --}}
   @php
   $activeClass = null;
-  $active = $configData["layout"] === 'vertical' ? 'active open':'active';
   $currentRouteName = Route::currentRouteName();
-  $slug = $submenu->slug ?? '';
-  $translatedSlug = niche_translate($slug);
 
-  if ($translatedSlug && ($currentRouteName === $translatedSlug || $currentRouteName === $translatedSlug . '.index')) {
-  $activeClass = 'active';
-  }
-  elseif (isset($submenu->submenu)) {
-  if (gettype($slug) === 'array') {
-  foreach($slug as $s){
-  $s = niche_translate($s);
-  if (str_contains($currentRouteName,$s) and strpos($currentRouteName,$s) === 0) {
-  $activeClass = $active;
+  $isSubmenuSelected = function($item) use ($currentRouteName, &$isSubmenuSelected) {
+  if (isset($item->slug)) {
+  $slugs = is_array($item->slug) ? $item->slug : [$item->slug];
+  foreach ($slugs as $s) {
+  $translatedS = niche_translate($s);
+  if ($currentRouteName === $translatedS || $currentRouteName === $translatedS . '.index' || (str_contains($currentRouteName, $translatedS) && strpos($currentRouteName, $translatedS) === 0)) {
+  return true;
   }
   }
   }
-  else{
-  if ($slug && str_contains($currentRouteName,$slug) and strpos($currentRouteName,$slug) === 0) {
-  $activeClass = $active;
+  if (isset($item->submenu)) {
+  foreach ($item->submenu as $sub) {
+  if ($isSubmenuSelected($sub)) return true;
   }
   }
+  return false;
+  };
+
+  if ($isSubmenuSelected($submenu)) {
+  $activeClass = isset($submenu->submenu) ? ($configData["layout"] === 'vertical' ? 'active open' : 'active') : 'active';
   }
   @endphp
 

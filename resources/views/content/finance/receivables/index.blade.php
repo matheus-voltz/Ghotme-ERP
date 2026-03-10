@@ -4,181 +4,221 @@
 
 @section('vendor-style')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
-  'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
-  'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
-  'resources/assets/vendor/libs/select2/select2.scss',
-  'resources/assets/vendor/libs/@form-validation/form-validation.scss',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
+'resources/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.scss',
+'resources/assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.scss',
+'resources/assets/vendor/libs/select2/select2.scss',
+'resources/assets/vendor/libs/@form-validation/form-validation.scss',
+'resources/assets/vendor/libs/flatpickr/flatpickr.scss',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.scss'
 ])
 @endsection
 
 @section('vendor-script')
 @vite([
-  'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
-  'resources/assets/vendor/libs/select2/select2.js',
-  'resources/assets/vendor/libs/@form-validation/popular.js',
-  'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
-  'resources/assets/vendor/libs/flatpickr/flatpickr.js',
-  'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
+'resources/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js',
+'resources/assets/vendor/libs/select2/select2.js',
+'resources/assets/vendor/libs/@form-validation/popular.js',
+'resources/assets/vendor/libs/@form-validation/bootstrap5.js',
+'resources/assets/vendor/libs/flatpickr/flatpickr.js',
+'resources/assets/vendor/libs/sweetalert2/sweetalert2.js'
 ])
 @endsection
 
 @section('page-script')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function() {
     const dt_table = document.querySelector('.datatables-receivables');
-    
+
     if (dt_table) {
-        const dt = $(dt_table).DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('finance.data') }}", 
-                data: function(d) {
-                    d.type = 'in';
+      const dt = $(dt_table).DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+          url: "{{ route('finance.data') }}",
+          data: function(d) {
+            d.type = 'in';
+          }
+        },
+        columns: [{
+            data: 'fake_id'
+          },
+          {
+            data: 'description'
+          },
+          {
+            data: 'entity_name'
+          },
+          {
+            data: 'amount'
+          },
+          {
+            data: 'due_date'
+          },
+          {
+            data: 'status'
+          },
+          {
+            data: 'id'
+          }
+        ],
+        columnDefs: [{
+            targets: 0,
+            render: function(data) {
+              return `<span class="fw-medium">#${data}</span>`;
+            }
+          },
+          {
+            targets: 1,
+            render: function(data) {
+              return `<span class="text-nowrap">${data}</span>`;
+            }
+          },
+          {
+            targets: 3,
+            render: function(data) {
+              return `<span class="fw-bold text-success">R$ ${parseFloat(data).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>`;
+            }
+          },
+          {
+            targets: 4,
+            render: function(data) {
+              var date = new Date(data);
+              return `<span class="text-nowrap"><i class="ti tabler-calendar me-1"></i>${date.toLocaleDateString('pt-BR')}</span>`;
+            }
+          },
+          {
+            targets: 5,
+            render: function(data) {
+              const statusObj = {
+                pending: {
+                  title: "{{ __('Pending') }}",
+                  class: 'bg-label-warning'
+                },
+                paid: {
+                  title: "{{ __('Paid') }}",
+                  class: 'bg-label-success'
+                },
+                overdue: {
+                  title: "{{ __('Overdue') }}",
+                  class: 'bg-label-danger'
                 }
-            },
-            columns: [
-                { data: 'fake_id' },
-                { data: 'description' },
-                { data: 'entity_name' },
-                { data: 'amount' },
-                { data: 'due_date' },
-                { data: 'status' },
-                { data: 'id' }
-            ],
-            columnDefs: [
-                {
-                    targets: 0,
-                    render: function(data) {
-                        return `<span class="fw-medium">#${data}</span>`;
-                    }
-                },
-                {
-                    targets: 1,
-                    render: function(data) {
-                        return `<span class="text-nowrap">${data}</span>`;
-                    }
-                },
-                {
-                    targets: 3,
-                    render: function(data) {
-                        return `<span class="fw-bold text-success">R$ ${parseFloat(data).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>`;
-                    }
-                },
-                {
-                    targets: 4,
-                    render: function(data) {
-                        var date = new Date(data);
-                        return `<span class="text-nowrap"><i class="ti tabler-calendar me-1"></i>${date.toLocaleDateString('pt-BR')}</span>`;
-                    }
-                },
-                {
-                    targets: 5,
-                    render: function(data) {
-                        const statusObj = {
-                            pending: { title: "{{ __('Pending') }}", class: 'bg-label-warning' },
-                            paid: { title: "{{ __('Paid') }}", class: 'bg-label-success' },
-                            overdue: { title: "{{ __('Overdue') }}", class: 'bg-label-danger' }
-                        };
-                        return `<span class="badge ${statusObj[data]?.class || 'bg-label-secondary'}">${statusObj[data]?.title || data}</span>`;
-                    }
-                },
-                {
-                    targets: -1,
-                    title: "{{ __('Actions') }}",
-                    orderable: false,
-                    searchable: false,
-                    render: function(data, type, full) {
-                        let actions = `<div class="d-flex align-items-center">`;
-                        if (full.status !== 'paid') {
-                            actions += `<a href="javascript:;" class="text-body mark-as-paid" data-id="${data}" data-bs-toggle="tooltip" title="{{ __('Mark as Paid') }}"><i class="ti tabler-check-circle ti-sm me-2 text-success"></i></a>`;
-                        }
-                        actions += `<a href="javascript:;" class="text-body delete-record" data-id="${data}" data-bs-toggle="tooltip" title="{{ __('Delete') }}"><i class="ti tabler-trash ti-sm text-danger"></i></a>`;
-                        actions += `</div>`;
-                        return actions;
-                    }
-                }
-            ],
-            order: [[4, 'asc']],
-            dom: '<"card-header d-flex flex-wrap pb-2"<"me-5 ms-n2"f><"dt-action-buttons v-stack align-items-start align-items-md-center justify-content-end flex-md-row flex-column gap-3 mb-3 mb-md-0"B>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-            language: {
-                sLengthMenu: '_MENU_',
-                search: '',
-                searchPlaceholder: "{{ __('Search Bill') }}",
-                paginate: {
-                    next: '<i class="ti tabler-chevron-right ti-sm"></i>',
-                    previous: '<i class="ti tabler-chevron-left ti-sm"></i>'
-                },
-                info: "{{ __('Showing') }} _START_ {{ __('to') }} _END_ {{ __('of') }} _TOTAL_ {{ __('entries') }}",
-                infoEmpty: "{{ __('No entries found') }}",
-                emptyTable: "{{ __('No data available in table') }}",
-                zeroRecords: "{{ __('No matching records found') }}"
-            },
-            buttons: [
-                {
-                    text: '<i class="ti tabler-plus me-md-1"></i><span class="d-md-inline-block d-none">{{ __("Add Receivable") }}</span>',
-                    className: 'add-new btn btn-success',
-                    attr: {
-                        'data-bs-toggle': 'offcanvas',
-                        'data-bs-target': '#offcanvasAddReceivable'
-                    }
-                }
-            ]
-        });
+              };
+              return `<span class="badge ${statusObj[data]?.class || 'bg-label-secondary'}">${statusObj[data]?.title || data}</span>`;
+            }
+          },
+          {
+            targets: -1,
+            title: "{{ __('Actions') }}",
+            orderable: false,
+            searchable: false,
+            render: function(data, type, full) {
+              let actions = `<div class="d-flex align-items-center">`;
+              if (full.status !== 'paid') {
+                actions += `<a href="javascript:;" class="text-body mark-as-paid" data-id="${data}" data-bs-toggle="tooltip" title="{{ __('Mark as Paid') }}"><i class="ti tabler-circle-check ti-sm me-2 text-success"></i></a>`;
+              }
+              actions += `<a href="javascript:;" class="text-body delete-record" data-id="${data}" data-bs-toggle="tooltip" title="{{ __('Delete') }}"><i class="ti tabler-trash ti-sm text-danger"></i></a>`;
+              actions += `</div>`;
+              return actions;
+            }
+          }
+        ],
+        order: [
+          [4, 'asc']
+        ],
+        dom: '<"card-header d-flex flex-wrap pb-2"<"me-5 ms-n2"f><"dt-action-buttons v-stack align-items-start align-items-md-center justify-content-end flex-md-row flex-column gap-3 mb-3 mb-md-0"B>>t<"row mx-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+        language: {
+          sLengthMenu: '_MENU_',
+          search: '',
+          searchPlaceholder: "{{ __('Search Bill') }}",
+          paginate: {
+            next: '<i class="ti tabler-chevron-right ti-sm"></i>',
+            previous: '<i class="ti tabler-chevron-left ti-sm"></i>'
+          },
+          info: "{{ __('Showing') }} _START_ {{ __('to') }} _END_ {{ __('of') }} _TOTAL_ {{ __('entries') }}",
+          infoEmpty: "{{ __('No entries found') }}",
+          emptyTable: "{{ __('No data available in table') }}",
+          zeroRecords: "{{ __('No matching records found') }}"
+        },
+        buttons: [{
+          text: '<i class="ti tabler-plus me-md-1"></i><span class="d-md-inline-block d-none">{{ __("Add Receivable") }}</span>',
+          className: 'add-new btn btn-success',
+          attr: {
+            'data-bs-toggle': 'offcanvas',
+            'data-bs-target': '#offcanvasAddReceivable'
+          }
+        }]
+      });
 
-        $(document).on('click', '.delete-record', function() {
-            var id = $(this).data('id');
-            Swal.fire({
-                title: "{{ __('Are you sure?') }}",
-                text: "{{ __('This action cannot be undone!') }}",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: "{{ __('Yes, delete it!') }}",
-                customClass: { confirmButton: 'btn btn-primary me-3', cancelButton: 'btn btn-label-secondary' }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: `${baseUrl}finance/transactions/${id}`,
-                        type: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                        success: function() {
-                            dt.draw();
-                            Swal.fire({ icon: 'success', title: "{{ __('Deleted!') }}", customClass: { confirmButton: 'btn btn-success' } });
-                        }
-                    });
-                }
-            });
-        });
-
-        $(document).on('click', '.mark-as-paid', function() {
-            var id = $(this).data('id');
+      $(document).on('click', '.delete-record', function() {
+        var id = $(this).data('id');
+        Swal.fire({
+          title: "{{ __('Are you sure?') }}",
+          text: "{{ __('This action cannot be undone!') }}",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: "{{ __('Yes, delete it!') }}",
+          customClass: {
+            confirmButton: 'btn btn-primary me-3',
+            cancelButton: 'btn btn-label-secondary'
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
             $.ajax({
-                url: `${baseUrl}finance/transactions/${id}/pay`,
-                type: 'POST',
-                headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function() {
-                    dt.draw();
-                    Swal.fire({ icon: 'success', title: "{{ __('Paid!') }}", customClass: { confirmButton: 'btn btn-success' } });
-                }
+              url: `${baseUrl}finance/transactions/${id}`,
+              type: 'DELETE',
+              headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+              },
+              success: function() {
+                dt.draw();
+                Swal.fire({
+                  icon: 'success',
+                  title: "{{ __('Deleted!') }}",
+                  customClass: {
+                    confirmButton: 'btn btn-success'
+                  }
+                });
+              }
             });
+          }
         });
+      });
+
+      $(document).on('click', '.mark-as-paid', function() {
+        var id = $(this).data('id');
+        $.ajax({
+          url: `${baseUrl}finance/transactions/${id}/pay`,
+          type: 'POST',
+          headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+          success: function() {
+            dt.draw();
+            Swal.fire({
+              icon: 'success',
+              title: "{{ __('Paid!') }}",
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            });
+          }
+        });
+      });
     }
 
     $('.flatpickr').flatpickr({
-        dateFormat: 'Y-m-d'
+      dateFormat: 'Y-m-d'
     });
 
     $('.select2').each(function() {
-        var $this = $(this);
-        $this.wrap('<div class="position-relative"></div>').select2({
-            placeholder: "{{ __('Select') }}",
-            dropdownParent: $this.parent()
-        });
+      var $this = $(this);
+      $this.wrap('<div class="position-relative"></div>').select2({
+        placeholder: "{{ __('Select') }}",
+        dropdownParent: $this.parent()
+      });
     });
-});
+  });
 </script>
 @endsection
 
@@ -312,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <select id="bill-client" name="client_id" class="select2 form-select">
             <option value="">{{ __('Select Client') }}</option>
             @foreach($clients as $client)
-              <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
+            <option value="{{ $client->id }}">{{ $client->name ?? $client->company_name }}</option>
             @endforeach
           </select>
         </div>
@@ -321,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <select id="bill-payment-method" name="payment_method_id" class="select2 form-select" required>
             <option value="">{{ __('Select Method') }}</option>
             @foreach($paymentMethods as $method)
-              <option value="{{ $method->id }}">{{ $method->name }}</option>
+            <option value="{{ $method->id }}">{{ $method->name }}</option>
             @endforeach
           </select>
         </div>

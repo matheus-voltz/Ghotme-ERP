@@ -149,6 +149,9 @@ Route::get('/accounting/export-pdf', [App\Http\Controllers\AccountingController:
 // Soluções por Nicho
 Route::get('/solucoes/{slug}', [App\Http\Controllers\SolutionController::class, 'show'])->name('solutions.show');
 
+// Cardápio Público (Digital Menu)
+Route::get('/cardapio/{slug}', [App\Http\Controllers\PublicMenuController::class, 'show'])->name('public.menu.show');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -383,6 +386,8 @@ Route::middleware([
     Route::get('/menu/manage', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.manage');
     Route::get('/menu/categories', [App\Http\Controllers\MenuController::class, 'index'])->name('menu.categories');
     Route::post('/menu/categories', [App\Http\Controllers\MenuController::class, 'storeCategory'])->name('menu.categories.store');
+    Route::put('/menu/categories/{id}', [App\Http\Controllers\MenuController::class, 'updateCategory'])->name('menu.categories.update');
+    Route::delete('/menu/categories/{id}', [App\Http\Controllers\MenuController::class, 'destroyCategory'])->name('menu.categories.destroy');
     Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
 
     // Recipes / Ficha Técnica (Food Service)

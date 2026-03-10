@@ -12,7 +12,7 @@ class MenuController extends Controller
     public function index()
     {
         $companyId = Auth::user()->company_id;
-        
+
         $categories = MenuCategory::with('items.images')
             ->where('company_id', $companyId)
             ->orderBy('order')
@@ -38,10 +38,41 @@ class MenuController extends Controller
             'company_id' => Auth::user()->company_id,
             'name' => $request->name,
             'type' => $request->type,
-            'icon' => $request->icon ?? 'ti-tools-kitchen-2'
+            'icon' => $request->icon ?? 'ti-tools-kitchen-2',
+            'order' => MenuCategory::where('company_id', Auth::user()->company_id)->count()
         ]);
 
         return back()->with('success', 'Categoria criada com sucesso!');
+    }
+
+    public function updateCategory(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:product,ingredient,beverage',
+            'icon' => 'nullable|string'
+        ]);
+
+        $category = MenuCategory::where('company_id', Auth::user()->company_id)->findOrFail($id);
+        $category->update([
+            'name' => $request->name,
+            'type' => $request->type,
+            'icon' => $request->icon
+        ]);
+
+        return back()->with('success', 'Categoria atualizada com sucesso!');
+    }
+
+    public function destroyCategory($id)
+    {
+        $category = MenuCategory::where('company_id', Auth::user()->company_id)->findOrFail($id);
+
+        // Remove associação dos itens
+        InventoryItem::where('menu_category_id', $category->id)->update(['menu_category_id' => null]);
+
+        $category->delete();
+
+        return back()->with('success', 'Categoria removida com sucesso!');
     }
 
     public function assignItem(Request $request)

@@ -24,6 +24,25 @@ $configData = Helper::appClasses();
 
     <div class="menu-inner-shadow"></div>
 
+    <style>
+        /* Estilo Premium Roxo para Item Ativo */
+        .menu-vertical .menu-item.active>.menu-link {
+            background: linear-gradient(72.47deg, #7367f0 22.16%, rgba(115, 103, 240, 0.7) 76.47%) !important;
+            color: #fff !important;
+            box-shadow: 0px 2px 6px 0px rgba(115, 103, 240, 0.48) !important;
+        }
+
+        .menu-vertical .menu-item.active>.menu-link i,
+        .menu-vertical .menu-item.active>.menu-link div {
+            color: #fff !important;
+        }
+
+        /* Garantir que o dropdown pai fique com a seta correta quando aberto */
+        .menu-vertical .menu-item.open>.menu-link.menu-toggle::after {
+            transform: translateY(-50%) rotate(90deg);
+        }
+    </style>
+
     <ul class="menu-inner py-1">
         @foreach ($menuData[0]->menu ?? [] as $menu)
         {{-- plan and trial check --}}
@@ -32,57 +51,57 @@ $configData = Helper::appClasses();
         $currentNiche = get_current_niche();
 
         if ($user) {
-            $isExpired = $user->isTrialExpired();
-            
-            // Trial check
-            if ($isExpired && !in_array($menu->slug, ['dashboard', 'settings'])) {
-                continue;
-            }
+        $isExpired = $user->isTrialExpired();
 
-            // Feature check
-            if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
-                continue;
-            }
+        // Trial check
+        if ($isExpired && !in_array($menu->slug, ['dashboard', 'settings'])) {
+        continue;
+        }
 
-            // Niche Inclusion Check (From JSON)
-            if (isset($menu->niche) && $currentNiche !== $menu->niche) {
-                continue;
-            }
+        // Feature check
+        if (isset($menu->feature) && !$user->hasFeature($menu->feature)) {
+        continue;
+        }
 
-            // Niche Exclusion Check (From JSON)
-            if (isset($menu->niche_exclude) && $currentNiche === $menu->niche_exclude) {
-                continue;
-            }
+        // Niche Inclusion Check (From JSON)
+        if (isset($menu->niche) && $currentNiche !== $menu->niche) {
+        continue;
+        }
 
-            // Master check rules
-            if ($user->is_master) {
-                if (!isset($menu->master_only) || !$menu->master_only) continue;
-            } else {
-                if (isset($menu->master_only) && $menu->master_only) continue;
-                
-                // Employee view restrictions
-                if ($user->role === 'funcionario') {
-                    if (in_array($menu->slug, ['financial', 'reports', 'settings'])) continue;
-                }
-            }
+        // Niche Exclusion Check (From JSON)
+        if (isset($menu->niche_exclude) && $currentNiche === $menu->niche_exclude) {
+        continue;
+        }
+
+        // Master check rules
+        if ($user->is_master) {
+        if (!isset($menu->master_only) || !$menu->master_only) continue;
+        } else {
+        if (isset($menu->master_only) && $menu->master_only) continue;
+
+        // Employee view restrictions
+        if ($user->role === 'funcionario') {
+        if (in_array($menu->slug, ['financial', 'reports', 'settings'])) continue;
+        }
+        }
         }
         @endphp
 
         {{-- menu headers --}}
         @if (isset($menu->menuHeader))
         @php
-            $headerText = __($menu->menuHeader);
-            $headerClass = '';
-            if ($currentNiche === 'food_service') {
-                if ($headerText === 'Oficina' || $headerText === 'Operacional') {
-                    $headerText = '👨‍🍳 Cozinha e Vendas';
-                    $headerClass = 'text-warning fw-bold';
-                }
-                if ($headerText === 'Serviços') {
-                    $headerText = '📋 Cardápio';
-                    $headerClass = 'text-info fw-bold';
-                }
-            }
+        $headerText = __($menu->menuHeader);
+        $headerClass = '';
+        if ($currentNiche === 'food_service') {
+        if ($headerText === 'Oficina' || $headerText === 'Operacional') {
+        $headerText = '👨‍🍳 Cozinha e Vendas';
+        $headerClass = 'text-warning fw-bold';
+        }
+        if ($headerText === 'Serviços') {
+        $headerText = '📋 Cardápio';
+        $headerClass = 'text-info fw-bold';
+        }
+        }
         @endphp
         <li class="menu-header small">
             <span class="menu-header-text {{ $headerClass }}">{{ $headerText }}</span>
@@ -92,20 +111,27 @@ $configData = Helper::appClasses();
         $activeClass = null;
         $currentRouteName = Route::currentRouteName();
 
-        if ($currentRouteName === $menu->slug) {
-            $activeClass = 'active';
-        } elseif (isset($menu->submenu)) {
-            if (gettype($menu->slug) === 'array') {
-                foreach ($menu->slug as $slug) {
-                    if (str_contains($currentRouteName, $slug) && strpos($currentRouteName, $slug) === 0) {
-                        $activeClass = 'active open';
-                    }
-                }
-            } else {
-                if (str_contains($currentRouteName, $menu->slug ?? '') && strpos($currentRouteName, $menu->slug ?? '') === 0) {
-                    $activeClass = 'active open';
-                }
-            }
+        // Função recursiva para verificar se o menu ou qualquer submenu está ativo
+        $isMenuSelected = function($menuItem) use ($currentRouteName, &$isMenuSelected) {
+        if (isset($menuItem->slug)) {
+        if (is_array($menuItem->slug)) {
+        foreach ($menuItem->slug as $s) {
+        if ($currentRouteName === $s || (str_contains($currentRouteName, $s) && strpos($currentRouteName, $s) === 0)) return true;
+        }
+        } else {
+        if ($currentRouteName === $menuItem->slug || (str_contains($currentRouteName, $menuItem->slug) && strpos($currentRouteName, $menuItem->slug) === 0)) return true;
+        }
+        }
+        if (isset($menuItem->submenu)) {
+        foreach ($menuItem->submenu as $sub) {
+        if ($isMenuSelected($sub)) return true;
+        }
+        }
+        return false;
+        };
+
+        if ($isMenuSelected($menu)) {
+        $activeClass = isset($menu->submenu) ? 'active open' : 'active';
         }
         @endphp
 
@@ -121,15 +147,15 @@ $configData = Helper::appClasses();
                 @endisset
                 @php
                 $menuName = isset($menu->name) ? __($menu->name) : '';
-                
+
                 // Melhoria Visual Premium por Nicho
                 if ($currentNiche === 'food_service') {
-                    if ($menuName === 'Service Orders' || $menuName === 'Ordens de Serviço' || ($menu->slug ?? '') === 'ordens') {
-                        $menuName = 'Painel de Pedidos';
-                    }
-                    if ($menuName === 'Entry Checklist' || str_contains($menuName, 'Checklist') || ($menu->slug ?? '') === 'ordens-servico.checklist') {
-                        $menuName = 'Personalizar Lanches';
-                    }
+                if ($menuName === 'Service Orders' || $menuName === 'Ordens de Serviço' || ($menu->slug ?? '') === 'ordens') {
+                $menuName = 'Painel de Pedidos';
+                }
+                if ($menuName === 'Entry Checklist' || str_contains($menuName, 'Checklist') || ($menu->slug ?? '') === 'ordens-servico.checklist') {
+                $menuName = 'Personalizar Lanches';
+                }
                 }
 
                 $menuName = niche_translate($menuName);

@@ -150,6 +150,7 @@ class PrepareDemoEnvironment extends Command
                 'company_id' => $company->id,
                 'role' => $role === 'admin' ? 'admin' : 'employee', // Supondo que a role seja simplificada no seu banco
                 'is_active' => true,
+                'email_verified_at' => now(),
                 'plan' => $role === 'admin' ? 'enterprise' : 'free'
             ]);
         }

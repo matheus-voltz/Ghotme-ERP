@@ -19,7 +19,7 @@
     <div class="col-12">
         <form id="formSettings">
             @csrf
-            
+
             <!-- PAGAMENTOS -->
             <div class="card mb-6 shadow-sm">
                 <div class="card-header border-bottom d-flex justify-content-between align-items-center bg-label-primary py-3">
@@ -198,33 +198,32 @@
                         </div>
                         <div class="col-md-4">
                             @if($settings->meli_active && $settings->meli_access_token)
-                                <div class="alert alert-success d-flex align-items-center mb-0 p-2 border-dashed">
-                                    <i class="ti tabler-circle-check-filled me-2 ti-md"></i>
-                                    <div>
-                                        <span class="fw-bold d-block small">Conta Conectada</span>
-                                        <a href="{{ route('meli.redirect') }}" class="btn btn-sm btn-success mt-1 py-0 px-2">Reconectar</a>
-                                    </div>
+                            <div class="alert alert-success d-flex align-items-center mb-0 p-2 border-dashed">
+                                <i class="ti tabler-circle-check-filled me-2 ti-md"></i>
+                                <div>
+                                    <span class="fw-bold d-block small">Conta Conectada</span>
+                                    <a href="{{ route('meli.redirect') }}" class="btn btn-sm btn-success mt-1 py-0 px-2">Reconectar</a>
                                 </div>
+                            </div>
                             @else
-                                <a href="{{ route('meli.redirect') }}" class="btn btn-warning w-100 shadow-warning fw-bold">
-                                    <i class="ti tabler-link me-1"></i> Conectar Mercado Livre
-                                </a>
+                            <a href="{{ route('meli.redirect') }}" class="btn btn-warning w-100 shadow-warning fw-bold">
+                                <i class="ti tabler-link me-1"></i> Conectar Mercado Livre
+                            </a>
                             @endif
                         </div>
                     </div>
                 </div>
             </div>
 
-            
+
             @endif
 
-            
+
+            @if(get_current_niche() === "food_service")
             <!-- IFOOD -->
-            <hr class="my-10">
-            <div class="mt-4"></div>
             <div class="card mb-6 border-danger shadow-none">
                 <div class="card-header border-bottom bg-label-danger py-3">
-                    <h5 class="card-title mb-0 text-danger"><i class="ti tabler-tools-kitchen-2 me-1"></i> 4. Delivery iFood (Gestão de Pedidos)</h5>
+                    <h5 class="card-title mb-0 text-danger"><i class="ti tabler-tools-kitchen-2 me-1"></i> 3. Delivery iFood (Gestão de Pedidos)</h5>
                     <p class="text-muted small mb-0">Receba e gerencie seus pedidos do iFood diretamente no painel Ghotme.</p>
                 </div>
                 <div class="card-body p-6">
@@ -252,15 +251,13 @@
                     </div>
                 </div>
             </div>
-            
-
-            
+            @endif
 
             <!-- FISCAL -->
             <div class="card mb-6 shadow-sm border-start border-info border-3">
                 <div class="card-header border-bottom py-3">
-                    <h5 class="card-title mb-0 text-info"><i class="ti tabler-file-invoice me-1"></i> {{ auth()->user()?->company?->niche === 'food_service' ? '5.' : '4.' }} Emissão Fiscal (NFe / NFSe)</h5>
-                    <p class="text-muted small mb-0">Emita notas fiscais de {{ auth()->user()?->company?->niche === 'food_service' ? 'vendas' : 'serviços e peças' }} automaticamente.</p>
+                    <h5 class="card-title mb-0 text-info"><i class="ti tabler-file-invoice me-1"></i> 4. Emissão Fiscal (NFe / NFSe)</h5>
+                    <p class="text-muted small mb-0">Emita notas fiscais de {{ get_current_niche() === 'food_service' ? 'vendas' : 'serviços e peças' }} automaticamente.</p>
                 </div>
                 <div class="card-body p-6">
                     <div class="row align-items-center">
@@ -296,49 +293,89 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('formSettings');
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('formSettings');
 
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: 'Salvando Configurações',
-            text: 'Aguarde um momento...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Salvando Configurações',
+                text: 'Aguarde um momento...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
 
-        const formData = new FormData(form);
+            const formData = new FormData(form);
 
-        fetch("{{ route('settings.integrations.update') }}", {
-            method: 'POST',
-            body: new URLSearchParams(formData),
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                Swal.fire({ icon: 'success', title: 'Sucesso!', text: data.message, customClass: { confirmButton: 'btn btn-success' } });
-            } else {
-                Swal.fire({ icon: 'error', title: 'Erro!', text: data.message, customClass: { confirmButton: 'btn btn-danger' } });
-            }
-        })
-        .catch(err => {
-            Swal.fire({ icon: 'error', title: 'Erro crítico', text: 'Não foi possível salvar as configurações.' });
-        });
-    };
-});
+            fetch("{{ route('settings.integrations.update') }}", {
+                    method: 'POST',
+                    body: new URLSearchParams(formData),
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sucesso!',
+                            text: data.message,
+                            customClass: {
+                                confirmButton: 'btn btn-success'
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erro!',
+                            text: data.message,
+                            customClass: {
+                                confirmButton: 'btn btn-danger'
+                            }
+                        });
+                    }
+                })
+                .catch(err => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro crítico',
+                        text: 'Não foi possível salvar as configurações.'
+                    });
+                });
+        };
+    });
 </script>
 
 <style>
-    .shadow-primary { box-shadow: 0 0.5rem 1.5rem rgba(115, 103, 240, 0.4) !important; }
-    .bg-lighter { background-color: #f8f7fa !important; }
-    .nav-tabs .nav-link.active { border-bottom: 2px solid #7367f0 !important; color: #7367f0 !important; font-weight: bold; }
-    .border-dashed { border-style: dashed !important; }
-    .btn-white { background: #fff; border-color: #fff; }
-    .btn-white:hover { background: #f2f2f2; }
+    .shadow-primary {
+        box-shadow: 0 0.5rem 1.5rem rgba(115, 103, 240, 0.4) !important;
+    }
+
+    .bg-lighter {
+        background-color: #f8f7fa !important;
+    }
+
+    .nav-tabs .nav-link.active {
+        border-bottom: 2px solid #7367f0 !important;
+        color: #7367f0 !important;
+        font-weight: bold;
+    }
+
+    .border-dashed {
+        border-style: dashed !important;
+    }
+
+    .btn-white {
+        background: #fff;
+        border-color: #fff;
+    }
+
+    .btn-white:hover {
+        background: #f2f2f2;
+    }
 </style>
 @endsection
