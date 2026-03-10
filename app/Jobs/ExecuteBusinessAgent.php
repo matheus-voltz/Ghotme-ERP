@@ -51,6 +51,9 @@ class ExecuteBusinessAgent implements ShouldQueue
                 return;
             }
 
+            // Set the context for reference in act()
+            $agent->setContext($this->context);
+
             // 1. Analyze the context
             Log::info("Agent ({$this->agentClass}) analyzing context...");
             $analysisResult = $agent->analyze($this->context);

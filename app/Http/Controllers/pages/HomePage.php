@@ -162,6 +162,7 @@ class HomePage extends Controller
         ->orderBy('created_at', 'desc')
         ->limit(5)
         ->get(),
+      'aiInsights' => \App\Models\AiInsight::latest()->limit(3)->get(),
     ];
   }
 
@@ -339,8 +340,8 @@ class HomePage extends Controller
       'retentionRate' => $retentionRate,
       'academyHighlights' => $academyHighlights,
       'lowStockItems' => InventoryItem::where('company_id', $companyId)
-        ->when(get_current_niche() === 'food_service', function($q) {
-            return $q->where('is_ingredient', true);
+        ->when(get_current_niche() === 'food_service', function ($q) {
+          return $q->where('is_ingredient', true);
         })
         ->whereRaw('quantity <= min_quantity')->count(),
       'pendingBudgets' => Budget::where('company_id', $companyId)->where('status', 'pending')->count(),
@@ -360,7 +361,7 @@ class HomePage extends Controller
       'topServiceLabels' => $topServices->pluck('name')->map(fn($item) => str($item)->limit(15))->toArray(),
       'topServiceData' => $topServices->pluck('total')->toArray(),
       'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
-      'lastUpdate' => SystemUpdate::latest()->first(),
+      'aiInsights' => \App\Models\AiInsight::latest()->limit(3)->get(),
     ];
   }
 }

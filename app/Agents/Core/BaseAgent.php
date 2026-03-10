@@ -10,6 +10,12 @@ abstract class BaseAgent implements AgentInterface
 {
     protected string $model = 'gemini-1.5-flash'; // Default model, can be overridden
     protected float $temperature = 0.5;
+    protected array $context = [];
+
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
+    }
 
     /**
      * Utility method to communicate with the LLM API.

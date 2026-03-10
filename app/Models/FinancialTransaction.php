@@ -10,6 +10,10 @@ class FinancialTransaction extends Model
 {
     use BelongsToCompany;
 
+    protected $dispatchesEvents = [
+        'created' => \App\Events\TransactionCreated::class,
+    ];
+
     protected $fillable = [
         'company_id',
         'description',

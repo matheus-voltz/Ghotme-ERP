@@ -85,16 +85,19 @@ PROMPT;
 
         // Just as an example, if it's warning or critical, we log it to SystemUpdate/Changelog for visibility
         if (in_array($analysisResult['status'], ['warning', 'critical'])) {
+            $tx = $this->context['transaction'];
+            $companyId = is_object($tx) ? $tx->company_id : $tx['company_id'];
 
-            // In a real scenario, you might have an `AiInsights` or `Alerts` specific table.
-            SystemUpdate::create([
-                'title' => 'Alerta Financeiro (IA Auto-Auditoria)',
-                'description' => $analysisResult['observation'] . " | Sugestão: " . $analysisResult['recommendation'],
-                'type' => 'bug', // Repurposing the type just to highlight
-                'is_active' => true,
+            \App\Models\AiInsight::create([
+                'company_id' => $companyId,
+                'agent_name' => 'FinancialAuditorAgent',
+                'title' => 'Auditoria Financeira',
+                'observation' => $analysisResult['observation'],
+                'recommendation' => $analysisResult['recommendation'],
+                'status' => $analysisResult['status'],
             ]);
 
-            Log::channel('single')->info("Agent Acted! Created a SystemUpdate for a critical transaction.");
+            Log::channel('single')->info("Agent Acted! Created an AiInsight for a critical transaction.");
             return true;
         }
 

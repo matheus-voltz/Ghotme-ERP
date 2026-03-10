@@ -18,6 +18,11 @@ interface AgentInterface
     public function analyze(array $context);
 
     /**
+     * Store the context for later reference during action.
+     */
+    public function setContext(array $context): void;
+
+    /**
      * Execute any action resulting from the analysis (Optional implementation).
      * 
      * @param mixed $analysisResult The result returned from the analyze method.

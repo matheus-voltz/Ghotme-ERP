@@ -15,6 +15,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\TransactionCreated::class => [
             \App\Listeners\TriggerFinancialAudit::class,
         ],
+        \App\Events\InventoryUpdated::class => [
+            \App\Listeners\TriggerInventoryOptimization::class,
+        ],
     ];
 
     /**

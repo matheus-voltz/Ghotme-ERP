@@ -166,33 +166,71 @@ $configData = Helper::appClasses();
         </div>
     </div>
 
-    <!-- Ingredients to Watch -->
+    <!-- AI Insights & Auditoria -->
     <div class="col-12 col-xl-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-header border-bottom py-3">
-                <h5 class="mb-0 fw-bold text-danger">{{ __('Low Ingredients') }}</h5>
+        <div class="card h-100 shadow-sm border-0 bg-label-primary">
+            <div class="card-header border-bottom py-3 d-flex justify-content-between align-items-center bg-primary text-white" style="border-radius: 12px 12px 0 0;">
+                <h5 class="mb-0 fw-bold text-white"><i class="ti tabler-brain me-1"></i> IA Insights & Auditoria</h5>
+                <span class="badge bg-white text-primary small">Beta</span>
             </div>
-            <div class="card-body p-0">
-                <ul class="list-group list-group-flush">
-                    @if(count($recentOS) > 0) {{-- Simulated check, need to fetch actual items if real data exists --}}
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
-                        <div class="d-flex align-items-center">
-                            <div class="avatar bg-label-danger rounded-circle p-2 me-3">
-                                <i class="ti tabler-alert-triangle fs-4"></i>
-                            </div>
-                            <div>
-                                <h6 class="mb-0 fw-bold">{{ __('Watch your inventory') }}</h6>
-                                <small class="text-muted">{{ $lowStockItems }} {{ __('items need restock.') }}</small>
-                            </div>
-                        </div>
-                    </li>
-                    @endif
-                </ul>
-                <div class="p-3">
-                    <a href="{{ route('inventory.items') }}" class="btn btn-outline-danger w-100">{{ __('Go to Inventory') }}</a>
+            <div class="card-body p-4">
+                @forelse($aiInsights ?? collect() as $insight)
+                <div class="mb-4 p-3 bg-white rounded shadow-sm border-start border-3 border-{{ $insight->status == 'critical' ? 'danger' : ($insight->status == 'warning' ? 'warning' : 'success') }}">
+                    <div class="d-flex justify-content-between mb-1">
+                        <h6 class="fw-bold mb-0 text-dark">{{ $insight->title }}</h6>
+                        <small class="text-muted">{{ $insight->created_at->diffForHumans() }}</small>
+                    </div>
+                    <p class="small mb-2 text-muted">{{ $insight->observation }}</p>
+                    <div class="p-2 bg-light rounded small">
+                        <strong><i class="ti tabler-bulb me-1"></i> Recomendação:</strong> {{ $insight->recommendation }}
+                    </div>
                 </div>
+                @empty
+                <div class="text-center py-5">
+                    <i class="ti tabler-coffee fs-1 opacity-25 mb-3"></i>
+                    <p class="text-muted mb-0">Nenhum alerta crítico encontrado pela auditoria automática.</p>
+                </div>
+                @endforelse
+
+                @if(isset($aiInsights) && count($aiInsights) > 0)
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary btn-sm rounded-pill w-100 py-2">
+                        <i class="ti tabler-refresh me-1"></i> Solicitar Re-Análise Completa
+                    </button>
+                </div>
+                @endif
             </div>
         </div>
     </div>
+</div>
+
+<!-- Ingredients to Watch -->
+<div class="col-12 col-xl-4">
+    <div class="card h-100 shadow-sm border-0">
+        <div class="card-header border-bottom py-3">
+            <h5 class="mb-0 fw-bold text-danger">{{ __('Low Ingredients') }}</h5>
+        </div>
+        <div class="card-body p-0">
+            <ul class="list-group list-group-flush">
+                @if(count($recentOS) > 0) {{-- Simulated check, need to fetch actual items if real data exists --}}
+                <li class="list-group-item d-flex justify-content-between align-items-center py-3 border-0">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar bg-label-danger rounded-circle p-2 me-3">
+                            <i class="ti tabler-alert-triangle fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ __('Watch your inventory') }}</h6>
+                            <small class="text-muted">{{ $lowStockItems }} {{ __('items need restock.') }}</small>
+                        </div>
+                    </div>
+                </li>
+                @endif
+            </ul>
+            <div class="p-3">
+                <a href="{{ route('inventory.items') }}" class="btn btn-outline-danger w-100">{{ __('Go to Inventory') }}</a>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 @endsection

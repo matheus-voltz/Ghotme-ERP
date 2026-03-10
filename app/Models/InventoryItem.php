@@ -10,6 +10,11 @@ class InventoryItem extends Model
 {
     use BelongsToCompany;
 
+    protected $dispatchesEvents = [
+        'created' => \App\Events\InventoryUpdated::class,
+        'updated' => \App\Events\InventoryUpdated::class,
+    ];
+
     protected $fillable = [
         'company_id',
         'name',
