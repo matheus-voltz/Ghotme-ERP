@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\IFoodController;
 use App\Http\Controllers\OrdemServicoController;
 use App\Http\Controllers\SettingsController;
@@ -171,14 +172,15 @@ Route::middleware([
         Route::get('/master/dashboard', [App\Http\Controllers\MasterPortalController::class, 'index'])->name('master.dashboard');
         Route::post('/master/ai-analysis', [App\Http\Controllers\MasterPortalController::class, 'aiAnalysis'])->name('master.ai-analysis');
         Route::get('/master/errors', [App\Http\Controllers\MasterPortalController::class, 'errors'])->name('master.errors');
+        Route::post('/master/errors/clear', [App\Http\Controllers\MasterPortalController::class, 'clearErrors'])->name('master.errors.clear');
         Route::delete('/master/errors/{id}', [App\Http\Controllers\MasterPortalController::class, 'destroyError'])->name('master.errors.destroy');
         Route::get('/master/companies', [App\Http\Controllers\MasterPortalController::class, 'companies'])->name('master.companies');
-        Route::post('/master/companies/{id}/toggle-status', [App\Http\Controllers\MasterPortalController::class, 'toggleCompanyStatus'])->name('master.companies.toggle-status');
-        
+        Route::post('/master/companies/{id}/update', [App\Http\Controllers\MasterPortalController::class, 'updateCompany'])->name('master.companies.update');
+
         // Newsletter Master
         Route::get('/master/newsletter/create', [App\Http\Controllers\MasterPortalController::class, 'createNewsletter'])->name('master.newsletter.create');
         Route::post('/master/newsletter', [App\Http\Controllers\MasterPortalController::class, 'sendNewsletter'])->name('master.newsletter.send');
-        
+
         // System Updates
         Route::post('/master/system-update', [App\Http\Controllers\MasterPortalController::class, 'logSystemUpdate'])->name('master.system-update.store');
     });
