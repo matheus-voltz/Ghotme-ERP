@@ -13,7 +13,6 @@ use App\Models\OrdemServico;
 use App\Models\FinancialTransaction;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Faker\Factory as Faker;
 use Carbon\Carbon;
 
 class PrepareDemoEnvironment extends Command
@@ -59,7 +58,7 @@ class PrepareDemoEnvironment extends Command
         }
 
         $this->info('Iniciando preparação do ambiente de demonstração...');
-        $faker = Faker::create('pt_BR');
+        $faker = fake('pt_BR');
 
         // ==== PASSO 1: LIMPEZA ====
         if ($this->cleanDatabase() === false) {
