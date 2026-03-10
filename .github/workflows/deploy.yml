@@ -60,8 +60,7 @@ jobs:
             
             # Migrations e Limpeza de Cache (agora com fallback para o Reverb)
             php artisan migrate --force
-            php artisan storage:link || true
-            php artisan package:clear
+            php artisan storage:link || true    
             php artisan config:clear
             php artisan cache:clear
             php artisan config:cache
