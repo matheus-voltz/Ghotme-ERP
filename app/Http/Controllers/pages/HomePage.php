@@ -92,21 +92,34 @@ class HomePage extends Controller
     6. JAMAIS use hashtags (# ou ##) no texto. Use negrito (**Texto**) para destacar títulos.";
 
     try {
-      $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
-      $response = Http::post($url, [
+      $model = config('services.ai.gemini_model', 'gemini-1.5-flash');
+      $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey;
+
+      \Illuminate\Support\Facades\Log::info("AI Consultant: Sending request to Gemini using model {$model}");
+
+      $response = Http::timeout(30)->post($url, [
         'contents' => [['parts' => [['text' => $prompt]]]]
       ]);
 
       if ($response->successful()) {
         $insight = $response->json('candidates.0.content.parts.0.text');
+
+        if (empty($insight)) {
+          \Illuminate\Support\Facades\Log::warning("AI Consultant: Empty response from Gemini");
+          return response()->json(['success' => false, 'message' => 'A IA não retornou um insight válido no momento.']);
+        }
+
         $insight = preg_replace('/^```html|```$/m', '', $insight);
         return response()->json(['success' => true, 'insight' => trim($insight)]);
+      } else {
+        \Illuminate\Support\Facades\Log::error("AI Consultant API Error: " . $response->body());
       }
     } catch (\Exception $e) {
-      return response()->json(['success' => false, 'message' => $e->getMessage()]);
+      \Illuminate\Support\Facades\Log::error("AI Consultant Exception: " . $e->getMessage());
+      return response()->json(['success' => false, 'message' => 'Erro técnico: ' . $e->getMessage()]);
     }
 
-    return response()->json(['success' => false, 'message' => 'Erro ao gerar análise']);
+    return response()->json(['success' => false, 'message' => 'O serviço de IA está temporariamente indisponível. Tente novamente em instantes.']);
   }
 
   public function index()

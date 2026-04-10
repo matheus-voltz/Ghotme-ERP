@@ -91,4 +91,25 @@ class MenuController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function updateTheme(Request $request)
+    {
+        $request->validate([
+            'primary_color' => 'required|string|max:10'
+        ]);
+
+        $company = Auth::user()->company;
+
+        if (!$company) {
+            return back()->withErrors(['error' => 'Empresa não encontrada para este usuário.']);
+        }
+
+        $config = $company->configuracoes_net ?? [];
+        $config['public_menu_theme'] = $request->primary_color;
+
+        $company->configuracoes_net = $config;
+        $company->save();
+
+        return back()->with('success', 'Aparência do cardápio atualizada com sucesso!');
+    }
 }

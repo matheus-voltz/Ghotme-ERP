@@ -59,7 +59,13 @@ $configData = Helper::appClasses();
             <div class="card-body py-4 d-flex justify-content-between align-items-center">
                 <div>
                     <h4 class="text-white mb-1 fw-bold">🍔 {{ __('Food Service Dashboard') }}</h4>
-                    <p class="mb-0 opacity-75">{{ __('Manage your kitchen and sales in real time.') }}</p>
+                    <p class="mb-0 text-white opacity-75">{{ __('Manage your kitchen and sales in real time.') }}</p>
+                    <div class="mt-3">
+                        <button class="btn btn-primary bg-white text-primary border-0 fw-bold shadow-sm" id="btn-client-ai-analysis"
+                            data-limit-reached="{{ (!auth()->user()->hasFeature('ai_analysis') || (!auth()->user()->hasFeature('ai_unlimited') && (Cache::get('ai_usage_' . auth()->user()->company_id . '_' . now()->format('Y-m'), 0)) >= 10)) ? 'true' : 'false' }}">
+                            <i class="ti tabler-brain me-1"></i> Consultor IA Ghotme
+                        </button>
+                    </div>
                 </div>
                 <div class="d-none d-md-block">
                     <span class="badge bg-label-warning p-2"><i class="ti tabler-flame me-1"></i> {{ __('Operation Online') }}</span>
@@ -233,4 +239,75 @@ $configData = Helper::appClasses();
     </div>
 </div>
 </div>
+
+@if(auth()->user()->role === 'admin')
+<!-- Modal IA Client Analysis -->
+<div class="modal fade" id="aiClientModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title">Consultor Estratégico Ghotme</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="client-ai-content" class="p-2" style="white-space: pre-wrap; line-height: 1.6;">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2 text-muted">O Consultor está analisando seus dados de vendas...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnAi = document.getElementById('btn-client-ai-analysis');
+        const aiModalEl = document.getElementById('aiClientModal');
+        const content = document.getElementById('client-ai-content');
+
+        if (btnAi && aiModalEl) {
+            btnAi.addEventListener('click', function() {
+                if (btnAi.getAttribute('data-limit-reached') === 'true') {
+                    Swal.fire({
+                        title: 'Limite Atingido ou Plano Diferente',
+                        text: 'A consulta estratégica de IA é um recurso do plano Enterprise.',
+                        icon: 'info'
+                    });
+                    return;
+                }
+
+                const modal = bootstrap.Modal.getOrCreateInstance(aiModalEl);
+                modal.show();
+                content.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary"></div><p class="mt-2 text-muted">O Consultor está analisando seus dados de vendas...</p></div>';
+
+                fetch('{{ route("dashboard.ai-analysis") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            content.innerHTML = `<div class="animate__animated animate__fadeIn">${data.insight.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>`;
+                        } else {
+                            content.innerHTML = `<div class="text-center p-4"><i class="ti tabler-alert-circle text-danger fs-1"></i><p class="text-danger mt-2">${data.message}</p></div>`;
+                        }
+                    })
+                    .catch(err => {
+                        content.innerHTML = '<div class="text-center p-4"><i class="ti tabler-circle-x text-danger fs-1"></i><p class="text-danger mt-2">Erro de conexão.</p></div>';
+                    });
+            });
+        }
+    });
+</script>
+@endpush
 @endsection

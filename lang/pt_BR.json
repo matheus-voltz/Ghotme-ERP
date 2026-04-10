@@ -450,5 +450,8 @@
   "This item is an ingredient/input": "Este item é um ingrediente/insumo",
   "Used for recipe configuration (Food Service)": "Usado para configuração de receita (Food Service)",
   "Available for Sale?": "Disponível para Venda?",
-  "If unchecked, selling price is not required.": "Se desmarcado, o preço de venda não é obrigatório."
+  "If unchecked, selling price is not required.": "Se desmarcado, o preço de venda não é obrigatório.",
+  "Página Não Encontrada": "Página Não Encontrada",
+  "Oops! 😖 A URL solicitada não foi encontrada neste servidor.": "Oops! 😖 A URL solicitada não foi encontrada neste servidor.",
+  "Voltar para o Início": "Voltar para o Início"
 }

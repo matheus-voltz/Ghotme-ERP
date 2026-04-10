@@ -50,7 +50,10 @@
         <span class="text-muted fw-light">Cardápio /</span> Montar e Desmontar
     </h4>
     <div class="d-flex gap-2">
-        <a href="{{ route('public.menu.show', Auth::user()->company->slug ?? 'default') }}" target="_blank" class="btn btn-label-primary">
+        <button class="btn btn-label-dark" data-bs-toggle="modal" data-bs-target="#modalAppearance">
+            <i class="ti tabler-palette me-1"></i> Aparência
+        </button>
+        <a href="{{ route('public.menu.show', auth()->user()->company?->slug ?? auth()->user()->company?->id ?? 'default') }}" target="_blank" class="btn btn-label-primary">
             <i class="ti tabler-external-link me-1"></i> Ver Cardápio Público
         </a>
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAddCategory">
@@ -225,6 +228,32 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Fechar</button>
                     <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Appearance -->
+<div class="modal fade" id="modalAppearance" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Personalizar Cardápio Público</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('menu.categories.theme') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p class="text-muted">A cor escolhida será o destaque principal (botões, detalhes e categorias) do seu cardápio público.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Cor Principal do Cardápio</label>
+                        <input type="color" name="primary_color" class="form-control form-control-color w-100" value="{{ optional(auth()->user()->company)->hasConfig('public_menu_theme', '#ff4757') ?? '#ff4757' }}" title="Escolha a cor principal">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Aparência</button>
                 </div>
             </form>
         </div>

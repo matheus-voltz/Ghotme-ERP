@@ -10,7 +10,9 @@ class PublicMenuController extends Controller
 {
     public function show($slug)
     {
-        $company = Company::where('slug', $slug)->firstOrFail();
+        $company = Company::where('slug', $slug)
+            ->orWhere('id', $slug)
+            ->firstOrFail();
 
         $categories = MenuCategory::where('company_id', $company->id)
             ->where('is_active', true)

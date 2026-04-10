@@ -389,6 +389,7 @@ Route::middleware([
     Route::put('/menu/categories/{id}', [App\Http\Controllers\MenuController::class, 'updateCategory'])->name('menu.categories.update');
     Route::delete('/menu/categories/{id}', [App\Http\Controllers\MenuController::class, 'destroyCategory'])->name('menu.categories.destroy');
     Route::post('/menu/items/assign', [App\Http\Controllers\MenuController::class, 'assignItem'])->name('menu.items.assign');
+    Route::post('/menu/theme', [App\Http\Controllers\MenuController::class, 'updateTheme'])->name('menu.categories.theme');
 
     // Recipes / Ficha Técnica (Food Service)
     Route::get('/inventory/recipes', [App\Http\Controllers\RecipeController::class, 'index'])->name('recipes.index');

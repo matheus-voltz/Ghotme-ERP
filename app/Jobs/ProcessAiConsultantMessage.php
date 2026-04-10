@@ -37,7 +37,20 @@ class ProcessAiConsultantMessage implements ShouldQueue
     {
         try {
             $chat = AiConsultantChat::findOrFail($this->chatId);
+
+            // Garante que o usuário e a empresa estejam carregados se não foram passados (caso de serialização em fila)
+            if (!$this->user || !$this->company) {
+                $this->user = $chat->user;
+                $this->company = $chat->company;
+            }
+
+            if (!$this->company) {
+                Log::error("ProcessAiConsultantMessage: Company not found for Chat ID {$this->chatId}");
+                return;
+            }
+
             $companyId = $this->company->id;
+            Log::info("ProcessAiConsultantMessage: Processing chat {$this->chatId} for company {$companyId}");
 
             // Busca contexto do negócio
             $nicheKey = get_current_niche($this->company);
@@ -54,7 +67,7 @@ class ProcessAiConsultantMessage implements ShouldQueue
 
             $revenue = FinancialTransaction::where('company_id', $companyId)->where('type', 'in')->where('status', 'paid')->whereMonth('paid_at', now()->month)->sum('amount');
             $expenses = FinancialTransaction::where('company_id', $companyId)->where('type', 'out')->where('status', 'paid')->whereMonth('paid_at', now()->month)->sum('amount');
-            
+
             // Detalhamento para sugestão de cortes
             $expensesByCategory = FinancialTransaction::where('company_id', $companyId)
                 ->where('type', 'out')
@@ -80,8 +93,8 @@ class ProcessAiConsultantMessage implements ShouldQueue
 
             // Memória de Longo Prazo do Tenant
             $businessMemories = \App\Models\AiBusinessMemory::getContextForCompany($companyId);
-            $memorySection = !empty($businessMemories) 
-                ? "**MEMÓRIA DO NEGÓCIO (Fatos anteriores):**\n{$businessMemories}\n" 
+            $memorySection = !empty($businessMemories)
+                ? "**MEMÓRIA DO NEGÓCIO (Fatos anteriores):**\n{$businessMemories}\n"
                 : "";
 
             $companyName = $this->company->name ?? 'sua empresa';
@@ -142,8 +155,9 @@ Sua dupla missão é:
                 ];
             })->toArray();
 
-            $apiKey = env('GEMINI_API_KEY');
-            $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . $apiKey;
+            $apiKey = config('services.ai.gemini_key');
+            $model = config('services.ai.gemini_model', 'gemini-3-flash-preview');
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey;
 
             $aiToolsService = new \App\Services\AiToolsService($companyId);
             $toolDefinitions = \App\Services\AiToolsService::getToolDefinitions();
@@ -177,7 +191,7 @@ Sua dupla missão é:
                 $candidate = $response->json('candidates.0');
                 $message = $candidate['content'];
                 $parts = $message['parts'];
-                
+
                 // Adiciona a resposta da IA ao histórico interno para a próxima rodada
                 $history[] = $message;
 
@@ -248,7 +262,6 @@ Sua dupla missão é:
 
                 $currentIteration++;
             }
-
         } catch (\Exception $e) {
             Log::error('Exceção Job AiConsultant: ' . $e->getMessage());
         }
