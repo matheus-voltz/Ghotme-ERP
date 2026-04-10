@@ -17,6 +17,11 @@ class CheckTrialStatus
     {
         $user = $request->user();
 
+        // Se o usuário é master, ignora a restrição de teste/plano
+        if ($user && $user->is_master) {
+            return $next($request);
+        }
+
         // Se o usuário não tem plano definido ou o plano ainda é 'free'
         if ($user && ($user->plan === 'free' || empty($user->plan))) {
             
