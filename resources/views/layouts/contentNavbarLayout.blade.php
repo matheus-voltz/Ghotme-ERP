@@ -76,7 +76,7 @@ isset($configData['contentLayout']) && $configData['contentLayout'] === 'compact
             $overdueDays = 0;
             $isLocked = false;
 
-            if ($user) {
+            if ($user && !$user->is_master) {
             $isOverdue = $user->isPaymentOverdue();
             $overdueDays = $user->getOverdueDays();
             $isLocked = $user->isLockedDueToOverdue();
