@@ -457,10 +457,11 @@
           <div class="col-md-6">
             <div class="d-flex justify-content-between mb-1">
               <span>Dias de Uso</span>
-              <span>{{ $daysUsed }} de 30</span>
+              @php $displayDays = $daysUsed > 30 ? 30 : $daysUsed; @endphp
+              <span>{{ $displayDays }} de 30</span>
             </div>
             <div class="progress" style="height: 10px;">
-              <div class="progress-bar" style="width: {{ ($daysUsed/30)*100 }}%"></div>
+              <div class="progress-bar" style="width: {{ ($displayDays/30)*100 }}%"></div>
             </div>
           </div>
           @else

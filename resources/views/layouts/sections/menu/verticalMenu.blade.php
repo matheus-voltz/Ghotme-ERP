@@ -54,7 +54,7 @@ $configData = Helper::appClasses();
         $isExpired = $user->isTrialExpired();
 
         // Trial check
-        if ($isExpired && !in_array($menu->slug, ['dashboard', 'settings'])) {
+        if ($isExpired && !in_array($menu->slug, ['dashboard'])) {
         continue;
         }
 
