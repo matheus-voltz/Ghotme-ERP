@@ -215,6 +215,13 @@ class SettingsController extends Controller
                 return response()->json(['success' => false, 'message' => $result['errors'][0]['description'] ?? 'Erro no Asaas']);
             }
 
+            if (!isset($result['id'])) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Erro de integração (sem ID): ' . json_encode($result)
+                ]);
+            }
+
             $invoiceUrl = $result['invoiceUrl'] ?? null;
             $paymentId = $result['id'];
             $status = ($method === 'credit_card' && isset($result['status']) && $result['status'] === 'CONFIRMED') ? 'paid' : 'pending';
