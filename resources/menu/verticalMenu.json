@@ -21,6 +21,11 @@
           "url": "/master/companies",
           "name": "Gestão de Empresas",
           "slug": "master.companies"
+        },
+        {
+          "url": "/master/sql",
+          "name": "SQL Runner",
+          "slug": "master.sql"
         }
       ]
     },

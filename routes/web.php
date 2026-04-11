@@ -179,6 +179,7 @@ Route::middleware([
         Route::delete('/master/errors/{id}', [App\Http\Controllers\MasterPortalController::class, 'destroyError'])->name('master.errors.destroy');
         Route::get('/master/companies', [App\Http\Controllers\MasterPortalController::class, 'companies'])->name('master.companies');
         Route::post('/master/companies/{id}/update', [App\Http\Controllers\MasterPortalController::class, 'updateCompany'])->name('master.companies.update');
+        Route::match(['get', 'post'], '/master/sql', [App\Http\Controllers\SqlRunnerController::class, 'sqlRunner'])->name('master.sql');
 
         // Newsletter Master
         Route::get('/master/newsletter/create', [App\Http\Controllers\MasterPortalController::class, 'createNewsletter'])->name('master.newsletter.create');
