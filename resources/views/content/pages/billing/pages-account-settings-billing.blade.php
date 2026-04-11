@@ -427,6 +427,20 @@
             icon: 'success',
             title: 'Perfil Atualizado!'
           });
+        },
+        error: function(xhr) {
+          let errorMsg = 'Erro ao atualizar perfil.';
+          if (xhr.status === 422) {
+            const errors = Object.values(xhr.responseJSON.errors).flat();
+            errorMsg = errors.join('<br>');
+          } else if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMsg = xhr.responseJSON.message;
+          }
+          Swal.fire({
+            icon: 'error',
+            title: 'Atenção',
+            html: errorMsg
+          });
         }
       });
     });

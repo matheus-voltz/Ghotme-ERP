@@ -300,13 +300,13 @@ class SettingsController extends Controller
             $user->update([
                 'company' => $validated['companyName'],
                 'email' => $validated['billingEmail'],
-                'cpf_cnpj' => $validated['cpf_cnpj'],
-                'contact_number' => $validated['mobileNumber'],
-                'country' => $validated['country'],
-                'city' => $validated['city'],
-                'billing_address' => $validated['billingAddress'],
-                'state' => $validated['state'],
-                'zip_code' => $validated['zipCode'],
+                'cpf_cnpj' => $validated['cpf_cnpj'] ?? null,
+                'contact_number' => $validated['mobileNumber'] ?? null,
+                'country' => $validated['country'] ?? null,
+                'city' => $validated['city'] ?? null,
+                'billing_address' => $validated['billingAddress'] ?? null,
+                'state' => $validated['state'] ?? null,
+                'zip_code' => $validated['zipCode'] ?? null,
             ]);
 
             // Optional: Update Asaas Customer data if needed
