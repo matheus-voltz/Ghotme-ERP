@@ -77,6 +77,7 @@ class AsaasService
         }
 
         $response = Http::withHeaders(['access_token' => $this->apiKey])
+            ->withoutRedirecting()
             ->post($this->baseUrl . '/subscriptions', $payload);
 
         return $response->json();
@@ -105,6 +106,7 @@ class AsaasService
         }
 
         $response = Http::withHeaders(['access_token' => $this->apiKey])
+            ->withoutRedirecting()
             ->post($this->baseUrl . '/payments', $payload);
 
         return $response->json();

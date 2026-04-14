@@ -276,9 +276,9 @@ $pageConfigs = [
   <section id="landingNichos" class="section-py bg-body landing-nichos">
     <div class="container">
       <div class="text-center mb-10">
-        <span class="badge bg-label-primary mb-3">Ecossistema Ghotme</span>
-        <h2 class="fw-extrabold mb-2">Um sistema, <span class="hero-title">infinitas possibilidades</span></h2>
-        <p class="text-muted fs-5">Escolha o seu nicho e veja como o Ghotme se adapta perfeitamente ao seu negócio.</p>
+        <span class="badge bg-label-primary mb-3">{{ __('Ghotme Ecosystem') }}</span>
+        <h2 class="fw-extrabold mb-2">{{ __('One system') }}, <span class="hero-title">{{ __('infinite possibilities') }}</span></h2>
+        <p class="text-muted fs-5">{{ __('Choose your niche and see how Ghotme adapts perfectly to your business.') }}</p>
       </div>
       <div class="row g-6 justify-content-center">
         <!-- Oficina -->
@@ -291,8 +291,8 @@ $pageConfigs = [
                     <i class="ti tabler-car fs-1"></i>
                   </span>
                 </div>
-                <h5 class="fw-bold text-heading mb-2">Oficina Mecânica</h5>
-                <p class="text-muted small mb-0">Gestão de OS, estoque de peças e histórico de veículos.</p>
+                <h5 class="fw-bold text-heading mb-2">{{ __('Mechanic Workshop') }}</h5>
+                <p class="text-muted small mb-0">{{ __('OS management, parts inventory and vehicle history.') }}</p>
               </div>
             </div>
           </a>
@@ -307,8 +307,8 @@ $pageConfigs = [
                     <i class="ti tabler-dog-bowl fs-1"></i>
                   </span>
                 </div>
-                <h5 class="fw-bold text-heading mb-2">Pet Shop</h5>
-                <p class="text-muted small mb-0">Agenda de banho e tosa, prontuário pet e vacinas.</p>
+                <h5 class="fw-bold text-heading mb-2">{{ __('Pet Shop') }}</h5>
+                <p class="text-muted small mb-0">{{ __('Bathing and grooming schedule, pet records and vaccines.') }}</p>
               </div>
             </div>
           </a>
@@ -323,8 +323,8 @@ $pageConfigs = [
                     <i class="ti tabler-sparkles fs-1"></i>
                   </span>
                 </div>
-                <h5 class="fw-bold text-heading mb-2">Clínica de Estética</h5>
-                <p class="text-muted small mb-0">Ficha de anamnese, protocolos e controle de sessões.</p>
+                <h5 class="fw-bold text-heading mb-2">{{ __('Beauty Clinic') }}</h5>
+                <p class="text-muted small mb-0">{{ __('Anamnesis form, protocols and session control.') }}</p>
               </div>
             </div>
           </a>
@@ -339,8 +339,8 @@ $pageConfigs = [
                     <i class="ti tabler-device-mobile-cog fs-1"></i>
                   </span>
                 </div>
-                <h5 class="fw-bold text-heading mb-2">Assistência Técnica</h5>
-                <p class="text-muted small mb-0">Laudos técnicos, garantia e controle de números de série.</p>
+                <h5 class="fw-bold text-heading mb-2">{{ __('Technical Assistance') }}</h5>
+                <p class="text-muted small mb-0">{{ __('Technical reports, warranty and serial number control.') }}</p>
               </div>
             </div>
           </a>
@@ -356,7 +356,7 @@ $pageConfigs = [
                   </span>
                 </div>
                 <h5 class="fw-bold text-heading mb-2">{{ __('Food Service & Trucks') }}</h5>
-                <p class="text-muted small mb-0">{{ __('Pedidos em tempo real, integração iFood e controle de insumos.') }}</p>
+                <p class="text-muted small mb-0">{{ __('Real-time orders, iFood integration and ingredient control.') }}</p>
               </div>
             </div>
           </a>
@@ -471,8 +471,8 @@ $pageConfigs = [
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-primary rounded-circle">
               <i class="ti tabler-building-skyscraper fs-1"></i>
             </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Construção e Engenharia') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Controle de obras, medições e emissão de RDO (Relatório Diário de Obra) em tempo real.') }}</p>
+            <h5 class="fw-extrabold mb-3">{{ __('Construction and Engineering') }}</h5>
+            <p class="text-muted small mb-0">{{ __('Construction control, measurements and real-time RDO (Daily Construction Report) issuance.') }}</p>
           </div>
         </div>
         <div class="col-md-3">
@@ -480,8 +480,8 @@ $pageConfigs = [
             <div class="avatar avatar-xl mx-auto mb-4 bg-label-danger rounded-circle">
               <i class="ti tabler-tools-kitchen-2 fs-1"></i>
             </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Food Truck e Delivery') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Integrado ao iFood com alertas de cozinha, gestão de receitas e controle de estoque de insumos.') }}</p>
+            <h5 class="fw-extrabold mb-3">{{ __('Food Truck and Delivery') }}</h5>
+            <p class="text-muted small mb-0">{{ __('Integrated with iFood with kitchen alerts, recipe management and ingredient inventory control.') }}</p>
           </div>
         </div>
       </div>
@@ -829,16 +829,16 @@ $pageConfigs = [
 <section id="landingPaymentPlatforms" class="section-py landing-payment-platforms">
   <div class="container">
     <div class="text-center mb-4">
-      <span class="badge bg-label-primary">Pagamentos Integrados</span>
+      <span class="badge bg-label-primary">{{ __('Integrated Payments') }}</span>
     </div>
     <h4 class="text-center mb-1">
-      <span class="position-relative fw-extrabold z-1">Plataformas
+      <span class="position-relative fw-extrabold z-1">{{ __('Payment') }}
         <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
           class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
       </span>
-      de pagamento
+      {{ __('Platforms') }}
     </h4>
-    <p class="text-center mb-md-11 pb-0 pb-xl-12">O site integra com Pagar.me, Asaas, PagSeguro, Stripe e Bitcoin.</p>
+    <p class="text-center mb-md-11 pb-0 pb-xl-12">{{ __('The site integrates with Pagar.me, Asaas, PagSeguro, Stripe and Bitcoin.') }}</p>
     <div class="row gy-12 mt-2 justify-content-center align-items-center">
       <style>
         @keyframes floating {
@@ -959,17 +959,17 @@ $pageConfigs = [
       <!-- Content Side -->
       <div class="col-lg-6">
         <div class="mb-4 text-start">
-          <span class="badge bg-label-primary">{{ __('Gestão na Palma da Mão') }}</span>
+          <span class="badge bg-label-primary">{{ __('Management in the Palm of Your Hand') }}</span>
         </div>
         <h3 class="mb-4 display-6 fw-extrabold">
-          {{ __('Seu ERP completo em') }}
-          <span class="text-primary position-relative z-1">{{ __('Qualquer Lugar') }}
+          {{ __('Your complete ERP in') }}
+          <span class="text-primary position-relative z-1">{{ __('Anywhere') }}
             <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
               class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%;" />
           </span>
         </h3>
         <p class="mb-5 fs-5">
-          {{ __('O aplicativo do Ghotme permite que você e sua equipe controlem o negócio de onde estiverem. Abra ordens de serviço, consulte estoques e analise métricas em tempo real.') }}
+          {{ __('The Ghotme app allows you and your team to control the business from wherever you are. Open service orders, check inventory and analyze metrics in real-time.') }}
         </p>
 
         <div class="row gy-4">
@@ -979,8 +979,8 @@ $pageConfigs = [
                 <i class="ti tabler-camera icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Vistoria Foto Integrada') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Tire fotos pelo celular e anexe na OS na hora.') }}</p>
+                <h6 class="mb-1">{{ __('Integrated Photo Inspection') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Take photos with your cell phone and attach them to the OS on the spot.') }}</p>
               </div>
             </div>
           </div>
@@ -990,8 +990,8 @@ $pageConfigs = [
                 <i class="ti tabler-bell-ringing icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Notificações Push') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Seja avisado sobre orçamentos aprovados.') }}</p>
+                <h6 class="mb-1">{{ __('Push Notifications') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Be notified about approved budgets.') }}</p>
               </div>
             </div>
           </div>
@@ -1001,8 +1001,8 @@ $pageConfigs = [
                 <i class="ti tabler-checkup-list icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('RDO e Checklist Técnico') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Emita Relatórios Diários de Obra direto do canteiro.') }}</p>
+                <h6 class="mb-1">{{ __('RDO and Technical Checklist') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Issue Daily Construction Reports directly from the site.') }}</p>
               </div>
             </div>
           </div>
@@ -1012,8 +1012,8 @@ $pageConfigs = [
                 <i class="ti tabler-chart-pie icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Dashboard Financeiro') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Veja seu faturamento de forma rápida.') }}</p>
+                <h6 class="mb-1">{{ __('Financial Dashboard') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('View your revenue quickly.') }}</p>
               </div>
             </div>
           </div>
@@ -1039,17 +1039,17 @@ $pageConfigs = [
         <!-- Content Side -->
         <div class="col-lg-6">
           <div class="mb-4 text-start">
-            <span class="badge bg-label-info">{{ __('Ecossistema Aberto') }}</span>
+            <span class="badge bg-label-info">{{ __('Open Ecosystem') }}</span>
           </div>
           <h3 class="mb-4 display-6 fw-extrabold">
-            {{ __('Ghotme API - 100% integrável') }}
-            <span class="text-info position-relative z-1">{{ __('com tudo o que você já usa!') }}
+            {{ __('Ghotme API - 100% integrable') }}
+            <span class="text-info position-relative z-1">{{ __('with everything you already use!') }}
               <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
                 class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%; filter: hue-rotate(180deg);" />
             </span>
           </h3>
           <p class="mb-5 fs-5">
-            {{ __('Seu negócio não deveria ficar preso a um software fechado. Com nossos Tokens de API, os seus clientes de planos avançados podem criar integrações incríveis sem limites.') }}
+            {{ __('Your business shouldn\'t be stuck with closed software. With our API Tokens, your advanced plan customers can create incredible integrations without limits.') }}
           </p>
 
           <div class="row gy-4">
@@ -1058,8 +1058,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-danger rounded-circle mb-3">
                   <i class="ti tabler-brand-zapier fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('Integrações No-Code') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Conecte o Ghotme ao Zapier ou n8n e dispare e-mails automáticos no Mailchimp ao aprovar orçamentos.') }}</p>
+                <h6 class="mb-2">{{ __('No-Code Integrations') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme to Zapier or n8n and trigger automatic emails in Mailchimp when approving budgets.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -1067,8 +1067,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-success rounded-circle mb-3">
                   <i class="ti tabler-message-chatbot fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('Chatbots no WhatsApp') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Permita que seus clientes consultem o status das Ordens de Serviço sozinhos através de um bot.') }}</p>
+                <h6 class="mb-2">{{ __('WhatsApp Chatbots') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Allow your customers to check the status of Service Orders themselves via a bot.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -1076,8 +1076,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-warning rounded-circle mb-3">
                   <i class="ti tabler-shopping-cart fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('Sincronização de E-commerce') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Unifique seu estoque do ERP físico com o Shopify, Mercado Livre ou WooCommerce via API.') }}</p>
+                <h6 class="mb-2">{{ __('E-commerce Synchronization') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Unify your physical ERP inventory with Shopify, Mercado Libre or WooCommerce via API.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -1085,8 +1085,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-primary rounded-circle mb-3">
                   <i class="ti tabler-chart-bar fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('Dashboards Inteligentes') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Conecte o Ghotme direto ao Power BI ou Looker Studio para painéis em telões na empresa.') }}</p>
+                <h6 class="mb-2">{{ __('Intelligent Dashboards') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme directly to Power BI or Looker Studio for dashboard displays in the company.') }}</p>
               </div>
             </div>
           </div>
@@ -1186,19 +1186,19 @@ $pageConfigs = [
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    30 dias de acesso ao plano Padrão
+                    {{ __('30 days of access to the Standard plan') }}
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    Acesso a todos os módulos essenciais
+                    {{ __('Access to all essential modules') }}
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    Sem necessidade de cartão de crédito
+                    {{ __('No credit card required') }}
                   </h6>
                 </li>
               </ul>
@@ -1230,11 +1230,11 @@ $pageConfigs = [
             </div>
             <div class="card-body">
               <ul class="list-unstyled pricing-list">
-                <li class="mb-2"><strong>{{ __('Indicado para:') }}</strong></li>
+                <li class="mb-2"><strong>{{ __('Recommended for:') }}</strong></li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('1 empresa (CNPJ)') }}
+                    {{ __('1 company (VAT/Tax ID)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
@@ -1246,55 +1246,55 @@ $pageConfigs = [
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Ordens de Serviço completas (timer, checklists, fotos)') }}
+                    {{ __('Complete Service Orders (timer, checklists, photos)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('CRM de Clientes com histórico') }}
+                    {{ __('Customer CRM with history') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Financeiro (entradas, saídas e fluxo de caixa)') }}
+                    {{ __('Financials (income, expenses and cash flow)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Controle de Estoque com alertas') }}
+                    {{ __('Inventory Control with alerts') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Orçamentos com aprovação via WhatsApp') }}
+                    {{ __('Budgets with approval via WhatsApp') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Kanban de Ordens de Serviço') }}
+                    {{ __('Service Order Kanban') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Portal do Cliente (link público)') }}
+                    {{ __('Customer Portal (public link)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Consultor IA – 10 análises por mês') }}
+                    {{ __('AI Consultant – 10 analyses per month') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Suporte básico (horário comercial)') }}
+                    {{ __('Basic support (business hours)') }}
                   </h6>
                 </li>
               </ul>
@@ -1327,71 +1327,71 @@ $pageConfigs = [
             </div>
             <div class="card-body">
               <ul class="list-unstyled pricing-list">
-                <li class="mb-2"><strong>{{ __('Indicado para:') }}</strong></li>
+                <li class="mb-2"><strong>{{ __('Recommended for:') }}</strong></li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Tudo do Padrão') }}</strong>, {{ __('mais:') }}
+                    <strong>{{ __('Everything in Standard') }}</strong>, {{ __('plus:') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Até 10 usuários') }}
+                    {{ __('Up to 10 users') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Consultor IA') }} <strong class="ms-1">{{ __('Ilimitado') }}</strong>
+                    {{ __('AI Consultant') }} <strong class="ms-1">{{ __('Unlimited') }}</strong>
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Robô de Reposição de Estoque') }}
+                    {{ __('Inventory Replenishment Robot') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('BPO Financeiro (gestão terceirizada)') }}
+                    {{ __('Financial BPO (outsourced management)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Portal do Contador (acesso externo)') }}
+                    {{ __('Accountant Portal (external access)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Emissão Ilimitada de Notas Fiscais') }}
+                    {{ __('Unlimited Tax Invoice Issuance') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Conciliação Bancária (OFX)') }}
+                    {{ __('Bank Reconciliation (OFX)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Integrações Externas (Mercado Livre, APIs)') }}
+                    {{ __('External Integrations (Marketplaces, APIs)') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Relatórios Avançados e Exportações') }}
+                    {{ __('Advanced Reports and Exports') }}
                   </h6>
                 </li>
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Suporte Prioritário') }}
+                    {{ __('Priority Support') }}
                   </h6>
                 </li>
               </ul>
@@ -1507,16 +1507,16 @@ $pageConfigs = [
   <section id="landingFAQ" class="section-py bg-body landing-faq">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">{{ __('Perguntas Frequentes') }}</span>
+        <span class="badge bg-label-primary">{{ __('Frequently Asked Questions') }}</span>
       </div>
       <h4 class="text-center mb-1">
-        {{ __('Dúvidas') }}
-        <span class="position-relative fw-extrabold z-1">{{ __('Comuns') }}
+        {{ __('Frequently Asked') }}
+        <span class="position-relative fw-extrabold z-1">{{ __('Questions') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
       </h4>
-      <p class="text-center mb-12 pb-md-4">{{ __('Encontre respostas para as principais dúvidas sobre o Ghotme.') }}</p>
+      <p class="text-center mb-12 pb-md-4">{{ __('Find answers to the main questions about Ghotme.') }}</p>
 
       <div class="row gy-12 align-items-center">
         <div class="col-lg-5">
@@ -1620,9 +1620,9 @@ $pageConfigs = [
           <div class="row align-items-center gy-8">
             <div class="col-lg-6 text-center text-lg-start">
               <div class="badge bg-white text-primary mb-3 px-3 py-2 rounded-pill fw-bold">🚀 Newsletter</div>
-              <h3 class="text-white fw-extrabold mb-4 display-5">{{ __('Fique por dentro do futuro da gestão') }}</h3>
+              <h3 class="text-white fw-extrabold mb-4 display-5">{{ __('Stay on top of the future of management') }}</h3>
               <p class="text-white opacity-90 mb-0 fs-5">
-                {{ __('Receba pílulas semanais de inteligência de negócio e atualizações exclusivas do ecossistema Ghotme.') }}
+                {{ __('Receive weekly pills of business intelligence and exclusive updates from the Ghotme ecosystem.') }}
               </p>
             </div>
             <div class="col-lg-6">
@@ -1631,12 +1631,12 @@ $pageConfigs = [
                 <div class="d-flex flex-column flex-sm-row gap-3 bg-white p-3 rounded-4 shadow-lg">
                   <div class="flex-grow-1 d-flex align-items-center ps-2">
                     <i class="ti tabler-mail text-muted fs-4 me-2"></i>
-                    <input type="email" name="email" class="form-control border-0 shadow-none p-0 fs-5" placeholder="seu@melhor-email.com" required style="background: transparent;">
+                    <input type="email" name="email" class="form-control border-0 shadow-none p-0 fs-5" placeholder="your@best-email.com" required style="background: transparent;">
                   </div>
-                  <button type="submit" class="btn btn-primary btn-lg px-8 rounded-3 shadow-sm">{{ __('Inscrever Agora') }}</button>
+                  <button type="submit" class="btn btn-primary btn-lg px-8 rounded-3 shadow-sm">{{ __('Subscribe Now') }}</button>
                 </div>
                 <p class="text-white opacity-75 small mt-3 text-center text-lg-start">
-                  <i class="ti tabler-shield-check me-1"></i> Respeitamos sua privacidade. Sem spam, nunca.
+                  <i class="ti tabler-shield-check me-1"></i> {{ __('We respect your privacy. No spam, ever.') }}
                 </p>
               </form>
             </div>
@@ -1779,17 +1779,17 @@ $pageConfigs = [
           <div class="avatar avatar-xl bg-label-primary mx-auto mb-6 rounded-circle shadow-sm" style="width: 80px; height: 80px;">
             <i class="ti tabler-device-mobile-bolt fs-1"></i>
           </div>
-          <h4 class="fw-extrabold mb-4">{{ __('App Ghotme: Em Breve!') }}</h4>
+          <h4 class="fw-extrabold mb-4">{{ __('Ghotme App: Coming Soon!') }}</h4>
           <p class="mb-8 fs-5 text-muted">
-            {{ __('Nosso aplicativo oficial está em fase final de homologação nas lojas da Apple e Google.') }}
+            {{ __('Our official app is in the final stage of approval in the Apple and Google stores.') }}
             <br><br>
-            {{ __('Gostaria de ser um dos primeiros a testar a versão Beta e ser avisado do lançamento oficial?') }}
+            {{ __('Would you like to be one of the first to test the Beta version and be notified of the official launch?') }}
           </p>
           <div class="d-grid gap-3">
             <button type="button" class="btn btn-primary btn-lg rounded-3 py-3" data-bs-dismiss="modal" onclick="document.getElementById('landingContact').scrollIntoView({behavior: 'smooth'}); setTimeout(() => { document.getElementById('contact-form-fullname').focus(); }, 800);">
-              <i class="ti tabler-mail-fast me-2"></i> {{ __('Quero ser avisado!') }}
+              <i class="ti tabler-mail-fast me-2"></i> {{ __('I want to be notified!') }}
             </button>
-            <button type="button" class="btn btn-label-secondary btn-lg rounded-3 py-3" data-bs-dismiss="modal">{{ __('Voltar') }}</button>
+            <button type="button" class="btn btn-label-secondary btn-lg rounded-3 py-3" data-bs-dismiss="modal">{{ __('Back') }}</button>
           </div>
         </div>
       </div>
@@ -1833,7 +1833,7 @@ $pageConfigs = [
           const originalText = btn.innerHTML;
 
           btn.disabled = true;
-          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Enviando...';
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> {{ __('Sending...') }}';
 
           const formData = new FormData(contactForm);
 
@@ -1850,7 +1850,7 @@ $pageConfigs = [
               if (data.success) {
                 Swal.fire({
                   icon: 'success',
-                  title: 'Sucesso!',
+                  title: "{{ __('Success!') }}",
                   text: data.message,
                   confirmButtonColor: '#7367f0'
                 });
@@ -1858,8 +1858,8 @@ $pageConfigs = [
               } else {
                 Swal.fire({
                   icon: 'error',
-                  title: 'Ops!',
-                  text: data.message || 'Erro ao enviar mensagem.',
+                  title: "{{ __('Oops!') }}",
+                  text: data.message || "{{ __('Error sending message.') }}",
                   confirmButtonColor: '#7367f0'
                 });
               }
@@ -1868,8 +1868,8 @@ $pageConfigs = [
               console.error('Erro:', err);
               Swal.fire({
                 icon: 'error',
-                title: 'Erro de Conexão',
-                text: 'Não foi possível enviar sua mensagem no momento.',
+                title: "{{ __('Connection Error') }}",
+                text: "{{ __('Could not send your message at this time.') }}",
                 confirmButtonColor: '#7367f0'
               });
             })
@@ -1906,7 +1906,7 @@ $pageConfigs = [
               if (data.success) {
                 Swal.fire({
                   icon: 'success',
-                  title: 'Bem-vindo(a)!',
+                  title: "{{ __('Welcome!') }}",
                   text: data.message,
                   confirmButtonColor: '#7367f0'
                 });
@@ -1914,8 +1914,8 @@ $pageConfigs = [
               } else {
                 Swal.fire({
                   icon: 'warning',
-                  title: 'Atenção',
-                  text: data.message || 'Erro ao se inscrever.',
+                  title: "{{ __('Attention') }}",
+                  text: data.message || "{{ __('Error subscribing.') }}",
                   confirmButtonColor: '#7367f0'
                 });
               }
@@ -1923,8 +1923,8 @@ $pageConfigs = [
             .catch(err => {
               Swal.fire({
                 icon: 'error',
-                title: 'Erro',
-                text: 'Não foi possível processar sua inscrição.',
+                title: "{{ __('Error') }}",
+                text: "{{ __('Could not process your subscription.') }}",
                 confirmButtonColor: '#7367f0'
               });
             })

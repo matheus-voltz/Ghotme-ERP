@@ -218,7 +218,7 @@ class SettingsController extends Controller
             if (!isset($result['id'])) {
                 return response()->json([
                     'success' => false, 
-                    'message' => 'Erro de integração (sem ID): ' . json_encode($result)
+                    'message' => 'Erro de integração (sem ID). Tipo(' . $user->plan_type . ') Result: ' . json_encode($result)
                 ]);
             }
 

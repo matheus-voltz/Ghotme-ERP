@@ -263,5 +263,25 @@
   "Contact": "Contact",
   "Access Panel": "Access Panel",
   "Login": "Login",
-  "Register": "Register"
-}
+  "Register": "Register",
+  "Ghotme Ecosystem": "Ghotme Ecosystem",
+  "Choose your niche and see how Ghotme adapts perfectly to your business.": "Choose your niche and see how Ghotme adapts perfectly to your business.",
+  "Mechanic Workshop": "Mechanic Workshop",
+  "OS management, parts inventory and vehicle history.": "OS management, parts inventory and vehicle history.",
+  "Pet Shop": "Pet Shop",
+  "Bathing and grooming schedule, pet records and vaccines.": "Bathing and grooming schedule, pet records and vaccines.",
+  "Beauty Clinic": "Beauty Clinic",
+  "Anamnesis form, protocols and session control.": "Anamnesis form, protocols and session control.",
+  "Technical Assistance": "Technical Assistance",
+  "Technical reports, warranty and serial number control.": "Technical reports, warranty and serial number control.",
+  "Food Service & Trucks": "Food Service & Trucks",
+  "Real-time orders, iFood integration and ingredient inventory control.": "Real-time orders, iFood integration and ingredient inventory control.",
+  "Construction and Engineering": "Construction and Engineering",
+  "Construction control, measurements and real-time RDO (Daily Construction Report) issuance.": "Construction control, measurements and real-time RDO (Daily Construction Report) issuance.",
+  "Food Truck and Delivery": "Food Truck and Delivery",
+  "Integrated with iFood with kitchen alerts, recipe management and ingredient inventory control.": "Integrated with iFood with kitchen alerts, recipe management and ingredient inventory control.",
+  "Gastronomy and Delivery": "Gastronomy and Delivery",
+  "Food trucks, snack bars and bars. Receive iFood orders with sound alerts on your dashboard.": "Food trucks, snack bars and bars. Receive iFood orders with sound alerts on your dashboard.",
+  "iFood Delivery": "iFood Delivery",
+  "Receive real-time notifications and integrate the kitchen flow with the largest food marketplace.": "Receive real-time notifications and integrate the kitchen flow with the largest food marketplace."
+  }
