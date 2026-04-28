@@ -12,10 +12,6 @@ $customizerHidden = 'customizer-hide';
 @vite(['resources/assets/vendor/scss/pages/page-auth.scss'])
 @endsection
 
-@section('page-script')
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-@endsection
-
 @section('content')
 <style>
   /* Custom Login Page Styles */
@@ -200,4 +196,6 @@ $customizerHidden = 'customizer-hide';
     <!-- /Login -->
   </div>
 </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 @endsection
