@@ -12,6 +12,10 @@ $customizerHidden = 'customizer-hide';
 @vite(['resources/assets/vendor/scss/pages/page-auth.scss'])
 @endsection
 
+@section('page-script')
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+@endsection
+
 @section('content')
 <style>
   /* Custom Login Page Styles */
@@ -175,6 +179,11 @@ $customizerHidden = 'customizer-hide';
               @endif
             </div>
           </div>
+          @if(config('services.recaptcha.site_key'))
+          <div class="mb-4 d-flex justify-content-center">
+            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+          </div>
+          @endif
           <button class="btn btn-primary d-grid w-100 shadow-primary" type="submit">Entrar</button>
         </form>
 

@@ -18,10 +18,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'master' => \App\Http\Middleware\MasterAdminMiddleware::class,
+            'master'    => \App\Http\Middleware\MasterAdminMiddleware::class,
+            'recaptcha' => \App\Http\Middleware\ValidateRecaptcha::class,
         ]);
         $middleware->trustProxies(at: '*');
         $middleware->web(LocaleMiddleware::class);
+        $middleware->web(\App\Http\Middleware\ValidateRecaptcha::class);
         $middleware->validateCsrfTokens(except: [
             '/webhook/asaas'
         ]);
