@@ -27,14 +27,14 @@
   <br/><br/>
   <img src="./Docs/screenshots/Captura_de_Tela_2026-04-28_a_s_00_54_35.png" width="700" alt="Dashboard Light" />
   <br/><br/>
-  <img src="./Docs/screenshots/1771554397359.jpg" width="700" alt="Client Management" />
+  <img src="./Docs/screenshots/1771554397076.jpg" width="700" alt="Client Management" />
   <br/><br/>
   <img src="./Docs/screenshots/1771554397407.jpg" width="700" alt="Internal Chat" />
 </p>
 
 ### 📱 Mobile
 <p>
-  <img src="./Docs/screenshots/1771554397076.jpg" width="220" alt="Mobile Dashboard" />
+  <img src="./Docs/screenshots/1771554397359.jpg" width="220" alt="Mobile Dashboard" />
   &nbsp;&nbsp;
   <img src="./Docs/screenshots/1771554397208.jpg" width="220" alt="Service Order" />
   &nbsp;&nbsp;
