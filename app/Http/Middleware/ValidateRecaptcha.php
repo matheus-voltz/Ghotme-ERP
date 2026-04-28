@@ -11,8 +11,8 @@ class ValidateRecaptcha
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Só valida no POST /login
-        if (!($request->isMethod('POST') && $request->is('login'))) {
+        // Só valida no POST /login e POST /register
+        if (!($request->isMethod('POST') && $request->is('login', 'register'))) {
             return $next($request);
         }
 
