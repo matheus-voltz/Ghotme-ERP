@@ -1,70 +1,188 @@
-# Ghotme ERP - All-in-One Multi-Niche SaaS Solution
+<div align="center">
 
-[English](#english) | [Français](#français) | [Português](#português) | [Español](#español)
+# Ghotme ERP
 
----
+**Modern · Multi-Tenant · Multi-Niche SaaS Platform**
 
-<a name="english"></a>
-## 🇺🇸 English
-**Ghotme ERP** is a next-generation SaaS platform designed to centralize management for service-based businesses. Built with a robust multitenant architecture and a unique multi-niche engine, it adapts its entire interface and logic to different industries.
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-ghotme.com.br-1D9E75?style=for-the-badge&logo=globe)](https://www.ghotme.com.br)
+[![Laravel](https://img.shields.io/badge/Laravel%2012-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP%208.2-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
+[![AWS](https://img.shields.io/badge/AWS-EC2%20%7C%20Lambda%20%7C%20SES-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![Status](https://img.shields.io/badge/Status-Production-1D9E75?style=for-the-badge)]()
 
-### 🚀 Key Features
-- **Multitenancy:** Total isolation of company data in a shared database environment.
-- **Dynamic Multi-Niche:** Specialized support for **Automotive**, **Pet Shops**, **Electronics Repair**, and **Beauty Clinics**.
-- **Customer Portal:** Dedicated area for customers to track service orders, approve budgets, and view history with niche-specific branding.
-- **Mobile Integration:** React Native/Expo app for team management, internal chat, and push notifications.
-- **Financial & Fiscal:** Complete cash flow management, accounts payable/receivable, and tax invoice (NFe) generation.
-- **Site Booking:** Public landing pages for online appointments that sync directly with the administrative calendar.
+> A next-generation SaaS ERP that adapts its entire interface and business logic to different industries — from automotive workshops to beauty clinics.
 
-### 🛠 Tech Stack
-- **Backend:** Laravel 12, Livewire 3 (TALL Stack).
-- **Frontend:** Vuexy Admin Template (Premium UI/UX).
-- **Mobile:** React Native / Expo.
-- **Real-time:** Laravel Reverb / Pusher for Chat and Notifications.
+🔗 **[Live Demo → www.ghotme.com.br](https://www.ghotme.com.br)**
+
+</div>
 
 ---
 
-<a name="français"></a>
-## 🇫🇷 Français
-**Ghotme ERP** est une plateforme SaaS de nouvelle génération conçue para centraliser la gestion des entreprises de services. Construit avec une architecture multilocataire (multitenant) robuste et um moteur multi-niche unique, il adapte toute son interface et sa logique à différents secteurs.
+## 📸 Screenshots
 
-### 🚀 Caractéristiques Principales
-- **Multitenancy :** Isolation totale des données de l'entreprise dans un environnement de base de données partagée.
-- **Multi-Niche Dynamique :** Support spécialisé pour l'**Automobile**, les **Animaleries**, la **Réparation Électronique** et les **Cliniques d'Esthétique**.
-- **Portail Client :** Espace dédié permettant aux clients de suivre les ordres de service, d'approuver les devis et de consulter l'historique.
-- **Intégration Mobile :** Application React Native/Expo pour la gestion d'équipe, chat interne et notifications push.
-- **Finance et Fiscalité :** Gestion complète des flux de trésorerie et génération de factures fiscales.
-- **Réservation en Ligne :** Pages de destination publiques pour les rendez-vous synchronisées avec le calendrier.
+> _Screenshots coming soon — visit the [live demo](https://www.ghotme.com.br) to see it in action._
+
+<!-- Replace the lines below with actual screenshots -->
+<!-- ![Dashboard](./Docs/screenshots/dashboard.png) -->
+<!-- ![Service Orders](./Docs/screenshots/service-orders.png) -->
+<!-- ![Financial](./Docs/screenshots/financial.png) -->
 
 ---
 
-<a name="português"></a>
-## 🇧🇷 Português
-O **Ghotme ERP** é uma plataforma SaaS de próxima geração projetada para centralizar a gestão de empresas prestadoras de serviço. Construído com uma arquitetura multitenant robusta e um motor multinicho único, ele adapta toda a sua interface e lógica para diferentes setores.
+## ✨ Key Features
 
-### 🚀 Principais Recursos
-- **Multitenancy:** Isolamento total dos dados das empresas em um ambiente de banco de dados compartilhado.
-- **Multinicho Dinâmico:** Suporte especializado para os setores **Automotivo**, **Pet Shops**, **Assistência Técnica** e **Clínicas de Estética**.
-- **Portal do Cliente:** Área dedicada para clientes acompanharem ordens de serviço, aprovarem orçamentos e verem histórico.
-- **Integração Mobile:** App em React Native/Expo para gestão da equipe, chat interno e notificações push.
-- **Financeiro e Fiscal:** Gestão completa de fluxo de caixa, contas a pagar/receber e emissão de Notas Fiscais.
-- **Agendamento Online:** Páginas públicas para agendamentos que sincronizam diretamente com o calendário administrativo.
-
-### 🛠 Tecnologias
-- **Backend:** Laravel 12, Livewire 3.
-- **Frontend:** Template Vuexy (Interface Premium).
-- **Mobile:** React Native / Expo.
+| Feature | Description |
+|---|---|
+| 🏢 **Multi-Tenancy** | Full data isolation per company in a shared database environment |
+| 🔧 **Multi-Niche Engine** | Adapts UI and logic for Automotive, Pet Shops, Electronics Repair, and Beauty Clinics |
+| 👤 **Customer Portal** | Clients track service orders, approve quotes, and view history |
+| 📱 **Mobile App** | React Native/Expo app for team management, internal chat, and push notifications |
+| 💰 **Financial Module** | Full cash flow, accounts payable/receivable, and tax invoice (NFe) generation |
+| 📅 **Online Booking** | Public landing pages for appointments synced with the admin calendar |
+| 🤖 **AI Integration** | LLM-powered data extraction and intelligent process automation |
+| ⚡ **Real-Time** | Live chat and notifications via Laravel Reverb / Pusher |
 
 ---
 
-<a name="español"></a>
-## 🇪🇸 Español
-**Ghotme ERP** es una plataforma SaaS de próxima generación diseñada para centralizar la gestión de empresas de servicios. Construido con una arquitectura multitenant robusta y un motor multinicho único, adapta toda su interfaz y lógica a diferentes industrias.
+## 🛠 Tech Stack
 
-### 🚀 Características Principales
-- **Multitenancy:** Aislamiento total de los datos de la empresa en un entorno de base de datos compartida.
-- **Multinicho Dinámico:** Soporte especializado para **Automotriz**, **Pet Shops**, **Reparación de Electrónica** y **Clínicas de Estética**.
-- **Portal del Cliente:** Área dedicada para que los clientes realicen el seguimiento de órdenes de servicio y aprueben presupuestos.
-- **Integración Móvil:** Aplicación React Native/Expo para gestión de equipos, chat interno y notificaciones push.
-- **Finanzas y Fiscalidad:** Gestión completa de flujo de caja y generación de facturas de impuestos.
-- **Reservas en Línea:** Páginas públicas para citas en línea que se sincronizan con el calendario administrativo.
+### Backend
+- **Laravel 12** + **Livewire 3** (TALL Stack)
+- **PHP 8.2** on **AWS EC2** (Ubuntu 22 + Nginx)
+- **MySQL 8** via **AWS RDS**
+- **AWS Lambda** (Python) + **AWS SES** for transactional email
+- **AWS API Gateway** for serverless endpoints
+- **Laravel Pulse** for real-time production monitoring
+
+### Frontend
+- **Vuexy Admin Template** (Premium UI/UX)
+- **Vue.js** + **TypeScript**
+- **Tailwind CSS**
+
+### Mobile
+- **React Native** / **Expo**
+
+### DevOps & Infrastructure
+- **AWS EC2** — production server
+- **AWS S3** — static assets & file storage
+- **AWS Lambda + SES** — serverless email pipeline
+- **GitHub Actions** — CI/CD with zero-downtime deploy on push to `main`
+- **Docker** — local development environment
+- **Let's Encrypt / Certbot** — SSL/HTTPS
+- **Elastic IP** — static addressing
+
+---
+
+## 🏗 Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────┐
+│                   Client / Browser                   │
+└──────────────────────────┬──────────────────────────┘
+                           │ HTTPS
+┌──────────────────────────▼──────────────────────────┐
+│              AWS EC2 (Ubuntu 22 + Nginx)             │
+│                  Laravel 12 / PHP 8.2                │
+│              Multi-Tenant Application Core           │
+└────────┬──────────────┬──────────────┬──────────────┘
+         │              │              │
+    ┌────▼────┐   ┌─────▼─────┐  ┌────▼────────────┐
+    │ AWS RDS │   │  AWS S3   │  │   AWS Lambda    │
+    │ MySQL 8 │   │  Storage  │  │  + SES (Email)  │
+    └─────────┘   └───────────┘  └─────────────────┘
+```
+
+---
+
+## 🚀 Getting Started (Local Dev)
+
+### Requirements
+- PHP 8.2+
+- Composer
+- Node.js 20+
+- Docker (optional)
+
+### Installation
+
+```bash
+git clone https://github.com/matheus-voltz/Ghotme-ERP.git
+cd Ghotme-ERP
+
+cp .env.example .env
+composer install
+npm install
+
+php artisan key:generate
+php artisan migrate --seed
+
+npm run dev
+php artisan serve
+```
+
+### Docker
+
+```bash
+docker-compose up -d
+```
+
+---
+
+## 🌍 Supported Niches
+
+| Niche | Status |
+|---|---|
+| 🔧 Automotive Workshops | ✅ Live |
+| 🐾 Pet Shops | ✅ Live |
+| 📱 Electronics Repair | ✅ Live |
+| 💆 Beauty Clinics | ✅ Live |
+
+---
+
+---
+
+## 🇫🇷 Version Française
+
+**Ghotme ERP** est une plateforme SaaS de nouvelle génération conçue pour centraliser la gestion des entreprises de services. Grâce à une architecture multi-locataire robuste et un moteur multi-niche unique, elle adapte toute son interface et sa logique métier à différents secteurs.
+
+### Fonctionnalités Principales
+
+| Fonctionnalité | Description |
+|---|---|
+| 🏢 **Multi-Tenancy** | Isolation complète des données par entreprise |
+| 🔧 **Moteur Multi-Niche** | Adapté pour Automobile, Animaleries, Réparation Électronique et Cliniques Esthétiques |
+| 👤 **Portail Client** | Suivi des ordres de service, approbation de devis, historique |
+| 📱 **Application Mobile** | React Native/Expo — gestion d'équipe, chat interne, notifications push |
+| 💰 **Module Financier** | Flux de trésorerie complet, comptes fournisseurs/clients, facturation |
+| 📅 **Réservation en Ligne** | Pages publiques pour rendez-vous synchronisées avec le calendrier |
+| 🤖 **Intégration IA** | Extraction de données et automatisation via LLM |
+| ⚡ **Temps Réel** | Chat et notifications via Laravel Reverb / Pusher |
+
+### Stack Technique
+
+- **Backend:** Laravel 12, PHP 8.2, MySQL 8
+- **Infrastructure:** AWS EC2, RDS, S3, Lambda, SES, API Gateway
+- **Frontend:** Vue.js, TypeScript, Tailwind CSS
+- **Mobile:** React Native / Expo
+- **CI/CD:** GitHub Actions — déploiement sans interruption
+
+### Niches Supportées
+
+| Niche | Statut |
+|---|---|
+| 🔧 Ateliers Automobiles | ✅ En production |
+| 🐾 Animaleries | ✅ En production |
+| 📱 Réparation Électronique | ✅ En production |
+| 💆 Cliniques Esthétiques | ✅ En production |
+
+---
+
+## 📄 License
+
+Private — All rights reserved © Ghotme Auto Center
+
+---
+
+<div align="center">
+  Built with ❤️ by <a href="https://github.com/matheus-voltz">Matheus Voltz</a>
+</div>
