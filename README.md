@@ -21,11 +21,29 @@
 
 ## 📸 Screenshots
 
-### 🌙 Dark Mode
-![Ghotme ERP Dashboard Dark](./Docs/screenshots/dashboard-dark.png)
+### 🖥️ Web — Dark Mode
+![Ghotme ERP Dashboard Dark](./Docs/screenshots/meu-sistema-dark.png)
 
-### ☀️ Light Mode
-![Ghotme ERP Dashboard Light](./Docs/screenshots/dashboard-light.png)
+### 🖥️ Web — Light Mode
+![Ghotme ERP Dashboard Light](./Docs/screenshots/Captura_de_Tela_2026-04-28_a_s_00_54_35.png)
+
+### 🖥️ Web — Client Management
+![Client Management](./Docs/screenshots/1771554397359.jpg)
+
+### 🖥️ Web — Internal Team Chat
+![Internal Chat](./Docs/screenshots/1771554397407.jpg)
+
+### 📱 Mobile — Dashboard
+![Mobile Dashboard](./Docs/screenshots/1771554397076.jpg)
+
+### 📱 Mobile — Service Order Detail
+![Mobile Service Order](./Docs/screenshots/1771554397208.jpg)
+
+### 📱 Mobile — Two-Factor Authentication
+![2FA](./Docs/screenshots/1771554397273.jpg)
+
+### 🚀 Onboarding
+![Onboarding](./Docs/screenshots/1771554397306.jpg)
 
 ---
 
@@ -36,11 +54,15 @@
 | 🏢 **Multi-Tenancy** | Full data isolation per company in a shared database environment |
 | 🔧 **Multi-Niche Engine** | Adapts UI and logic for Automotive, Pet Shops, Electronics Repair, and Beauty Clinics |
 | 👤 **Customer Portal** | Clients track service orders, approve quotes, and view history |
-| 📱 **Mobile App** | React Native/Expo app for team management, internal chat, and push notifications |
+| 📱 **Mobile App** | React Native/Expo — dashboard, service orders with timer, quick actions, push notifications |
+| 🔐 **Two-Factor Auth** | 6-digit TOTP authentication for enhanced security |
+| 💬 **Internal Chat** | Real-time team messaging via Laravel Reverb / Pusher |
 | 💰 **Financial Module** | Full cash flow, accounts payable/receivable, and tax invoice (NFe) generation |
 | 📅 **Online Booking** | Public landing pages for appointments synced with the admin calendar |
-| 🤖 **AI Integration** | LLM-powered data extraction and intelligent process automation |
-| ⚡ **Real-Time** | Live chat and notifications via Laravel Reverb / Pusher |
+| 🎨 **Theme Customizer** | Real-time UI customization — colors, skins, layout, navbar type |
+| 🤖 **AI Analysis** | LLM-powered business insights and intelligent process automation |
+| ⚡ **Kanban Board** | Visual service order management with drag-and-drop |
+| 📊 **Reports & Analytics** | Revenue, conversion rate, retention, and profitability dashboards |
 
 ---
 
