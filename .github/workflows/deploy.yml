@@ -34,41 +34,34 @@ jobs:
           npm install --legacy-peer-deps
           npm run build
 
-      - name: Executar comandos de Deploy via SSH na Hostinger
+      - name: Deploy via SSH na EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.HOSTINGER_HOST }}
-          username: ${{ secrets.HOSTINGER_USER }}
-          password: ${{ secrets.HOSTINGER_PASSWORD }}
-          port: ${{ secrets.HOSTINGER_PORT }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
           script: |
-            # Mudar para o diretório do projeto
-            cd domains/ghotme.com.br/public_html 2>/dev/null || cd public_html
-            
-            # Inicializa o Git se não existir (corrige erro fatal: not a git repository)
-            if [ ! -d ".git" ]; then
-              git init
-              git remote add origin https://github.com/matheus-voltz/Ghotme-ERP.git
-            fi
-            
-            # Tentar limpar o repositório local do servidor se houver conflitos
+            cd /var/www/ghotme
+
             git fetch origin main
             git reset --hard origin/main
-            
-            # Atualizar dependências do PHP (via servidor)
+
             composer install --no-dev --optimize-autoloader --no-interaction
-            
-            # Migrations e Limpeza de Cache (agora com fallback para o Reverb)
+
+            npm install --legacy-peer-deps
+            npm run build
+
             php artisan migrate --force
-            php artisan storage:link || true    
-            php artisan config:clear
-            php artisan cache:clear
+            php artisan storage:link || true
+            php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan package:discover --ansi
-            
-            # Limpar Opcache se disponível
+
             php -r "if(function_exists('opcache_reset')) opcache_reset();"
-            
-            echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso (Build via GitHub)!"
+
+            sudo chown -R www-data:www-data /var/www/ghotme/storage /var/www/ghotme/bootstrap/cache
+
+            echo "Ghotme ERP atualizado na EC2 com sucesso!"
