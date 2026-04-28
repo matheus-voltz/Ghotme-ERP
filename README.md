@@ -21,29 +21,30 @@
 
 ## 📸 Screenshots
 
-### 🖥️ Web — Dark Mode
-![Ghotme ERP Dashboard Dark](./Docs/screenshots/meu-sistema-dark.png)
+### 🖥️ Web
+<p>
+  <img src="./Docs/screenshots/meu-sistema-dark.png" width="700" alt="Dashboard Dark" />
+  <br/><br/>
+  <img src="./Docs/screenshots/Captura_de_Tela_2026-04-28_a_s_00_54_35.png" width="700" alt="Dashboard Light" />
+  <br/><br/>
+  <img src="./Docs/screenshots/1771554397359.jpg" width="700" alt="Client Management" />
+  <br/><br/>
+  <img src="./Docs/screenshots/1771554397407.jpg" width="700" alt="Internal Chat" />
+</p>
 
-### 🖥️ Web — Light Mode
-![Ghotme ERP Dashboard Light](./Docs/screenshots/Captura_de_Tela_2026-04-28_a_s_00_54_35.png)
-
-### 🖥️ Web — Client Management
-![Client Management](./Docs/screenshots/1771554397359.jpg)
-
-### 🖥️ Web — Internal Team Chat
-![Internal Chat](./Docs/screenshots/1771554397407.jpg)
-
-### 📱 Mobile — Dashboard
-![Mobile Dashboard](./Docs/screenshots/1771554397076.jpg)
-
-### 📱 Mobile — Service Order Detail
-![Mobile Service Order](./Docs/screenshots/1771554397208.jpg)
-
-### 📱 Mobile — Two-Factor Authentication
-![2FA](./Docs/screenshots/1771554397273.jpg)
+### 📱 Mobile
+<p>
+  <img src="./Docs/screenshots/1771554397076.jpg" width="220" alt="Mobile Dashboard" />
+  &nbsp;&nbsp;
+  <img src="./Docs/screenshots/1771554397208.jpg" width="220" alt="Service Order" />
+  &nbsp;&nbsp;
+  <img src="./Docs/screenshots/1771554397273.jpg" width="220" alt="2FA" />
+</p>
 
 ### 🚀 Onboarding
-![Onboarding](./Docs/screenshots/1771554397306.jpg)
+<p>
+  <img src="./Docs/screenshots/1771554397306.jpg" width="700" alt="Onboarding" />
+</p>
 
 ---
 
