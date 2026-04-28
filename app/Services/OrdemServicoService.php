@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\OrdemServicoStatus;
 use App\Models\OrdemServico;
 use App\Models\OrdemServicoItem;
 use App\Models\OrdemServicoPart;
@@ -152,10 +153,12 @@ class OrdemServicoService
 
         // Ações de Finalização ou Início de Preparo (Food Service)
         $isFood = $currentNiche === 'food_service';
-        $shouldDeduct = $type === 'os_finalizada' || $os->status === 'paid' || $os->status === 'finalized';
+        $shouldDeduct = $type === 'os_finalizada'
+            || $os->status === OrdemServicoStatus::Paid
+            || $os->status === OrdemServicoStatus::Finalized;
 
         // No Food Service, baixamos no running também (início de preparo/venda)
-        if ($isFood && $os->status === 'running') {
+        if ($isFood && $os->status === OrdemServicoStatus::Running) {
             $shouldDeduct = true;
         }
 

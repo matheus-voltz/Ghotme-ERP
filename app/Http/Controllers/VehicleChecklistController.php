@@ -25,9 +25,6 @@ class VehicleChecklistController extends Controller
 
     public function create(Request $request)
     {
-        // DEBUGGING
-        \Illuminate\Support\Facades\Log::info('--- Checklist Create Start ---');
-
         $vehicles = Vehicles::all();
 
         // Filter checklist items by current niche categories
@@ -64,9 +61,6 @@ class VehicleChecklistController extends Controller
         }
         
         $inspectionComponent = niche_config('components.visual_inspection');
-        \Illuminate\Support\Facades\Log::info('Checklist Niche: ' . niche('current'));
-        \Illuminate\Support\Facades\Log::info('Pet Type Determined: ' . $petType);
-        \Illuminate\Support\Facades\Log::info('Inspection Component Path: ' . ($inspectionComponent ?? 'NULL'));
 
         return view('content.pages.ordens-servico.checklist-create', compact('vehicles', 'checklistItems', 'selectedOs', 'petType'));
     }

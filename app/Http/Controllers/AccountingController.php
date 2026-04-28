@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\OrdemServicoStatus;
 use App\Models\OrdemServico;
 use App\Models\TaxInvoice;
 use App\Models\Company;
@@ -25,6 +26,10 @@ class AccountingController extends Controller
         // Se houver token, busca a empresa pelo token (acesso direto do contador)
         if ($token) {
             $company = Company::where('accountant_token', $token)->firstOrFail();
+            // Armazena na sessão para que exportações não precisem do token na URL
+            session(['accountant_company_id' => $company->id]);
+        } elseif (session('accountant_company_id')) {
+            $company = Company::findOrFail(session('accountant_company_id'));
         } else {
             // Caso contrário, exige login
             $user = Auth::user();
@@ -43,7 +48,7 @@ class AccountingController extends Controller
 
         // Receitas (OS finalizadas no período)
         $revenue = OrdemServico::where('company_id', $company->id)
-            ->whereIn('status', ['completed', 'finalized', 'paid'])
+            ->whereIn('status', [OrdemServicoStatus::Completed, OrdemServicoStatus::Finalized, OrdemServicoStatus::Paid])
             ->whereBetween('updated_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59'])
             ->with(['client'])
             ->get();
@@ -184,10 +189,9 @@ class AccountingController extends Controller
     {
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
-        $token = $request->get('token');
 
-        if ($token) {
-            $company = Company::where('accountant_token', $token)->firstOrFail();
+        if (session('accountant_company_id')) {
+            $company = Company::findOrFail(session('accountant_company_id'));
         } else {
             $company = Company::find(Auth::user()->company_id);
         }
@@ -223,10 +227,9 @@ class AccountingController extends Controller
     {
         $month = $request->get('month', date('m'));
         $year = $request->get('year', date('Y'));
-        $token = $request->get('token');
 
-        if ($token) {
-            $company = Company::where('accountant_token', $token)->firstOrFail();
+        if (session('accountant_company_id')) {
+            $company = Company::findOrFail(session('accountant_company_id'));
         } else {
             $company = Company::find(Auth::user()->company_id);
         }

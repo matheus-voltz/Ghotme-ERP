@@ -2,13 +2,18 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\OrdemServicoStatus;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class UpdateOrdemServicoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        $os = $this->route('ordem_servico');
+        return $this->user() !== null
+            && $os !== null
+            && $os->company_id === $this->user()->company_id;
     }
 
     public function rules(): array
@@ -16,7 +21,7 @@ class UpdateOrdemServicoRequest extends FormRequest
         return [
             'client_id' => 'required|exists:clients,id',
             'veiculo_id' => 'required|exists:veiculos,id',
-            'status' => 'required',
+            'status' => ['required', new Enum(OrdemServicoStatus::class)],
             'description' => 'nullable|string',
             'km_entry' => 'nullable|integer',
             'services' => 'nullable|array',

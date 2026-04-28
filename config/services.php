@@ -45,4 +45,8 @@ return [
         'gemini_model' => env('GEMINI_MODEL', 'gemini-3-flash-preview'),
     ],
 
+    'ifood' => [
+        'webhook_secret' => env('IFOOD_WEBHOOK_SECRET'),
+    ],
+
 ];

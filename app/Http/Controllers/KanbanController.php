@@ -152,8 +152,6 @@ class KanbanController extends Controller
 
     public function fetchActivities($id)
     {
-        \Illuminate\Support\Facades\Log::info('fetchActivities called with ID: ' . $id);
-
         // Se o ID não for numérico, provavelmente é um card de demonstração (ex: in-progress-1)
         if (!is_numeric($id)) {
             return response()->json([]);

@@ -142,15 +142,11 @@ class MasterPortalController extends Controller
             $emails = $emails->merge(Clients::whereNotNull('email')->pluck('email'));
         }
 
-        $uniqueEmails = $emails->unique();
+        $uniqueEmails = $emails->unique()->values()->all();
 
-        // Dispara o envio (podemos reutilizar o Job existente ou criar um MasterSendJob)
-        // Por simplicidade, vamos usar o Job existente ajustando a lógica para aceitar lista customizada se necessário
-        // Mas para agora, vamos apenas simular ou usar o padrão
-        
-        // TODO: Implementar lógica de disparo Master para a lista $uniqueEmails
-        
-        return redirect()->route('master.dashboard')->with('success', 'Newsletter Master enviada para a fila de processamento!');
+        SendNewsletterJob::dispatch($campaign, $uniqueEmails);
+
+        return redirect()->route('master.dashboard')->with('success', 'Newsletter Master enviada para a fila de processamento! (' . count($uniqueEmails) . ' destinatários)');
     }
 
     public function logSystemUpdate(Request $request)
