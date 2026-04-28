@@ -21,12 +21,11 @@
 
 ## 📸 Screenshots
 
-> _Screenshots coming soon — visit the [live demo](https://www.ghotme.com.br) to see it in action._
+### 🌙 Dark Mode
+![Ghotme ERP Dashboard Dark](./Docs/screenshots/dashboard-dark.png)
 
-<!-- Replace the lines below with actual screenshots -->
-<!-- ![Dashboard](./Docs/screenshots/dashboard.png) -->
-<!-- ![Service Orders](./Docs/screenshots/service-orders.png) -->
-<!-- ![Financial](./Docs/screenshots/financial.png) -->
+### ☀️ Light Mode
+![Ghotme ERP Dashboard Light](./Docs/screenshots/dashboard-light.png)
 
 ---
 
