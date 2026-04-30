@@ -66,11 +66,7 @@ jobs:
       - name: Notificar sucesso no Telegram
         if: success()
         run: |
-          TEXT="✅ Deploy concluído — Ghotme ERP
-
-Commit: ${{ github.event.head_commit.message }}
-Por: ${{ github.event.head_commit.author.name }}
-Horário: $(date '+%d/%m/%Y %H:%M') UTC"
+          TEXT=$(printf "✅ Deploy concluído — Ghotme ERP\n\nCommit: ${{ github.event.head_commit.message }}\nPor: ${{ github.event.head_commit.author.name }}\nHorário: $(date '+%d/%m/%Y %H:%M') UTC")
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
             --data-urlencode "text=$TEXT"
@@ -78,11 +74,7 @@ Horário: $(date '+%d/%m/%Y %H:%M') UTC"
       - name: Notificar falha no Telegram
         if: failure()
         run: |
-          TEXT="❌ Deploy FALHOU — Ghotme ERP
-
-Commit: ${{ github.event.head_commit.message }}
-Por: ${{ github.event.head_commit.author.name }}
-Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          TEXT=$(printf "❌ Deploy FALHOU — Ghotme ERP\n\nCommit: ${{ github.event.head_commit.message }}\nPor: ${{ github.event.head_commit.author.name }}\nLog: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
             --data-urlencode "text=$TEXT"
