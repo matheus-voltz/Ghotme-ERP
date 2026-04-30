@@ -24,93 +24,99 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configurar chave SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
       - name: Deploy → Empresa A
         id: empresa_a
         if: ${{ inputs.cliente_empresa_a == true }}
         continue-on-error: true
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_EMPRESA_A }}
-          username: ${{ secrets.USER_EMPRESA_A }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /var/www/empresa_a
-            git fetch origin main
-            git reset --hard origin/main
-            composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan migrate --force
-            php artisan optimize:clear
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.USER_EMPRESA_A }}@${{ secrets.HOST_EMPRESA_A }} \
+            "cd /var/www/empresa_a && \
+             git fetch origin main && \
+             git reset --hard origin/main && \
+             composer install --no-dev --optimize-autoloader --no-interaction && \
+             php artisan migrate --force && \
+             php artisan optimize:clear" \
+            > /tmp/log_empresa_a.txt 2>&1
 
       - name: Deploy → Empresa B
         id: empresa_b
         if: ${{ inputs.cliente_empresa_b == true }}
         continue-on-error: true
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_EMPRESA_B }}
-          username: ${{ secrets.USER_EMPRESA_B }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /var/www/empresa_b
-            git fetch origin main
-            git reset --hard origin/main
-            composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan migrate --force
-            php artisan optimize:clear
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.USER_EMPRESA_B }}@${{ secrets.HOST_EMPRESA_B }} \
+            "cd /var/www/empresa_b && \
+             git fetch origin main && \
+             git reset --hard origin/main && \
+             composer install --no-dev --optimize-autoloader --no-interaction && \
+             php artisan migrate --force && \
+             php artisan optimize:clear" \
+            > /tmp/log_empresa_b.txt 2>&1
 
       - name: Deploy → Empresa C
         id: empresa_c
         if: ${{ inputs.cliente_empresa_c == true }}
         continue-on-error: true
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST_EMPRESA_C }}
-          username: ${{ secrets.USER_EMPRESA_C }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            cd /var/www/empresa_c
-            git fetch origin main
-            git reset --hard origin/main
-            composer install --no-dev --optimize-autoloader --no-interaction
-            php artisan migrate --force
-            php artisan optimize:clear
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.USER_EMPRESA_C }}@${{ secrets.HOST_EMPRESA_C }} \
+            "cd /var/www/empresa_c && \
+             git fetch origin main && \
+             git reset --hard origin/main && \
+             composer install --no-dev --optimize-autoloader --no-interaction && \
+             php artisan migrate --force && \
+             php artisan optimize:clear" \
+            > /tmp/log_empresa_c.txt 2>&1
 
       - name: Notificar resultado no Telegram
         if: always()
         run: |
           RESULTADO=""
 
+          # Empresa A
           if [ "${{ inputs.cliente_empresa_a }}" = "true" ]; then
             if [ "${{ steps.empresa_a.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa A - Oficina do João"
             else
-              RESULTADO="$RESULTADO\n❌ Empresa A - Oficina do João (ERRO)"
+              ERRO=$(tail -3 /tmp/log_empresa_a.txt 2>/dev/null | tr '\n' ' ')
+              RESULTADO="$RESULTADO\n❌ Empresa A - Oficina do João\n   └ $ERRO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa A - Oficina do João (pulado)"
           fi
 
+          # Empresa B
           if [ "${{ inputs.cliente_empresa_b }}" = "true" ]; then
             if [ "${{ steps.empresa_b.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa B - Pet Shop Silva"
             else
-              RESULTADO="$RESULTADO\n❌ Empresa B - Pet Shop Silva (ERRO)"
+              ERRO=$(tail -3 /tmp/log_empresa_b.txt 2>/dev/null | tr '\n' ' ')
+              RESULTADO="$RESULTADO\n❌ Empresa B - Pet Shop Silva\n   └ $ERRO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa B - Pet Shop Silva (pulado)"
           fi
 
+          # Empresa C
           if [ "${{ inputs.cliente_empresa_c }}" = "true" ]; then
             if [ "${{ steps.empresa_c.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa C - Eletrônicos Ramos"
             else
-              RESULTADO="$RESULTADO\n❌ Empresa C - Eletrônicos Ramos (ERRO)"
+              ERRO=$(tail -3 /tmp/log_empresa_c.txt 2>/dev/null | tr '\n' ' ')
+              RESULTADO="$RESULTADO\n❌ Empresa C - Eletrônicos Ramos\n   └ $ERRO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa C - Eletrônicos Ramos (pulado)"
           fi
 
-          TEXT=$(printf "🚀 Deploy finalizado — $(date '+%d/%m/%Y %H:%M') UTC\n$RESULTADO")
+          TEXT=$(printf "🚀 Deploy — $(date '+%d/%m/%Y %H:%M') UTC\n$RESULTADO")
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
