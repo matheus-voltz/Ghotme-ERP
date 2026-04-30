@@ -44,31 +44,55 @@ jobs:
           script: |
             # Mudar para o diretório do projeto
             cd domains/ghotme.com.br/public_html 2>/dev/null || cd public_html
-            
+
             # Inicializa o Git se não existir (corrige erro fatal: not a git repository)
             if [ ! -d ".git" ]; then
               git init
               git remote add origin https://github.com/matheus-voltz/Ghotme-ERP.git
             fi
-            
+
             # Tentar limpar o repositório local do servidor se houver conflitos
             git fetch origin main
             git reset --hard origin/main
-            
+
             # Atualizar dependências do PHP (via servidor)
             composer install --no-dev --optimize-autoloader --no-interaction
-            
+
             # Migrations e Limpeza de Cache (agora com fallback para o Reverb)
             php artisan migrate --force
-            php artisan storage:link || true    
+            php artisan storage:link || true
             php artisan config:clear
             php artisan cache:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan package:discover --ansi
-            
+
             # Limpar Opcache se disponível
             php -r "if(function_exists('opcache_reset')) opcache_reset();"
-            
+
             echo "🚀 Ghotme ERP atualizado na Hostinger com sucesso (Build via GitHub)!"
+
+      - name: Notificar sucesso no Telegram
+        if: success()
+        run: |
+          TEXT="✅ Deploy concluído — Ghotme ERP
+
+Commit: ${{ github.event.head_commit.message }}
+Por: ${{ github.event.head_commit.author.name }}
+Horário: $(date '+%d/%m/%Y %H:%M') UTC"
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode "text=$TEXT"
+
+      - name: Notificar falha no Telegram
+        if: failure()
+        run: |
+          TEXT="❌ Deploy FALHOU — Ghotme ERP
+
+Commit: ${{ github.event.head_commit.message }}
+Por: ${{ github.event.head_commit.author.name }}
+Log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode "text=$TEXT"

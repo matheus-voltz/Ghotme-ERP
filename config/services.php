@@ -45,4 +45,18 @@ return [
         'gemini_model' => env('GEMINI_MODEL', 'gemini-3-flash-preview'),
     ],
 
+    'ifood' => [
+        'webhook_secret' => env('IFOOD_WEBHOOK_SECRET'),
+    ],
+
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret'   => env('RECAPTCHA_SECRET_KEY'),
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id'   => env('TELEGRAM_CHAT_ID'),
+    ],
+
 ];
