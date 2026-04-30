@@ -24,12 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # -------------------------------------------------------
-      # Cada step abaixo só roda se o cliente foi marcado (true)
-      # -------------------------------------------------------
-
       - name: Deploy → Empresa A
+        id: empresa_a
         if: ${{ inputs.cliente_empresa_a == true }}
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST_EMPRESA_A }}
@@ -44,7 +42,9 @@ jobs:
             php artisan optimize:clear
 
       - name: Deploy → Empresa B
+        id: empresa_b
         if: ${{ inputs.cliente_empresa_b == true }}
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST_EMPRESA_B }}
@@ -59,7 +59,9 @@ jobs:
             php artisan optimize:clear
 
       - name: Deploy → Empresa C
+        id: empresa_c
         if: ${{ inputs.cliente_empresa_c == true }}
+        continue-on-error: true
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST_EMPRESA_C }}
@@ -73,35 +75,42 @@ jobs:
             php artisan migrate --force
             php artisan optimize:clear
 
-      # -------------------------------------------------------
-      # Notificação final resumindo quem foi atualizado
-      # -------------------------------------------------------
-
       - name: Notificar resultado no Telegram
         if: always()
         run: |
-          ATUALIZADOS=""
-          PULADOS=""
+          RESULTADO=""
 
           if [ "${{ inputs.cliente_empresa_a }}" = "true" ]; then
-            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa A - Oficina do João"
+            if [ "${{ steps.empresa_a.outcome }}" = "success" ]; then
+              RESULTADO="$RESULTADO\n✅ Empresa A - Oficina do João"
+            else
+              RESULTADO="$RESULTADO\n❌ Empresa A - Oficina do João (ERRO)"
+            fi
           else
-            PULADOS="$PULADOS\n⏭ Empresa A - Oficina do João"
+            RESULTADO="$RESULTADO\n⏭ Empresa A - Oficina do João (pulado)"
           fi
 
           if [ "${{ inputs.cliente_empresa_b }}" = "true" ]; then
-            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa B - Pet Shop Silva"
+            if [ "${{ steps.empresa_b.outcome }}" = "success" ]; then
+              RESULTADO="$RESULTADO\n✅ Empresa B - Pet Shop Silva"
+            else
+              RESULTADO="$RESULTADO\n❌ Empresa B - Pet Shop Silva (ERRO)"
+            fi
           else
-            PULADOS="$PULADOS\n⏭ Empresa B - Pet Shop Silva"
+            RESULTADO="$RESULTADO\n⏭ Empresa B - Pet Shop Silva (pulado)"
           fi
 
           if [ "${{ inputs.cliente_empresa_c }}" = "true" ]; then
-            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa C - Eletrônicos Ramos"
+            if [ "${{ steps.empresa_c.outcome }}" = "success" ]; then
+              RESULTADO="$RESULTADO\n✅ Empresa C - Eletrônicos Ramos"
+            else
+              RESULTADO="$RESULTADO\n❌ Empresa C - Eletrônicos Ramos (ERRO)"
+            fi
           else
-            PULADOS="$PULADOS\n⏭ Empresa C - Eletrônicos Ramos"
+            RESULTADO="$RESULTADO\n⏭ Empresa C - Eletrônicos Ramos (pulado)"
           fi
 
-          TEXT=$(printf "🚀 Deploy finalizado\n\nAtualizados:$ATUALIZADOS\n\nPulados:$PULADOS\n\nHorário: $(date '+%d/%m/%Y %H:%M') UTC")
+          TEXT=$(printf "🚀 Deploy finalizado — $(date '+%d/%m/%Y %H:%M') UTC\n$RESULTADO")
 
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
