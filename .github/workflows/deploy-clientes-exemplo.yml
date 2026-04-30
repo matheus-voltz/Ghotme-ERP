@@ -1,0 +1,108 @@
+name: Deploy Clientes (Exemplo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cliente_empresa_a:
+        description: 'Empresa A - Oficina do João'
+        type: boolean
+        default: false
+      cliente_empresa_b:
+        description: 'Empresa B - Pet Shop Silva'
+        type: boolean
+        default: false
+      cliente_empresa_c:
+        description: 'Empresa C - Eletrônicos Ramos'
+        type: boolean
+        default: false
+
+jobs:
+  deploy:
+    name: Deploy nos clientes selecionados
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -------------------------------------------------------
+      # Cada step abaixo só roda se o cliente foi marcado (true)
+      # -------------------------------------------------------
+
+      - name: Deploy → Empresa A
+        if: ${{ inputs.cliente_empresa_a == true }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_EMPRESA_A }}
+          username: ${{ secrets.USER_EMPRESA_A }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/empresa_a
+            git fetch origin main
+            git reset --hard origin/main
+            composer install --no-dev --optimize-autoloader --no-interaction
+            php artisan migrate --force
+            php artisan optimize:clear
+
+      - name: Deploy → Empresa B
+        if: ${{ inputs.cliente_empresa_b == true }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_EMPRESA_B }}
+          username: ${{ secrets.USER_EMPRESA_B }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/empresa_b
+            git fetch origin main
+            git reset --hard origin/main
+            composer install --no-dev --optimize-autoloader --no-interaction
+            php artisan migrate --force
+            php artisan optimize:clear
+
+      - name: Deploy → Empresa C
+        if: ${{ inputs.cliente_empresa_c == true }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_EMPRESA_C }}
+          username: ${{ secrets.USER_EMPRESA_C }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /var/www/empresa_c
+            git fetch origin main
+            git reset --hard origin/main
+            composer install --no-dev --optimize-autoloader --no-interaction
+            php artisan migrate --force
+            php artisan optimize:clear
+
+      # -------------------------------------------------------
+      # Notificação final resumindo quem foi atualizado
+      # -------------------------------------------------------
+
+      - name: Notificar resultado no Telegram
+        if: always()
+        run: |
+          ATUALIZADOS=""
+          PULADOS=""
+
+          if [ "${{ inputs.cliente_empresa_a }}" = "true" ]; then
+            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa A - Oficina do João"
+          else
+            PULADOS="$PULADOS\n⏭ Empresa A - Oficina do João"
+          fi
+
+          if [ "${{ inputs.cliente_empresa_b }}" = "true" ]; then
+            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa B - Pet Shop Silva"
+          else
+            PULADOS="$PULADOS\n⏭ Empresa B - Pet Shop Silva"
+          fi
+
+          if [ "${{ inputs.cliente_empresa_c }}" = "true" ]; then
+            ATUALIZADOS="$ATUALIZADOS\n✅ Empresa C - Eletrônicos Ramos"
+          else
+            PULADOS="$PULADOS\n⏭ Empresa C - Eletrônicos Ramos"
+          fi
+
+          TEXT=$(printf "🚀 Deploy finalizado\n\nAtualizados:$ATUALIZADOS\n\nPulados:$PULADOS\n\nHorário: $(date '+%d/%m/%Y %H:%M') UTC")
+
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+            --data-urlencode "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --data-urlencode "text=$TEXT"
