@@ -30,6 +30,42 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
+      - name: Criar script de resumo de erros
+        run: |
+          cat > /tmp/resumir_erro.py << 'PYEOF'
+          import sys, json, urllib.request
+
+          log_file, api_key = sys.argv[1], sys.argv[2]
+
+          with open(log_file) as f:
+              log = f.read()[-3000:]
+
+          payload = json.dumps({
+              "model": "claude-haiku-4-5-20251001",
+              "max_tokens": 80,
+              "messages": [{
+                  "role": "user",
+                  "content": f"Resuma em UMA frase curta (máximo 100 caracteres, sem markdown, em português) o erro principal deste log de deploy Laravel:\n\n{log}"
+              }]
+          })
+
+          req = urllib.request.Request(
+              "https://api.anthropic.com/v1/messages",
+              data=payload.encode(),
+              headers={
+                  "x-api-key": api_key,
+                  "anthropic-version": "2023-06-01",
+                  "content-type": "application/json"
+              }
+          )
+          try:
+              resp = json.loads(urllib.request.urlopen(req, timeout=10).read())
+              print(resp["content"][0]["text"].strip())
+          except Exception:
+              lines = [l for l in log.strip().split('\n') if l.strip()]
+              print(lines[-1][:100] if lines else "Erro desconhecido")
+          PYEOF
+
       - name: Deploy → Empresa A
         id: empresa_a
         if: ${{ inputs.cliente_empresa_a == true }}
@@ -85,8 +121,8 @@ jobs:
             if [ "${{ steps.empresa_a.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa A - Oficina do João"
             else
-              ERRO=$(tail -3 /tmp/log_empresa_a.txt 2>/dev/null | tr '\n' ' ')
-              RESULTADO="$RESULTADO\n❌ Empresa A - Oficina do João\n   └ $ERRO"
+              RESUMO=$(python3 /tmp/resumir_erro.py /tmp/log_empresa_a.txt "${{ secrets.ANTHROPIC_API_KEY }}")
+              RESULTADO="$RESULTADO\n❌ Empresa A - Oficina do João\n   └ $RESUMO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa A - Oficina do João (pulado)"
@@ -97,8 +133,8 @@ jobs:
             if [ "${{ steps.empresa_b.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa B - Pet Shop Silva"
             else
-              ERRO=$(tail -3 /tmp/log_empresa_b.txt 2>/dev/null | tr '\n' ' ')
-              RESULTADO="$RESULTADO\n❌ Empresa B - Pet Shop Silva\n   └ $ERRO"
+              RESUMO=$(python3 /tmp/resumir_erro.py /tmp/log_empresa_b.txt "${{ secrets.ANTHROPIC_API_KEY }}")
+              RESULTADO="$RESULTADO\n❌ Empresa B - Pet Shop Silva\n   └ $RESUMO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa B - Pet Shop Silva (pulado)"
@@ -109,8 +145,8 @@ jobs:
             if [ "${{ steps.empresa_c.outcome }}" = "success" ]; then
               RESULTADO="$RESULTADO\n✅ Empresa C - Eletrônicos Ramos"
             else
-              ERRO=$(tail -3 /tmp/log_empresa_c.txt 2>/dev/null | tr '\n' ' ')
-              RESULTADO="$RESULTADO\n❌ Empresa C - Eletrônicos Ramos\n   └ $ERRO"
+              RESUMO=$(python3 /tmp/resumir_erro.py /tmp/log_empresa_c.txt "${{ secrets.ANTHROPIC_API_KEY }}")
+              RESULTADO="$RESULTADO\n❌ Empresa C - Eletrônicos Ramos\n   └ $RESUMO"
             fi
           else
             RESULTADO="$RESULTADO\n⏭ Empresa C - Eletrônicos Ramos (pulado)"
