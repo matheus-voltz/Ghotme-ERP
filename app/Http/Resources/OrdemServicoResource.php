@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\OrdemServicoStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,7 +23,7 @@ class OrdemServicoResource extends JsonResource
             ),
             'opened_by' => $this->user->name ?? 'Sistema',
             'status' => $this->status,
-            'status_label' => $this->getStatusLabel($this->status),
+            'status_label' => OrdemServicoStatus::tryFrom($this->status)?->label() ?? $this->status,
             'total' => (float) $this->total,
             'total_formatted' => 'R$ ' . number_format($this->total, 2, ',', '.'),
             'date' => $this->created_at->format('d/m/Y'),
@@ -30,18 +31,5 @@ class OrdemServicoResource extends JsonResource
         ];
     }
 
-    protected function getStatusLabel($status)
-    {
-        $statusLabels = [
-            'pending' => 'Pendente',
-            'in_progress' => 'Em Manutenção',
-            'testing' => 'Em Teste',
-            'cleaning' => 'Em Limpeza',
-            'completed' => 'Pronto para Retirada',
-            'paid' => 'Finalizado / Pago',
-            'awaiting_approval' => 'Aguardando Aprovação'
-        ];
 
-        return $statusLabels[$status] ?? $status;
-    }
 }

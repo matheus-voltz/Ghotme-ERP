@@ -238,6 +238,11 @@ $customizerHidden = 'customizer-hide';
             @enderror
           </div>
           @endif
+          @if(config('services.recaptcha.site_key'))
+          <div class="mb-4 d-flex justify-content-center">
+            <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.site_key') }}"></div>
+          </div>
+          @endif
           <button type="submit" class="btn btn-primary d-grid w-100 shadow-primary">Cadastrar</button>
         </form>
 
@@ -254,4 +259,6 @@ $customizerHidden = 'customizer-hide';
     <!-- /Register -->
   </div>
 </div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 @endsection

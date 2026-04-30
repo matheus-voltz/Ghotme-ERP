@@ -18,34 +18,31 @@ class SendNewsletterJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $campaign;
+    protected array $customEmails;
 
-    public function __construct(NewsletterCampaign $campaign)
+    public function __construct(NewsletterCampaign $campaign, array $customEmails = [])
     {
         $this->campaign = $campaign;
+        $this->customEmails = $customEmails;
     }
 
     public function handle(): void
     {
-        Log::info("Iniciando envio da newsletter: " . $this->campaign->subject);
-        
-        $subscribers = NewsletterSubscriber::where('is_active', true)->get();
+        $emails = count($this->customEmails) > 0
+            ? collect($this->customEmails)
+            : NewsletterSubscriber::where('is_active', true)->pluck('email');
+
         $count = 0;
 
-        foreach ($subscribers as $subscriber) {
+        foreach ($emails as $email) {
             try {
-                Mail::to($subscriber->email)->send(new NewsletterMail($this->campaign->subject, $this->campaign->content));
+                Mail::to($email)->send(new NewsletterMail($this->campaign->subject, $this->campaign->content));
                 $count++;
-                Log::info("Newsletter enviada para: " . $subscriber->email);
             } catch (\Exception $e) {
-                Log::error("Erro ao enviar newsletter para " . $subscriber->email . ": " . $e->getMessage());
+                Log::error("Erro ao enviar newsletter para {$email}: " . $e->getMessage());
             }
         }
 
-        // Atualiza a contagem de envios na campanha
-        $this->campaign->update([
-            'sent_count' => $count
-        ]);
-
-        Log::info("Finalizado envio da newsletter. Total de sucessos: " . $count);
+        $this->campaign->update(['sent_count' => $count]);
     }
 }

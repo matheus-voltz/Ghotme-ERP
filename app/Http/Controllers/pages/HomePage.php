@@ -95,8 +95,6 @@ class HomePage extends Controller
       $model = config('services.ai.gemini_model', 'gemini-1.5-flash');
       $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey;
 
-      \Illuminate\Support\Facades\Log::info("AI Consultant: Sending request to Gemini using model {$model}");
-
       $response = Http::timeout(30)->post($url, [
         'contents' => [['parts' => [['text' => $prompt]]]]
       ]);

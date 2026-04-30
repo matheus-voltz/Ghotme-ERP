@@ -135,7 +135,6 @@ class SupportChat extends Component
                 'is_read' => false
             ]);
 
-            Log::info("ENVIO MASTER DEBUG: Salvo com Sucesso! ID: " . $newMessage->id . " | Company: " . $newMessage->company_id . " | Sender: " . $newMessage->sender_id . " | Receiver: " . $newMessage->receiver_id);
 
             // SE EU SOU MASTER ENVIANDO: Notifico o cliente para ele ver o badge/alerta
             if (Auth::user()->is_master && $recipient) {
@@ -297,7 +296,6 @@ class SupportChat extends Component
                 })
                 ->orderBy('created_at', 'asc')->get();
             
-            Log::info("Chat Master-Cliente DEBUG: " . $messages->count() . " mensagens encontradas.");
         } elseif ($this->chatType === 'client' && $this->activeClientId) {
             $activeContact = \App\Models\Clients::withoutGlobalScopes()->find($this->activeClientId);
             $messages = ChatMessage::withoutGlobalScopes()

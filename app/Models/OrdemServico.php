@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrdemServicoStatus;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\BelongsToCompany;
 use App\Traits\HasCustomFields;
@@ -33,6 +34,12 @@ class OrdemServico extends Model implements Auditable
     ];
 
     protected $appends = ['total', 'client_name'];
+
+    protected $casts = [
+        'status' => OrdemServicoStatus::class,
+        'scheduled_at' => 'datetime',
+        'paid_at' => 'datetime',
+    ];
 
     protected static function boot()
     {
