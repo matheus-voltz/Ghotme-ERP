@@ -285,21 +285,28 @@ class HomePage extends Controller
       ->groupBy('y', 'm')
       ->get();
 
+    // Indexar por (m, y) para busca O(1) ao invés de .where() O(n)
+    $finByMonth = $financialRaw->mapToGroups(fn($item) => ["{$item->y}-{$item->m}" => $item])->map(fn($items) => $items->keyBy('type'));
+    $itemsByMonth = $osItemsRaw->mapToGroups(fn($item) => ["{$item->y}-{$item->m}" => $item->total])->map(fn($items) => $items->sum());
+    $partsByMonth = $osPartsRaw->mapToGroups(fn($item) => ["{$item->y}-{$item->m}" => $item->total])->map(fn($items) => $items->sum());
+    $budgetsByMonth = $budgetsRaw->mapToGroups(fn($item) => ["{$item->y}-{$item->m}" => $item->total])->map(fn($items) => $items->sum());
+
     for ($i = 5; $i >= 0; $i--) {
       $mDate = $now->copy()->subMonths($i);
       $m = $mDate->month;
       $y = $mDate->year;
+      $key = "{$y}-{$m}";
       $months[] = $mDate->translatedFormat('M');
 
-      // Busca na coleção puxada do array
-      $finIn = $financialRaw->where('m', $m)->where('y', $y)->where('type', 'in')->sum('total');
-      $itemsInc = $osItemsRaw->where('m', $m)->where('y', $y)->sum('total');
-      $partsInc = $osPartsRaw->where('m', $m)->where('y', $y)->sum('total');
+      // Busca indexada O(1)
+      $finIn = $finByMonth->get($key)?->get('in')?->total ?? 0;
+      $itemsInc = $itemsByMonth->get($key) ?? 0;
+      $partsInc = $partsByMonth->get($key) ?? 0;
 
       $revenueTrends[] = $finIn + $itemsInc + $partsInc;
 
-      $expenseTrends[] = $financialRaw->where('m', $m)->where('y', $y)->where('type', 'out')->sum('total');
-      $budgetTrends[] = $budgetsRaw->where('m', $m)->where('y', $y)->sum('total');
+      $expenseTrends[] = $finByMonth->get($key)?->get('out')?->total ?? 0;
+      $budgetTrends[] = $budgetsByMonth->get($key) ?? 0;
     }
 
     // 5. Melhores Serviços (Ranking) - Filtrado por Empresa
