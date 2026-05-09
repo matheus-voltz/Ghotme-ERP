@@ -225,12 +225,14 @@ class HomePage extends Controller
       : ($revenueMonth > 0 ? 100 : 0);
 
     // 3. Financeiro Pendente (Contas a Pagar/Receber próximas)
-    $receivablesPending = FinancialTransaction::where('type', 'in')
+    $receivablesPending = FinancialTransaction::where('company_id', $companyId)
+      ->where('type', 'in')
       ->where('status', 'pending')
       ->whereDate('due_date', '<=', $now->copy()->addDays(7))
       ->sum('amount');
 
-    $payablesPending = FinancialTransaction::where('type', 'out')
+    $payablesPending = FinancialTransaction::where('company_id', $companyId)
+      ->where('type', 'out')
       ->where('status', 'pending')
       ->whereDate('due_date', '<=', $now->copy()->addDays(7))
       ->sum('amount');
