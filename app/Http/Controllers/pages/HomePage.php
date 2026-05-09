@@ -375,9 +375,16 @@ class HomePage extends Controller
         'running' => $osStats['running'],
         'finalized' => OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->count(),
       ],
-      'conversionRate' => Budget::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count() > 0
-        ? (Budget::where('company_id', $companyId)->where('status', 'approved')->whereMonth('updated_at', $now->month)->count() / Budget::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count()) * 100
-        : 0,
+      'conversionRate' => (function() use ($companyId, $now) {
+        $stats = Budget::where('company_id', $companyId)
+          ->whereMonth('created_at', $now->month)
+          ->select(
+            DB::raw('COUNT(*) as total'),
+            DB::raw('SUM(CASE WHEN status = "approved" AND MONTH(updated_at) = ' . $now->month . ' THEN 1 ELSE 0 END) as approved')
+          )
+          ->first();
+        return $stats->total > 0 ? ($stats->approved / $stats->total) * 100 : 0;
+      })(),
       'topServiceLabels' => $topServices->pluck('name')->map(fn($item) => str($item)->limit(15))->toArray(),
       'topServiceData' => $topServices->pluck('total')->toArray(),
       'monthlyProfitability' => $revenueMonth > 0 ? (($revenueMonth - $monthlyExpenses) / $revenueMonth) * 100 : 0,
