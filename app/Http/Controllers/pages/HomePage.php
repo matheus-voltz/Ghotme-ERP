@@ -327,7 +327,7 @@ class HomePage extends Controller
       ->sum('amount');
 
     // 6. Novas Métricas de Inteligência
-    \$totalClients = Clients::where('company_id', \$companyId)->count();
+    $totalClients = Clients::where('company_id', $companyId)->count();
     $avgTicket = $osStats['total_month'] > 0 ? $revenueMonth / $osStats['total_month'] : 0;
 
     // Retenção: Clientes com mais de 1 OS nos últimos 6 meses (Otimizado)
