@@ -61,12 +61,15 @@ use App\Http\Controllers\VehicleLookupController;
 Route::get('/', function () {
     // Registra a visita de forma rápida e silenciosa
     try {
-        \App\Models\SiteVisit::create([
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'path' => '/',
-            'referer' => request()->header('referer')
-        ]);
+        $userAgent = request()->userAgent();
+        if ($userAgent && !preg_match('/bot|crawl|slurp|spider|mediapartners/i', $userAgent)) {
+            \App\Models\SiteVisit::create([
+                'ip_address' => request()->ip(),
+                'user_agent' => $userAgent,
+                'path' => '/',
+                'referer' => request()->header('referer')
+            ]);
+        }
     } catch (\Exception $e) {
     }
 

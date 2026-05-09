@@ -24,7 +24,7 @@ class MasterPortalController extends Controller
         for ($i = 29; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $days[] = now()->subDays($i)->format('d/m');
-            $visitCounts[] = \App\Models\SiteVisit::whereDate('created_at', $date)->count();
+            $visitCounts[] = \App\Models\SiteVisit::whereDate('created_at', $date)->distinct('ip_address')->count('ip_address');
         }
 
         $stats = [
@@ -33,7 +33,7 @@ class MasterPortalController extends Controller
             'total_clients' => Clients::count(),
             'total_subscribers' => NewsletterSubscriber::count(),
             'total_errors' => SystemError::count(),
-            'total_visits_30d' => \App\Models\SiteVisit::where('created_at', '>=', now()->subDays(30))->count(),
+            'total_visits_30d' => \App\Models\SiteVisit::where('created_at', '>=', now()->subDays(30))->distinct('ip_address')->count('ip_address'),
             'global_revenue' => BillingHistory::where('status', 'paid')->sum('amount'),
             'pending_revenue' => BillingHistory::where('status', 'pending')->sum('amount'),
             'recent_subscribers' => NewsletterSubscriber::latest()->limit(5)->get(),
