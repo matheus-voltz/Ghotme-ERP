@@ -371,8 +371,8 @@ class HomePage extends Controller
       'expenseTrends' => $expenseTrends,
       'budgetTrends' => $budgetTrends,
       'osDistribution' => [
-        'pending' => OrdemServico::where('company_id', $companyId)->where('status', 'pending')->count(),
-        'running' => OrdemServico::where('company_id', $companyId)->where('status', 'running')->count(),
+        'pending' => $osStats['pending'],
+        'running' => $osStats['running'],
         'finalized' => OrdemServico::where('company_id', $companyId)->where('status', 'finalized')->count(),
       ],
       'conversionRate' => Budget::where('company_id', $companyId)->whereMonth('created_at', $now->month)->count() > 0
