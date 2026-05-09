@@ -225,12 +225,14 @@ class HomePage extends Controller
       : ($revenueMonth > 0 ? 100 : 0);
 
     // 3. Financeiro Pendente (Contas a Pagar/Receber próximas)
-    $receivablesPending = FinancialTransaction::where('type', 'in')
+    $receivablesPending = FinancialTransaction::where('company_id', $companyId)
+      ->where('type', 'in')
       ->where('status', 'pending')
       ->whereDate('due_date', '<=', $now->copy()->addDays(7))
       ->sum('amount');
 
-    $payablesPending = FinancialTransaction::where('type', 'out')
+    $payablesPending = FinancialTransaction::where('company_id', $companyId)
+      ->where('type', 'out')
       ->where('status', 'pending')
       ->whereDate('due_date', '<=', $now->copy()->addDays(7))
       ->sum('amount');
@@ -318,7 +320,7 @@ class HomePage extends Controller
       ->sum('amount');
 
     // 6. Novas Métricas de Inteligência
-    $totalClients = Clients::count();
+    \$totalClients = Clients::where('company_id', \$companyId)->count();
     $avgTicket = $osStats['total_month'] > 0 ? $revenueMonth / $osStats['total_month'] : 0;
 
     // Retenção: Clientes com mais de 1 OS nos últimos 6 meses (Otimizado)
