@@ -246,9 +246,12 @@ $pageConfigs = [
   <!-- Hero: Start -->
   <section id="hero-animation">
     <div id="landingHero" class="section-py landing-hero position-relative">
-      <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
-        class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1"
-        width="1920" height="1080" fetchpriority="high" />
+      <picture>
+        <source srcset="{{ asset('assets/img/front-pages/backgrounds/hero-bg.webp') }}" type="image/webp">
+        <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
+          class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1"
+          width="1920" height="1080" fetchpriority="high" />
+      </picture>
       <div class="container">
         <div class="hero-text-box text-center position-relative">
           <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">{{ __('The ERP that shapes itself to your business') }}</h1>
@@ -266,12 +269,15 @@ $pageConfigs = [
         <div id="heroDashboardAnimation" class="hero-animation-img mt-12">
           <a href="{{ url('/dashboard') }}" target="_blank">
             <div id="heroAnimationImg" class="position-relative hero-dashboard-img">
-              <img
-                src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
-                alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
-                data-app-light-img="front-pages/landing-page/meu-sistema-light.png"
-                data-app-dark-img="front-pages/landing-page/meu-sistema-dark.png"
-                width="1200" height="749" fetchpriority="high" />
+              <picture>
+                <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.webp') }}" type="image/webp">
+                <img
+                  src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
+                  alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
+                  data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
+                  data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
+                  width="1200" height="749" fetchpriority="high" />
+              </picture>
             </div>
           </a>
         </div>
@@ -931,8 +937,11 @@ $pageConfigs = [
 
 <!-- Mobile App Section: Start -->
 <section id="landingApp" class="section-py bg-body landing-app position-relative">
-  <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
-    class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100 z-n1" style="opacity: 0.2;" />
+  <picture>
+    <source srcset="{{ asset('assets/img/front-pages/backgrounds/hero-bg.webp') }}" type="image/webp">
+    <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
+      class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100 z-n1" style="opacity: 0.2;" />
+  </picture>
   <div class="container">
     <div class="row align-items-center gy-6">
       <!-- Image Side -->
@@ -961,7 +970,10 @@ $pageConfigs = [
         <div class="d-inline-block position-relative pt-5">
           <!-- Blob background behind phone -->
           <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-label-primary" style="width: 280px; height: 280px; opacity: 0.5; filter: blur(40px); z-index: 0;"></div>
-          <img src="{{ asset('assets/img/front-pages/landing-page/meu-mobile.png') }}" alt="Ghotme Mobile App Dashboard" class="img-fluid mobile-hero-img position-relative z-1" />
+          <picture>
+            <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-mobile.webp') }}" type="image/webp">
+            <img src="{{ asset('assets/img/front-pages/landing-page/meu-mobile.png') }}" alt="Ghotme Mobile App Dashboard" class="img-fluid mobile-hero-img position-relative z-1" />
+          </picture>
         </div>
       </div>
 
@@ -1530,8 +1542,11 @@ $pageConfigs = [
       <div class="row gy-12 align-items-center">
         <div class="col-lg-5">
           <div class="text-center">
-            <img src="{{ asset('assets/img/front-pages/landing-page/faq-boy-with-logos.png') }}"
-              alt="faq boy with logos" class="faq-image" />
+            <picture>
+              <source srcset="{{ asset('assets/img/front-pages/landing-page/faq-boy-with-logos.webp') }}" type="image/webp">
+              <img src="{{ asset('assets/img/front-pages/landing-page/faq-boy-with-logos.png') }}"
+                alt="faq boy with logos" class="faq-image" />
+            </picture>
           </div>
         </div>
         <div class="col-lg-7">
@@ -1682,10 +1697,13 @@ $pageConfigs = [
           </div>
         </div>
         <div class="col-lg-6 pt-lg-12 text-center text-lg-end">
-          <img src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}" alt="cta dashboard"
-            data-app-light-img="front-pages/landing-page/meu-sistema-light.png"
-            data-app-dark-img="front-pages/landing-page/meu-sistema-dark.png"
-            class="img-fluid mt-lg-4 hover-shadow-xl transition-all" style="border-radius: 1rem; transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);" />
+          <picture>
+            <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.webp') }}" type="image/webp">
+            <img src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}" alt="cta dashboard"
+              data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
+              data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
+              class="img-fluid mt-lg-4 hover-shadow-xl transition-all" style="border-radius: 1rem; transform: perspective(1000px) rotateY(-10deg) rotateX(5deg);" />
+          </picture>
         </div>
       </div>
     </div>
@@ -1711,8 +1729,11 @@ $pageConfigs = [
           <div class="contact-img-box position-relative border p-2 h-100">
             <img src="{{ asset('assets/img/front-pages/icons/contact-border.png') }}" alt="contact border"
               class="contact-border-img position-absolute d-none d-lg-block scaleX-n1-rtl" />
-            <img src="{{ asset('assets/img/front-pages/landing-page/contact-customer-service.png') }}"
-              alt="contact customer service" class="contact-img w-100 scaleX-n1-rtl" />
+            <picture>
+              <source srcset="{{ asset('assets/img/front-pages/landing-page/contact-customer-service.webp') }}" type="image/webp">
+              <img src="{{ asset('assets/img/front-pages/landing-page/contact-customer-service.png') }}"
+                alt="contact customer service" class="contact-img w-100 scaleX-n1-rtl" />
+            </picture>
             <div class="p-4 pb-2">
               <div class="row g-4">
                 <div class="col-md-6 col-lg-12 col-xl-6">
