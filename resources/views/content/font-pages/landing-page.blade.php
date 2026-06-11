@@ -387,13 +387,13 @@ $pageConfigs = [
       <div class="text-center mb-4">
         <span class="badge bg-label-primary">{{ __('Key Features') }}</span>
       </div>
-      <h4 class="text-center mb-1">
+      <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Everything you need') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
         {{ __('to manage your business') }}
-      </h4>
+      </h2>
       <p class="text-center mb-12">{{ __('Powerful tools for service companies, retail and self-employed providers.') }}</p>
       <div class="features-icon-wrapper row gx-0 gy-6 g-sm-12">
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
@@ -449,9 +449,9 @@ $pageConfigs = [
       <div class="text-center mb-4">
         <span class="badge bg-label-primary">{{ __('Made for you') }}</span>
       </div>
-      <h4 class="text-center mb-1">
+      <h2 class="h4 text-center mb-1">
         {{ __('One system') }}, <span class="fw-extrabold">{{ __('infinite possibilities') }}</span>
-      </h4>
+      </h2>
       <p class="text-center mb-12">{{ __('See how Ghotme transforms to meet the specific needs of each market:') }}</p>
       <div class="row g-6">
         <div class="col-md-3">
@@ -846,13 +846,13 @@ $pageConfigs = [
     <div class="text-center mb-4">
       <span class="badge bg-label-primary">{{ __('Integrated Payments') }}</span>
     </div>
-    <h4 class="text-center mb-1">
+    <h2 class="h4 text-center mb-1">
       <span class="position-relative fw-extrabold z-1">{{ __('Payment') }}
         <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
           class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
       </span>
       {{ __('Platforms') }}
-    </h4>
+    </h2>
     <p class="text-center mb-md-11 pb-0 pb-xl-12">{{ __('The site integrates with Pagar.me, Asaas, PagSeguro, Stripe and Bitcoin.') }}</p>
     <div class="row gy-12 mt-2 justify-content-center align-items-center">
       <style>
@@ -1155,13 +1155,13 @@ $pageConfigs = [
       <div class="text-center mb-4">
         <span class="badge bg-label-primary">{{ __('Pricing Plans') }}</span>
       </div>
-      <h4 class="text-center mb-1">
+      <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Tailored pricing plans') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
         </span>
         {{ __('made for you') }}
-      </h4>
+      </h2>
       <p class="text-center pb-2 mb-7">{{ __('All plans include essential features to boost your business.') }}<br />{{ __('Choose the best plan for your needs.') }}</p>
 
       <div class="text-center mb-12">

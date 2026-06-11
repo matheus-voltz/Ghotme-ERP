@@ -37,7 +37,7 @@ $primaryColorCSS = Helpers::generatePrimaryColorCSS($configData['color']);
 @php
 $currentNiche = get_current_niche();
 @endphp
-<html lang="{{ session()->get('locale') ?? app()->getLocale() }}"
+<html lang="{{ str_replace('_', '-', session()->get('locale') ?? app()->getLocale()) }}"
   class="{{ $navbarType ?? '' }} {{ $contentLayout ?? '' }} {{ $menuFixed ?? '' }} {{ $menuCollapsed ?? '' }} {{ $footerFixed ?? '' }} {{ $customizerHidden ?? '' }} niche-{{ $currentNiche }}"
   dir="{{ $configData['textDirection'] }}" data-skin="{{ $skinName }}" data-assets-path="{{ asset('/assets') . '/' }}"
   data-base-url="{{ url('/') }}" data-framework="laravel" data-template="{{ $configData['layout'] }}-menu-template"
@@ -56,7 +56,7 @@ $currentNiche = get_current_niche();
 
   <meta charset="utf-8" />
   <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0" />
 
   <title>
     @yield('title') | {{ config('variables.templateName') ? config('variables.templateName') : 'TemplateName' }}
@@ -74,7 +74,7 @@ $currentNiche = get_current_niche();
     content="{{ config('variables.templateDescription') ? config('variables.templateDescription') : '' }}" />
   <meta property="og:site_name"
     content="{{ config('variables.creatorName') ? config('variables.creatorName') : '' }}" />
-  <meta name="robots" content="noindex, nofollow" />
+  <meta name="robots" content="index, follow" />
   <!-- laravel CRUD token -->
   <meta name="csrf-token" content="{{ csrf_token() }}" />
   @auth
@@ -145,12 +145,65 @@ $currentNiche = get_current_niche();
       padding: 0.5em 0.8em;
       font-weight: 600;
     }
+
+    /* =============================================
+       WCAG AA Contrast Fixes
+       ============================================= */
+
+    /* bg-label-primary badges: aumenta contraste do texto */
+    .bg-label-primary {
+      color: #4a3aad !important; /* era ~#7367f0 (razão ~2.8:1) → agora ~4.8:1 */
+    }
+
+    /* text-info: azul claro → azul acessível */
+    .text-info {
+      color: #0a7abf !important; /* razão 4.6:1 sobre branco */
+    }
+
+    /* btn-outline-secondary: texto/borda mais escuro */
+    .btn-outline-secondary {
+      color: #5a5f6e !important;
+      border-color: #5a5f6e !important;
+    }
+    .btn-outline-secondary:hover {
+      color: #fff !important;
+      background-color: #5a5f6e !important;
+    }
+
+    /* text-body-secondary (/mês, subtítulos): garante contraste mínimo */
+    .text-body-secondary {
+      color: #6c757d !important; /* Bootstrap padrão, mas garante aplicação */
+    }
+
+    /* opacity-75 em texto: remove opacidade que reduz contraste */
+    .landing-app h5.opacity-75,
+    section h5.opacity-75 {
+      opacity: 1 !important;
+    }
+
+    /* Bloco de código API: cores dos spans dentro do card-body dark */
+    .card-body.font-monospace span[style*="color: #808080"] {
+      color: #a0a0a0 !important; /* cinza claro suficiente sobre #1e1f22 */
+    }
+    .card-body.font-monospace span[style*="color: #6a8759"] {
+      color: #89c07a !important; /* verde mais claro */
+    }
+    .card-body.font-monospace span[style*="color: #9876aa"] {
+      color: #c49edb !important; /* roxo mais claro */
+    }
+
+    /* bg-label-secondary (cards "Sem Ghotme"): texto mais escuro */
+    .bg-label-secondary {
+      color: #444 !important;
+    }
   </style>
 </head>
 
 <body>
   <!-- Layout Content -->
-  @yield('layoutContent')
+  <main id="main-content">
+    @yield('layoutContent')
+  </main>
   <!--/ Layout Content -->
 
   {{-- remove while creating package --}}
