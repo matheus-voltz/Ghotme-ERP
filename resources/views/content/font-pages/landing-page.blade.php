@@ -21,213 +21,6 @@ $pageConfigs = [
 <!-- Page Styles -->
 @section('page-style')
 @vite(['resources/assets/vendor/scss/pages/front-page-landing.scss'])
-<style>
-  .hero-dashboard-img {
-    aspect-ratio: 1200/749;
-    min-height: 250px;
-  }
-  .landing-hero img[alt="hero background"] {
-    aspect-ratio: 16/9;
-  }
-  :root {
-    --ghotme-primary: #7367f0;
-    --ghotme-gradient: linear-gradient(135deg, #7367f0 0%, #4831d4 100%);
-  }
-
-  .hero-title {
-    background: var(--ghotme-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
-  }
-
-  .niche-card {
-    transition: all 0.3s ease;
-    border: 1px solid rgba(115, 103, 240, 0.1) !important;
-  }
-
-  .niche-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(115, 103, 240, 0.15);
-    border-color: var(--ghotme-primary) !important;
-  }
-
-  .pricing-card-popular {
-    position: relative;
-    border: 2px solid var(--ghotme-primary) !important;
-    transform: scale(1.05);
-    z-index: 10;
-  }
-
-  .pricing-card-popular::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: var(--ghotme-gradient);
-    z-index: -1;
-    border-radius: 0.5rem;
-    opacity: 0.1;
-  }
-
-  .btn-primary {
-    background: var(--ghotme-gradient) !important;
-    border: none !important;
-    transition: all 0.3s ease;
-  }
-
-  .btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 10px 20px rgba(115, 103, 240, 0.3);
-  }
-
-  .badge-niche {
-    font-size: 0.75rem;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    margin-bottom: 1rem;
-  }
-
-  /* Animações dos Ícones dos Planos */
-  @keyframes float {
-    0% {
-      transform: translateY(0px) rotate(0deg);
-    }
-
-    50% {
-      transform: translateY(-10px) rotate(5deg);
-    }
-
-    100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-  }
-
-  @keyframes propulsion {
-    0% {
-      transform: translateY(0px) rotate(0deg);
-    }
-
-    25% {
-      transform: translateY(-5px) rotate(-2deg);
-    }
-
-    50% {
-      transform: translateY(0px) rotate(0deg);
-    }
-
-    75% {
-      transform: translateY(-5px) rotate(2deg);
-    }
-
-    100% {
-      transform: translateY(0px) rotate(0deg);
-    }
-  }
-
-  @keyframes rocketLaunch {
-    0% {
-      transform: translateY(0) scale(1);
-      filter: drop-shadow(0 0 0px rgba(115, 103, 240, 0));
-    }
-
-    50% {
-      transform: translateY(-15px) scale(1.1);
-      filter: drop-shadow(0 15px 20px rgba(115, 103, 240, 0.4));
-    }
-
-    100% {
-      transform: translateY(0) scale(1);
-      filter: drop-shadow(0 0 0px rgba(115, 103, 240, 0));
-    }
-  }
-
-  .animate-float {
-    animation: float 4s ease-in-out infinite;
-  }
-
-  .animate-propulsion {
-    animation: propulsion 2s ease-in-out infinite;
-  }
-
-  .animate-rocket {
-    animation: rocketLaunch 3s ease-in-out infinite;
-  }
-
-  /* Custom Cursor */
-  .cursor-dot,
-  .cursor-outline {
-    pointer-events: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    z-index: 9999;
-    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-  }
-
-  .cursor-dot {
-    width: 8px;
-    height: 8px;
-    background-color: var(--ghotme-primary);
-  }
-
-  .cursor-outline {
-    width: 40px;
-    height: 40px;
-    border: 2px solid rgba(115, 103, 240, 0.5);
-  }
-
-  .cursor-trail {
-    pointer-events: none;
-    position: fixed;
-    width: 6px;
-    height: 6px;
-    background: var(--ghotme-primary);
-    border-radius: 50%;
-    z-index: 9998;
-    opacity: 0.5;
-  }
-
-  body:hover .cursor-dot,
-  body:hover .cursor-outline {
-    opacity: 1;
-  }
-
-  @media (max-width: 991px) {
-
-    .cursor-dot,
-    .cursor-outline,
-    .cursor-trail {
-      display: none;
-    }
-  }
-
-  /* Interaction Hover */
-  a:hover~.cursor-outline,
-  button:hover~.cursor-outline {
-    transform: translate(-50%, -50%) scale(1.5);
-    background-color: rgba(115, 103, 240, 0.1);
-    border-color: var(--ghotme-primary);
-  }
-
-  @media (min-width: 992px) {
-
-    html,
-    body,
-    a,
-    button,
-    input,
-    select,
-    textarea,
-    .card {
-      cursor: none !important;
-    }
-  }
-</style>
 @endsection
 
 <!-- Vendor Scripts -->
@@ -262,7 +55,7 @@ $pageConfigs = [
           <div class="landing-hero-btn d-inline-block position-relative">
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">{{ __('Discover our system') }} <img
                 src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt="Join community arrow"
-                class="scaleX-n1-rtl" width="80" height="42" loading="lazy" /></span>
+                class="scaleX-n1-rtl" width="80" height="42" loading="lazy" decoding="async" /></span>
             <a href="#landingPricing" class="btn btn-primary btn-lg">{{ __('Start your free trial') }}</a>
           </div>
         </div>
@@ -301,7 +94,7 @@ $pageConfigs = [
           <a href="{{ route('solutions.show', 'workshop') }}" class="text-decoration-none">
             <div class="card h-100 niche-card text-center p-6">
               <div class="card-body">
-                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px;">
+                <div class="avatar avatar-lg mx-auto mb-4" style="width: 70px; height: 70px; flex-shrink: 0;">
                   <span class="avatar-initial rounded-circle bg-label-primary" style="border-radius: 50% !important;">
                     <i class="ti tabler-car fs-1"></i>
                   </span>
@@ -390,7 +183,7 @@ $pageConfigs = [
       <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Everything you need') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
-            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('to manage your business') }}
       </h2>
@@ -906,27 +699,27 @@ $pageConfigs = [
       <div class="row gy-12 mt-2 justify-content-center align-items-center">
         <div class="col-lg-3 col-sm-6 text-center">
           <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
-            <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px;" />
+            <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 text-center">
           <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-2">
-            <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px;" />
+            <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 text-center">
           <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-3">
-            <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px;" />
+            <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 text-center">
           <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-4">
-            <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" />
+            <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
           </div>
         </div>
         <div class="col-lg-3 col-sm-6 text-center">
           <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
-            <img src="{{ asset('assets/img/front-pages/partners/bitcoin_logo_full.svg') }}" alt="Bitcoin Logo" class="img-fluid" style="max-height: 70px;" />
+            <img src="{{ asset('assets/img/front-pages/partners/bitcoin_logo_full.svg') }}" alt="Bitcoin Logo" class="img-fluid" style="max-height: 70px;" loading="lazy" width="200" height="70" />
           </div>
         </div>
       </div>
@@ -1158,7 +951,7 @@ $pageConfigs = [
       <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Tailored pricing plans') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
-            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('made for you') }}
       </h2>
@@ -1191,7 +984,7 @@ $pageConfigs = [
             <div class="card-header">
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/paper-airplane.png') }}" alt="paper airplane icon"
-                  class="mb-8 pb-2 animate-float" />
+                  class="mb-8 pb-2 animate-float" loading="lazy" decoding="async" width="100" height="100" />
                 <h4 class="mb-0">{{ __('Basic') }}</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -1238,7 +1031,7 @@ $pageConfigs = [
                 <div class="position-absolute end-0 top-0 mt-n2">
                   <span class="badge bg-label-primary rounded-1">{{ __('Popular') }}</span>
                 </div>
-                <img src="{{ asset('assets/img/front-pages/icons/plane.png') }}" alt="plane icon" class="mb-8 pb-2 animate-propulsion" />
+                <img src="{{ asset('assets/img/front-pages/icons/plane.png') }}" alt="plane icon" class="mb-8 pb-2 animate-propulsion" loading="lazy" decoding="async" width="100" height="100" />
                 <h4 class="mb-0">{{ __('Standard') }}</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -1335,7 +1128,7 @@ $pageConfigs = [
             <div class="card-header">
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/shuttle-rocket.png') }}" alt="shuttle rocket icon"
-                  class="mb-8 pb-2 animate-rocket" />
+                  class="mb-8 pb-2 animate-rocket" loading="lazy" decoding="async" width="100" height="100" />
                 <h4 class="mb-0">{{ __('Enterprise') }}</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
@@ -1534,7 +1327,7 @@ $pageConfigs = [
         {{ __('Frequently Asked') }}
         <span class="position-relative fw-extrabold z-1">{{ __('Questions') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
-            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
       </h4>
       <p class="text-center mb-12 pb-md-4">{{ __('Find answers to the main questions about Ghotme.') }}</p>
@@ -1545,7 +1338,7 @@ $pageConfigs = [
             <picture>
               <source srcset="{{ asset('assets/img/front-pages/landing-page/faq-boy-with-logos.webp') }}" type="image/webp">
               <img src="{{ asset('assets/img/front-pages/landing-page/faq-boy-with-logos.png') }}"
-                alt="faq boy with logos" class="faq-image" />
+                alt="faq boy with logos" class="faq-image" loading="lazy" width="400" height="400" />
             </picture>
           </div>
         </div>
@@ -1719,7 +1512,7 @@ $pageConfigs = [
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Let\'s Grow') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
-            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('Together') }}
       </h4>
@@ -1728,11 +1521,11 @@ $pageConfigs = [
         <div class="col-lg-5">
           <div class="contact-img-box position-relative border p-2 h-100">
             <img src="{{ asset('assets/img/front-pages/icons/contact-border.png') }}" alt="contact border"
-              class="contact-border-img position-absolute d-none d-lg-block scaleX-n1-rtl" />
+              class="contact-border-img position-absolute d-none d-lg-block scaleX-n1-rtl" loading="lazy" width="400" height="300" />
             <picture>
               <source srcset="{{ asset('assets/img/front-pages/landing-page/contact-customer-service.webp') }}" type="image/webp">
               <img src="{{ asset('assets/img/front-pages/landing-page/contact-customer-service.png') }}"
-                alt="contact customer service" class="contact-img w-100 scaleX-n1-rtl" />
+                alt="contact customer service" class="contact-img w-100 scaleX-n1-rtl" loading="lazy" width="400" height="400" />
             </picture>
             <div class="p-4 pb-2">
               <div class="row g-4">
@@ -1965,63 +1758,6 @@ $pageConfigs = [
         });
       }
 
-      // Custom Mouse Effect
-      const dot = document.createElement('div');
-      const outline = document.createElement('div');
-      dot.className = 'cursor-dot';
-      outline.className = 'cursor-outline';
-      document.body.appendChild(dot);
-      document.body.appendChild(outline);
-
-      let mouseX = 0,
-        mouseY = 0;
-      let outlineX = 0,
-        outlineY = 0;
-
-      window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        dot.style.left = mouseX + 'px';
-        dot.style.top = mouseY + 'px';
-
-        // Create trail
-        if (Math.random() > 0.8) {
-          const trail = document.createElement('div');
-          trail.className = 'cursor-trail';
-          trail.style.left = mouseX + 'px';
-          trail.style.top = mouseY + 'px';
-          document.body.appendChild(trail);
-          setTimeout(() => {
-            trail.style.opacity = '0';
-            trail.style.transform = 'scale(0.2)';
-            setTimeout(() => trail.remove(), 300);
-          }, 50);
-        }
-      });
-
-      // Smooth outline follow
-      const animateCursor = () => {
-        let distX = mouseX - outlineX;
-        let distY = mouseY - outlineY;
-        outlineX = outlineX + (distX * 0.15);
-        outlineY = outlineY + (distY * 0.15);
-        outline.style.left = outlineX + 'px';
-        outline.style.top = outlineY + 'px';
-        requestAnimationFrame(animateCursor);
-      };
-      animateCursor();
-
-      // Hover effects
-      document.querySelectorAll('a, button, select, input, .card').forEach(el => {
-        el.addEventListener('mouseenter', () => {
-          outline.style.transform = 'translate(-50%, -50%) scale(1.5)';
-          outline.style.backgroundColor = 'rgba(115, 103, 240, 0.1)';
-        });
-        el.addEventListener('mouseleave', () => {
-          outline.style.transform = 'translate(-50%, -50%) scale(1)';
-          outline.style.backgroundColor = 'transparent';
-        });
-      });
     });
   </script>
   @endsection
