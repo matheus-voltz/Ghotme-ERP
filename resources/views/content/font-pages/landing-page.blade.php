@@ -47,32 +47,30 @@ $pageConfigs = [
       </picture>
       <div class="container">
         <div class="hero-text-box text-center position-relative">
-          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">{{ __('The ERP that shapes itself to your business') }}</h1>
+          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">O ERP que se molda ao seu negócio</h1>
           <h2 class="hero-sub-title h6 mb-6">
-            {{ __('The only intelligent system that') }} <strong>{{ __('speaks your language') }}</strong>. <br class="d-none d-lg-block" />
-            {{ __('Our technology adapts terms, icons, and processes instantly to the reality of your segment, whatever it may be.') }}
+            O único sistema inteligente que <strong>fala a sua língua</strong>. <br class="d-none d-lg-block" />
+            Nossa tecnologia adapta termos, ícones e processos instantaneamente à realidade do seu segmento, seja qual for.
           </h2>
           <div class="landing-hero-btn d-inline-block position-relative">
-            <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">{{ __('Discover our system') }} <img
-                src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt="Join community arrow"
-                class="scaleX-n1-rtl" width="80" height="42" loading="lazy" decoding="async" /></span>
-            <a href="#landingPricing" class="btn btn-primary btn-lg">{{ __('Start your free trial') }}</a>
+            <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">Conheça nosso sistema <img
+                src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt=""
+                class="scaleX-n1-rtl" width="80" height="42" loading="lazy" decoding="async" aria-hidden="true" /></span>
+            <a href="#landingPricing" class="btn btn-primary btn-lg">Comece seu teste grátis</a>
           </div>
         </div>
         <div id="heroDashboardAnimation" class="hero-animation-img mt-12">
-          <a href="{{ url('/dashboard') }}" target="_blank">
-            <div id="heroAnimationImg" class="position-relative hero-dashboard-img">
-              <picture>
-                <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.webp') }}" type="image/webp">
-                <img
-                  src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
-                  alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
-                  data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
-                  data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
-                  width="1200" height="749" fetchpriority="high" />
-              </picture>
-            </div>
-          </a>
+          <div id="heroAnimationImg" class="position-relative hero-dashboard-img">
+            <picture>
+              <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.webp') }}" type="image/webp">
+              <img
+                src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
+                alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
+                data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
+                data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
+                width="1200" height="749" fetchpriority="high" />
+            </picture>
+          </div>
         </div>
       </div>
     </div>
@@ -182,7 +180,7 @@ $pageConfigs = [
       </div>
       <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Everything you need') }}
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('to manage your business') }}
@@ -214,8 +212,8 @@ $pageConfigs = [
           <div class="mb-4 text-primary text-center">
             <i class="ti tabler-receipt-tax icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">{{ __('Fiscal and Accounting without Fear') }}</h5>
-          <p class="features-icon-description">{{ __('Integrated Tax Invoice emission (NFe/NFSe) and exclusive portal for your accountant.') }}</p>
+          <h5 class="mb-2">Fiscal e Contabilidade sem Medo</h5>
+          <p class="features-icon-description">Emissão de NF-e/NFS-e integrada e portal exclusivo para o seu contador.</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
@@ -236,69 +234,6 @@ $pageConfigs = [
   </section>
   <!-- Useful features: End -->
 
-  <!-- Multi-Niche: Start -->
-  <section id="landingNiches" class="section-py bg-body">
-    <div class="container">
-      <div class="text-center mb-4">
-        <span class="badge bg-label-primary">{{ __('Made for you') }}</span>
-      </div>
-      <h2 class="h4 text-center mb-1">
-        {{ __('One system') }}, <span class="fw-extrabold">{{ __('infinite possibilities') }}</span>
-      </h2>
-      <p class="text-center mb-12">{{ __('See how Ghotme transforms to meet the specific needs of each market:') }}</p>
-      <div class="row g-6">
-        <div class="col-md-3">
-          <div class="card niche-card shadow-sm text-center p-5 h-100">
-            <div class="avatar avatar-xl mx-auto mb-4 bg-label-info rounded-circle">
-              <i class="ti tabler-settings-automation fs-1"></i>
-            </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Automotive Segment') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Management of plates, chassis and history by vehicles for Workshops and Aesthetics.') }}</p>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card niche-card shadow-sm text-center p-5 h-100">
-            <div class="avatar avatar-xl mx-auto mb-4 bg-label-success rounded-circle">
-              <i class="ti tabler-heart-handshake fs-1"></i>
-            </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Health and Well-being') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Dynamic labels for Pets, Patients and session control for Clinics and Pet Shops.') }}</p>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card niche-card shadow-sm text-center p-5 h-100">
-            <div class="avatar avatar-xl mx-auto mb-4 bg-label-warning rounded-circle">
-              <i class="ti tabler-device-laptop fs-1"></i>
-            </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Technology and Retail') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Focus on Serial, Model and warranty for Technical Assistance and Stores in general.') }}</p>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card niche-card shadow-sm text-center p-5 h-100">
-            <div class="avatar avatar-xl mx-auto mb-4 bg-label-primary rounded-circle">
-              <i class="ti tabler-building-skyscraper fs-1"></i>
-            </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Construction and Engineering') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Construction control, measurements and real-time RDO (Daily Construction Report) issuance.') }}</p>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card niche-card shadow-sm text-center p-5 h-100">
-            <div class="avatar avatar-xl mx-auto mb-4 bg-label-danger rounded-circle">
-              <i class="ti tabler-tools-kitchen-2 fs-1"></i>
-            </div>
-            <h5 class="fw-extrabold mb-3">{{ __('Food Truck and Delivery') }}</h5>
-            <p class="text-muted small mb-0">{{ __('Integrated with iFood with kitchen alerts, recipe management and ingredient inventory control.') }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="text-center mt-8">
-        <p class="fw-medium text-primary">{{ __('And much more... Ghotme is configurable for any service provider!') }}</p>
-      </div>
-    </div>
-  </section>
-  <!-- Multi-Niche: End -->
 
   <!-- Business Highlights Carousel: Start -->
   <section id="landingBusinessHighlights" class="section-py bg-body landing-reviews pb-0">
@@ -315,7 +250,7 @@ $pageConfigs = [
               <h4 class="text-center mb-1">
                 <span class="position-relative fw-extrabold z-1">{{ __('Why choose') }}
                   <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}"
-                    alt="section title icon"
+                    alt="" aria-hidden="true"
                     class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
                 </span>
                 {{ __('Ghotme?') }}
@@ -399,7 +334,7 @@ $pageConfigs = [
               <h4 class="text-center mb-1">
                 <span class="position-relative fw-extrabold z-1">{{ __('Made for') }}
                   <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}"
-                    alt="section title icon"
+                    alt="" aria-hidden="true"
                     class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
                 </span>
                 {{ __('your Business') }}
@@ -482,7 +417,7 @@ $pageConfigs = [
               <h4 class="text-center mb-1">
                 <span class="position-relative fw-extrabold z-1">{{ __('Integrations that') }}
                   <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}"
-                    alt="section title icon"
+                    alt="" aria-hidden="true"
                     class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
                 </span>
                 {{ __('make your life easier') }}
@@ -564,7 +499,7 @@ $pageConfigs = [
               <h4 class="text-center mb-1">
                 <span class="position-relative fw-extrabold z-1">{{ __('Your Journey') }}
                   <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}"
-                    alt="section title icon"
+                    alt="" aria-hidden="true"
                     class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
                 </span>
                 {{ __('to Success') }}
@@ -641,86 +576,31 @@ $pageConfigs = [
     </div>
     <h2 class="h4 text-center mb-1">
       <span class="position-relative fw-extrabold z-1">{{ __('Payment') }}
-        <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+        <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
           class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" />
       </span>
       {{ __('Platforms') }}
     </h2>
-    <p class="text-center mb-md-11 pb-0 pb-xl-12">{{ __('The site integrates with Pagar.me, Asaas, PagSeguro, Stripe and Bitcoin.') }}</p>
+    <p class="text-center mb-md-11 pb-0 pb-xl-12">Integramos com Pagar.me, Asaas, PagSeguro e Stripe para PIX, boleto e cartão.</p>
     <div class="row gy-12 mt-2 justify-content-center align-items-center">
-      <style>
-        @keyframes floating {
-          0% {
-            transform: translateY(0px);
-          }
-
-          50% {
-            transform: translateY(-10px);
-          }
-
-          100% {
-            transform: translateY(0px);
-          }
-        }
-
-        .partner-logo-container {
-          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          filter: grayscale(100%);
-          opacity: 0.6;
-        }
-
-        .partner-logo-container:hover {
-          filter: grayscale(0%);
-          opacity: 1;
-          transform: scale(1.1);
-          filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.1));
-        }
-
-        .floating-animation {
-          animation: floating 3s ease-in-out infinite;
-        }
-
-        .delay-1 {
-          animation-delay: 0s;
-        }
-
-        .delay-2 {
-          animation-delay: 0.5s;
-        }
-
-        .delay-3 {
-          animation-delay: 1s;
-        }
-
-        .delay-4 {
-          animation-delay: 1.5s;
-        }
-      </style>
-      <div class="row gy-12 mt-2 justify-content-center align-items-center">
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
-            <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
-          </div>
+      <div class="col-lg-3 col-sm-6 text-center">
+        <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
+          <img src="{{ asset('assets/img/front-pages/partners/pagarme_hq.png') }}" alt="Pagar.me Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
         </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-2">
-            <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
-          </div>
+      </div>
+      <div class="col-lg-3 col-sm-6 text-center">
+        <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-2">
+          <img src="{{ asset('assets/img/front-pages/partners/asaas.png') }}" alt="Asaas Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
         </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-3">
-            <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
-          </div>
+      </div>
+      <div class="col-lg-3 col-sm-6 text-center">
+        <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-3">
+          <img src="{{ asset('assets/img/front-pages/partners/pagseguro_hq.png') }}" alt="PagSeguro Logo" class="img-fluid" style="max-height: 40px;" loading="lazy" width="200" height="40" />
         </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-4">
-            <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
-          </div>
-        </div>
-        <div class="col-lg-3 col-sm-6 text-center">
-          <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
-            <img src="{{ asset('assets/img/front-pages/partners/bitcoin_logo_full.svg') }}" alt="Bitcoin Logo" class="img-fluid" style="max-height: 70px;" loading="lazy" width="200" height="70" />
-          </div>
+      </div>
+      <div class="col-lg-3 col-sm-6 text-center">
+        <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-4">
+          <img src="{{ asset('assets/img/front-pages/partners/stripe_hq.png') }}" alt="Stripe Logo" class="img-fluid" style="max-height: 45px;" loading="lazy" width="200" height="45" />
         </div>
       </div>
     </div>
@@ -739,27 +619,6 @@ $pageConfigs = [
     <div class="row align-items-center gy-6">
       <!-- Image Side -->
       <div class="col-lg-6 text-center text-lg-start position-relative">
-        <style>
-          .mobile-hero-img {
-            max-width: 240px;
-            animation: floatingMobileReal 4s ease-in-out infinite;
-            filter: drop-shadow(-20px 20px 40px rgba(var(--bs-primary-rgb), 0.3));
-          }
-
-          @keyframes floatingMobileReal {
-            0% {
-              transform: translateY(0px) rotate(-2deg);
-            }
-
-            50% {
-              transform: translateY(-15px) rotate(-1deg);
-            }
-
-            100% {
-              transform: translateY(0px) rotate(-2deg);
-            }
-          }
-        </style>
         <div class="d-inline-block position-relative pt-5">
           <!-- Blob background behind phone -->
           <div class="position-absolute top-50 start-50 translate-middle rounded-circle bg-label-primary" style="width: 280px; height: 280px; opacity: 0.5; filter: blur(40px); z-index: 0;"></div>
@@ -773,17 +632,17 @@ $pageConfigs = [
       <!-- Content Side -->
       <div class="col-lg-6">
         <div class="mb-4 text-start">
-          <span class="badge bg-label-primary">{{ __('Management in the Palm of Your Hand') }}</span>
+          <span class="badge bg-label-primary">Gestão na Palma da Mão</span>
         </div>
         <h3 class="mb-4 display-6 fw-extrabold">
-          {{ __('Your complete ERP in') }}
-          <span class="text-primary position-relative z-1">{{ __('Anywhere') }}
-            <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+          Seu ERP completo em
+          <span class="text-primary position-relative z-1">Qualquer Lugar
+            <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
               class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%;" />
           </span>
         </h3>
         <p class="mb-5 fs-5">
-          {{ __('The Ghotme app allows you and your team to control the business from wherever you are. Open service orders, check inventory and analyze metrics in real-time.') }}
+          O app Ghotme permite que você e sua equipe controlem o negócio de onde estiverem. Abra ordens de serviço, consulte o estoque e analise métricas em tempo real.
         </p>
 
         <div class="row gy-4">
@@ -793,8 +652,8 @@ $pageConfigs = [
                 <i class="ti tabler-camera icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Integrated Photo Inspection') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Take photos with your cell phone and attach them to the OS on the spot.') }}</p>
+                <h6 class="mb-1">Inspeção Fotográfica Integrada</h6>
+                <p class="mb-0 text-muted fs-6">Tire fotos com o celular e anexe direto na OS na hora.</p>
               </div>
             </div>
           </div>
@@ -804,8 +663,8 @@ $pageConfigs = [
                 <i class="ti tabler-bell-ringing icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Push Notifications') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Be notified about approved budgets.') }}</p>
+                <h6 class="mb-1">Notificações Push</h6>
+                <p class="mb-0 text-muted fs-6">Seja avisado sobre orçamentos aprovados em tempo real.</p>
               </div>
             </div>
           </div>
@@ -815,8 +674,8 @@ $pageConfigs = [
                 <i class="ti tabler-checkup-list icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('RDO and Technical Checklist') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('Issue Daily Construction Reports directly from the site.') }}</p>
+                <h6 class="mb-1">RDO e Checklist Técnico</h6>
+                <p class="mb-0 text-muted fs-6">Emita Relatórios Diários de Obra direto do canteiro.</p>
               </div>
             </div>
           </div>
@@ -826,19 +685,16 @@ $pageConfigs = [
                 <i class="ti tabler-chart-pie icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">{{ __('Financial Dashboard') }}</h6>
-                <p class="mb-0 text-muted fs-6">{{ __('View your revenue quickly.') }}</p>
+                <h6 class="mb-1">Dashboard Financeiro</h6>
+                <p class="mb-0 text-muted fs-6">Visualize seu faturamento e despesas em tempo real.</p>
               </div>
             </div>
           </div>
         </div>
 
         <div class="mt-8 d-flex gap-3">
-          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
-            <i class="ti tabler-brand-apple icon-md me-2"></i> {{ __('App Store') }}
-          </a>
-          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-dark btn-lg border border-secondary shadow-sm hover-shadow-lg transition-all px-4">
-            <i class="ti tabler-brand-google-play icon-md me-2"></i> {{ __('Google Play') }}
+          <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-primary btn-lg shadow-sm hover-shadow-lg transition-all px-5">
+            <i class="ti tabler-device-mobile-bolt icon-md me-2"></i> Entrar na lista beta
           </a>
         </div>
       </div>
@@ -853,17 +709,17 @@ $pageConfigs = [
         <!-- Content Side -->
         <div class="col-lg-6">
           <div class="mb-4 text-start">
-            <span class="badge bg-label-info">{{ __('Open Ecosystem') }}</span>
+            <span class="badge bg-label-info">Ecossistema Aberto</span>
           </div>
           <h3 class="mb-4 display-6 fw-extrabold">
-            {{ __('Ghotme API - 100% integrable') }}
-            <span class="text-info position-relative z-1">{{ __('with everything you already use!') }}
-              <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+            API Ghotme — 100% integrável
+            <span class="text-info position-relative z-1">com o que você já usa!
+              <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
                 class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%; filter: hue-rotate(180deg);" />
             </span>
           </h3>
           <p class="mb-5 fs-5">
-            {{ __('Your business shouldn\'t be stuck with closed software. With our API Tokens, your advanced plan customers can create incredible integrations without limits.') }}
+            Seu negócio não precisa ficar preso a software fechado. Com os API Tokens do Ghotme, clientes do plano Avançado criam integrações incríveis sem limites.
           </p>
 
           <div class="row gy-4">
@@ -872,8 +728,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-danger rounded-circle mb-3">
                   <i class="ti tabler-brand-zapier fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('No-Code Integrations') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme to Zapier or n8n and trigger automatic emails in Mailchimp when approving budgets.') }}</p>
+                <h6 class="mb-2">Integrações No-Code</h6>
+                <p class="mb-0 text-muted fs-6 small">Conecte o Ghotme ao Zapier ou n8n e dispare e-mails automáticos no Mailchimp ao aprovar orçamentos.</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -881,8 +737,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-success rounded-circle mb-3">
                   <i class="ti tabler-message-chatbot fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('WhatsApp Chatbots') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Allow your customers to check the status of Service Orders themselves via a bot.') }}</p>
+                <h6 class="mb-2">Chatbots para WhatsApp</h6>
+                <p class="mb-0 text-muted fs-6 small">Permita que seus clientes consultem o status das OSs por conta própria via bot, sem depender de você.</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -890,8 +746,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-warning rounded-circle mb-3">
                   <i class="ti tabler-shopping-cart fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('E-commerce Synchronization') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Unify your physical ERP inventory with Shopify, Mercado Libre or WooCommerce via API.') }}</p>
+                <h6 class="mb-2">Sincronização com E-commerce</h6>
+                <p class="mb-0 text-muted fs-6 small">Unifique o estoque do ERP com Shopify, Mercado Livre ou WooCommerce via API — tudo em um lugar só.</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -899,8 +755,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-primary rounded-circle mb-3">
                   <i class="ti tabler-chart-bar fs-4"></i>
                 </div>
-                <h6 class="mb-2">{{ __('Intelligent Dashboards') }}</h6>
-                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme directly to Power BI or Looker Studio for dashboard displays in the company.') }}</p>
+                <h6 class="mb-2">Dashboards Inteligentes</h6>
+                <p class="mb-0 text-muted fs-6 small">Conecte o Ghotme ao Power BI ou Looker Studio para painéis avançados na sua empresa.</p>
               </div>
             </div>
           </div>
@@ -950,7 +806,7 @@ $pageConfigs = [
       </div>
       <h2 class="h4 text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Tailored pricing plans') }}
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('made for you') }}
@@ -985,13 +841,13 @@ $pageConfigs = [
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/paper-airplane.png') }}" alt="paper airplane icon"
                   class="mb-8 pb-2 animate-float" loading="lazy" decoding="async" width="100" height="100" />
-                <h4 class="mb-0">{{ __('Basic') }}</h4>
+                <h4 class="mb-0">Teste Grátis</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
                   <h1 class="price-toggle price-monthly text-primary mb-0">0</h1>
                   <h1 class="price-toggle price-yearly text-primary mb-0 d-none">0</h1>
-                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/{{ __('month') }}</sub>
-                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/{{ __('year') }}</sub>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/30 dias</sub>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/30 dias</sub>
                 </div>
               </div>
             </div>
@@ -1000,24 +856,24 @@ $pageConfigs = [
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('30 days of access to the Standard plan') }}
+                    30 dias do Plano Padrão completo
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('Access to all essential modules') }}
+                    Acesso a todos os módulos essenciais
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    {{ __('No credit card required') }}
+                    Sem cartão de crédito
                   </h6>
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{{ url('/register') }}" class="btn btn-label-primary plan-action-btn">{{ __('Start Free') }}</a>
+                <a href="{{ url('/register') }}" class="btn btn-label-primary plan-action-btn">Começar Grátis</a>
               </div>
             </div>
           </div>
@@ -1129,7 +985,7 @@ $pageConfigs = [
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/shuttle-rocket.png') }}" alt="shuttle rocket icon"
                   class="mb-8 pb-2 animate-rocket" loading="lazy" decoding="async" width="100" height="100" />
-                <h4 class="mb-0">{{ __('Enterprise') }}</h4>
+                <h4 class="mb-0">Avançado</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
                   <h1 class="price-toggle price-monthly text-primary mb-0">279</h1>
@@ -1145,7 +1001,7 @@ $pageConfigs = [
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    <strong>{{ __('Everything in Standard') }}</strong>, {{ __('plus:') }}
+                    <strong>Tudo do Plano Padrão</strong>, mais:
                   </h6>
                 </li>
                 <li class="mb-3">
@@ -1226,47 +1082,6 @@ $pageConfigs = [
   <!-- Fun facts: Start -->
   <section id="landingDiferenciais" class="section-py landing-diferenciais">
     <div class="container">
-      <style>
-        .diferencial-card {
-          transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-          position: relative;
-          z-index: 1;
-          background: var(--bs-body-bg);
-          /* Ensure opacity */
-        }
-
-        .diferencial-card:hover {
-          transform: translateY(-8px);
-          border-color: transparent !important;
-        }
-
-        .diferencial-card .icon-box {
-          transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          /* Bounce effect */
-          display: inline-block;
-        }
-
-        .diferencial-card:hover .icon-box {
-          transform: scale(1.15) rotate(3deg);
-        }
-
-        /* Individual Colors */
-        .hover-effect-primary:hover {
-          box-shadow: 0 15px 30px rgba(var(--bs-primary-rgb), 0.25);
-        }
-
-        .hover-effect-success:hover {
-          box-shadow: 0 15px 30px rgba(var(--bs-success-rgb), 0.25);
-        }
-
-        .hover-effect-info:hover {
-          box-shadow: 0 15px 30px rgba(var(--bs-info-rgb), 0.25);
-        }
-
-        .hover-effect-warning:hover {
-          box-shadow: 0 15px 30px rgba(var(--bs-warning-rgb), 0.25);
-        }
-      </style>
       <div class="row gy-6">
         <div class="col-sm-6 col-lg-3">
           <div class="card border border-primary shadow-none h-100 diferencial-card hover-effect-primary">
@@ -1317,6 +1132,95 @@ $pageConfigs = [
   </section>
   <!-- Fun facts: End -->
 
+  <!-- Testimonials: Start -->
+  <section id="landingTestimonials" class="section-py bg-body">
+    <div class="container">
+      <div class="text-center mb-4">
+        <span class="badge bg-label-primary">Depoimentos</span>
+      </div>
+      <h4 class="text-center mb-1">
+        O que nossos clientes
+        <span class="position-relative fw-extrabold z-1">dizem
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
+            class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
+        </span>
+      </h4>
+      <p class="text-center mb-12">Empresários reais, resultados reais.</p>
+      <div class="row g-6">
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-6">
+              <div class="d-flex mb-4">
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5"></i>
+              </div>
+              <p class="mb-6 text-body fst-italic">"O Ghotme substituiu 4 planilhas que eu usava. Agora abro uma OS em 30 segundos e o cliente recebe o orçamento no WhatsApp na hora."</p>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                  <span class="avatar-initial rounded-circle bg-label-primary">RC</span>
+                </div>
+                <div>
+                  <h6 class="mb-0">Ricardo Carvalho</h6>
+                  <small class="text-muted">Oficina AutoTech — Curitiba, PR</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-6">
+              <div class="d-flex mb-4">
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5"></i>
+              </div>
+              <p class="mb-6 text-body fst-italic">"Reduzi mais de 3 horas por semana em controles manuais. O módulo pet shop é perfeito — cada animal tem seu histórico completo."</p>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                  <span class="avatar-initial rounded-circle bg-label-success">FM</span>
+                </div>
+                <div>
+                  <h6 class="mb-0">Fernanda Melo</h6>
+                  <small class="text-muted">PetCare Premium — São Paulo, SP</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body p-6">
+              <div class="d-flex mb-4">
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
+                <i class="ti tabler-star-filled text-warning fs-5"></i>
+              </div>
+              <p class="mb-6 text-body fst-italic">"Meu contador adorou o portal de acesso. Ele baixa os XMLs sozinho e não me liga mais pedindo nota fiscal. Valeu cada centavo."</p>
+              <div class="d-flex align-items-center">
+                <div class="avatar avatar-md me-3">
+                  <span class="avatar-initial rounded-circle bg-label-info">LS</span>
+                </div>
+                <div>
+                  <h6 class="mb-0">Lucas Souza</h6>
+                  <small class="text-muted">TechFix Assistência — Belo Horizonte, MG</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Testimonials: End -->
+
   <!-- FAQ: Start -->
   <section id="landingFAQ" class="section-py bg-body landing-faq">
     <div class="container">
@@ -1324,9 +1228,9 @@ $pageConfigs = [
         <span class="badge bg-label-primary">{{ __('Frequently Asked Questions') }}</span>
       </div>
       <h4 class="text-center mb-1">
-        {{ __('Frequently Asked') }}
-        <span class="position-relative fw-extrabold z-1">{{ __('Questions') }}
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+        Perguntas
+        <span class="position-relative fw-extrabold z-1">Frequentes
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
       </h4>
@@ -1511,7 +1415,7 @@ $pageConfigs = [
       </div>
       <h4 class="text-center mb-1">
         <span class="position-relative fw-extrabold z-1">{{ __('Let\'s Grow') }}
-          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="section title icon"
+          <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
         {{ __('Together') }}
