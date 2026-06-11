@@ -9,3 +9,76 @@
     RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*)$ /public/$1 [L,QSA]
 </IfModule>
+
+# Enable compression
+<IfModule mod_deflate.c>
+    AddType application/javascript .js
+    AddType application/font-woff .woff
+    AddType application/font-woff2 .woff2
+    AddEncoding gzip .gz
+
+    FilterDeclare COMPRESS DEFLATE
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $text/html
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $text/css
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $text/javascript
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $application/javascript
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $application/json
+    FilterProvider COMPRESS DEFLATE resp=Content-Type $image/svg+xml
+    FilterChain COMPRESS
+    FilterProtocol COMPRESS DEFLATE change=yes transfer-encoding=chunked
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Imagens
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # Fonts
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType application/x-font-ttf "access plus 1 year"
+    ExpiresByType application/x-font-opentype "access plus 1 year"
+    ExpiresByType font/eot "access plus 1 year"
+    ExpiresByType font/opentype "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+
+    # CSS e JS (versionados pelo Vite)
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+
+    # HTML (sem cache para permitir revalidação)
+    ExpiresByType text/html "access plus 1 hour"
+
+    # Default
+    ExpiresDefault "access plus 2 days"
+</IfModule>
+
+# Cache-Control headers
+<IfModule mod_headers.c>
+    # Assets com hash (1 ano)
+    <FilesMatch "\.(js|css|woff|woff2|eot|ttf|otf)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+        Header set Pragma "public"
+    </FilesMatch>
+
+    # Imagens (1 ano)
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=31536000, must-revalidate"
+        Header set Pragma "public"
+    </FilesMatch>
+
+    # HTML (1 hora)
+    <FilesMatch "\.html$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+        Header set Pragma "public"
+    </FilesMatch>
+</IfModule>

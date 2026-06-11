@@ -85,6 +85,10 @@ $currentNiche = get_current_niche();
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/favicon/favicon.ico') }}" />
 
+  <!-- Preload critical resources for LCP optimization -->
+  <link rel="preload" as="style" href="{{ asset('assets/vendor/css/core.css') }}" />
+  <link rel="preload" as="style" href="{{ asset('assets/css/demo.css') }}" />
+
   <!-- Include Styles -->
   <!-- $isFront is used to append the front layout styles only on the front layout otherwise the variable will be blank -->
   @include('layouts/sections/styles' . $isFront)

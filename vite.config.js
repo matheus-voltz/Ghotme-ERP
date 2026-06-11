@@ -57,19 +57,7 @@ export default defineConfig({
         'resources/css/app.css',
         'resources/assets/css/demo.css',
         'resources/js/app.js',
-        ...pageJsFiles,
         ...vendorJsFiles,
-        ...LibsJsFiles,
-        'resources/js/laravel-user-management.js', // Processing Laravel User Management CRUD JS File
-        'resources/js/laravel-clients.js',
-        'resources/js/laravel-vehicles.js',
-        // 'resources/js/financial-kanban.js',
-        'resources/js/cep-lookup.js',
-        'resources/js/inventory-items.js',
-        'resources/js/inventory-suppliers.js',
-        'resources/js/vehicle-history.js',
-        'resources/js/services-table.js',
-        'resources/js/service-packages.js',
         ...CoreScssFiles,
         ...LibsScssFiles,
         ...LibsCssFiles,
@@ -89,11 +77,38 @@ export default defineConfig({
     }
   },
   json: {
-    stringify: true // Helps with JSON import compatibility
+    stringify: true
   },
   build: {
+    target: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     commonjsOptions: {
-      include: [/node_modules/] // Helps with importing CommonJS modules
+      include: [/node_modules/]
+    },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'vendor-jquery': ['jquery'],
+          'vendor-bootstrap': ['bootstrap'],
+          'vendor-datatables': [
+            'datatables.net-bs5',
+            'datatables.net-buttons-bs5',
+            'datatables.net-responsive-bs5',
+            'datatables.net-select-bs5'
+          ],
+          'vendor-calendar': ['@fullcalendar/core', '@fullcalendar/daygrid', '@fullcalendar/timegrid'],
+          'vendor-maps': ['mapbox-gl', 'leaflet'],
+          'vendor-charts': ['apexcharts', 'chart.js'],
+          'vendor-utils': ['lodash', 'moment', 'select2', 'sweetalert2']
+        }
+      }
     }
   }
 });

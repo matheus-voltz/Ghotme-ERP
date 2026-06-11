@@ -1,5 +1,47 @@
 // This file is used for writing your custom styles
 
+// Font display strategy to reduce CLS (Cumulative Layout Shift)
+@font-face {
+  font-display: swap;
+}
+
+// Prevent layout shift from images
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+// Ensure images maintain aspect ratio
+img {
+  aspect-ratio: auto;
+}
+
+// For images with known dimensions
+img[width],
+img[height] {
+  width: auto;
+  height: auto;
+  aspect-ratio: attr(width) / attr(height);
+}
+
+// Prevent layout shift from custom fonts
+@supports (font-display: swap) {
+  @font-face {
+    font-display: swap;
+  }
+}
+
+// Reserve space for lazy-loaded images
+img[loading="lazy"] {
+  background-color: #f5f5f5;
+}
+
+// Custom styles
 // .card {
 //    background-color: #fd0000;
 //  }
