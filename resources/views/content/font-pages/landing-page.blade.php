@@ -22,6 +22,13 @@ $pageConfigs = [
 @section('page-style')
 @vite(['resources/assets/vendor/scss/pages/front-page-landing.scss'])
 <style>
+  .hero-dashboard-img {
+    aspect-ratio: 1200/749;
+    min-height: 250px;
+  }
+  .landing-hero img[alt="hero background"] {
+    aspect-ratio: 16/9;
+  }
   :root {
     --ghotme-primary: #7367f0;
     --ghotme-gradient: linear-gradient(135deg, #7367f0 0%, #4831d4 100%);
@@ -240,7 +247,8 @@ $pageConfigs = [
   <section id="hero-animation">
     <div id="landingHero" class="section-py landing-hero position-relative">
       <img src="{{ asset('assets/img/front-pages/backgrounds/hero-bg.png') }}" alt="hero background"
-        class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1" />
+        class="position-absolute top-0 start-50 translate-middle-x object-fit-cover w-100 h-100" data-speed="1"
+        width="1920" height="1080" fetchpriority="high" />
       <div class="container">
         <div class="hero-text-box text-center position-relative">
           <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">{{ __('The ERP that shapes itself to your business') }}</h1>
@@ -251,7 +259,7 @@ $pageConfigs = [
           <div class="landing-hero-btn d-inline-block position-relative">
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">{{ __('Discover our system') }} <img
                 src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt="Join community arrow"
-                class="scaleX-n1-rtl" /></span>
+                class="scaleX-n1-rtl" width="80" height="42" loading="lazy" /></span>
             <a href="#landingPricing" class="btn btn-primary btn-lg">{{ __('Start your free trial') }}</a>
           </div>
         </div>
@@ -262,7 +270,8 @@ $pageConfigs = [
                 src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
                 alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
                 data-app-light-img="front-pages/landing-page/meu-sistema-light.png"
-                data-app-dark-img="front-pages/landing-page/meu-sistema-dark.png" />
+                data-app-dark-img="front-pages/landing-page/meu-sistema-dark.png"
+                width="1200" height="749" fetchpriority="high" />
             </div>
           </a>
         </div>
