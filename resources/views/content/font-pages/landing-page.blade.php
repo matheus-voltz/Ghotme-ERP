@@ -56,7 +56,7 @@ $pageConfigs = [
             <span class="hero-btn-item position-absolute d-none d-md-flex fw-medium">Conheça nosso sistema <img
                 src="{{ asset('assets/img/front-pages/icons/Join-community-arrow.png') }}" alt=""
                 class="scaleX-n1-rtl" width="80" height="42" loading="lazy" decoding="async" aria-hidden="true"
-                style="mix-blend-mode: multiply;" /></span>
+                style="mix-blend-mode: screen;" /></span>
             <a href="#landingPricing" class="btn btn-primary btn-lg">Comece seu teste grátis</a>
           </div>
         </div>
