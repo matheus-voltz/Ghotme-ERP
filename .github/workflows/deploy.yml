@@ -44,6 +44,7 @@ jobs:
           command_timeout: 20m
           timeout: 30s
           script: |
+            sudo chown -R ubuntu:ubuntu /var/www/ghotme
             cd /var/www/ghotme
 
             git fetch origin main
@@ -60,7 +61,7 @@ jobs:
 
             php -r "if(function_exists('opcache_reset')) opcache_reset();"
 
-            sudo chown -R www-data:www-data /var/www/ghotme/storage /var/www/ghotme/bootstrap/cache
+            sudo chown -R www-data:www-data /var/www/ghotme/storage /var/www/ghotme/bootstrap/cache /var/www/ghotme/public
 
             echo "✅ Ghotme ERP atualizado na EC2 com sucesso!"
 
