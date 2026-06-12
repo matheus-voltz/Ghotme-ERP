@@ -62,7 +62,7 @@ $pageConfigs = [
               <source srcset="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.webp') }}" type="image/webp">
               <img
                 src="{{ asset('assets/img/front-pages/landing-page/meu-sistema-' . $configData['theme'] . '.png') }}"
-                alt="Ghotme Dashboard" class="animation-img w-75 mx-auto d-block"
+                alt="Ghotme Dashboard" class="animation-img w-50 mx-auto d-block"
                 data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
                 data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
                 width="1200" height="749" fetchpriority="high" />
