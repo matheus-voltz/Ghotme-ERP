@@ -11,54 +11,54 @@
             <span class="app-brand-text demo text-white fw-bold ms-2 ps-1">{{ config('variables.templateName') }}</span>
           </a>
           <p class="footer-text footer-logo-description mb-6">
-            A solução completa para gestão de serviços e vendas. Simplifique seu dia a dia e cresça com o Ghotme.
+            {{ __('The complete solution for service and sales management. Simplify your daily routine and grow with Ghotme.') }}
           </p>
           <form class="footer-form">
-            <label for="footer-email" class="small mb-1">Inscreva-se na nossa newsletter</label>
+            <label for="footer-email" class="small mb-1">{{ __('Subscribe to our newsletter') }}</label>
             <div class="d-flex mt-1">
               <input type="email" class="form-control rounded-0 rounded-start-bottom rounded-start-top"
-                id="footer-email" placeholder="Seu melhor e-mail" />
+                id="footer-email" placeholder="{{ __('Your best email') }}" />
               <button type="submit"
-                class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">Assinar</button>
+                class="btn btn-primary shadow-none rounded-0 rounded-end-bottom rounded-end-top">{{ __('Subscribe') }}</button>
             </div>
           </form>
         </div>
         <div class="col-lg-2 col-md-4 col-sm-6">
-          <h6 class="footer-title mb-6">Sistema</h6>
+          <h6 class="footer-title mb-6">{{ __('System') }}</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="#landingHero" class="footer-link">Início</a>
+              <a href="#landingHero" class="footer-link">{{ __('Home') }}</a>
             </li>
             <li class="mb-4">
-              <a href="#landingFeatures" class="footer-link">Funcionalidades</a>
+              <a href="#landingFeatures" class="footer-link">{{ __('Features') }}</a>
             </li>
             <li class="mb-4">
-              <a href="#landingPricing" class="footer-link">Planos</a>
+              <a href="#landingPricing" class="footer-link">{{ __('Plans') }}</a>
             </li>
             <li class="mb-4">
-              <a href="#landingFAQ" class="footer-link">Dúvidas Frequentes</a>
+              <a href="#landingFAQ" class="footer-link">{{ __('FAQ') }}</a>
             </li>
           </ul>
         </div>
         <div class="col-lg-2 col-md-4 col-sm-6">
-          <h6 class="footer-title mb-6">Legal & Ajuda</h6>
+          <h6 class="footer-title mb-6">{{ __('Legal & Help') }}</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
-              <a href="{{ route('terms') }}" class="footer-link">Termos de Uso</a>
+              <a href="{{ route('terms') }}" class="footer-link">{{ __('Terms of Use') }}</a>
             </li>
             <li class="mb-4">
-              <a href="{{ route('privacy') }}" class="footer-link">Política de Privacidade</a>
+              <a href="{{ route('privacy') }}" class="footer-link">{{ __('Privacy Policy') }}</a>
             </li>
             <li class="mb-4">
-              <a href="mailto:suporte@ghotme.com.br" class="footer-link">Suporte</a>
+              <a href="mailto:suporte@ghotme.com.br" class="footer-link">{{ __('Support') }}</a>
             </li>
             <li class="mb-4">
-              <a href="{{ url('/login') }}" class="footer-link">Área do Cliente</a>
+              <a href="{{ url('/login') }}" class="footer-link">{{ __('Client Area') }}</a>
             </li>
           </ul>
         </div>
         <div class="col-lg-3 col-md-4">
-          <h6 class="footer-title mb-6">Contato</h6>
+          <h6 class="footer-title mb-6">{{ __('Contact') }}</h6>
           <ul class="list-unstyled">
             <li class="mb-4">
               <a href="mailto:contato@ghotme.com.br" class="footer-link d-flex align-items-center">
@@ -67,7 +67,7 @@
             </li>
             <li class="mb-4">
               <span class="footer-link d-flex align-items-center" style="cursor: default;">
-                <i class="ti tabler-clock me-2"></i> Seg - Sex, 9h às 18h
+                <i class="ti tabler-clock me-2"></i> {{ __('Mon - Fri, 9am to 6pm') }}
               </span>
             </li>
           </ul>
@@ -95,10 +95,10 @@
           </script>
         </span>
         <span class="fw-bold text-white">Ghotme</span>
-        <span class="footer-bottom-text">. Todos os direitos reservados.</span>
+        <span class="footer-bottom-text">. {{ __('All rights reserved.') }}</span>
       </div>
       <div>
-        <span class="footer-bottom-text">Feito com ❤️ para impulsionar negócios.</span>
+        <span class="footer-bottom-text">{{ __('Made with ❤️ to boost businesses.') }}</span>
       </div>
     </div>
   </div>
