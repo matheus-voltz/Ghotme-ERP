@@ -47,13 +47,13 @@ $pageConfigs = [
       </picture>
       <div class="container">
         <div class="hero-text-box text-center position-relative">
-          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">O ERP que se molda ao seu negócio</h1>
+          <h1 class="text-primary hero-title display-6 fw-extrabold text-uppercase">{{ __('The ERP that shapes itself to your business') }}</h1>
           <h2 class="hero-sub-title h6 mb-6">
-            O único sistema inteligente que <strong>fala a sua língua</strong>. <br class="d-none d-lg-block" />
-            Nossa tecnologia adapta termos, ícones e processos instantaneamente à realidade do seu segmento, seja qual for.
+            {{ __('The only intelligent system that') }} <strong>{{ __('speaks your language') }}</strong>. <br class="d-none d-lg-block" />
+            {{ __('Our technology adapts terms, icons, and processes instantly to the reality of your segment, whatever it may be.') }}
           </h2>
           <div class="landing-hero-btn d-inline-block position-relative">
-            <a href="#landingPricing" class="btn btn-primary btn-lg">Comece seu teste grátis</a>
+            <a href="#landingPricing" class="btn btn-primary btn-lg">{{ __('Start your free trial') }}</a>
           </div>
         </div>
         <div id="heroDashboardAnimation" class="hero-animation-img mt-12">
@@ -209,8 +209,8 @@ $pageConfigs = [
           <div class="mb-4 text-primary text-center">
             <i class="ti tabler-receipt-tax icon-xl mb-3"></i>
           </div>
-          <h5 class="mb-2">Fiscal e Contabilidade sem Medo</h5>
-          <p class="features-icon-description">Emissão de NF-e/NFS-e integrada e portal exclusivo para o seu contador.</p>
+          <h5 class="mb-2">{{ __('Fiscal and Accounting without Fear') }}</h5>
+          <p class="features-icon-description">{{ __('Integrated Tax Invoice emission (NFe/NFSe) and exclusive portal for your accountant.') }}</p>
         </div>
         <div class="col-lg-4 col-sm-6 text-center features-icon-box">
           <div class="mb-4 text-primary text-center">
@@ -396,8 +396,8 @@ $pageConfigs = [
                           </span>
                         </div>
                       </div>
-                      <h5 class="mb-2">{{ __('Gastronomia e Delivery') }}</h5>
-                      <p class="mb-0">{{ __('Food trucks, lanchonetes e bares. Receba pedidos do iFood com alertas sonoros na sua dashboard.') }}</p>
+                      <h5 class="mb-2">{{ __('Food Service & Delivery') }}</h5>
+                      <p class="mb-0">{{ __('Food trucks, snack bars and pubs. Receive iFood orders with sound alerts on your dashboard.') }}</p>
                     </div>
                   </div>
                 </div>
@@ -479,7 +479,7 @@ $pageConfigs = [
                         </div>
                       </div>
                       <h5 class="mb-2">{{ __('Delivery iFood') }}</h5>
-                      <p class="mb-0">{{ __('Receba notificações em tempo real e integre o fluxo de cozinha com o maior marketplace de comida.') }}</p>
+                      <p class="mb-0">{{ __('Receive real-time notifications and integrate the kitchen flow with the largest food marketplace.') }}</p>
                     </div>
                   </div>
                 </div>
@@ -578,7 +578,7 @@ $pageConfigs = [
       </span>
       {{ __('Platforms') }}
     </h2>
-    <p class="text-center mb-md-11 pb-0 pb-xl-12">Integramos com Pagar.me, Asaas, PagSeguro e Stripe para PIX, boleto e cartão.</p>
+    <p class="text-center mb-md-11 pb-0 pb-xl-12">{{ __('We integrate with Pagar.me, Asaas, PagSeguro and Stripe for PIX, bank slip and card.') }}</p>
     <div class="row gy-12 mt-2 justify-content-center align-items-center">
       <div class="col-lg-3 col-sm-6 text-center">
         <div class="p-4 rounded-3 shadow-none border border-transparent partner-logo-container floating-animation delay-1">
@@ -629,17 +629,17 @@ $pageConfigs = [
       <!-- Content Side -->
       <div class="col-lg-6">
         <div class="mb-4 text-start">
-          <span class="badge bg-label-primary">Gestão na Palma da Mão</span>
+          <span class="badge bg-label-primary">{{ __('Management in the Palm of Your Hand') }}</span>
         </div>
         <h3 class="mb-4 display-6 fw-extrabold">
-          Seu ERP completo em
-          <span class="text-primary position-relative z-1">Qualquer Lugar
+          {{ __('Your complete ERP in') }}
+          <span class="text-primary position-relative z-1">{{ __('Anywhere') }}
             <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
               class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%;" />
           </span>
         </h3>
         <p class="mb-5 fs-5">
-          O app Ghotme permite que você e sua equipe controlem o negócio de onde estiverem. Abra ordens de serviço, consulte o estoque e analise métricas em tempo real.
+          {{ __('The Ghotme app allows you and your team to control the business from wherever you are. Open service orders, check inventory and analyze metrics in real-time.') }}
         </p>
 
         <div class="row gy-4">
@@ -649,8 +649,8 @@ $pageConfigs = [
                 <i class="ti tabler-camera icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">Inspeção Fotográfica Integrada</h6>
-                <p class="mb-0 text-muted fs-6">Tire fotos com o celular e anexe direto na OS na hora.</p>
+                <h6 class="mb-1">{{ __('Integrated Photo Inspection') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Take photos with your cell phone and attach them to the OS on the spot.') }}</p>
               </div>
             </div>
           </div>
@@ -660,8 +660,8 @@ $pageConfigs = [
                 <i class="ti tabler-bell-ringing icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">Notificações Push</h6>
-                <p class="mb-0 text-muted fs-6">Seja avisado sobre orçamentos aprovados em tempo real.</p>
+                <h6 class="mb-1">{{ __('Push Notifications') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Be notified about approved budgets in real-time.') }}</p>
               </div>
             </div>
           </div>
@@ -671,8 +671,8 @@ $pageConfigs = [
                 <i class="ti tabler-checkup-list icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">RDO e Checklist Técnico</h6>
-                <p class="mb-0 text-muted fs-6">Emita Relatórios Diários de Obra direto do canteiro.</p>
+                <h6 class="mb-1">{{ __('RDO and Technical Checklist') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('Issue Daily Construction Reports directly from the construction site.') }}</p>
               </div>
             </div>
           </div>
@@ -682,8 +682,8 @@ $pageConfigs = [
                 <i class="ti tabler-chart-pie icon-lg"></i>
               </div>
               <div>
-                <h6 class="mb-1">Dashboard Financeiro</h6>
-                <p class="mb-0 text-muted fs-6">Visualize seu faturamento e despesas em tempo real.</p>
+                <h6 class="mb-1">{{ __('Financial Dashboard') }}</h6>
+                <p class="mb-0 text-muted fs-6">{{ __('View your revenue and expenses in real-time.') }}</p>
               </div>
             </div>
           </div>
@@ -691,7 +691,7 @@ $pageConfigs = [
 
         <div class="mt-8 d-flex gap-3">
           <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#appComingSoonModal" class="btn btn-primary btn-lg shadow-sm hover-shadow-lg transition-all px-5">
-            <i class="ti tabler-device-mobile-bolt icon-md me-2"></i> Entrar na lista beta
+            <i class="ti tabler-device-mobile-bolt icon-md me-2"></i> {{ __('Enter the beta list') }}
           </a>
         </div>
       </div>
@@ -706,17 +706,17 @@ $pageConfigs = [
         <!-- Content Side -->
         <div class="col-lg-6">
           <div class="mb-4 text-start">
-            <span class="badge bg-label-info">Ecossistema Aberto</span>
+            <span class="badge bg-label-info">{{ __('Open Ecosystem') }}</span>
           </div>
           <h3 class="mb-4 display-6 fw-extrabold">
-            API Ghotme — 100% integrável
-            <span class="text-info position-relative z-1">com o que você já usa!
+            {{ __('Ghotme API - 100% integrable') }}
+            <span class="text-info position-relative z-1">{{ __('with everything you already use!') }}
               <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
                 class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" style="width: 100%; filter: hue-rotate(180deg);" />
             </span>
           </h3>
           <p class="mb-5 fs-5">
-            Seu negócio não precisa ficar preso a software fechado. Com os API Tokens do Ghotme, clientes do plano Avançado criam integrações incríveis sem limites.
+            {{ __('Your business should not be stuck with closed software. With Ghotme API Tokens, Advanced plan customers create incredible integrations without limits.') }}
           </p>
 
           <div class="row gy-4">
@@ -725,8 +725,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-danger rounded-circle mb-3">
                   <i class="ti tabler-brand-zapier fs-4"></i>
                 </div>
-                <h6 class="mb-2">Integrações No-Code</h6>
-                <p class="mb-0 text-muted fs-6 small">Conecte o Ghotme ao Zapier ou n8n e dispare e-mails automáticos no Mailchimp ao aprovar orçamentos.</p>
+                <h6 class="mb-2">{{ __('No-Code Integrations') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme to Zapier or n8n and trigger automatic emails in Mailchimp when approving budgets.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -734,8 +734,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-success rounded-circle mb-3">
                   <i class="ti tabler-message-chatbot fs-4"></i>
                 </div>
-                <h6 class="mb-2">Chatbots para WhatsApp</h6>
-                <p class="mb-0 text-muted fs-6 small">Permita que seus clientes consultem o status das OSs por conta própria via bot, sem depender de você.</p>
+                <h6 class="mb-2">{{ __('WhatsApp Chatbots') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Let your customers check the status of Service Orders themselves via a bot, without depending on you.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -743,8 +743,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-warning rounded-circle mb-3">
                   <i class="ti tabler-shopping-cart fs-4"></i>
                 </div>
-                <h6 class="mb-2">Sincronização com E-commerce</h6>
-                <p class="mb-0 text-muted fs-6 small">Unifique o estoque do ERP com Shopify, Mercado Livre ou WooCommerce via API — tudo em um lugar só.</p>
+                <h6 class="mb-2">{{ __('E-commerce Synchronization') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Unify your ERP inventory with Shopify, Mercado Livre or WooCommerce via API - all in one place.') }}</p>
               </div>
             </div>
             <div class="col-sm-6">
@@ -752,8 +752,8 @@ $pageConfigs = [
                 <div class="avatar avatar-md bg-label-primary rounded-circle mb-3">
                   <i class="ti tabler-chart-bar fs-4"></i>
                 </div>
-                <h6 class="mb-2">Dashboards Inteligentes</h6>
-                <p class="mb-0 text-muted fs-6 small">Conecte o Ghotme ao Power BI ou Looker Studio para painéis avançados na sua empresa.</p>
+                <h6 class="mb-2">{{ __('Intelligent Dashboards') }}</h6>
+                <p class="mb-0 text-muted fs-6 small">{{ __('Connect Ghotme directly to Power BI or Looker Studio for advanced dashboards in your company.') }}</p>
               </div>
             </div>
           </div>
@@ -838,13 +838,13 @@ $pageConfigs = [
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/paper-airplane.png') }}" alt="paper airplane icon"
                   class="mb-8 pb-2 animate-float" loading="lazy" decoding="async" width="100" height="100" />
-                <h4 class="mb-0">Teste Grátis</h4>
+                <h4 class="mb-0">{{ __('Free Trial') }}</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
                   <h1 class="price-toggle price-monthly text-primary mb-0">0</h1>
                   <h1 class="price-toggle price-yearly text-primary mb-0 d-none">0</h1>
-                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/30 dias</sub>
-                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/30 dias</sub>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-monthly">/{{ __('30 days') }}</sub>
+                  <sub class="h6 text-body-secondary mb-n1 ms-1 price-yearly d-none">/{{ __('30 days') }}</sub>
                 </div>
               </div>
             </div>
@@ -853,24 +853,24 @@ $pageConfigs = [
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    30 dias do Plano Padrão completo
+                    {{ __('30 days of the full Standard plan') }}
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    Acesso a todos os módulos essenciais
+                    {{ __('Access to all essential modules') }}
                   </h6>
                 </li>
                 <li>
                   <h6 class="d-flex align-items-center mb-3">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    Sem cartão de crédito
+                    {{ __('No credit card required') }}
                   </h6>
                 </li>
               </ul>
               <div class="d-grid mt-8">
-                <a href="{{ url('/register') }}" class="btn btn-label-primary plan-action-btn">Começar Grátis</a>
+                <a href="{{ url('/register') }}" class="btn btn-label-primary plan-action-btn">{{ __('Start Free') }}</a>
               </div>
             </div>
           </div>
@@ -982,7 +982,7 @@ $pageConfigs = [
               <div class="text-center">
                 <img src="{{ asset('assets/img/front-pages/icons/shuttle-rocket.png') }}" alt="shuttle rocket icon"
                   class="mb-8 pb-2 animate-rocket" loading="lazy" decoding="async" width="100" height="100" />
-                <h4 class="mb-0">Avançado</h4>
+                <h4 class="mb-0">{{ __('Advanced') }}</h4>
                 <div class="d-flex align-items-center justify-content-center">
                   <sup class="h6 text-body mt-2 mb-0 me-1">R$</sup>
                   <h1 class="price-toggle price-monthly text-primary mb-0">279</h1>
@@ -998,7 +998,7 @@ $pageConfigs = [
                 <li class="mb-3">
                   <h6 class="d-flex align-items-center">
                     <span class="badge badge-center rounded-pill bg-label-primary p-0 me-3"><i class="ti tabler-check icon-12px"></i></span>
-                    <strong>Tudo do Plano Padrão</strong>, mais:
+                    <strong>{{ __('Everything in the Standard plan') }}</strong>, {{ __('plus:') }}
                   </h6>
                 </li>
                 <li class="mb-3">
@@ -1133,16 +1133,16 @@ $pageConfigs = [
   <section id="landingTestimonials" class="section-py bg-body">
     <div class="container">
       <div class="text-center mb-4">
-        <span class="badge bg-label-primary">Depoimentos</span>
+        <span class="badge bg-label-primary">{{ __('Testimonials') }}</span>
       </div>
       <h4 class="text-center mb-1">
-        O que nossos clientes
-        <span class="position-relative fw-extrabold z-1">dizem
+        {{ __('What our clients') }}
+        <span class="position-relative fw-extrabold z-1">{{ __('say') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
       </h4>
-      <p class="text-center mb-12">Empresários reais, resultados reais.</p>
+      <p class="text-center mb-12">{{ __('Real entrepreneurs, real results.') }}</p>
       <div class="row g-6">
         <div class="col-lg-4 col-md-6">
           <div class="card h-100 border-0 shadow-sm">
@@ -1154,14 +1154,14 @@ $pageConfigs = [
                 <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
                 <i class="ti tabler-star-filled text-warning fs-5"></i>
               </div>
-              <p class="mb-6 text-body fst-italic">"O Ghotme substituiu 4 planilhas que eu usava. Agora abro uma OS em 30 segundos e o cliente recebe o orçamento no WhatsApp na hora."</p>
+              <p class="mb-6 text-body fst-italic">"{{ __('Ghotme replaced 4 spreadsheets I used to keep. Now I open a service order in 30 seconds and the customer gets the quote on WhatsApp instantly.') }}"</p>
               <div class="d-flex align-items-center">
                 <div class="avatar avatar-md me-3">
                   <span class="avatar-initial rounded-circle bg-label-primary">RC</span>
                 </div>
                 <div>
                   <h6 class="mb-0">Ricardo Carvalho</h6>
-                  <small class="text-muted">Oficina AutoTech — Curitiba, PR</small>
+                  <small class="text-muted">{{ __('AutoTech Workshop — Curitiba, PR') }}</small>
                 </div>
               </div>
             </div>
@@ -1177,14 +1177,14 @@ $pageConfigs = [
                 <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
                 <i class="ti tabler-star-filled text-warning fs-5"></i>
               </div>
-              <p class="mb-6 text-body fst-italic">"Reduzi mais de 3 horas por semana em controles manuais. O módulo pet shop é perfeito — cada animal tem seu histórico completo."</p>
+              <p class="mb-6 text-body fst-italic">"{{ __('I cut more than 3 hours a week of manual controls. The pet shop module is perfect — each animal has its complete history.') }}"</p>
               <div class="d-flex align-items-center">
                 <div class="avatar avatar-md me-3">
                   <span class="avatar-initial rounded-circle bg-label-success">FM</span>
                 </div>
                 <div>
                   <h6 class="mb-0">Fernanda Melo</h6>
-                  <small class="text-muted">PetCare Premium — São Paulo, SP</small>
+                  <small class="text-muted">{{ __('PetCare Premium — São Paulo, SP') }}</small>
                 </div>
               </div>
             </div>
@@ -1200,14 +1200,14 @@ $pageConfigs = [
                 <i class="ti tabler-star-filled text-warning fs-5 me-1"></i>
                 <i class="ti tabler-star-filled text-warning fs-5"></i>
               </div>
-              <p class="mb-6 text-body fst-italic">"Meu contador adorou o portal de acesso. Ele baixa os XMLs sozinho e não me liga mais pedindo nota fiscal. Valeu cada centavo."</p>
+              <p class="mb-6 text-body fst-italic">"{{ __('My accountant loved the access portal. He downloads the XMLs himself and no longer calls me asking for invoices. Worth every penny.') }}"</p>
               <div class="d-flex align-items-center">
                 <div class="avatar avatar-md me-3">
                   <span class="avatar-initial rounded-circle bg-label-info">LS</span>
                 </div>
                 <div>
                   <h6 class="mb-0">Lucas Souza</h6>
-                  <small class="text-muted">TechFix Assistência — Belo Horizonte, MG</small>
+                  <small class="text-muted">{{ __('TechFix Assistance — Belo Horizonte, MG') }}</small>
                 </div>
               </div>
             </div>
@@ -1225,8 +1225,8 @@ $pageConfigs = [
         <span class="badge bg-label-primary">{{ __('Frequently Asked Questions') }}</span>
       </div>
       <h4 class="text-center mb-1">
-        Perguntas
-        <span class="position-relative fw-extrabold z-1">Frequentes
+        {{ __('Frequently Asked') }}
+        <span class="position-relative fw-extrabold z-1">{{ __('Questions') }}
           <img src="{{ asset('assets/img/front-pages/icons/section-title-icon.png') }}" alt="" aria-hidden="true"
             class="section-title-img position-absolute object-fit-contain bottom-0 z-n1" loading="lazy" width="100" height="100" />
         </span>
