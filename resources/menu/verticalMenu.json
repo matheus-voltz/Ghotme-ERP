@@ -202,7 +202,8 @@
       "url": "/admin/sales-hub",
       "name": "Pedidos por Chat",
       "icon": "menu-icon icon-base ti tabler-message-2-code",
-      "slug": "sales-hub"
+      "slug": "sales-hub",
+      "niche": "food_service"
     },
     {
       "name": "Equipe",
