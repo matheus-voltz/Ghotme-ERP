@@ -1,12 +1,12 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
-// URL da API originária das Variáveis de Ambiente (.env)
-const DEV_URL = 'http://10.0.0.171:8000/api';
-const PROD_URL = 'https://ghotme.com.br/api';
+// URL da API originária das Variáveis de Ambiente (.env) ou fallback para produção
+const DEV_URL = process.env.EXPO_PUBLIC_API_URL || 'https://ghotme.com.br/api';
+const PROD_URL = process.env.EXPO_PUBLIC_PROD_API_URL || 'https://ghotme.com.br/api';
 
 const api = axios.create({
-    baseURL: __DEV__ ? DEV_URL : PROD_URL,
+    baseURL: DEV_URL, // Conecta diretamente na URL definida no .env (produção)
     timeout: 15000, // 15 segundos de timeout
     headers: {
         'Content-Type': 'application/json',

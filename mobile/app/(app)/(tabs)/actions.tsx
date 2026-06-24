@@ -13,6 +13,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
 import { useAuth } from '../../../context/AuthContext';
+import { useLanguage } from '../../../context/LanguageContext';
 import api from '../../../services/api';
 
 // ─── Tipagens ───────────────────────────────────────────────────────────────
@@ -82,6 +83,7 @@ export default function ActionsScreen() {
 // AÇÕES RÁPIDAS ORIGINAIS (Nichos não-food)
 // ═══════════════════════════════════════════════════════════════════════════
 function OriginalActionsScreen({ colors, labels, niche }: any) {
+    const { t } = useLanguage();
     const getEntityIcon = () => {
         switch (niche) {
             case 'pet': return 'paw-outline';
