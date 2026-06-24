@@ -5,7 +5,6 @@ import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { useNiche } from '../../../context/NicheContext';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -29,7 +28,10 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const dropX = useSharedValue(0);
   const stretchX = useSharedValue(1);
   const stretchY = useSharedValue(1);
+  const visible = useSharedValue(0);
   const initialized = useRef(false);
+
+  const baseOpacity = isDark ? 0.28 : 0.16;
 
   useEffect(() => {
     const center = centers[state.index];
@@ -37,8 +39,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const target = center - DROP_SIZE / 2;
 
     if (!initialized.current) {
-      // Place the drop without animating on first paint.
+      // Place the drop without animating on first paint, then fade it in.
       dropX.value = target;
+      visible.value = withTiming(1, { duration: 200 });
       initialized.current = true;
       return;
     }
@@ -56,6 +59,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   }, [state.index, centers]);
 
   const dropStyle = useAnimatedStyle(() => ({
+    opacity: visible.value * baseOpacity,
     transform: [
       { translateX: dropX.value },
       { scaleX: stretchX.value },
@@ -96,7 +100,7 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             pointerEvents="none"
             style={[
               styles.drop,
-              { backgroundColor: colors.primary, opacity: isDark ? 0.28 : 0.16 },
+              { backgroundColor: colors.primary },
               dropStyle,
             ]}
           />
@@ -129,6 +133,9 @@ function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
                 <Pressable
                   key={route.key}
                   onPress={onPress}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isFocused }}
+                  accessibilityLabel={options.title}
                   style={styles.tab}
                   onLayout={(e) => {
                     const { x, width } = e.nativeEvent.layout;
@@ -187,21 +194,10 @@ export default function TabLayout() {
         }}
       />
 
+      {/* Registered route only — hidden from the tab bar (see CustomTabBar). */}
       <Tabs.Screen
         name="checklist_view"
-        options={{
-          title: isFoodService ? 'Pedidos' : 'Vistoria',
-          tabBarIcon: () => (
-            <View style={styles.middleButtonWrapper}>
-              <LinearGradient
-                colors={['#7367F0', '#CE9FFC']}
-                style={styles.middleButton}
-              >
-                <Ionicons name={isFoodService ? "receipt" : "car-sport"} size={28} color="#fff" />
-              </LinearGradient>
-            </View>
-          ),
-        }}
+        options={{ title: isFoodService ? 'Pedidos' : 'Vistoria' }}
       />
 
       <Tabs.Screen
@@ -262,21 +258,4 @@ const styles = StyleSheet.create({
     height: DROP_SIZE,
     borderRadius: DROP_SIZE / 2,
   },
-  middleButtonWrapper: {
-    top: -25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#7367F0',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  middleButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
 });
