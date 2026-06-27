@@ -697,6 +697,7 @@ $pageConfigs = [
       </div>
     </div>
   </div>
+</section>
   <!-- Mobile App Section: End -->
 
   <!-- API & Integrations Section: Start -->
@@ -1528,18 +1529,7 @@ $pageConfigs = [
       const menuBtn = document.querySelector('.navbar-toggler');
       const menuCollapse = document.getElementById('navbarSupportedContent');
 
-      // Troca de Preços
-      if (toggler) {
-        toggler.addEventListener('change', function() {
-          const isYearly = this.checked;
-          document.querySelectorAll('.price-monthly').forEach(el => el.classList.toggle('d-none', isYearly));
-          document.querySelectorAll('.price-yearly').forEach(el => el.classList.toggle('d-none', !isYearly));
-          document.querySelectorAll('.plan-action-btn').forEach(btn => {
-            const link = isYearly ? btn.getAttribute('data-yearly-link') : btn.getAttribute('data-monthly-link');
-            if (link) btn.setAttribute('href', link);
-          });
-        });
-      }
+      // Troca de Preços: gerenciada por front-page-landing.js
 
       // Menu Mobile (Correção para o erro de travamento)
       if (menuBtn && menuCollapse) {

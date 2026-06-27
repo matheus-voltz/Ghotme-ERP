@@ -301,6 +301,11 @@
   transform: scale(1.05);
   z-index: 10;
 
+  // Remove scale em telas menores que xl para evitar overflow horizontal
+  @media (max-width: 1199.98px) {
+    transform: scale(1);
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -313,6 +318,12 @@
     border-radius: 0.5rem;
     opacity: 0.1;
   }
+}
+
+// Garante que o scale do card popular não gere scroll horizontal
+.landing-pricing .row {
+  overflow: visible;
+  padding-block: 0.5rem;
 }
 
 .btn-primary {

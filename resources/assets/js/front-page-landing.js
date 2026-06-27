@@ -85,6 +85,7 @@
       centeredSlides: true,
       observer: true,
       observeParents: true,
+      autoHeight: true,
       autoplay: {
         delay: 5000,
         disableOnInteraction: false
