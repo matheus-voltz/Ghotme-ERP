@@ -65,7 +65,7 @@ $pageConfigs = [
                 alt="Ghotme Dashboard" class="animation-img w-65 mx-auto d-block"
                 data-app-light-img="front-pages/landing-page/meu-sistema-light.webp"
                 data-app-dark-img="front-pages/landing-page/meu-sistema-dark.webp"
-                width="1905" height="899" fetchpriority="high" />
+                width="1000"  fetchpriority="high" />
             </picture>
           </div>
         </div>
